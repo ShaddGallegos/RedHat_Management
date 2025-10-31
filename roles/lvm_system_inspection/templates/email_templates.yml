@@ -1,0 +1,212 @@
+# email_templates.yml - Reusable email notification templates
+---
+email_templates:
+
+  high_disk_usage_alert: |
+    Subject: High Disk Usage Alert - {{ inventory_hostname }}
+
+    High Disk Usage Detected - Automated Processing Initiated
+
+    Server: {{ inventory_hostname }}
+    Alert Time: {{ timestamp }}
+
+    Filesystems over {{ threshold }}% usage:
+    {% for fs in filesystems %}
+    Mount Point: {{ fs.mount }}
+    Device: {{ fs.device }}
+    Filesystem: {{ fs.fstype }}
+    Usage: {{ fs.usage_percent }}%
+    Available Space: {{ fs.available_gb }}GB
+    Total Size: {{ fs.total_gb }}GB
+    {% if fs.is_lvm %}
+    LVM Info: VG={{ fs.vg_name }}, LV={{ fs.lv_name }}
+    {% endif %}
+    {% endfor %}
+
+    {% if has_lvm_filesystems %}
+    LVM filesystems detected - automated extension will be attempted.
+    You will receive additional notifications as the process progresses.
+    {% else %}
+    Non-LVM filesystems detected - manual intervention required.
+    {% endif %}
+
+    This is an automated alert from your disk monitoring system.
+    From: lvm-automation@{{ inventory_hostname }}
+
+    -- End of Alert --
+
+  lvm_extension_success: |
+    Subject: LVM Extension Success - {{ inventory_hostname }}
+
+    LVM Extension Process Completed Successfully
+
+    Server: {{ inventory_hostname }}
+    Volume Group: {{ vg_name }}
+    Logical Volume: {{ lv_name }}
+    Mount Point: {{ mount_point }}
+    Device: {{ device }}
+    Extension Method: {{ method }}
+
+    {% if method == 'existing_pes' %}
+    Details:
+    - Available PEs: {{ available_pes }}
+    - Required PEs: {{ required_pes }}
+    - Extended by: {{ extend_percent }}%
+    {% elif method == 'new_disk' %}
+    Details:
+    - Insufficient PEs available: {{ available_pes }}
+    - Required PEs: {{ required_pes }}
+    - New disk created: {{ new_disk_size }}GB
+    - Disk integration completed successfully
+    {% endif %}
+
+    Final disk usage: {{ final_usage }}
+
+    Timestamp: {{ timestamp }}
+    From: lvm-automation@{{ inventory_hostname }}
+
+    -- End of Notification --
+
+  lvm_extension_failure: |
+    Subject: LVM Extension FAILED - {{ hostname }}
+ 
+    LVM Extension Process Failed
+ 
+    Server: {{ hostname }}
+    Volume Group: {{ vg_name | default('UNDEFINED') }}
+    Logical Volume: {{ lv_name | default('UNDEFINED') }}
+    Mount Point: {{ mount_point | default('UNDEFINED') }}
+    Device: {{ device | default('UNDEFINED') }}
+ 
+    Error Details:
+    {{ error_message }}
+ 
+    Please investigate manually:
+    1. Check system logs: journalctl -xe
+    2. Verify LVM status: vgdisplay {{ vg_name | default('') }}
+    3. Check disk space: df -h {{ mount_point | default('') }}
+    4. Review Ansible logs for detailed error information
+ 
+    Timestamp: {{ timestamp }}
+    From: lvm-automation@{{ inventory_hostname }}
+
+    -- End of Notification --
+
+  nutanix_disk_creation: |
+    Subject: Nutanix Disk Creation - {{ vm_name }}
+ 
+    New Disk Created via Nutanix API
+ 
+    VM Name: {{ vm_name }}
+    Target Host: {{ target_hostname }}
+    New Disk Size: {{ new_disk_size }}GB
+    Volume Group: {{ vg_name }}
+    Logical Volume: {{ lv_name }}
+    Mount Point: {{ mount_point }}
+ 
+    Status: Disk created successfully
+    Next Step: Automatic integration with existing LVM structure
+ 
+    This disk was created because the existing Volume Group 
+    did not have sufficient Physical Extents for {{ extend_percent }}% expansion.
+ 
+    Timestamp: {{ timestamp }}
+    From: lvm-automation@{{ inventory_hostname }}
+
+    -- End of Notification --
+
+  disk_integration_complete: |
+    Subject: Disk Integration Complete - {{ hostname }}
+ 
+    Disk Integration Process Completed Successfully
+ 
+    Server: {{ hostname }}
+    Volume Group: {{ vg_name }}
+    Logical Volume: {{ lv_name }}
+    Mount Point: {{ mount_point }}
+    New Disk Device: {{ new_disk_device }}
+    New Disk Size: {{ new_disk_size }}GB
+ 
+    Integration Results:
+    {% for result in integration_results %}
+     - {{ result.step }}: {{ result.status }}
+    {% endfor %}
+ 
+    Final Status: {{ final_status }}
+ 
+    The automated LVM extension process is now complete.
+    Your filesystem has been successfully expanded by {{ extend_percent }}%.
+ 
+    Timestamp: {{ timestamp }}
+    From: lvm-automation@{{ inventory_hostname }}
+
+    -- End of Notification --
+
+  non_lvm_alert: |
+    Subject: Non-LVM Disk Usage Alert - {{ hostname }}
+ 
+    High disk usage detected on {{ hostname }}:
+ 
+    Mount Point: {{ mount_point }}
+    Device: {{ device }}
+    Usage: {{ usage_percent }}%
+ 
+    This is a non-LVM filesystem and requires manual intervention.
+ 
+    Recommended Actions:
+    1. Clean up unnecessary files
+    2. Archive old data
+    3. Consider migrating to LVM for future automated management
+    4. Add additional storage manually if needed
+ 
+    Timestamp: {{ timestamp }}
+    From: lvm-automation@{{ inventory_hostname }}
+
+    -- End of Notification --
+
+  unsupported_os_alert: |
+    Subject: Unsupported OS Disk Usage Alert - {{ hostname }}
+ 
+    High disk usage detected on unsupported system:
+ 
+    Host: {{ hostname }}
+    OS: {{ os_family }} {{ os_version }}
+    Usage: {{ usage_percent }}%
+ 
+    Automated LVM extension only supports RHEL 8/9.
+    Manual intervention required.
+ 
+    Please address this disk usage issue manually.
+ 
+    Timestamp: {{ timestamp }}
+    From: lvm-automation@{{ inventory_hostname }}
+
+    -- End of Notification --
+
+# SMTP Configuration Notes:
+# 
+# The ansible.builtin.mail module supports the following parameters:
+# - to: recipient email address
+# - subject: email subject
+# - body: email body content
+# - smtp_host: SMTP server (default: localhost)
+# - smtp_port: SMTP port (default: 25)
+# - smtp_username: SMTP authentication username
+# - smtp_password: SMTP authentication password 
+# - from: sender email address
+# - headers: additional email headers
+# - charset: character encoding (default: utf-8)
+# - subtype: MIME subtype (default: plain)
+# - attach: list of files to attach
+# - bcc: blind carbon copy recipients
+# - cc: carbon copy recipients
+# 
+# Example usage in playbook:
+# - name: Send notification
+# community.general.mail:
+# to: "{{ admin_email }}"
+# subject: "{{ email_templates.lvm_extension_success | regex_replace('^Subject: ', '') | split('\n') | first }}"
+# body: "{{ email_templates.lvm_extension_success | regex_replace('^Subject:.*\n', '') }}"
+# smtp_host: "{{ mail_smtp_host | default('localhost') }}"
+# smtp_port: "{{ mail_smtp_port | default(25) }}"
+# from: "{{ mail_from | default('lvm-automation@' + inventory_hostname) }}"

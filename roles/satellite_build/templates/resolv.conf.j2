@@ -1,0 +1,5 @@
+# DNS configuration
+search {{ satellite_hostname.split('.')[1:] | join('.') }}
+nameserver {{ satellite_ip }}
+nameserver 8.8.8.8
+nameserver 8.8.4.4

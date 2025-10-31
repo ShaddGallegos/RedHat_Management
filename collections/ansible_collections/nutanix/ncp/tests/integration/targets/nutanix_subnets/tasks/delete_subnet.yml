@@ -1,0 +1,67 @@
+---
+# Variables required before running this playbook:
+# - vpc
+# - ip_address_management
+# - ip_address_pools
+# - dhcp_settings
+# - ip
+# - username
+# - password
+
+- name: Overlay Subnet with IP_pools and DHCP
+  ntnx_subnets:
+    state: present
+    name: Overlay Subnet with IP_pools and DHCP
+    overlay_subnet:
+      vpc:
+        name: "{{ vpc.name }}"
+      ipam:
+        network_ip: "{{ ip_address_management.network_ip }}"
+        network_prefix: "{{ ip_address_management.network_prefix }}"
+        gateway_ip: "{{ ip_address_management.gateway_ip_address }}"
+        ip_pools:
+          - start_ip: "{{ ip_address_pools.start_address }}"
+            end_ip: "{{ ip_address_pools.end_address }}"
+        dhcp:
+          dns_servers: "{{ dhcp_settings.dns_servers }}"
+          domain_search: "{{ dhcp_settings.domain_search }}"
+          domain_name: "{{ dhcp_settings.domain_name }}"
+          tftp_server_name: "{{ dhcp_settings.tftp_server_name }}"
+          boot_file: "{{ dhcp_settings.boot_file }}"
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+    fail_msg: " Unable to create Overlay Subnet with IP_pools and DHCP "
+    success_msg: " Overlay Subnet with IP_pools and DHCP created successfully "
+
+- name: Delete subnet with check mode
+  ntnx_subnets:
+    state: absent
+    subnet_uuid: "{{ result.subnet_uuid }}"
+  register: output
+  ignore_errors: true
+  check_mode: true
+
+- name: Delete subnet with check mode Status
+  ansible.builtin.assert:
+    that:
+      - output.failed == false
+      - output.changed == false
+      - output.msg =="Subnet with uuid:{{ result.subnet_uuid }} will be deleted."
+      - output.subnet_uuid == "{{ result.subnet_uuid }}"
+    fail_msg: "Delete subnet with check mode failed"
+    success_msg: "Delete subnet with check mode passed"
+
+- name: Delete subnet
+  ntnx_subnets:
+    state: absent
+    nutanix_host: "{{ ip }}"
+    nutanix_username: "{{ username }}"
+    nutanix_password: "{{ password }}"
+    validate_certs: false
+    subnet_uuid: "{{ result.subnet_uuid }}"

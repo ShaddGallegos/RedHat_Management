@@ -1,0 +1,69 @@
+---
+- name: Start testing ntnx_foundation_image_upload
+  ansible.builtin.debug:
+    msg: start testing ntnx_foundation_image_upload
+
+- name: Download image for test
+  ansible.builtin.get_url:
+    mode: "0644"
+    url: "{{ image_url }}"
+    dest: "{{ source }}"
+  no_log: true
+
+- name: Image upload with nos installer_type
+  ntnx_foundation_image_upload:
+    state: present
+    source: "{{ source }}"
+    filename: integration-test-ntnx-package.tar.gz
+    installer_type: nos
+    timeout: 1800
+  register: result
+  ignore_errors: true
+  no_log: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.failed==false
+      - result.changed==true
+    fail_msg: " Fail : unable to upload image  with nos installer_type "
+    success_msg: "Success: upload image  with nos installer_type successfully "
+
+- name: Delete Image with nos installer_type with check mode
+  ntnx_foundation_image_upload:
+    state: absent
+    filename: "integration-test-ntnx-package.tar.gz"
+    installer_type: nos
+  register: output
+  ignore_errors: true
+  check_mode: true
+
+- name: Delete Image with nos installer_type with check mode Status
+  ansible.builtin.assert:
+    that:
+      - output.failed == false
+      - output.changed == false
+      - output.msg =="Image with name:integration-test-ntnx-package.tar.gz will be deleted."
+      - output.image_name == "integration-test-ntnx-package.tar.gz"
+    fail_msg: "Delete image with nos installer_type with check mode failed"
+    success_msg: "Delete image with nos installer_type with check mode passed"
+
+- name: Delete Image with nos installer_type
+  ntnx_foundation_image_upload:
+    state: absent
+    filename: integration-test-ntnx-package.tar.gz
+    installer_type: nos
+  register: result
+  ignore_errors: true
+  no_log: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response.status_code == 200
+      - result.failed==false
+      - result.changed==true
+      - result.image_name == "integration-test-ntnx-package.tar.gz"
+    fail_msg: " Fail : unable to delete image  with nos installer_type "
+    success_msg: "Success: image  with nos installer_type deleted successfully "

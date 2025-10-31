@@ -1,0 +1,6 @@
+  become: true
+  collections:
+  - community.general
+  gather_facts: true
+- hosts: all
+- name: Integrate New Disk into Existing LVM Structure

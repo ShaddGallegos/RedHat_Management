@@ -1,0 +1,14 @@
+---
+🐍 python:
+  - "**/*.py"
+  - "*.py"
+
+📝 documentation:
+  - "**/*.md"
+  - "*.md"
+
+⚙ ci:
+  - .github/**
+
+⚙ build:
+  - Makefile

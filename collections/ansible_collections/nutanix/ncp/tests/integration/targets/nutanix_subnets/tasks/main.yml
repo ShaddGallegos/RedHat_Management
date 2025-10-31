@@ -1,0 +1,15 @@
+---
+- name: Set module defaults
+  module_defaults:
+    group/nutanix.ncp.ntnx:
+      nutanix_host: "{{ ip }}"
+      nutanix_username: "{{ username }}"
+      nutanix_password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+  block:
+    - name: Import create_subnet.yml
+      ansible.builtin.import_tasks: "create_subnet.yml"
+    - name: Import delete_subnet.yml
+      ansible.builtin.import_tasks: "delete_subnet.yml"
+    - name: Import negative_scenarios.yml
+      ansible.builtin.import_tasks: "negative_scenarios.yml"

@@ -1,0 +1,43 @@
+download_url: https://console.redhat.com/api/automation-hub/v3/plugin/ansible/content/published/collections/artifacts/redhat-satellite-5.6.0.tar.gz
+format_version: 1.0.0
+name: satellite
+namespace: redhat
+server: https://console.redhat.com/api/automation-hub/content/published/
+signatures:
+- pubkey_fingerprint: 39B5D759361A97464C564A8FE1A4BD708A828AAD
+  pulp_created: '2025-09-16T19:28:28.790511Z'
+  signature: '-----BEGIN PGP SIGNATURE-----
+
+
+    iQIcBAABCAAGBQJoyboyAAoJEOGkvXCKgoqtrnsP/0wPRYT28p8Ym2XKY18dHAG7
+
+    av5UVUbufRmkspAyJTffwJbx/4ZUBFAYquMcrpGehqxHSVVws+a0+zVRNe1uvTKh
+
+    0tPMwORihhqTiXynaVn0Doz+ydscC2lWTNv+EWLP35hn8hLtNWvTLOC4nZd5TGX6
+
+    Xzl3gqgcvfSs7ihLaV/85F1LjlIow0ouGP1vTwObMmeWFPXIjLO887eTqjkP/HK8
+
+    EVlgkmkKZBuIRKy6P6XZ3qtYvlFlB7yfqB+Mx+jqihsXOa6qB//TBbfKecKIU0lj
+
+    mgqS4nu4bOGpdh56PPKXfOCta6Rlgysu7lJq6rL3oJOM8FrOxL2uwqRJIABzKtjo
+
+    /pJLWDrrL7069BnETFB2LWOBUD9Cwxv9K8zmFg3geTAuiWRImugMtmukgW7E4XK1
+
+    4u75VRs8pYee33qxH2LwkFWrGC3H+iYqmNNjyENYhyMSLl0LMU6aAMRI2tFewIs2
+
+    gQf1QxvgetDBeLCvau907SYk4NRghQ13pB9/oCWLhzsDMCPIVsVpJ58M3djZJO0h
+
+    oiwgnh5/mQEcc5ZlZGld0DomagOnzXCTO9w23QAX1UDVtkBhL7wzuAZybSEtRkxP
+
+    aLSxmYqeAk8qujw02n1Yg/9ijkcvsqslggU16jBE/6cipjRrR4sqqSLwWxU/hfct
+
+    8GRWu16yKdH+R75cVt0g
+
+    =Afzf
+
+    -----END PGP SIGNATURE-----
+
+    '
+  signing_service: null
+version: 5.6.0
+version_url: /api/automation-hub/content/published/v3/plugin/ansible/content/published/collections/index/redhat/satellite/versions/5.6.0/

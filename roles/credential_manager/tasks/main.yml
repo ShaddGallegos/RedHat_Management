@@ -1,0 +1,39 @@
+---
+- name: Collect and encrypt credentials
+  ansible.builtin.include_tasks: prompt_vars.yml
+
+- name: Create master defaults file
+  ansible.builtin.template:
+    src: master_defaults.yml.j2
+    dest: "{{ master_defaults_file }}"
+    mode: '0644'
+  delegate_to: localhost
+
+- name: Create encrypted vault file
+  ansible.builtin.template:
+    src: vault.yml.j2
+    dest: "{{ vault_file }}"
+    mode: '0600'
+  delegate_to: localhost
+
+- name: Encrypt vault file with ansible-vault
+  ansible.builtin.command:
+    cmd: "ansible-vault encrypt {{ vault_file }}"
+  delegate_to: localhost
+  when: not (vault_file is exists and vault_file | ansible.builtin.stat).stat.isreg
+  failed_when: false
+
+- name: Display success message
+  ansible.builtin.debug:
+    msg: |
+      [OK] Credentials collected and encrypted successfully!
+
+      Files created:
+      - {{ master_defaults_file }} (non-sensitive defaults)
+      - {{ vault_file }} (encrypted sensitive data)
+
+      To view encrypted data:
+      ansible-vault view {{ vault_file }}
+
+      To edit encrypted data:
+      ansible-vault edit {{ vault_file }}

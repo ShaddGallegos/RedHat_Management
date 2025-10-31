@@ -1,0 +1,45 @@
+download_url: https://console.redhat.com/api/automation-hub/v3/plugin/ansible/content/published/collections/artifacts/nutanix-ncp-2.2.0.tar.gz
+format_version: 1.0.0
+name: ncp
+namespace: nutanix
+server: https://console.redhat.com/api/automation-hub/content/published/
+signatures:
+- pubkey_fingerprint: 39B5D759361A97464C564A8FE1A4BD708A828AAD
+  pulp_created: '2025-07-18T07:47:14.664213Z'
+  signature: '-----BEGIN PGP SIGNATURE-----
+
+    Version: GnuPG v1
+
+
+    iQIcBAABCAAGBQJoefv3AAoJEOGkvXCKgoqtsFUP/3gK5cWgxHDK6M6+mvV1+bo5
+
+    T15j3eQ0/2bJuq3pxYFw3HQehFvOROVB4oBfVqetc6GXZIZhOpibA7jOrUOAWL2g
+
+    AoyLNcyCqWUevfUk81+jOJz31Wbwe9Sppgvv1JR8q5D834Vkq1dYrwEehgFNeRLg
+
+    nGEeLSMewaguJJFNglqZjZv4YA9tnqdwJ0mbQsMkY0S2pukFGWtcp2bkskqtHush
+
+    BavnmgFZoA0MoDEyZW1lluTNbUvktF1QYLmghIwMDoJhKbbuZHeVmZ0Ss1ibrSiF
+
+    GAXQV62oMRPN6lmT75h31VRtDK8L3jd+gQpjpld10+rJgSq5d1w73AsAtW1tP8kd
+
+    Rkl9wMuYRd0CsSiDmR+0p4hxTdQu1ozSOsw+FK7WqXGg97uLMcOMznA/Opd4aNM8
+
+    XO06ICuSlin6QLLn2/ZABI9cctZLb6QjeSeZ20QsjDb6+pdC4ChcFbO9sPxt/G83
+
+    TOnGe78UMfXcKVhG+8Nb769TIY7P7huIRzi8v639vY/fklgPFUagqytyNcEMmLrE
+
+    ddMPF0k/am8gcNlGbnt164WH4PErD8GmgDtCXrfvDkhpc+AxwooJwQloj4OfFewM
+
+    BVo51ikYgg3fFaFeFTtvW2USvGDtTwaLMEhg/yTSvk0qx6+apG4jUjSVsamU9eMi
+
+    HpwCOQYPotp0KxaQZ2ol
+
+    =XvOr
+
+    -----END PGP SIGNATURE-----
+
+    '
+  signing_service: null
+version: 2.2.0
+version_url: /api/automation-hub/content/published/v3/plugin/ansible/content/published/collections/index/nutanix/ncp/versions/2.2.0/

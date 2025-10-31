@@ -1,0 +1,51 @@
+---
+# LibVirt configuration tasks
+
+- name: Start and enable libvirt services
+  ansible.builtin.systemd:
+- name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - libvirtd
+    - virtqemud
+    - virtnetworkd
+    - virtstoraged
+  become: true
+
+- name: Create libvirt network for Satellite provisioning
+  ansible.builtin.template:
+    src: libvirt-network.xml.j2
+    dest: /tmp/satellite-pxe-network.xml
+    mode: '0644'
+  become: true
+
+- name: Define libvirt network for PXE
+  ansible.builtin.shell: |
+    virsh net-list --all | grep -q {{ libvirt_network }} || \
+    virsh net-define /tmp/satellite-pxe-network.xml
+  become: true
+  register: network_result
+  changed_when: "'defined' in network_result.stdout"
+
+- name: Start and autostart libvirt network
+  ansible.builtin.shell: |
+    virsh net-start {{ libvirt_network }} 2>/dev/null || true
+    virsh net-autostart {{ libvirt_network }}
+  become: true
+  changed_when: false
+
+- name: Configure libvirt default storage pool
+  ansible.builtin.shell: |
+    virsh pool-list --all | grep -q {{ libvirt_storage_pool }} || \
+    virsh pool-define-as {{ libvirt_storage_pool }} dir --target /var/lib/libvirt/images
+  become: true
+  register: pool_result
+  changed_when: "'defined' in pool_result.stdout"
+
+- name: Start and autostart storage pool
+  ansible.builtin.shell: |
+    virsh pool-start {{ libvirt_storage_pool }} 2>/dev/null || true
+    virsh pool-autostart {{ libvirt_storage_pool }}
+  become: true
+  changed_when: false

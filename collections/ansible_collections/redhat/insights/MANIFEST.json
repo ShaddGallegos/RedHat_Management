@@ -1,0 +1,36 @@
+{
+ "collection_info": {
+  "namespace": "redhat",
+  "name": "insights",
+  "version": "1.3.0",
+  "authors": [
+   "Will Tome (@wtome)"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "linux",
+   "monitoring",
+   "infrastructure",
+   "security",
+   "tools"
+  ],
+  "description": "Ansible Collection for Red Hat insights",
+  "license": [
+   "Apache-2.0"
+  ],
+  "license_file": null,
+  "dependencies": {},
+  "repository": "https://github.com/redhatinsights/ansible-collections-insights",
+  "documentation": null,
+  "homepage": null,
+  "issues": null
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "6be61efc2cd2ac96809c82c923dd68896b0d1d26343e414f87123c32a9066498",
+  "format": 1
+ },
+ "format": 1
+}

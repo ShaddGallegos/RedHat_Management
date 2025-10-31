@@ -1,0 +1,8 @@
+---
+- name: Ntnx_foundation_aos_packages_info integration tests
+  module_defaults:
+    nutanix.ncp.ntnx_foundation_aos_packages_info:
+      nutanix_host: "{{ foundation_host }}"
+  block:
+    - name: Import Tasks
+      ansible.builtin.import_tasks: get_aos.yml

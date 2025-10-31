@@ -1,0 +1,394 @@
+---
+# =============================================================================
+# LVM Auto-Extension Master Playbook
+# =============================================================================
+# This is the main orchestration playbook for LVM automation
+# 
+# Usage:
+# ansible-playbook site.yml --ask-vault-pass
+# ansible-playbook site.yml --tags health-check
+# ansible-playbook site.yml --tags auto-extend
+# ansible-playbook site.yml --limit "production_servers"
+#
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Play 1: Initial Setup and Validation
+# -----------------------------------------------------------------------------
+- name: Initialize Environment and Validate Prerequisites
+- hosts: localhost
+  gather_facts: false
+ tags: [always, setup]
+ 
+  tasks:
+- name: Display execution information
+ ansible.builtin.debug:
+ msg:
+ - "========================================"
+ - "LVM Automation Framework"
+ - "Execution started: {{ ansible_date_time.iso8601 }}"
+ - "Target hosts: {{ ansible_play_hosts | length }}"
+ - "========================================"
+ 
+- name: Load vault credentials
+ ansible.builtin.include_vars:
+ file: vault/credentials.yml
+ no_log: true
+ tags: [always]
+ 
+- name: Validate required variables
+ ansible.builtin.assert:
+ that:
+ - lvm_threshold_percent is defined
+ - lvm_extend_percent is defined
+ fail_msg: "Required LVM configuration variables are missing"
+ success_msg: "Configuration validated successfully"
+
+# -----------------------------------------------------------------------------
+# Play 2: System Health Check and Inventory
+# -----------------------------------------------------------------------------
+- name: System Health Check and LVM Discovery
+- hosts: all
+  gather_facts: true
+ tags: [health-check, inspect, always]
+ 
+ pre_tasks:
+- name: Ensure we have sudo access
+ ansible.builtin.ping:
+  become: true
+ 
+  roles:
+ - role: lvm_system_inspection
+ tags: [inspect]
+ 
+ - role: disk_usage_alerting
+ tags: [monitor]
+ 
+ post_tasks:
+- name: Generate health check summary
+ ansible.builtin.debug:
+ msg:
+ - "Host: {{ inventory_hostname }}"
+ - "Total VGs: {{ ansible_lvm.vgs | default({}) | length }}"
+ - "Total LVs: {{ ansible_lvm.lvs | default({}) | length }}"
+ - "Critical LVs: {{ critical_lvs | default([]) | length }}"
+ - "Warning LVs: {{ warning_lvs | default([]) | length }}"
+ when: ansible_lvm is defined
+
+# -----------------------------------------------------------------------------
+# Play 3: ServiceNow Ticket Creation (Pre-Extension)
+# -----------------------------------------------------------------------------
+- name: Create ServiceNow Tickets for Required Extensions
+- hosts: localhost
+  gather_facts: false
+ tags: [ticket, pre-ticket]
+ 
+  vars:
+    hosts_requiring_extension: "{{ groups['all'] | 
+ select('extract', hostvars, 'extension_needed') | 
+ select('equalto', true) | list }}"
+ 
+  tasks:
+- name: Create ServiceNow change request
+ ansible.builtin.include_role:
+- name: servicenow_ticket_management
+  vars:
+    ticket_action: create
+    ticket_type: change_request
+    ticket_short_description: "Automated LVM Extension Required"
+    ticket_description: |
+ Automated LVM extension required for {{ hosts_requiring_extension | length }} host(s).
+ 
+    Hosts:
+ {% for host in hosts_requiring_extension %}
+ - {{ host }}: {{ hostvars[host].critical_lvs | default([]) | length }} critical LV(s)
+ {% endfor %}
+ 
+    Threshold: {{ lvm_threshold_percent }}%
+ Extension Size: {{ lvm_extend_percent }}%
+    ticket_priority: "{{ '2' if hosts_requiring_extension | length > 5 else '3' }}"
+    affected_hosts: "{{ hosts_requiring_extension }}"
+    when: 
+ - create_ticket | default(true)
+ - hosts_requiring_extension | length > 0
+
+# -----------------------------------------------------------------------------
+# Play 4: Automated LVM Extension
+# -----------------------------------------------------------------------------
+- name: Execute Automated LVM Extension
+- hosts: all
+  gather_facts: false
+ serial: "{{ batch_size | default(5) }}"
+ tags: [extend, auto-extend]
+ 
+ pre_tasks:
+- name: Check if extension is needed
+ ansible.builtin.set_fact:
+ should_extend: "{{ extension_needed | default(false) or 
+ (critical_lvs | default([]) | length > 0) }}"
+ 
+- name: Display extension plan
+ ansible.builtin.debug:
+ msg:
+ - "Host: {{ inventory_hostname }}"
+ - "Extension needed: {{ should_extend }}"
+ - "Critical LVs: {{ critical_lvs | default([]) }}"
+ - "Warning LVs: {{ warning_lvs | default([]) }}"
+ when: should_extend
+ 
+  roles:
+ - role: lvm_smart_extend
+ when: should_extend and not ansible_check_mode
+ tags: [extend]
+ 
+ post_tasks:
+- name: Verify extension success
+ ansible.builtin.command:
+ cmd: "df -h {{ item.mount }}"
+ loop: "{{ extended_lvs | default([]) }}"
+ register: verify_extension
+ changed_when: false
+ when: extended_lvs is defined
+ 
+- name: Record extension results
+ ansible.builtin.set_fact:
+ extension_results:
+ host: "{{ inventory_hostname }}"
+ extended_count: "{{ extended_lvs | default([]) | length }}"
+ failed_count: "{{ failed_extensions | default([]) | length }}"
+ timestamp: "{{ ansible_date_time.iso8601 }}"
+ success: "{{ failed_extensions | default([]) | length == 0 }}"
+
+# -----------------------------------------------------------------------------
+# Play 5: Emergency Disk Space Response
+# -----------------------------------------------------------------------------
+- name: Emergency Disk Space Response
+- hosts: all
+  gather_facts: false
+ tags: [emergency, never]
+ 
+  vars:
+    emergency_threshold: 95
+ 
+  tasks:
+- name: Identify critical disk space
+ ansible.builtin.shell: |
+ df -h | awk '$5+0 >= {{ emergency_threshold }} {print $6}'
+ register: critical_mounts
+ changed_when: false
+ 
+- name: Create emergency ServiceNow incident
+ ansible.builtin.include_role:
+- name: servicenow_ticket_management
+  vars:
+    ticket_action: create
+    ticket_type: incident
+    ticket_priority: "1"
+    ticket_urgency: "1"
+    ticket_short_description: "CRITICAL: Disk Space Emergency on {{ inventory_hostname }}"
+    ticket_description: |
+ CRITICAL DISK SPACE ALERT
+ 
+    Host: {{ inventory_hostname }}
+ Critical Mounts: {{ critical_mounts.stdout_lines | join(', ') }}
+    Threshold: {{ emergency_threshold }}%
+ 
+ Immediate action required!
+    when: critical_mounts.stdout_lines | length > 0
+    delegate_to: localhost
+ 
+- name: Attempt emergency extension
+ ansible.builtin.include_role:
+- name: lvm_extension_orchestrator
+  vars:
+    force_extend: true
+    skip_validation: false
+    when: critical_mounts.stdout_lines | length > 0
+
+# -----------------------------------------------------------------------------
+# Play 6: ServiceNow Ticket Update (Post-Extension)
+# -----------------------------------------------------------------------------
+- name: Update ServiceNow Tickets with Results
+- hosts: localhost
+  gather_facts: false
+ tags: [ticket, post-ticket]
+ 
+  vars:
+    all_extensions: "{{ groups['all'] | 
+ map('extract', hostvars, 'extension_results') | 
+ select('defined') | list }}"
+    successful_hosts: "{{ all_extensions | 
+ selectattr('success', 'equalto', true) | 
+ map(attribute='host') | list }}"
+    failed_hosts: "{{ all_extensions | 
+ selectattr('success', 'equalto', false) | 
+ map(attribute='host') | list }}"
+ 
+  tasks:
+- name: Update ServiceNow change request
+ ansible.builtin.include_role:
+- name: servicenow_ticket_management
+  vars:
+    ticket_action: update
+    ticket_state: "{{ 'closed_successful' if failed_hosts | length == 0 else 'closed_incomplete' }}"
+    ticket_work_notes: |
+ LVM Extension Results:
+ 
+ Total Hosts: {{ all_extensions | length }}
+    Successful: {{ successful_hosts | length }}
+    Failed: {{ failed_hosts | length }}
+ 
+ {% if successful_hosts | length > 0 %}
+ Successful Extensions:
+ {% for host in successful_hosts %}
+ - {{ host }}
+ {% endfor %}
+ {% endif %}
+ 
+ {% if failed_hosts | length > 0 %}
+ Failed Extensions (Manual Intervention Required):
+ {% for host in failed_hosts %}
+ - {{ host }}
+ {% endfor %}
+ {% endif %}
+ 
+ Execution completed: {{ ansible_date_time.iso8601 }}
+    when: 
+ - create_ticket | default(true)
+ - all_extensions | length > 0
+
+# -----------------------------------------------------------------------------
+# Play 7: Cleanup and Reporting
+# -----------------------------------------------------------------------------
+- name: Generate Final Report and Cleanup
+- hosts: localhost
+  gather_facts: false
+ tags: [report, cleanup, always]
+ 
+  vars:
+    report_dir: "{{ playbook_dir }}/reports"
+    report_file: "{{ report_dir }}/lvm_extension_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.json"
+ 
+  tasks:
+- name: Create reports directory
+ ansible.builtin.file:
+ path: "{{ report_dir }}"
+ state: directory
+ mode: '0755'
+ 
+- name: Collect execution summary
+ ansible.builtin.set_fact:
+ execution_summary:
+ playbook: "site.yml"
+ execution_time: "{{ ansible_date_time.iso8601 }}"
+ total_hosts: "{{ groups['all'] | length }}"
+ hosts_checked: "{{ ansible_play_hosts | length }}"
+ extensions_performed: "{{ groups['all'] | 
+ map('extract', hostvars, 'extension_results') | 
+ select('defined') | list | length }}"
+ successful_extensions: "{{ groups['all'] | 
+ map('extract', hostvars, 'extension_results') | 
+ select('defined') | 
+ selectattr('success', 'equalto', true) | list | length }}"
+ failed_extensions: "{{ groups['all'] | 
+ map('extract', hostvars, 'extension_results') | 
+ select('defined') | 
+ selectattr('success', 'equalto', false) | list | length }}"
+ tickets_created: "{{ servicenow_tickets_created | default(0) }}"
+ 
+- name: Write execution report
+ ansible.builtin.copy:
+ content: "{{ execution_summary | to_nice_json }}"
+ dest: "{{ report_file }}"
+ mode: '0644'
+ 
+- name: Display execution summary
+ ansible.builtin.debug:
+ msg:
+ - "========================================"
+ - "Execution Summary"
+ - "========================================"
+ - "Total Hosts: {{ execution_summary.total_hosts }}"
+ - "Hosts Checked: {{ execution_summary.hosts_checked }}"
+ - "Extensions Performed: {{ execution_summary.extensions_performed }}"
+ - "Successful: {{ execution_summary.successful_extensions }}"
+ - "Failed: {{ execution_summary.failed_extensions }}"
+ - "Report: {{ report_file }}"
+ - "========================================"
+ 
+- name: Send notification (if configured)
+ ansible.builtin.include_role:
+- name: disk_usage_alerting
+  vars:
+    alert_type: summary
+    alert_message: "{{ execution_summary }}"
+    when: 
+ - notifications_enabled | default(false)
+ - execution_summary.extensions_performed > 0
+
+# -----------------------------------------------------------------------------
+# Play 8: Rollback (Manual Trigger Only)
+# -----------------------------------------------------------------------------
+- name: Rollback LVM Extensions
+- hosts: all
+  gather_facts: false
+ tags: [rollback, never]
+ 
+  tasks:
+- name: Confirm rollback
+ ansible.builtin.pause:
+ prompt: |
+ WARNING: You are about to rollback LVM extensions!
+ This will revert changes made by the last execution.
+ 
+ Are you sure you want to continue? (yes/no)
+ register: rollback_confirmation
+ delegate_to: localhost
+ run_once: true
+ 
+- name: Perform rollback
+ ansible.builtin.include_role:
+- name: lvm_smart_extend
+  vars:
+    operation: rollback
+    when: rollback_confirmation.user_input | lower == 'yes'
+ 
+- name: Create rollback ServiceNow ticket
+ ansible.builtin.include_role:
+- name: servicenow_ticket_management
+  vars:
+    ticket_action: create
+    ticket_type: incident
+    ticket_priority: "2"
+    ticket_short_description: "LVM Extension Rollback Performed"
+    ticket_description: |
+ LVM extensions have been rolled back on {{ inventory_hostname }}
+ 
+    Reason: Manual rollback initiated
+    Timestamp: {{ ansible_date_time.iso8601 }}
+    delegate_to: localhost
+    when: rollback_confirmation.user_input | lower == 'yes'
+
+# -----------------------------------------------------------------------------
+# Play 9: Dry-Run Simulation
+# -----------------------------------------------------------------------------
+- name: Dry-Run Simulation (What-If Analysis)
+- hosts: all
+  gather_facts: true
+ check_mode: true
+ tags: [dry-run, never]
+ 
+  tasks:
+- name: Simulate health check
+ ansible.builtin.include_role:
+- name: lvm_system_inspection
+ 
+- name: Display what would be extended
+ ansible.builtin.debug:
+ msg:
+ - "=== DRY RUN MODE ==="
+ - "Host: {{ inventory_hostname }}"
+ - "Would extend: {{ critical_lvs | default([]) | length }} LV(s)"
+ - "Would create ServiceNow ticket: {{ create_ticket | default(true) }}"
+ - "No actual changes will be made"
+ - "==================="

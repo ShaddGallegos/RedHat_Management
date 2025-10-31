@@ -1,0 +1,85 @@
+---
+# Variables required before running this playbook:
+# - external_nat_subnet
+# - private_ip
+
+- name: Started Negative Creation Cases
+  ansible.builtin.debug:
+    msg: "Started Negative Creation Cases"
+- name: Create floating ip with unknown external subnet name
+  ntnx_floating_ips:
+    state: present
+    external_subnet:
+      name: "external_subnet"
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.failed==true
+      - result.msg=="Failed generating floating_ip spec"
+    success_msg: " Success: returned error as expected "
+#################################################################
+- name: Create floating ip with unknown external subnet uuid
+  ntnx_floating_ips:
+    state: present
+    wait: false
+    external_subnet:
+      uuid: 54e295c3-16d3-49de-96ba-b921948b3a
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.status_code==422
+    success_msg: " Success: returned error as expected "
+###############################################################
+- name: Create floating ip with unknown vpc
+  ntnx_floating_ips:
+    state: present
+    external_subnet:
+      name: "{{ external_nat_subnet.name}}"
+    vpc:
+      name: vpc
+    private_ip: "{{ private_ip }}"
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.failed==true
+      - result.msg=="Failed generating floating_ip spec"
+    success_msg: " Success: returned error as expected "
+###############################################################
+- name: Create floating ip with unknown vpc uuid
+  ntnx_floating_ips:
+    state: present
+    external_subnet:
+      name: "{{ external_nat_subnet.name }}"
+    vpc:
+      uuid: 471181f8-eb2d-4303-9a61-6b25a1b3
+    private_ip: "{{ private_ip }}"
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.status_code==422
+    success_msg: " Success: returned error as expected "
+##############################################################
+- name: Delete floating ip with unknown uuid
+  ntnx_floating_ips:
+    state: absent
+    fip_uuid: 5
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.status_code==400
+    success_msg: " Success: returned error as expected "

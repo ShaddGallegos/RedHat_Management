@@ -1,0 +1,138 @@
+---
+# Project-wide variable prompt playbook for all environments/integrations
+# Compatible with Ansible Automation Platform 2.6
+# Usage: ansible-playbook project_vars_prompt.yml
+
+- hosts: localhost
+  gather_facts: false
+  vars_prompt:
+    # Libvirt
+    - name: libvirt_api_url
+      prompt: "Libvirt API URL (e.g., http://libvirt.example.com/api/hosts)"
+      private: no
+    - name: libvirt_token
+      prompt: "Libvirt API token (leave blank if not required)"
+      private: yes
+    - name: libvirt_hosts
+      prompt: "Libvirt hosts (comma-separated)"
+      private: no
+    # Satellite
+    - name: satellite_api_url
+      prompt: "Satellite API URL (e.g., http://satellite.example.com/api/hosts)"
+      private: no
+    - name: satellite_token
+      prompt: "Satellite API token (leave blank if not required)"
+      private: yes
+    - name: satellite_hosts
+      prompt: "Satellite hosts (comma-separated)"
+      private: no
+    # Insights
+    - name: insights_server
+      prompt: "Insights server URL (e.g., https://console.redhat.com)"
+      private: no
+    - name: insights_client_id
+      prompt: "Insights client ID (leave blank if not required)"
+      private: yes
+    - name: insights_client_secret
+      prompt: "Insights client secret (leave blank if not required)"
+      private: yes
+    # GitHub
+    - name: github_token
+      prompt: "GitHub token (leave blank if not required)"
+      private: yes
+    # EDA
+    - name: eda_api_url
+      prompt: "EDA API URL (leave blank if not required)"
+      private: no
+    # AWS
+    - name: aws_access_key
+      prompt: "AWS Access Key (leave blank if not required)"
+      private: yes
+    - name: aws_secret_key
+      prompt: "AWS Secret Key (leave blank if not required)"
+      private: yes
+    # GCP
+    - name: gcp_service_account
+      prompt: "GCP Service Account JSON (leave blank if not required)"
+      private: yes
+    # Azure
+    - name: azure_client_id
+      prompt: "Azure Client ID (leave blank if not required)"
+      private: yes
+    - name: azure_client_secret
+      prompt: "Azure Client Secret (leave blank if not required)"
+      private: yes
+    # VMware
+    - name: vmware_api_url
+      prompt: "VMware API URL (e.g., https://vcenter.example.com/rest/vcenter/host)"
+      private: no
+    - name: vmware_token
+      prompt: "VMware API token (leave blank if not required)"
+      private: yes
+    # Nutanix
+    - name: nutanix_api_url
+      prompt: "Nutanix API URL (e.g., http://nutanix.example.com/api/hosts)"
+      private: no
+    - name: nutanix_token
+      prompt: "Nutanix API token (leave blank if not required)"
+      private: yes
+    # Vagrant
+    - name: vagrant_hosts
+      prompt: "Vagrant hosts (comma-separated, leave blank if not required)"
+      private: no
+    # Bare Metal
+    - name: baremetal_hosts
+      prompt: "Bare Metal hosts (comma-separated, leave blank if not required)"
+      private: no
+    # OpenShift
+    - name: openshift_api_url
+      prompt: "OpenShift API URL (leave blank if not required)"
+      private: no
+    # ACM for OpenShift
+    - name: acm_api_url
+      prompt: "ACM API URL (leave blank if not required)"
+      private: no
+    # ServiceNow
+    - name: servicenow_api_url
+      prompt: "ServiceNow API URL (e.g., https://servicenow.example.com/api/now/table/host)"
+      private: no
+    - name: servicenow_token
+      prompt: "ServiceNow API token (leave blank if not required)"
+      private: yes
+
+  tasks:
+    - name: Write all variables to project_vars.yml
+      copy:
+        dest: project_vars.yml
+        content: |
+          ---
+          libvirt_api_url: "{{ libvirt_api_url }}"
+          libvirt_token: "{{ libvirt_token }}"
+          libvirt_hosts: {{ libvirt_hosts.split(',') if libvirt_hosts else [] }}
+          satellite_api_url: "{{ satellite_api_url }}"
+          satellite_token: "{{ satellite_token }}"
+          satellite_hosts: {{ satellite_hosts.split(',') if satellite_hosts else [] }}
+          insights_server: "{{ insights_server }}"
+          insights_client_id: "{{ insights_client_id }}"
+          insights_client_secret: "{{ insights_client_secret }}"
+          github_token: "{{ github_token }}"
+          eda_api_url: "{{ eda_api_url }}"
+          aws_access_key: "{{ aws_access_key }}"
+          aws_secret_key: "{{ aws_secret_key }}"
+          gcp_service_account: "{{ gcp_service_account }}"
+          azure_client_id: "{{ azure_client_id }}"
+          azure_client_secret: "{{ azure_client_secret }}"
+          vmware_api_url: "{{ vmware_api_url }}"
+          vmware_token: "{{ vmware_token }}"
+          nutanix_api_url: "{{ nutanix_api_url }}"
+          nutanix_token: "{{ nutanix_token }}"
+          vagrant_hosts: {{ vagrant_hosts.split(',') if vagrant_hosts else [] }}
+          baremetal_hosts: {{ baremetal_hosts.split(',') if baremetal_hosts else [] }}
+          openshift_api_url: "{{ openshift_api_url }}"
+          acm_api_url: "{{ acm_api_url }}"
+          servicenow_api_url: "{{ servicenow_api_url }}"
+          servicenow_token: "{{ servicenow_token }}"
+
+    - name: Show summary of collected variables
+      debug:
+        msg: "Project-wide variables have been written to project_vars.yml. Use this file in your playbooks, roles, and plugins."

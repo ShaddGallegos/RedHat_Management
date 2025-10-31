@@ -1,0 +1,5 @@
+# vault.yml - Encrypted variables (use ansible-vault encrypt)
+---
+vault_nutanix_password: "your_nutanix_password_here"
+vault_storage_container_uuid: "your_storage_container_uuid_here"
+vault_admin_email: "admin@yourdomain.com"

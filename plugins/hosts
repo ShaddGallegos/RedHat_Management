@@ -1,0 +1,11 @@
+[rhel8]
+rhel8-test1.example.com
+rhel8-test2.example.com
+
+[rhel9]
+rhel9-test1.example.com
+rhel9-test2.example.com
+
+[nutanix_hosts:children]
+rhel8
+rhel9

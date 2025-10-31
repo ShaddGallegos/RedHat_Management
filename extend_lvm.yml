@@ -1,0 +1,23 @@
+---
+- name: Automated LVM Extension for Libvirt VMs
+- hosts: virtual_machines
+  gather_facts: true
+  become: true
+  
+  vars:
+    vg_name: "{{ target_vg | default('rhel') }}"
+    lv_name: "{{ target_lv | default('root') }}"
+    mount_point: "{{ target_mount | default('/') }}"
+    growth_percentage: "{{ growth_percent | default(20) }}"
+
+  tasks:
+- name: Validate RHEL version compatibility
+      ansible.builtin.fail:
+        msg: "This playbook only supports RHEL 8 and RHEL 9"
+      when: 
+        - ansible_distribution != "RedHat"
+        - ansible_distribution_major_version not in ["8", "9"]
+
+- name: Display current LVM status
+      ansible.builtin.debug:
+        msg: "Starting LVM extension process for {{ vg_name }}/{{ lv_name }}"

@@ -1,0 +1,23 @@
+---
+- name: Create PBR for vpc "{{ item.vpc_name }}"
+  nutanix.ncp.ntnx_pbrs:
+    state: present
+    vpc:
+      name: "{{ item.vpc_name }}"
+    priority: "{{ item.priority }}"
+    source:
+      network:
+        ip: "{{ item.nip }}"
+        prefix: "{{ item.prefix }}"
+    destination:
+      external: true
+    protocol:
+      any: true
+    action:
+      deny: true
+  register: pbr_result
+- name: Print vpc name and pbr uuid
+  ansible.builtin.debug:
+    msg:
+      - "vpc_name: {{ item.vpc_name }}"
+      - "uuid: {{ pbr_result.pbr_uuid }}"

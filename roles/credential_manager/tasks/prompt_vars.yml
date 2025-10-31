@@ -1,0 +1,16 @@
+---
+- name: Initialize collected variables
+  ansible.builtin.set_fact:
+    collected_vars: {}
+    sensitive_vars: {}
+
+- name: Process credential categories
+  ansible.builtin.include_tasks: prompt_category.yml
+  loop: "{{ credential_categories }}"
+  loop_control:
+    loop_var: category
+
+- name: Store collected variables
+  ansible.builtin.set_fact:
+    master_defaults: "{{ collected_vars }}"
+    vault_vars: "{{ sensitive_vars }}"

@@ -1,0 +1,85 @@
+---
+# Variables required before running this playbook:
+# - vpc
+# - external_nat_subnet
+
+- name: Start testing static routes info tests
+  ansible.builtin.debug:
+    msg: Start testing static routes info tests
+
+- name: Create new static routes
+  ntnx_static_routes:
+    vpc_uuid: "{{ vpc.uuid }}"
+    static_routes:
+      - destination: "0.0.0.0/0"
+        next_hop:
+          external_subnet_ref:
+            name: "{{ external_nat_subnet.name }}"
+      - destination: "10.2.2.0/24"
+        next_hop:
+          external_subnet_ref:
+            uuid: "{{ external_nat_subnet.uuid }}"
+      - destination: "10.2.3.0/24"
+        next_hop:
+          external_subnet_ref:
+            uuid: "{{ external_nat_subnet.uuid }}"
+  register: result
+
+- name: Create new static routes status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+      - result.changed == true
+    fail_msg: "Fail: Unable to create static routes for vpc"
+    success_msg: "Success: Static routes created"
+
+###########################################################################################################
+
+- name: Wait 60 seconds for static routes to be created
+  ansible.builtin.pause:
+    seconds: 60
+
+- name: Get all static routes
+  ntnx_static_routes_info:
+    vpc_uuid: "{{ vpc.uuid }}"
+  register: result
+
+- name: Set destination variables
+  ansible.builtin.set_fact:
+    d1: "{{ result.response.status.resources.static_routes_list[0].destination }}"
+    d2: "{{ result.response.status.resources.static_routes_list[1].destination }}"
+
+- name: Check info module response
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.changed == false
+      - result.response.status.resources.static_routes_list[0]["is_active"] == true
+      - ("{{d1}}" == "10.2.2.0/24" and "{{d2}}" == "10.2.3.0/24") or ("{{d2}}" == "10.2.2.0/24" and "{{d1}}" == "10.2.3.0/24")
+      - result.response.status.resources.static_routes_list[0]["nexthop"]["external_subnet_reference"]["name"] == "{{ external_nat_subnet.name }}"
+      - result.response.status.resources.static_routes_list[1]["is_active"] == true
+      - result.response.status.resources.static_routes_list[1]["nexthop"]["external_subnet_reference"]["name"] == "{{ external_nat_subnet.name }}"
+      - result.response.status.resources.default_route["is_active"] == true
+      - result.response.status.resources.default_route["destination"] == "0.0.0.0/0"
+      - result.response.status.resources.default_route["nexthop"]["external_subnet_reference"]["name"] == "{{ external_nat_subnet.name }}"
+
+    fail_msg: "Fail: Unable to get static routes for vpc"
+    success_msg: "Success"
+
+###########################################################################################################
+
+- name: Remove all routes for cleanup
+  ntnx_static_routes:
+    vpc_uuid: "{{ vpc.uuid }}"
+    remove_all_routes: true
+  register: result
+  ignore_errors: true
+
+- name: Remove all routes status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+      - result.changed == true
+      - result.response.status.resources.static_routes_list == []

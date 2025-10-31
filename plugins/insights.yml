@@ -1,0 +1,24 @@
+---
+# Official Red Hat Insights dynamic inventory plugin configuration
+# Usage: ansible-inventory -i insights.yml --list
+# You can set the server URL and authentication via environment variables or prompt in your wrapper script.
+# Example: export INSIGHTS_SERVER=https://console.redhat.com
+# For authentication, use either:
+#   export INSIGHTS_CLIENT_ID=your_client_id
+#   export INSIGHTS_CLIENT_SECRET=your_client_secret
+# Or basic auth:
+#   export INSIGHTS_USER=your_username
+#   export INSIGHTS_PASSWORD=your_password
+
+plugin: redhatinsights.insights.insights
+server: "{{ lookup('env','INSIGHTS_SERVER') | default('https://console.redhat.com') }}"
+keyed_groups:
+  # Create a group for each Red Hat Enterprise Linux version
+  - key: insights_metadata.rhel_version
+    prefix: rhel
+  # Create a group for systems registered with Insights
+  - key: registered_with
+    prefix: registered_with
+registered_with: insights
+# hosts and groups will be dynamically pulled from the Insights API
+# You can further filter or group hosts using keyed_groups or other plugin options

@@ -1,0 +1,59 @@
+---
+# Role: satellite_pxe_services
+# Purpose: Configure PXE services for automated node provisioning with libvirt integration
+
+# Satellite API Configuration
+satellite_url: "https://{{ satellite_hostname | default('satellite.prod.spg') }}"
+satellite_username: "admin"
+satellite_password: "{{ vault_satellite_password | default('bj8H7ndC7$') }}"
+satellite_organization: "{{ vault_satellite_organization | default('RedHat') }}"
+satellite_location: "{{ vault_satellite_location | default('Denver') }}"
+
+# Network Configuration
+primary_interface: "{{ discovered_provisioning_interface | default('enp2s0') }}"
+network_range: "10.168.0.0/16"
+satellite_ip: "{{ ansible_host | default('10.168.151.127') }}"
+satellite_fqdn: "{{ satellite_hostname | default('satellite.prod.spg') }}"
+netmask: "255.255.0.0"
+gateway: "10.168.0.1"
+dns_servers:
+  - "10.168.0.1"
+  - "8.8.8.8"
+
+# DHCP Configuration
+dhcp_range_start: "10.168.1.100"
+dhcp_range_end: "10.168.1.200"
+
+# Libvirt Configuration
+libvirt_host: "localhost"
+libvirt_network: "satellite-pxe"
+libvirt_storage_pool: "default"
+
+# Node Group Configuration
+node_hostgroup_name: "Node-Servers"
+
+# Required Packages
+pxe_packages:
+  - tftp-server
+  - dhcp-server
+  - syslinux
+  - libvirt
+  - libvirt-daemon-config-network
+  - libvirt-daemon-kvm
+  - qemu-kvm
+  - virt-install
+  - virt-manager
+  - bridge-utils
+
+# Firewall Ports
+pxe_firewall_ports:
+  - "69/udp"    # TFTP
+  - "67/udp"    # DHCP
+  - "68/udp"    # DHCP Client
+  - "16509/tcp" # Libvirt
+
+# Service Configuration
+configure_tftp: true
+configure_dhcp: true
+configure_libvirt: true
+configure_satellite_api: true

@@ -1,0 +1,8 @@
+download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/theforeman-foreman-5.6.0.tar.gz
+format_version: 1.0.0
+name: foreman
+namespace: theforeman
+server: https://galaxy.ansible.com/api/
+signatures: []
+version: 5.6.0
+version_url: /api/v3/plugin/ansible/content/published/collections/index/theforeman/foreman/versions/5.6.0/

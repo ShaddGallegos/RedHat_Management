@@ -1,0 +1,22 @@
+---
+# pull hypervisor and nos packages info from FVM
+- name: Get hypervisor and nos packages info from FVM
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Get hypervisor images info from foundation
+      nutanix.ncp.ntnx_foundation_hypervisor_images_info:
+        nutanix_host: 10.xx.xx.xx
+      register: hyp
+
+    - name: Get aos images info from foundation
+      nutanix.ncp.ntnx_foundation_aos_packages_info:
+        nutanix_host: 10.xx.xx.xx
+      register: nos
+
+    - name: Print available hypervisor image details
+      ansible.builtin.debug:
+        msg: "{{ hyp }}"
+    - name: Print available NOS image details
+      ansible.builtin.debug:
+        msg: "{{ nos }}"

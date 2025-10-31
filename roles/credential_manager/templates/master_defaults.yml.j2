@@ -1,0 +1,48 @@
+---
+# Master defaults file - Non-sensitive configuration
+# Generated: {{ ansible_date_time.iso8601 }}
+
+# AAP Controller Configuration
+aap_controller_host: "{{ master_defaults.aap_controller_host }}"
+aap_controller_username: "{{ master_defaults.aap_controller_username }}"
+aap_controller_verify_ssl: {{ master_defaults.aap_controller_verify_ssl }}
+
+# EDA Controller Configuration
+eda_controller_host: "{{ master_defaults.eda_controller_host }}"
+eda_controller_username: "{{ master_defaults.eda_controller_username }}"
+
+# ServiceNow Configuration
+snow_instance: "{{ master_defaults.snow_instance }}"
+snow_username: "{{ master_defaults.snow_username }}"
+
+# Nutanix Configuration
+nutanix_host: "{{ master_defaults.nutanix_host }}"
+nutanix_username: "{{ master_defaults.nutanix_username }}"
+nutanix_port: "{{ master_defaults.nutanix_port }}"
+nutanix_validate_certs: {{ master_defaults.nutanix_validate_certs }}
+
+# Splunk Configuration
+splunk_host: "{{ master_defaults.splunk_host }}"
+splunk_port: "{{ master_defaults.splunk_port }}"
+splunk_index: "{{ master_defaults.splunk_index }}"
+
+# Email Configuration
+smtp_host: "{{ master_defaults.smtp_host }}"
+smtp_port: "{{ master_defaults.smtp_port }}"
+{% if master_defaults.smtp_username %}
+smtp_username: "{{ master_defaults.smtp_username }}"
+{% endif %}
+admin_email: "{{ master_defaults.admin_email }}"
+operations_email: "{{ master_defaults.operations_email }}"
+
+# Project Configuration
+project_name: "{{ master_defaults.project_name }}"
+project_scm_url: "{{ master_defaults.project_scm_url }}"
+project_scm_branch: "{{ master_defaults.project_scm_branch }}"
+organization_name: "{{ master_defaults.organization_name }}"
+execution_environment: "{{ master_defaults.execution_environment }}"
+
+# LVM Configuration
+lvm_extend_percent: 20
+lvm_extend_size_gb: 10
+disk_usage_threshold: 90

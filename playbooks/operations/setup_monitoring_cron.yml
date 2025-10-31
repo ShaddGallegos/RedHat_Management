@@ -1,0 +1,10 @@
+---
+# Converted from shell script to Ansible playbook
+# Generated: 2025-10-07 17:29:59
+# Original script: scripts/setup_monitoring_cron.sh
+- name: Setup Monitoring Cron - Wrapper
+- hosts: all
+  gather_facts: false
+  tasks:
+- name: Include setup_monitoring_cron playbook
+  ansible.builtin.import_playbook: setup_monitoring_cron.yml

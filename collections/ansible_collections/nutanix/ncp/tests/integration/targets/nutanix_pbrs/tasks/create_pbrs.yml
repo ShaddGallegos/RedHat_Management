@@ -1,0 +1,290 @@
+---
+# Variables required before running this playbook:
+# - vpc
+# - network
+# - priority
+# - protocol
+# - tcp
+# - udp
+# - icmp
+# - reroute_ip
+# - todelete
+
+- name: Create PBR with vpc name, source network, external destination, with reroute action and any type and code icmp
+  ntnx_pbrs:
+    validate_certs: false
+    state: present
+    nutanix_host: "{{ ip }}"
+    nutanix_username: "{{ username }}"
+    nutanix_password: "{{ password }}"
+    priority: 103
+    vpc:
+      name: "{{ vpc.name }}"
+    source:
+      network:
+        ip: "{{ network.ip }}"
+        prefix: "{{ network.prefix }}"
+    destination:
+      external: true
+    action:
+      allow: true
+    protocol:
+      icmp:
+        type: 25
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+    fail_msg: " Unable to create PBR with vpc name with source network and destination external with reroute action and udp port rangelist"
+    success_msg: " PBR with vpc name with source network and destination external with reroute action and  udp port rangelist created successfully "
+
+- name: Adding PBR to delete list
+  ansible.builtin.set_fact:
+    todelete: "{{ todelete + [  result.pbr_uuid ] }}"
+################################################################################################################################
+- name: Create PBR with vpc name, any source, any destination, any protocol and deny action
+  ntnx_pbrs:
+    state: present
+    priority: "{{ priority.0 }}"
+    vpc:
+      name: "{{ vpc.name }}"
+    source:
+      any: true
+    destination:
+      any: true
+    action:
+      deny: true
+    protocol:
+      any: true
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+    fail_msg: " Unable to create PBR with vpc name, any source, any destination, any protocol and deny action "
+    success_msg: " PBR with vpc name, any source, any destination, any protocol and deny action created successfully "
+
+- name: Adding PBR to delete list
+  ansible.builtin.set_fact:
+    todelete: "{{ todelete + [  result.pbr_uuid ] }}"
+###############################################################################################
+- name: Create PBR with vpc uuid, any source, external destination and allow action with protocol number
+  ntnx_pbrs:
+    state: present
+    priority: "{{ priority.1 }}"
+    vpc:
+      uuid: "{{ vpc.uuid }}"
+    source:
+      any: true
+    destination:
+      external: true
+    action:
+      allow: true
+    protocol:
+      number: "{{ protocol.number }}"
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+    fail_msg: " Unable to create PBR with vpc uuid, any source, external destination and allow action with protocol number"
+    success_msg: " Create PBR with vpc uuid, any source, external destination and allow action with protocol number created successfully "
+
+- name: Adding PBR to delete list
+  ansible.builtin.set_fact:
+    todelete: "{{ todelete + [  result.pbr_uuid ] }}"
+#######################################################################################################
+- name: Create PBR with vpc name with source external and destination network with reroute action and tcp port rangelist
+  ntnx_pbrs:
+    state: present
+    priority: "{{ priority.2 }}"
+    vpc:
+      name: "{{ vpc.name }}"
+    source:
+      external: true
+    destination:
+      network:
+        ip: "{{ network.ip }}"
+        prefix: "{{ network.prefix }}"
+    action:
+      reroute: "{{ reroute_ip }}"
+    protocol:
+      tcp:
+        src: "{{ tcp.port }}"
+        dst: "{{ tcp.port_rangelist }}"
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+    fail_msg: " Unable to create PBR with vpc name with source external and destination network with reroute action and tcp port rangelist "
+    success_msg: " PBR with vpc name with source external and destination network with reroute action and tcp port rangelist created successfully "
+
+- name: Adding PBR to delete list
+  ansible.builtin.set_fact:
+    todelete: "{{ todelete + [  result.pbr_uuid ] }}"
+##########################################################################################################
+- name: Create PBR with vpc name with source external and destination network with reroute action and any tcp port rangelist
+  ntnx_pbrs:
+    state: present
+    priority: "{{ priority.3 }}"
+    vpc:
+      name: "{{ vpc.name }}"
+    source:
+      external: true
+    destination:
+      network:
+        ip: "{{ network.ip }}"
+        prefix: "{{ network.prefix }}"
+    action:
+      allow: true
+    protocol:
+      tcp:
+        src: "*"
+        dst: "*"
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+    fail_msg: " Unable to create PBR with vpc name with source external and destination network with reroute action and any tcp ports rangelist "
+    success_msg: " PBR with vpc name with source external and destination network with reroute action and any tcp ports rangelist created successfully "
+
+- name: Adding PBR to delete list
+  ansible.builtin.set_fact:
+    todelete: "{{ todelete + [  result.pbr_uuid ] }}"
+###########################################################################################################
+- name: Create PBR with vpc name, custom source network, external destination, reroute action and udp port rangelist
+  ntnx_pbrs:
+    state: present
+    priority: "{{ priority.4 }}"
+    vpc:
+      name: "{{ vpc.name }}"
+    source:
+      network:
+        ip: "{{ network.ip }}"
+        prefix: "{{ network.prefix }}"
+    destination:
+      any: true
+    action:
+      reroute: "{{ reroute_ip }}"
+    protocol:
+      udp:
+        src: "{{ udp.port_rangelist }}"
+        dst: "{{ udp.port }}"
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+    fail_msg: " Unable to create PBR with vpc name with source network and destination external with reroute action and udp port rangelist"
+    success_msg: " PBR with vpc name with source network and destination external with reroute action and udp port rangelist created successfully "
+
+- name: Adding PBR to delete list
+  ansible.builtin.set_fact:
+    todelete: "{{ todelete + [  result.pbr_uuid ] }}"
+##############################################################################################################
+- name: Create PBR with vpc name, custom source network, external destination, reroute action and any udp ports
+  ntnx_pbrs:
+    state: present
+    wait: true
+    priority: "{{ priority.5 }}"
+    vpc:
+      name: "{{ vpc.name }}"
+    source:
+      network:
+        ip: "{{ network.ip }}"
+        prefix: "{{ network.prefix }}"
+    destination:
+      any: true
+    action:
+      reroute: "{{ reroute_ip }}"
+    protocol:
+      udp:
+        src: "*"
+        dst: "*"
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.response.status.state == 'COMPLETE'
+    fail_msg: " Unable to create PBR with vpc name with source network and destination external with reroute action and and udp port "
+    success_msg: " PBR with vpc name with source network and destination external with reroute action and any udp ports created successfully "
+
+- name: Adding PBR to delete list
+  ansible.builtin.set_fact:
+    todelete: "{{ todelete + [  result.pbr_uuid ] }}"
+##################################################################################################################
+- name: Create PBR with vpc name, source network, external destination, with reroute action and icmp
+  ntnx_pbrs:
+    state: present
+    priority: "{{ priority.6 }}"
+    wait: false
+    vpc:
+      name: "{{ vpc.name }}"
+    source:
+      network:
+        ip: "{{ network.ip }}"
+        prefix: "{{ network.prefix }}"
+    destination:
+      external: true
+    action:
+      reroute: "{{reroute_ip}}"
+    protocol:
+      icmp:
+        code: "{{ icmp.code }}"
+        type: "{{ icmp.type }}"
+  register: result
+  ignore_errors: true
+
+- name: Adding PBR to delete list
+  ansible.builtin.set_fact:
+    todelete: "{{ todelete + [  result.pbr_uuid ] }}"
+##################################################################################################################
+- name: Delete Pbr with check mode
+  ntnx_pbrs:
+    state: absent
+    pbr_uuid: "{{ result.pbr_uuid }}"
+  register: output
+  ignore_errors: true
+  check_mode: true
+
+- name: Delete Pbr with check mode Status
+  ansible.builtin.assert:
+    that:
+      - output.failed == false
+      - output.changed == false
+      - output.msg =="Pbr with uuid:{{ result.pbr_uuid}} will be deleted."
+      - output.pbr_uuid == "{{ result.pbr_uuid }}"
+    fail_msg: "Delete Pbr with check mode failed"
+    success_msg: "Delete Pbr with check mode passed"
+
+- name: Delete all created pbrs
+  ntnx_pbrs:
+    state: absent
+    pbr_uuid: "{{ item }}"
+  register: result
+  loop: "{{ todelete }}"
+  ignore_errors: true

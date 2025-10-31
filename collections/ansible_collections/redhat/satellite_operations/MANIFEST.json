@@ -1,0 +1,46 @@
+{
+ "collection_info": {
+  "namespace": "redhat",
+  "name": "satellite_operations",
+  "version": "3.0.0",
+  "authors": [
+   "Baptiste Agasse <bagasse@redhat.com>",
+   "Chris Roberts <chrobert@redhat.com>",
+   "Eric D. Helms <ericdhelms@gmail.com>",
+   "Evgeni Golov <evgeni@golov.de>",
+   "Ewoud Kohl van Wijngaarden <ewoud@kohlvanwijngaarden.nl>",
+   "Griffin Sullivan <Griffin-Sullivan@users.noreply.github.com>",
+   "Jeffrey van Pelt <jeff@vanpelt.one>",
+   "Jeremy Audet <audet.jeremy@pm.me>",
+   "Kyle Williams <kyle.williams@thetradedesk.com>",
+   "Matthias Dellweg <2500@gmx.de>",
+   "Robert Rettig <robert@rettig.bayern>",
+   "willtome <willtome@gmail.com>"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "foreman",
+   "katello",
+   "satellite",
+   "infrastructure"
+  ],
+  "description": "Satellite operations tasks such as install, upgrade and maintenance",
+  "license": [
+   "GPL-3.0-or-later"
+  ],
+  "license_file": null,
+  "dependencies": {},
+  "repository": "https://github.com/RedHatSatellite/satellite-operations-collection",
+  "documentation": "https://access.redhat.com/documentation/en-us/red_hat_satellite/",
+  "homepage": "https://access.redhat.com/products/red-hat-satellite",
+  "issues": "https://bugzilla.redhat.com"
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "810e0e0fe788e3bddd26e7c8f42a82c927ebda22fd1af09e918d4590d462d43b",
+  "format": 1
+ },
+ "format": 1
+}

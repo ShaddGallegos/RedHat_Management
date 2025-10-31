@@ -1,0 +1,152 @@
+---
+- name: Start Upgrade Qualification Tests on version 2.2.0
+  ansible.builtin.debug:
+    msg: "Start Upgrade Qualification Tests on version 2.2.0"
+
+##################################################
+
+- name: Set variables
+  set_fact:
+    vm_ext_id_1: 8edf9f7b-6b4f-48cc-56fa-9863f852a964
+    subnet_ext_id: 94e263d3-bab9-4009-9566-25a8501b1629
+    disk_image_ext_id: e4953b46-3d31-475b-8841-24696288b904
+
+- name: Update vm with subnet and disk using the image
+  ntnx_vms_v2:
+    name: "test_qual_vm_updated_hercules_new"
+    ext_id: "{{ vm_ext_id_1 }}"
+    description: ansible test updated
+    state: present
+  register: result
+  ignore_errors: true
+
+- name: Check creating VM status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.changed == true
+      - result.response.name == "test_qual_vm_updated_hercules_new"
+      - result.response.description == "ansible test updated"
+    fail_msg: " Unable to update older VM with subnet and disk using the image "
+    success_msg: "Able to update VM with subnet and disk using the image successfully "
+
+- name: Create 2nd vm with subnet and disk using the image
+  ntnx_vms_v2:
+    name: "test_qual_vm_2_hercules_new"
+    description: ansible test
+    cluster:
+      ext_id: "{{ cluster.uuid }}"
+    disks:
+      - backing_info:
+          vm_disk:
+            disk_size_bytes: 26843545600
+            data_source:
+              reference:
+                image_reference:
+                  image_ext_id: "{{ disk_image_ext_id }}"
+        disk_address:
+          bus_type: SCSI
+          index: 3
+    nics:
+      - network_info:
+          subnet:
+            ext_id: "{{ subnet_ext_id }}"
+  register: result
+  ignore_errors: true
+
+- name: Check creating VM status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.changed == true
+      - result.response.name == "test_qual_vm_2_hercules_new"
+      - result.response.cluster.ext_id == "{{ cluster.uuid }}"
+      - result.response.disks[0].backing_info.data_source.reference.image_ext_id == "{{ disk_image_ext_id }}"
+      - result.response.nics[0].network_info.subnet.ext_id == "{{ subnet_ext_id }}"
+    fail_msg: " Unable to create VM with subnet and disk using the image "
+    success_msg: " VM with subnet and disk using the image created successfully "
+
+- name: Store VM ext_id
+  set_fact:
+    vm_ext_id_2: "{{ result.response.ext_id }}"
+
+- name: Print VM ext_id
+  ansible.builtin.debug:
+    msg: "VM ext_id: {{ vm_ext_id_2 }}"
+
+- name: Delete VM1
+  ntnx_vms_v2:
+    ext_id: "{{ vm_ext_id_1 }}"
+    state: absent
+  register: result
+  ignore_errors: true
+
+- name: Deletion Status
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.failed == false
+      - result.response is defined
+      - result.response.status == 'SUCCEEDED'
+      - result.changed == True
+      - result.failed == False
+      - result.ext_id == "{{ vm_ext_id_1 }}"
+    fail_msg: "Unable to delete VM "
+    success_msg: "VM is deleted successfully "
+
+- name: Delete VM2
+  ntnx_vms_v2:
+    ext_id: "{{ vm_ext_id_2 }}"
+    state: absent
+  register: result
+  ignore_errors: true
+
+- name: Deletion Status
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.failed == false
+      - result.response is defined
+      - result.response.status == 'SUCCEEDED'
+      - result.changed == True
+      - result.failed == False
+      - result.ext_id == "{{ vm_ext_id_2 }}"
+    fail_msg: "Unable to delete VM "
+    success_msg: "VM is deleted successfully "
+
+- name: Delete all Created Subnets
+  ntnx_subnets_v2:
+    state: absent
+    ext_id: "{{ subnet_ext_id }}"
+  register: result
+  ignore_errors: true
+
+- name: Deletion Status
+  ansible.builtin.assert:
+    that:
+      - result.changed == true
+      - result.failed == false
+      - result.response.status == 'SUCCEEDED'
+    fail_msg: "Unable to delete Subnet "
+    success_msg: "Subnet is deleted successfully "
+
+- name: Delete images
+  ntnx_images_v2:
+    state: absent
+    ext_id: "{{ disk_image_ext_id }}"
+  register: result
+  ignore_errors: true
+
+- name: Deletion Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.changed == true
+      - result.failed == false
+      - result.response.status == 'SUCCEEDED'
+    fail_msg: "Unable to delete images  "
+    success_msg: "Images deleted successfully "
+
+- name: End Upgrade Qualification Tests on version 2.2.0
+  ansible.builtin.debug:
+    msg: "End Upgrade Qualification Tests on version 2.2.0"

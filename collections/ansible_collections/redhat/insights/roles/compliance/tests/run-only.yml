@@ -1,0 +1,8 @@
+---
+- name: Run-only test of compliance role
+  hosts: all
+  tasks:
+    - name: Run Insights compliance
+      ansible.builtin.import_role:
+        name: redhat.insights.compliance
+        tasks_from: run

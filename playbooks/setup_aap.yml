@@ -1,0 +1,287 @@
+---
+- name: Setup Ansible Automation Platform and Credentials
+- hosts: localhost
+  gather_facts: false
+  vars_prompt:
+- name: "aap_admin_username"
+      prompt: "Enter Ansible Automation Platform admin username"
+      private: no
+- name: "aap_admin_password"
+      prompt: "Enter Ansible Automation Platform admin password"
+      private: yes
+- name: "satellite_admin_username"
+      prompt: "Enter Satellite admin username"
+      private: no
+- name: "satellite_admin_password"
+      prompt: "Enter Satellite admin password"
+      private: yes
+- name: "satellite_hostname"
+      prompt: "Enter Satellite hostname (FQDN)"
+      private: no
+- name: "satellite_ip"
+      prompt: "Enter Satellite IP address"
+      private: no
+- name: "insights_username"
+      prompt: "Enter Red Hat Insights username"
+      private: no
+- name: "insights_password"
+      prompt: "Enter Red Hat Insights password"
+      private: yes
+- name: "libvirt_ssh_user"
+      prompt: "Enter SSH username for Libvirt system"
+      private: no
+- name: "libvirt_ssh_password"
+      prompt: "Enter SSH password for Libvirt system"
+      private: yes
+- name: "github_username"
+      prompt: "Enter GitHub username"
+      private: no
+- name: "github_password"
+      prompt: "Enter GitHub password or token"
+      private: yes
+- name: "machine_credential_name"
+      prompt: "Enter name for machine credential"
+      private: no
+
+  tasks:
+- name: Ensure AAP containerized bundle is present
+      ansible.builtin.debug:
+        msg: "Please follow Red Hat documentation to install the AAP containerized bundle: https://access.redhat.com/documentation/en-us/red_hat_ansible_automation_platform/2.4/html-single/installation_guide/index"
+
+- name: Create AAP admin credential
+      awx.awx.credential:
+- name: "AAP Admin Credential"
+        credential_type: "Machine"
+        inputs:
+          username: "{{ aap_admin_username }}"
+          password: "{{ aap_admin_password }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        validate_certs: false
+        state: present
+
+- name: Create Satellite admin credential
+      awx.awx.credential:
+- name: "Satellite Admin Credential"
+        credential_type: "Machine"
+        inputs:
+          username: "{{ satellite_admin_username }}"
+          password: "{{ satellite_admin_password }}"
+          host: "{{ satellite_hostname }}"
+          ip: "{{ satellite_ip }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        validate_certs: false
+        state: present
+
+- name: Create Insights credential
+      awx.awx.credential:
+- name: "Insights Credential"
+        credential_type: "Machine"
+        inputs:
+          username: "{{ insights_username }}"
+          password: "{{ insights_password }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        validate_certs: false
+        state: present
+
+- name: Create Libvirt SSH credential
+      awx.awx.credential:
+- name: "Libvirt SSH Credential"
+        credential_type: "Machine"
+        inputs:
+          username: "{{ libvirt_ssh_user }}"
+          password: "{{ libvirt_ssh_password }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        validate_certs: false
+        state: present
+
+- name: Create GitHub credential
+      awx.awx.credential:
+- name: "GitHub Credential"
+        credential_type: "Source Control"
+        inputs:
+          username: "{{ github_username }}"
+          password: "{{ github_password }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        validate_certs: false
+        state: present
+
+- name: Create machine credential for automation
+      awx.awx.credential:
+- name: "{{ machine_credential_name }}"
+        credential_type: "Machine"
+        inputs:
+          username: "{{ libvirt_ssh_user }}"
+          password: "{{ libvirt_ssh_password }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        validate_certs: false
+        state: present
+
+- name: Create Insights inventory
+      awx.awx.inventory:
+- name: "Insights Hosts"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Add Insights inventory source
+      awx.awx.inventory_source:
+- name: "Insights Source"
+        inventory: "Insights Hosts"
+        source: insights
+        source_vars:
+          username: "{{ insights_username }}"
+          password: "{{ insights_password }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Create Libvirt inventory
+      awx.awx.inventory:
+- name: "Libvirt Hosts"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Add Libvirt inventory source
+      awx.awx.inventory_source:
+- name: "Libvirt Source"
+        inventory: "Libvirt Hosts"
+        source: scm
+        source_project: "Libvirt Project"
+        source_path: "inventories/libvirt"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Create Satellite inventory
+      awx.awx.inventory:
+- name: "Satellite Hosts"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Add Satellite inventory source
+      awx.awx.inventory_source:
+- name: "Satellite Source"
+        inventory: "Satellite Hosts"
+        source: satellite6
+        source_vars:
+          username: "{{ satellite_admin_username }}"
+          password: "{{ satellite_admin_password }}"
+          host: "{{ satellite_hostname }}"
+          ip: "{{ satellite_ip }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Create GitHub inventory (if using SCM inventory)
+      awx.awx.inventory:
+- name: "GitHub Hosts"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Add GitHub inventory source
+      awx.awx.inventory_source:
+- name: "GitHub Source"
+        inventory: "GitHub Hosts"
+        source: scm
+        source_project: "Libvirt Project"
+        source_path: "inventories/github"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Create Libvirt Project (GitHub)
+      awx.awx.project:
+- name: "Libvirt Project"
+        scm_type: git
+        scm_url: "https://github.com/shaddgallegos/Add_LVM_to_System_libvirt.git"
+        scm_branch: "main"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Create Insights Project
+      awx.awx.project:
+- name: "Insights Project"
+        scm_type: git
+        scm_url: "https://github.com/shaddgallegos/Add_LVM_to_System_libvirt.git"
+        scm_branch: "main"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Create Libvirt Job Template
+      awx.awx.job_template:
+- name: "Libvirt Setup"
+        job_type: "run"
+        inventory: "Libvirt Hosts"
+        project: "Libvirt Project"
+        playbook: "playbooks/setup_libvirt.yml"
+        credential: "{{ machine_credential_name }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Create Insights Job Template
+      awx.awx.job_template:
+- name: "Insights Setup"
+        job_type: "run"
+        inventory: "Insights Hosts"
+        project: "Insights Project"
+        playbook: "playbooks/setup_insights.yml"
+        credential: "{{ machine_credential_name }}"
+        organization: "Default"
+        controller_host: "https://aap.example.com"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        state: present
+
+- name: Display setup summary
+      ansible.builtin.debug:
+        msg: |
+          AAP setup complete. All credentials created.
+          Satellite Host: {{ satellite_hostname }}
+          Satellite IP: {{ satellite_ip }}
+          Please verify in the AAP UI: https://aap.example.com

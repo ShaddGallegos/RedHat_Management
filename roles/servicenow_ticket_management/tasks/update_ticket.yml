@@ -1,0 +1,34 @@
+---
+# Tasks to update a ServiceNow ticket
+
+- name: Validate required variables for ticket update
+  ansible.builtin.assert:
+    that:
+      - snow_ticket_number is defined
+      - update_message is defined or work_notes is defined
+      - servicenow_instance is defined
+      - servicenow_username is defined
+      - servicenow_password is defined
+    fail_msg: "Missing required variables for ServiceNow ticket update"
+
+- name: Set default update variables if not provided
+  ansible.builtin.set_fact:
+    ticket_work_notes: "{{ update_message | default(work_notes) | default('Updated by Ansible automation.') }}"
+    ticket_state: "{{ state | default('updated') }}"
+
+- name: Update ServiceNow incident
+  servicenow.itsm.incident:
+    instance: "{{ servicenow_instance }}"
+    username: "{{ servicenow_username }}"
+    password: "{{ servicenow_password }}"
+    state: "{{ ticket_state }}"
+    number: "{{ snow_ticket_number }}"
+    work_notes: "{{ ticket_work_notes }}"
+    verify_ssl: "{{ servicenow_verify_ssl | default(false) }}"
+    timeout: "{{ servicenow_api_timeout | default(30) }}"
+  register: snow_update_result
+  delegate_to: localhost
+
+- name: Log ticket update status
+  ansible.builtin.debug:
+    msg: "ServiceNow ticket {{ snow_ticket_number }} updated successfully with notes: {{ ticket_work_notes }}"

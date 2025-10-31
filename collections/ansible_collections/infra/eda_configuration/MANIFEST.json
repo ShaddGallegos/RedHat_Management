@@ -1,0 +1,42 @@
+{
+ "collection_info": {
+  "namespace": "infra",
+  "name": "eda_configuration",
+  "version": "1.1.0",
+  "authors": [
+   "Chris Renwick @crenwick93",
+   "Tom Page @Tompage1994",
+   "Sean Sullivan @sean-m-sullivan",
+   "David Danielsson @djdanielsson"
+  ],
+  "readme": "README.md",
+  "tags": [
+   "cloud",
+   "infrastructure",
+   "ansible",
+   "event",
+   "driven",
+   "controller",
+   "eda",
+   "automation"
+  ],
+  "description": "Ansible content that interacts with the Ansible EDA Controller.",
+  "license": [
+   "GPL-3.0-only"
+  ],
+  "license_file": null,
+  "dependencies": {},
+  "repository": "https://github.com/redhat-cop/eda_configuration",
+  "documentation": "https://github.com/redhat-cop/eda_configuration/blob/devel/README.md",
+  "homepage": null,
+  "issues": "https://github.com/redhat-cop/eda_configuration/issues"
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "d39b9416ac932e46c26cd84ee79a4f3640c46737f96a1a7f547f9ef946abf835",
+  "format": 1
+ },
+ "format": 1
+}

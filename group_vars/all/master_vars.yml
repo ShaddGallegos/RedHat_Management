@@ -1,0 +1,17 @@
+env:
+  DEFAULT_ADMIN_USER: admin
+  NUTANIX_ACTION: skip
+  SATELLITE_ACTION: skip
+integrations:
+  aap: false
+  ahub: false
+  aws: false
+  azure: false
+  eda: false
+  gcp: false
+  github: false
+  libvirt: false
+  nutanix: false
+  satellite: false
+  servicenow: false
+nodes: []

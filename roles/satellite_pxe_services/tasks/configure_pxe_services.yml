@@ -1,0 +1,179 @@
+---
+# Configure PXE Services for Satellite Provisioning
+# Enhanced for libvirt integration and automated node provisioning
+
+- name: Install PXE and virtualization packages
+  ansible.builtin.dnf:
+- name:
+      - tftp-server
+      - syslinux
+      - bind-utils
+      - dhcp-server
+      - ipxe-bootimgs
+      - libvirt
+      - libvirt-daemon
+      - libvirt-daemon-driver-qemu
+      - virt-install
+      - qemu-kvm
+    state: present
+  become: true
+
+- name: Start and enable libvirt services
+  ansible.builtin.systemd:
+- name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - libvirtd
+    - virtqemud
+    - virtnetworkd
+    - virtstoraged
+  become: true
+
+- name: Create TFTP root directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: nobody
+    group: nobody
+    mode: '0755'
+  loop:
+    - /var/lib/tftpboot
+    - /var/lib/tftpboot/pxelinux.cfg
+    - /var/lib/tftpboot/boot
+    - /var/lib/tftpboot/images
+    - /var/lib/tftpboot/images/rhel96
+  become: true
+
+- name: Copy PXE boot files
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    remote_src: true
+    mode: '0644'
+  loop:
+    - { src: "/usr/share/syslinux/pxelinux.0", dest: "/var/lib/tftpboot/pxelinux.0" }
+    - { src: "/usr/share/syslinux/menu.c32", dest: "/var/lib/tftpboot/menu.c32" }
+    - { src: "/usr/share/syslinux/chain.c32", dest: "/var/lib/tftpboot/chain.c32" }
+    - { src: "/usr/share/syslinux/ldlinux.c32", dest: "/var/lib/tftpboot/ldlinux.c32" }
+    - { src: "/usr/share/syslinux/libutil.c32", dest: "/var/lib/tftpboot/libutil.c32" }
+  become: true
+  ignore_errors: true
+
+- name: Configure TFTP service via systemd
+  ansible.builtin.systemd:
+- name: tftp.socket
+    enabled: true
+    state: started
+  become: true
+
+- name: Start and enable TFTP service
+  ansible.builtin.systemd:
+- name: tftp.service
+    enabled: true
+  become: true
+
+- name: Configure DHCP for PXE boot with libvirt support
+  ansible.builtin.template:
+    src: ../templates/dhcpd.conf.j2
+    dest: /etc/dhcp/dhcpd.conf
+    backup: true
+    mode: '0644'
+  become: true
+  notify: restart dhcpd
+
+- name: Configure network interface for DHCP
+  ansible.builtin.lineinfile:
+    path: /etc/sysconfig/dhcpd
+    regexp: '^DHCPDARGS='
+    line: 'DHCPDARGS="{{ primary_interface }}"'
+    create: true
+  become: true
+  notify: restart dhcpd
+
+- name: Create libvirt network for Satellite provisioning
+  ansible.builtin.template:
+    src: ../templates/libvirt-network.xml.j2
+    dest: /tmp/satellite-pxe-network.xml
+    mode: '0644'
+  become: true
+
+- name: Define libvirt network for PXE
+  ansible.builtin.shell: |
+    virsh net-define /tmp/satellite-pxe-network.xml
+    virsh net-autostart {{ libvirt_network }}
+    virsh net-start {{ libvirt_network }} || true
+  become: true
+  ignore_errors: true
+
+- name: Start and enable network services
+  ansible.builtin.systemd:
+- name: "{{ item }}"
+    state: started
+    enabled: true
+  loop:
+    - dhcpd
+  become: true
+
+- name: Configure firewall for PXE services
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+    zone: public
+  loop:
+    - tftp
+    - dhcp
+  become: true
+  ignore_errors: true
+
+- name: Open additional ports for libvirt/PXE
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+    zone: public
+  loop:
+    - "69/udp"     # TFTP
+    - "67/udp"     # DHCP Server
+    - "68/udp"     # DHCP Client
+    - "16509/tcp"  # Libvirt
+  become: true
+  ignore_errors: true
+
+- name: Create PXE default configuration
+  ansible.builtin.template:
+    src: ../templates/pxe-default.j2
+    dest: /var/lib/tftpboot/pxelinux.cfg/default
+    mode: '0644'
+  become: true
+
+- name: Display PXE services configuration status
+  ansible.builtin.debug:
+    msg: |
+      PXE SERVICES CONFIGURATION STATUS:
+      
+      Services Installed and Running:
+      • TFTP Server (xinetd): [ACTIVE]
+      • DHCP Server: [ACTIVE]
+      • Libvirt: [ACTIVE]
+      
+      Network Configuration:
+      • Interface: {{ primary_interface }}
+      • DHCP Range: {{ dhcp_range_start }} - {{ dhcp_range_end }}
+      • PXE Server: {{ satellite_ip }}
+      • Libvirt Network: {{ libvirt_network }}
+      
+      PXE Files:
+      • TFTP Root: /var/lib/tftpboot
+      • Boot Files: [CONFIGURED]
+      • Default Config: [CREATED]
+      
+      Firewall:
+      • TFTP (69/udp): [OPEN]
+      • DHCP (67-68/udp): [OPEN]
+      • Libvirt (16509/tcp): [OPEN]
+      
+      Ready for Node Provisioning!

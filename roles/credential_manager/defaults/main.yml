@@ -1,0 +1,128 @@
+---
+# Default values for credential manager role
+master_defaults_file: "{{ playbook_dir }}/../vars/master_defaults.yml"
+vault_file: "{{ playbook_dir }}/../group_vars/all/vault.yml"
+
+# Prompt categories
+credential_categories:
+- name: "AAP Controller"
+  vars:
+- name: "aap_controller_host"
+        prompt: "AAP Controller hostname/IP"
+        required: true
+- name: "aap_controller_username"
+        prompt: "AAP Controller admin username"
+        required: true
+        sensitive: true
+- name: "aap_controller_password"
+        prompt: "AAP Controller admin password"
+        required: true
+        sensitive: true
+- name: "aap_controller_verify_ssl"
+        prompt: "Verify SSL certificates? (true/false)"
+        default: "false"
+
+- name: "EDA Controller"
+  vars:
+- name: "eda_controller_host"
+        prompt: "EDA Controller hostname/IP"
+        required: true
+- name: "eda_controller_username"
+        prompt: "EDA Controller admin username"
+        required: true
+        sensitive: true
+- name: "eda_controller_password"
+        prompt: "EDA Controller admin password"
+        required: true
+        sensitive: true
+
+- name: "ServiceNow"
+  vars:
+- name: "snow_instance"
+        prompt: "ServiceNow instance name (e.g., dev12345)"
+        required: true
+- name: "snow_username"
+        prompt: "ServiceNow username"
+        required: true
+        sensitive: true
+- name: "snow_password"
+        prompt: "ServiceNow password"
+        required: true
+        sensitive: true
+
+- name: "Nutanix Prism"
+  vars:
+- name: "nutanix_host"
+        prompt: "Nutanix Prism Central hostname/IP"
+        required: true
+- name: "nutanix_username"
+        prompt: "Nutanix username"
+        required: true
+        sensitive: true
+- name: "nutanix_password"
+        prompt: "Nutanix password"
+        required: true
+        sensitive: true
+- name: "nutanix_port"
+        prompt: "Nutanix API port"
+        default: "9440"
+- name: "nutanix_validate_certs"
+        prompt: "Validate SSL certificates? (true/false)"
+        default: "false"
+
+- name: "Splunk"
+  vars:
+- name: "splunk_host"
+        prompt: "Splunk hostname/IP"
+        required: true
+- name: "splunk_port"
+        prompt: "Splunk HEC port"
+        default: "8088"
+- name: "splunk_token"
+        prompt: "Splunk HEC token"
+        required: true
+        sensitive: true
+- name: "splunk_index"
+        prompt: "Splunk index for events"
+        default: "main"
+
+- name: "Email Notifications"
+  vars:
+- name: "smtp_host"
+        prompt: "SMTP server hostname"
+        default: "localhost"
+- name: "smtp_port"
+        prompt: "SMTP port"
+        default: "25"
+- name: "smtp_username"
+        prompt: "SMTP username (leave blank for none)"
+        required: false
+        sensitive: true
+- name: "smtp_password"
+        prompt: "SMTP password (leave blank for none)"
+        required: false
+        sensitive: true
+- name: "admin_email"
+        prompt: "Admin email address"
+        required: true
+- name: "operations_email"
+        prompt: "Operations team email"
+        required: true
+
+- name: "Project Settings"
+  vars:
+- name: "project_name"
+        prompt: "AAP Project name"
+        default: "LVM_Automation_Nutanix"
+- name: "project_scm_url"
+        prompt: "Git repository URL"
+        required: true
+- name: "project_scm_branch"
+        prompt: "Git branch"
+        default: "main"
+- name: "organization_name"
+        prompt: "AAP Organization name"
+        default: "Default"
+- name: "execution_environment"
+        prompt: "Execution Environment name"
+        default: "Default execution environment"

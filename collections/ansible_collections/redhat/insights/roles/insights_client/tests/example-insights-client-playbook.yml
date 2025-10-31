@@ -1,0 +1,7 @@
+---
+- name: Simple test of insights_client role
+  hosts: all
+  tasks:
+    - name: Include insights_client role
+      ansible.builtin.include_role:
+        name: redhat.insights.insights_client

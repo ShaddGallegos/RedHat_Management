@@ -1,0 +1,83 @@
+{% macro pretty_md_list(text) %}
+{% if text is not string %}
+{% for line in text %}
+- {{ line }}
+{% endfor %}
+{% else %}
+{{ text }}
+{% endif %}
+{% endmacro %}
+{% macro pretty_html_list(text) %}
+{% if text is not string %}
+<ul>
+{% for line in text %}
+<li>{{ line }}</li>
+{% endfor %}
+</ul>
+{% else -%}
+{{ text }}
+{%- endif %}
+{% endmacro %}
+{% if docs.name is defined %}{{ docs.name }}{% else %}{{ docs.module }}{% endif %} - {{ docs.short_description }}
+====================================
+- [Synopsis](#synopsis)
+{% if docs.deprecated is defined %}
+- [DEPRECATED](#deprecated)
+{% endif %}
+- [Requirements](#requirements)
+- [Notes](#notes)
+- [Parameters](#parameters)
+- [Examples](#examples)
+
+## Synopsis
+{{ pretty_md_list(docs.description) }}
+
+{% if docs.deprecated is defined %}
+## DEPRECATED
+Please note that `{% if docs.name is defined %}{{ docs.name }}{% else %}{{ docs.module }}{% endif %}` is **deprecated**:
+- To be removed in version: {{ docs.deprecated.removed_in }}
+- Why: {{ docs.deprecated.why | trim }}
+- Alternative: {{ docs.deprecated.alternative | trim }}
+
+{% endif %}
+## Requirements
+{% if docs.requirements | d(none) is not none %}
+{{ pretty_md_list(docs.requirements) }}
+{% else %}
+(none)
+{% endif %}
+
+## Notes
+{% if docs.notes | d(none) is not none %}
+{{ pretty_md_list(docs.notes) }}
+{% else %}
+(none)
+{% endif %}
+
+## Parameters
+
+<table>
+<tr>
+<th>Parameter</th>
+<th>Choices/Defaults</th>
+<th>Configuration</th>
+<th>Comments</th>
+</tr>
+{% for option in docs.options %}
+<tr>
+<td><b>{{ option }}</b></br>
+{% if docs.options[option]['required'] is defined and docs.options[option]['required'] %}<p style="color:red;font-size:75%">required</p>{% endif %}</td>
+<td>{% if docs.options[option]['choices'] is defined %}<b>Choices:</b><br>
+{{ pretty_html_list(docs.options[option]['choices']) }}{% endif %}{% if docs.options[option]['default'] is defined %}<b>Default:</b><br>
+{{ docs.options[option]['default'] }}{% endif %}</td>
+<td>{% if docs.options[option]['env'] is defined %}<b>env:</b><br>
+{{ docs.options[option]['env'] | to_nice_yaml }}{% endif %}</td>
+<td>{{ pretty_html_list(docs.options[option]['description']) }}</td>
+</tr>
+{% endfor %}
+</table>
+
+## Examples
+```yaml
+{{ examples }}
+```

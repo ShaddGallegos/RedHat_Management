@@ -1,0 +1,132 @@
+---
+- name: Start ntnx_address_groups update tests
+  ansible.builtin.debug:
+    msg: Start ntnx_address_groups update tests
+
+- name: Generate random project_name
+  ansible.builtin.set_fact:
+    random_name: "{{query('community.general.random_string',numbers=false, special=false,length=12)[0]}}"
+
+- name: Set suffix name
+  ansible.builtin.set_fact:
+    suffix_name: "ansible-ag"
+
+- name: Set address group names
+  ansible.builtin.set_fact:
+    ag1: "{{random_name}}{{suffix_name}}1"
+    ag2: "{{random_name}}{{suffix_name}}2"
+
+##############################################################################################
+
+- name: Create address group with
+  ntnx_address_groups:
+    state: present
+    name: "{{ag1}}"
+    desc: test-ansible-address-group-3-desc
+    subnets:
+      - network_ip: "10.1.1.0"
+        network_prefix: 24
+      - network_ip: "10.1.2.1"
+        network_prefix: 32
+  register: test_ag
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - test_ag.response is defined
+      - test_ag.changed == true
+    fail_msg: "Unable to create address group"
+    success_msg: "Address group created successfully"
+
+###################################################################################################
+
+- name: Update all fields
+  ntnx_address_groups:
+    state: present
+    address_group_uuid: "{{test_ag.address_group_uuid}}"
+    name: "{{ag2}}"
+    desc: test-ansible-address-group-3-desc-updated
+    subnets:
+      - network_ip: "10.1.3.1"
+        network_prefix: 32
+  register: result
+
+- name: Update status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.address_group_uuid is defined
+      - result.changed == true
+      - result.response.name == "{{ag2}}"
+      - result.response.description == "test-ansible-address-group-3-desc-updated"
+      - result.response.ip_address_block_list[0].ip == "10.1.3.1"
+      - result.response.ip_address_block_list[0].prefix_length == 32
+      - result.response.ip_address_block_list | length == 1
+
+    fail_msg: "Unable to update address group"
+    success_msg: "Address group updated successfully"
+
+###################################################################################################
+
+- name: Idempotency check
+  ntnx_address_groups:
+    state: present
+    address_group_uuid: "{{test_ag.address_group_uuid}}"
+    name: "{{ag2}}"
+    desc: test-ansible-address-group-3-desc-updated
+    subnets:
+      - network_ip: "10.1.3.1"
+        network_prefix: 32
+  register: result
+
+- name: Idempotency check status
+  ansible.builtin.assert:
+    that:
+      - result.changed == False
+      - result.failed == False
+      - "'Nothing to change' in result.msg"
+
+    fail_msg: "Idempotency check failed"
+    success_msg: "Idempotency check passed"
+
+###################################################################################################
+
+- name: Check mode test
+  ntnx_address_groups:
+    state: present
+    address_group_uuid: "{{test_ag.address_group_uuid}}"
+    name: "{{ag2}}"
+    desc: test-ansible-address-group-3-desc
+    subnets:
+      - network_ip: "10.1.1.0"
+        network_prefix: 24
+      - network_ip: "10.1.2.1"
+        network_prefix: 32
+  register: result
+  check_mode: true
+  ignore_errors: true
+
+- name: Check mode Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.address_group_uuid is defined
+      - result.changed == False
+      - result.response.name == "{{ag2}}"
+      - result.response.description == "test-ansible-address-group-3-desc"
+      - result.response.ip_address_block_list[0].ip == "10.1.1.0"
+      - result.response.ip_address_block_list[1].ip == "10.1.2.1"
+      - result.response.ip_address_block_list[0].prefix_length == 24
+      - result.response.ip_address_block_list[1].prefix_length == 32
+
+    fail_msg: "Check mode failed"
+    success_msg: "Check mode spec generated successfully"
+
+###################################################################################################
+
+- name: Cleanup created entities
+  ntnx_address_groups:
+    state: absent
+    address_group_uuid: "{{test_ag.address_group_uuid}}"
+  register: result
+  ignore_errors: true

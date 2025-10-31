@@ -1,0 +1,17 @@
+---
+- name: Set module defaults
+  module_defaults:
+    group/nutanix.ncp.ntnx:
+      nutanix_host: "{{ ip }}"
+      nutanix_username: "{{ username }}"
+      nutanix_password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+  block:
+    - name: Import create_project.yml
+      ansible.builtin.import_tasks: "create_project.yml"
+    - name: Import delete_project.yml
+      ansible.builtin.import_tasks: "delete_project.yml"
+    - name: Import update_project.yml
+      ansible.builtin.import_tasks: "update_project.yml"
+    - name: Import projects_with_role_mappings.yml
+      ansible.builtin.import_tasks: "projects_with_role_mappings.yml"

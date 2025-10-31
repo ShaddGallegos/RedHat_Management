@@ -1,0 +1,143 @@
+---
+# Converted from shell script to Ansible playbook
+# Generated: 2025-10-07 17:29:59
+# Original script: scripts/setup_lvm_automation.sh
+- name: Setup LVM Automation Environment
+- hosts: localhost
+  gather_facts: false
+  connection: local
+  vars:
+    project_dir: '{{ playbook_dir }}/..'
+    collections_requirements:
+- name: community.general
+        version: '>=6.0.0'
+- name: nutanix.ncp
+        version: '>=1.0.0'
+- name: ansible.posix
+        version: '>=1.5.0'
+- name: ansible.eda
+        version: '>=1.0.0'
+  tasks:
+- name: Display setup banner
+      ansible.builtin.debug:
+        msg: Setting up Libvirt LVM Automation Environment...
+- name: Ensure required directories exist
+      ansible.builtin.file:
+        path: '{{ project_dir }}/{{ item }}'
+        state: directory
+        mode: '0755'
+      loop:
+        - inventory
+        - group_vars
+        - playbooks
+        - roles
+        - vault
+        - logs
+        - scripts
+- name: Create requirements.yml for collections
+      ansible.builtin.copy:
+        content: "{{ {'collections': collections_requirements} | to_nice_yaml }}"
+        dest: '{{ project_dir }}/requirements.yml'
+        mode: '0644'
+- name: Install Ansible collections
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install -r {{ project_dir }}/requirements.yml
+      register: collection_install
+      changed_when: "'Installing' in collection_install.stdout"
+- name: Create example vault file
+      ansible.builtin.copy:
+        dest: '{{ project_dir }}/vault_example.yml'
+        content: |
+          # vault.yml - Encrypted variables (use ansible-vault encrypt)
+
+          ---
+
+          vault_nutanix_password: "your_nutanix_password_here"
+
+          vault_storage_container_uuid: "your_storage_container_uuid_here"
+
+          vault_admin_email: "admin@yourdomain.com"
+        mode: '0644'
+        force: false
+- name: Create group_vars/all.yml
+      ansible.builtin.copy:
+        dest: '{{ project_dir }}/group_vars/all.yml'
+        content: |
+          ---
+          # Global variables for all hosts
+          disk_usage_threshold: 90
+          extend_percentage: 20
+          # Webhook settings
+          webhook_host: "localhost"
+          webhook_port: 5000
+          # Notification settings
+          notification_enabled: true
+        mode: '0644'
+        force: false
+- name: Create Python requirements.txt
+      ansible.builtin.copy:
+        dest: '{{ project_dir }}/requirements.txt'
+        content: |
+          ansible>=6.0.0
+          ansible-runner>=2.3.0
+          nutanix-ncp>=1.0.0
+          community-general>=5.0.0
+          ansible-rulebook>=0.13.0
+          PyYAML>=5.1
+          requests>=2.25.0
+        mode: '0644'
+        force: false
+- name: Create setup_monitoring_cron playbook
+      ansible.builtin.copy:
+        dest: '{{ project_dir }}/playbooks/setup_monitoring_cron.yml'
+        content: |
+          ---
+- name: Setup Disk Monitoring Cron Job
+- hosts: all
+  become: true
+  vars:
+    webhook_url: "{{ webhook_url | default('http://eda-controller:5000/webhook') }}"
+  tasks:
+- name: Create monitoring script
+                ansible.builtin.copy:
+                  dest: /usr/local/bin/lvm-disk-monitor.sh
+                  mode: '0755'
+                  content: |
+                    #!/bin/bash
+                    WEBHOOK_URL="{{ webhook_url }}"
+                    HOSTNAME="$(hostname)"
+                    df -h | grep -E '^/dev/' | while read line; do
+                      USAGE=$(echo $line | awk '{print $5}' | tr -d '%')
+                      MOUNT=$(echo $line | awk '{print $6}')
+                      DEVICE=$(echo $line | awk '{print $1}')
+                      if [ $USAGE -ge 90 ]; then
+                        curl -X POST "$WEBHOOK_URL" \
+                          -H 'Content-Type: application/json' \
+                          -d "{
+                            \"hostname\": \"$HOSTNAME\",
+                            \"disk_usage_percent\": $USAGE,
+                            \"mount_point\": \"$MOUNT\",
+                            \"device\": \"$DEVICE\"
+                          }"
+                      fi
+                    done
+- name: Add cron job for monitoring
+                ansible.builtin.cron:
+- name: "LVM Disk Usage Monitor"
+                  minute: "*/5"
+                  job: "/usr/local/bin/lvm-disk-monitor.sh >/dev/null 2>&1"
+                  user: root
+        mode: '0644'
+        force: false
+- name: Display setup complete message
+      ansible.builtin.debug:
+        msg:
+          - Setup complete! Configure your inventory.yml
+          - ''
+          - 'Next steps:'
+          - ' 1. Edit inventory/hosts with your servers'
+          - ' 2. Create vault: cp vault_example.yml vault.yml'
+          - ' 3. Edit vault.yml with your credentials'
+          - ' 4. Encrypt vault: ansible-vault encrypt vault.yml'
+          - ' 5. Test setup: ansible all -i inventory/hosts -m ping'
+          - ' 6. Start EDA: ansible-playbook playbooks/start_eda.yml'

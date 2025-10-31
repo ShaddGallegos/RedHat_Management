@@ -1,0 +1,21 @@
+---
+name: Ok-To-Test
+
+on: [issue_comment]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.issue.pull_request }}
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - run: echo "Your Github Token is ${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Slash Command Dispatch
+        uses: peter-evans/slash-command-dispatch@v2
+        with:
+          token: ${{ secrets.PAT }}
+          commands: ok-to-test
+          permission: write
+      - run: echo "🍏 This job's status is ${{ job.status }}."

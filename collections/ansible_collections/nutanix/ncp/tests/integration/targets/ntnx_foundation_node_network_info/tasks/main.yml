@@ -1,0 +1,8 @@
+---
+- name: Ntnx_foundation_node_network_info integration tests
+  module_defaults:
+    group/nutanix.ncp.ntnx:
+      nutanix_host: "{{ foundation_host }}"
+  block:
+    - name: Import Tasks
+      ansible.builtin.import_tasks: get_info.yml

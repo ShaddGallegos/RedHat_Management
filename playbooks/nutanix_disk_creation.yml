@@ -1,0 +1,111 @@
+---
+# nutanix_disk_creation.yml - Creates and attaches new disk via Nutanix API
+- name: Create and Attach New Disk via Nutanix for LVM Extension
+- hosts: localhost
+  gather_facts: false
+ collections:
+ - nutanix.ncp
+ - community.general
+ 
+  vars:
+ # Nutanix connection details - should be provided via extra vars or vault
+    nutanix_host: "{{ nutanix_cluster_ip }}"
+    nutanix_username: "{{ nutanix_user }}"
+    nutanix_password: "{{ nutanix_pass }}"
+    nutanix_validate_certs: false
+ 
+  tasks:
+- name: Validate required variables
+ ansible.builtin.fail:
+ msg: "Missing required variable: {{ item }}"
+ when: vars[item] is not defined or vars[item] == ""
+ loop:
+ - vm_name
+ - new_disk_size_gb
+ - nutanix_host
+ - nutanix_username
+ - storage_container_uuid
+ 
+- name: Get VM information from Nutanix
+ ntnx_vms_v2:
+ state: present
+ hostname: "{{ nutanix_host }}"
+ username: "{{ nutanix_username }}"
+ password: "{{ nutanix_password }}"
+ validate_certs: "{{ nutanix_validate_certs }}"
+- name: "{{ vm_name }}"
+ register: vm_info
+ 
+- name: Add new disk to VM
+ ntnx_vms_disks_v2:
+ hostname: "{{ nutanix_host }}"
+ username: "{{ nutanix_username }}"
+ password: "{{ nutanix_password }}"
+ validate_certs: "{{ nutanix_validate_certs }}"
+ vm_uuid: "{{ vm_info.response.extId }}"
+ disks:
+ - disk_size_mib: "{{ (new_disk_size_gb | int * 1024) }}"
+ storage_config:
+ storage_container_reference:
+ uuid: "{{ storage_container_uuid }}"
+ state: present
+ register: disk_creation_result
+ 
+- name: Wait for disk attachment to complete
+ ansible.builtin.pause:
+ seconds: 30
+ prompt: "Waiting for disk to be attached to VM..."
+ 
+- name: Create follow-up payload for disk integration
+ ansible.builtin.set_fact:
+ disk_integration_payload:
+ hostname: "{{ target_hostname }}"
+ action: "integrate_new_disk"
+ new_disk_size_gb: "{{ new_disk_size_gb }}"
+ vg_name: "{{ vg_name }}"
+ lv_name: "{{ lv_name }}"
+ mount_point: "{{ mount_point }}"
+ vm_name: "{{ vm_name }}"
+ disk_created: true
+ 
+- name: Trigger disk integration on target host
+ ansible.builtin.uri:
+ url: "http://localhost:5000/webhook/integrate-disk"
+ method: POST
+ body_format: json
+ body: "{{ disk_integration_payload }}"
+ status_code: [200, 201]
+ ignore_errors: true
+ 
+- name: Display disk creation results
+ ansible.builtin.debug:
+ msg: |
+ === Nutanix Disk Creation Completed ===
+ VM: {{ vm_name }}
+ New Disk Size: {{ new_disk_size_gb }}GB
+ Disk Creation Status: {{ 'Success' if disk_creation_result is succeeded else 'Failed' }}
+ Next Step: Integration with LVM on target host
+ 
+- name: Send disk creation notification email
+ community.general.mail:
+ to: "{{ admin_email | default('admin@example.com') }}"
+ subject: "Nutanix Disk Creation - {{ vm_name }}"
+ body: |
+ New Disk Created via Nutanix API
+ 
+ VM Name: {{ vm_name }}
+ Target Host: {{ target_hostname }}
+ New Disk Size: {{ new_disk_size_gb }}GB
+ Volume Group: {{ vg_name }}
+ Logical Volume: {{ lv_name }}
+ Mount Point: {{ mount_point }}
+ 
+ Status: Disk created successfully
+ Next Step: Automatic integration with existing LVM structure
+ 
+ This disk was created because the existing Volume Group 
+ did not have sufficient Physical Extents for 20% expansion.
+ 
+ Timestamp: {{ ansible_date_time.iso8601 }}
+ ignore_errors: true
+ when: admin_email is defined

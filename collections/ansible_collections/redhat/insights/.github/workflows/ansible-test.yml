@@ -1,0 +1,93 @@
+---
+name: CI
+on:  # yamllint disable-line rule:truthy
+  # Run CI against all pushes (direct commits, also merged PRs), Pull Requests
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+
+  ###
+  # Sanity tests (REQUIRED)
+  #
+  # https://docs.ansible.com/ansible/latest/dev_guide/testing_sanity.html
+  sanity:
+    name: Sanity (Ⓐ${{ matrix.ansible }}+py${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        ansible:
+          - ''
+        python:
+          - ''
+        exclude:
+          - ansible: ''
+        include:
+          - ansible: '2.15'
+            python: '3.9'
+          - ansible: '2.15'
+            python: '3.11'
+          - ansible: '2.16'
+            python: '3.9'
+          - ansible: '2.16'
+            python: '3.11'
+          - ansible: '2.17'
+            python: '3.10'
+          - ansible: '2.17'
+            python: '3.12'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          path: repo
+
+      - name: Check out the branch
+        run: |
+          # Create a branch for the current HEAD, which happens to be a merge
+          # commit
+          git checkout -b 'pull-request-${{ github.event.pull_request.number }}'
+
+          # Name the target branch
+          git branch '${{
+            github.event.pull_request.base.ref
+          }}' --track 'origin/${{
+            github.event.pull_request.base.ref
+          }}'
+
+          # Show branch information
+          git branch -vv
+        working-directory: repo
+        if: github.event_name == 'pull_request'
+
+      - name: Get git version
+        id: git-version
+        run: |
+          export version=$(git describe --tags | grep -Po '\d+\.\d+\.\d+')
+          echo "git_version=$version" >> $GITHUB_OUTPUT
+        working-directory: repo
+
+      - name: Generate galaxy.yml
+        run: |
+          set -euxo pipefail
+          sudo apt-get --no-install-recommends -y install python3 python3-jinja2
+          python3 .github/scripts/jinja2-replace galaxy.yml.j2 galaxy.yml
+        working-directory: repo
+        env:
+          JINJA_collection_name: insights
+          JINJA_collection_namespace: redhat
+          JINJA_collection_repo: https://github.com/${{ github.repository }}
+          JINJA_collection_version: ${{ steps.git-version.outputs.git_version }}
+
+      - name: Run sanity tests
+        uses: ansible-community/ansible-test-gh-action@release/v1
+        with:
+          ansible-core-version: stable-${{ matrix.ansible }}
+          collection-src-directory: ${{ github.workspace }}/repo
+          coverage: 'never'
+          target-python-version: ${{ matrix.python }}
+          testing-type: sanity

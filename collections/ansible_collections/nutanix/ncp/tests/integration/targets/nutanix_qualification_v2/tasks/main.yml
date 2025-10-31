@@ -1,0 +1,15 @@
+---
+- name: Set module defaults
+  module_defaults:
+    group/nutanix.ncp.ntnx:
+      nutanix_host: "{{ ip }}"
+      nutanix_username: "{{ username }}"
+      nutanix_password: "{{ password }}"
+      validate_certs: "{{ validate_certs }}"
+  block:
+    # - name: Import qualification_2.1.1.yml
+    #   ansible.builtin.import_tasks: "qualification_2.1.1.yml"
+      # ignore_errors: true
+    - name: Import qualification_2.2.0.yml
+      ansible.builtin.import_tasks: "qualification_2.2.0.yml"
+    #   ignore_errors: true

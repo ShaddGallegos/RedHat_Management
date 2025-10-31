@@ -1,0 +1,23 @@
+---
+- name: Generate documentations
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Generate docs from docs.md.j2
+      ansible.builtin.template:
+        src: ./templates/docs.md.j2
+        dest: "{{ item.output }}"
+        mode: "u=rw,go=r"
+      vars:
+        # yamllint disable rule:line-length
+        docs: "{{ lookup('file', '../' + item.file) | regex_search(\"(?<=DOCUMENTATION\\s=\\s''')((.|\\n)*?)(?=''')\") | from_yaml }}"
+        examples: "{{ lookup('file', '../' + item.file) | regex_search(\"(?<=EXAMPLES\\s=\\s''')((.|\\n)*?)(?=''')\") }}"
+        # yamllint enable rule:line-length
+      loop:
+        - file: 'plugins/inventory/insights.py'
+          output: 'inventory.md'
+        - file: 'plugins/modules/insights_register.py'
+          output: 'insights_register.md'
+        - file: 'plugins/modules/insights_config.py'
+          output: 'insights_config.md'

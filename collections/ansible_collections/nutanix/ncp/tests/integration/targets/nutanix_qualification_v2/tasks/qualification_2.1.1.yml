@@ -1,0 +1,123 @@
+---
+- name: Start Upgrade Qualification Tests on version 2.1.1
+  ansible.builtin.debug:
+    msg: "Start Upgrade Qualification Tests on version 2.1.1"
+
+- name: Create DISK_IMAGE using valid source url
+  ntnx_images_v2:
+    state: present
+    type: DISK_IMAGE
+    name: "test_ansible_qual_disk_image"
+    description: image created from integration test
+    checksum:
+      sha1:
+        hex_digest: "{{ disk_image.checksum }}"
+    source:
+      url_source:
+        url: "{{ disk_image.url }}"
+        should_allow_insecure_url: true
+  register: result
+  ignore_errors: true
+
+- name: Creation Status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.changed == true
+      - result.failed == false
+      - result.response.checksum.hex_digest == "{{ disk_image.checksum }}"
+      - result.response.name == "test_ansible_qual_disk_image"
+      - result.response.source.url == "{{ disk_image.url }}"
+      - result.ext_id is defined
+      - result.ext_id == result.response.ext_id
+      - result.task_ext_id is defined
+    fail_msg: "Unable to Create DISK_IMAGE with valid source url  "
+    success_msg: "DISK_IMAGE with valid source url is created successfully "
+
+- name: Store DISK_IMAGE ext_id
+  set_fact:
+    disk_image_ext_id: "{{ result.ext_id }}"
+
+- name: Print DISK_IMAGE ext_id
+  ansible.builtin.debug:
+    msg: "DISK_IMAGE ext_id: {{ disk_image_ext_id }}"
+
+##################################################
+- name: VLAN subnet without IPAM
+  ntnx_subnets_v2:
+    state: present
+    wait: true
+    name: "test_ansible_qual_1"
+    subnet_type: VLAN
+    cluster_reference: "{{ cluster.uuid }}"
+    virtual_switch_reference: "{{ virtual_switch.uuid }}"
+    network_id: 221
+  register: result
+  ignore_errors: true
+
+- name: Check creating subnet status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.changed == true
+      - result.response.name == "test_ansible_qual_1"
+      - result.response.subnet_type == "VLAN"
+      - result.response.virtual_switch_reference == "{{ virtual_switch.uuid }}"
+      - result.response.cluster_reference == "{{ cluster.uuid }}"
+      - result.response.network_id == 221
+    fail_msg: " Unable to create VLAN subnet without IPAM "
+    success_msg: " VLAN subnet without IPAM created successfully "
+
+- name: Store subnet ext_id
+  set_fact:
+    subnet_ext_id: "{{ result.response.ext_id }}"
+
+- name: Print subnet ext_id
+  ansible.builtin.debug:
+    msg: "Subnet ext_id: {{ subnet_ext_id }}"
+
+##################################################
+
+- name: Create vm with subnet and disk using the image
+  ntnx_vms_v2:
+    name: "test_qual_vm"
+    description: ansible test
+    cluster:
+      ext_id: "{{ cluster.uuid }}"
+    disks:
+      - backing_info:
+          vm_disk:
+            disk_size_bytes: 26843545600
+            data_source:
+              reference:
+                image_reference:
+                  image_ext_id: "{{ disk_image_ext_id }}"
+        disk_address:
+          bus_type: SCSI
+          index: 3
+    nics:
+      - network_info:
+          subnet:
+            ext_id: "{{ subnet_ext_id }}"
+  register: result
+  ignore_errors: true
+
+- name: Check creating VM status
+  ansible.builtin.assert:
+    that:
+      - result.response is defined
+      - result.changed == true
+      - result.response.name == "test_qual_vm"
+      - result.response.cluster.ext_id == "{{ cluster.uuid }}"
+      - result.response.disks[0].backing_info.data_source.reference.image_ext_id == "{{ disk_image_ext_id }}"
+      - result.response.nics[0].network_info.subnet.ext_id == "{{ subnet_ext_id }}"
+    fail_msg: " Unable to create VM with subnet and disk using the image "
+    success_msg: " VM with subnet and disk using the image created successfully "
+
+- name: Store VM ext_id
+  set_fact:
+    vm_ext_id: "{{ result.response.ext_id }}"
+
+- name: Print VM ext_id
+  ansible.builtin.debug:
+    msg: "VM ext_id: {{ vm_ext_id }}"

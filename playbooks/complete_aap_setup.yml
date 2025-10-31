@@ -1,0 +1,135 @@
+---
+- name: Complete AAP Configuration
+- hosts: localhost
+  gather_facts: false
+ 
+  vars_files:
+    - ../vault/credentials.yml
+ 
+  vars:
+    aap_controller_host: "{{ credentials.aap.controller_url }}"
+    aap_username: "{{ credentials.aap.username }}"
+    aap_password: "{{ credentials.aap.password }}"
+    aap_organization: "{{ credentials.aap.organization }}"
+    aap_validate_certs: false
+ 
+  tasks:
+- name: Display setup info
+      ansible.builtin.debug:
+        msg:
+          - "Configuring AAP Controller: {{ aap_controller_host }}"
+          - "Organization: {{ aap_organization }}"
+ 
+- name: Create ServiceNow credential type
+      awx.awx.credential_type:
+- name: "ServiceNow API"
+        description: "ServiceNow API credentials"
+        kind: cloud
+        inputs:
+          fields:
+            - id: instance
+              type: string
+              label: Instance
+            - id: username
+              type: string
+              label: Username
+            - id: password
+              type: string
+              label: Password
+              secret: true
+        injectors:
+          env:
+            SNOW_INSTANCE: "{% raw %}{{ instance }}{% endraw %}"
+            SNOW_USERNAME: "{% raw %}{{ username }}{% endraw %}"
+            SNOW_PASSWORD: "{% raw %}{{ password }}{% endraw %}"
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_username }}"
+        controller_password: "{{ aap_password }}"
+        validate_certs: "{{ aap_validate_certs }}"
+        state: present
+ 
+- name: Create ServiceNow credential
+      awx.awx.credential:
+- name: "ServiceNow Production"
+        organization: "{{ aap_organization }}"
+        credential_type: "ServiceNow API"
+        inputs:
+          instance: "{{ credentials.servicenow.instance }}"
+          username: "{{ credentials.servicenow.username }}"
+          password: "{{ credentials.servicenow.password }}"
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_username }}"
+        controller_password: "{{ aap_password }}"
+        validate_certs: "{{ aap_validate_certs }}"
+        state: present
+      when: credentials.servicenow is defined
+ 
+- name: Create project
+      awx.awx.project:
+- name: "LVM Automation"
+        organization: "{{ aap_organization }}"
+        scm_type: git
+        scm_url: "{{ credentials.git.repository_url }}"
+        scm_branch: "{{ credentials.git.branch | default('main') }}"
+        scm_update_on_launch: true
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_username }}"
+        controller_password: "{{ aap_password }}"
+        validate_certs: "{{ aap_validate_certs }}"
+        state: present
+      when: credentials.git is defined
+ 
+- name: Create dynamic inventories
+      awx.awx.inventory:
+- name: "{{ item.name }}"
+        organization: "{{ aap_organization }}"
+        description: "{{ item.description }}"
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_username }}"
+        controller_password: "{{ aap_password }}"
+        validate_certs: "{{ aap_validate_certs }}"
+        state: present
+      loop:
+- name: "Insights Inventory"
+          description: "Red Hat Insights registered systems"
+- name: "Satellite Inventory"
+          description: "Satellite managed systems"
+- name: "Nutanix Inventory"
+          description: "Nutanix VMs"
+ 
+- name: Create job templates
+      awx.awx.job_template:
+- name: "{{ item.name }}"
+        organization: "{{ aap_organization }}"
+        project: "LVM Automation"
+        playbook: "{{ item.playbook }}"
+        inventory: "{{ item.inventory }}"
+        ask_variables_on_launch: "{{ item.ask_vars | default(false) }}"
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_username }}"
+        controller_password: "{{ aap_password }}"
+        validate_certs: "{{ aap_validate_certs }}"
+        state: present
+      loop:
+- name: "01 - Sync All Inventories"
+          playbook: "playbooks/sync_inventories.yml"
+          inventory: "Insights Inventory"
+- name: "02 - LVM Health Check"
+          playbook: "playbooks/lvm_health_check.yml"
+          inventory: "Insights Inventory"
+- name: "03 - Auto-Extend LVM"
+          playbook: "playbooks/lvm_auto_extend.yml"
+          inventory: "Insights Inventory"
+          ask_vars: true
+ 
+- name: Display success
+      ansible.builtin.debug:
+        msg:
+          - "==================================="
+          - "AAP Configuration Complete!"
+          - "==================================="
+          - ""
+          - "Next steps:"
+          - "1. Log into AAP: {{ aap_controller_host }}"
+          - "2. Run '01 - Sync All Inventories'"
+          - "3. Test with '02 - LVM Health Check'"
