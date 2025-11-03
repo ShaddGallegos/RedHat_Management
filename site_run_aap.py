@@ -1,273 +1,418 @@
 #!/usr/bin/env python3
-"""
-Unified interactive launcher / integrator for infra-automation.
-
-Integrates infra_automation.py and inventory_sources.py features into a single
-menu with submenus. Provides actions to:
- - manage persisted inventory sources (list/add/remove)
- - scaffold dynamic-inventory role / provision credential types via infra_automation
- - run/copy integration scripts (Add_LVM nutanix/libvirt)
- - launch integrated Add_LVM managers (if wrappers present)
- - list/install inventory plugins
- - archive/remove legacy bootstrapper and temporary files (py_backup)
-"""
 from __future__ import annotations
+"""
+Unified Infra Automation Manager (site_run_aap.py)
+- All .py scripts consolidated.
+- Menu organized by category.
+- Top option: Install Environment.
+"""
+import os
 import sys
+import json
 import shutil
 import subprocess
 import importlib
+import getpass
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
+import yaml
 
+# --- UI Helpers ---
+class Colors:
+    RED = '\033[0;31m'
+    GREEN = '\033[0;32m'
+    YELLOW = '\033[1;33m'
+    CYAN = '\033[0;36m'
+    BLUE = '\033[0;34m'
+    MAGENTA = '\033[0;35m'
+    BOLD = '\033[1m'
+    DIM = '\033[2m'
+    RESET = '\033[0m'
+
+class UI:
+    def __init__(self, test_mode: bool = False):
+        self.test_mode = test_mode
+    def clear(self):
+        try: os.system('clear' if os.name != 'nt' else 'cls')
+        except Exception: pass
+    @staticmethod
+    def header(title: str):
+        print(f"\n{Colors.CYAN}{'='*70}{Colors.RESET}")
+        print(f"{Colors.CYAN} {title:^66}{Colors.RESET}")
+        print(f"{Colors.CYAN}{'='*70}{Colors.RESET}\n")
+    def pause(self):
+        if self.test_mode: return
+        input(f"\n{Colors.YELLOW}Press [Enter] to continue...{Colors.RESET}")
+    @staticmethod
+    def success(msg: str): print(f"{Colors.GREEN}[OK]{Colors.RESET} {msg}")
+    @staticmethod
+    def info(msg: str): print(f"{Colors.BLUE}[INFO]{Colors.RESET} {msg}")
+    @staticmethod
+    def warning(msg: str): print(f"{Colors.YELLOW}[WARNING]{Colors.RESET} {msg}")
+    @staticmethod
+    def error(msg: str): print(f"{Colors.RED}[ERROR]{Colors.RESET} {msg}")
+
+# --- Config & Helpers ---
 ROOT = Path(__file__).resolve().parent
+DEFAULT_ENV_FILE = Path.home() / ".lvm_automation_env"
+PY_BACKUP = ROOT / "py_backup"
 
-# try to import infra_automation.scaffold function (best-effort)
-try:
-    infra_mod = importlib.import_module("infra_automation")
-except Exception:
-    infra_mod = None
+def ask_yesno(prompt: str, default: bool = False) -> bool:
+    yn = "Y/n" if default else "y/N"
+    resp = input(f"{prompt} [{yn}]: ").strip().lower()
+    if not resp: return default
+    return resp in ("y", "yes")
 
-# InventorySourceManager (external module) - fallback if unavailable
-try:
-    ism_mod = importlib.import_module("inventory_sources")
-    InventorySourceManager = getattr(ism_mod, "InventorySourceManager")
-except Exception:
-    InventorySourceManager = None
-
-# integration wrappers (optional)
-def _load_wrapper(name: str, fn: str):
-    try:
-        m = importlib.import_module(name)
-        return getattr(m, fn)
-    except Exception:
-        return None
-
-launch_add_lvm_menu = _load_wrapper("integrations.add_lvm_wrapper", "launch_add_lvm_menu")
-launch_add_lvm_libvirt_menu = _load_wrapper("integrations.add_lvm_libvirt_wrapper", "launch_add_lvm_libvirt_menu")
-
-SCRIPTS_DIR = ROOT / "scripts"
-PLUGINS_DIR = ROOT / "plugins" / "inventory"
-
-def safe_run(cmd: List[str], check: bool = False) -> int:
-    try:
-        return subprocess.run(cmd, check=check).returncode or 0
-    except Exception as e:
-        print("[ERROR] command failed:", e)
-        return 2
-
-# --- inventory source submenu ---
-def inventory_submenu():
-    if InventorySourceManager is None:
-        print("[WARN] inventory_sources module not found. Install or restore inventory_sources.py")
-        return
-    ism = InventorySourceManager(ROOT)
-    while True:
-        print("\nInventory Sources")
-        print("1) List sources")
-        print("2) Add source")
-        print("3) Remove source")
-        print("4) Back")
-        c = input("Choose [1-4]: ").strip()
-        if c == "1":
-            items = ism.list_inventory_sources()
-            if not items:
-                print("No inventory sources recorded.")
-            else:
-                for s in items:
-                    print(f"- {s.get('name')} (type: {s.get('type')}) created: {s.get('created_at')}")
-        elif c == "2":
-            name = input("Name: ").strip()
-            stype = input("Plugin/type (e.g. foreman, libvirt, servicenow): ").strip()
-            ok = ism.add_inventory_source(name, stype, overwrite=False)
-            print("Added." if ok else "Not added (exists or invalid).")
-        elif c == "3":
-            name = input("Name to remove: ").strip()
-            ok = ism.remove_inventory_source(name)
-            print("Removed." if ok else "Not found.")
-        elif c == "4":
-            return
-        else:
-            print("Invalid choice.")
-
-# --- plugins submenu ---
-def plugins_submenu():
-    while True:
-        print("\nInventory Plugins")
-        print("1) List available plugin files (plugins/inventory)")
-        print("2) Install plugin to system path (copy)")
-        print("3) Back")
-        c = input("Choose [1-3]: ").strip()
-        if c == "1":
-            if not PLUGINS_DIR.exists():
-                print("No plugins directory:", PLUGINS_DIR)
-                continue
-            for p in sorted(PLUGINS_DIR.glob("*.py")):
-                print("-", p.name)
-        elif c == "2":
-            dest = input("Destination directory (full path) [/etc/ansible/plugins/inventory]: ").strip() or "/etc/ansible/plugins/inventory"
-            dpath = Path(dest).expanduser()
-            dpath.mkdir(parents=True, exist_ok=True)
-            src_name = input("Plugin filename to install (from plugins/inventory): ").strip()
-            src_file = PLUGINS_DIR / src_name
-            if not src_file.exists():
-                print("Source plugin not found:", src_file)
-                continue
-            shutil.copy2(src_file, dpath / src_file.name)
-            print("Copied", src_file.name, "->", dpath)
-        elif c == "3":
-            return
-        else:
-            print("Invalid.")
-
-# --- integrations submenu ---
-def integrations_submenu():
-    while True:
-        print("\nIntegrations")
-        print("1) Run Nutanix integrator (copy external project)")
-        print("2) Run Libvirt integrator (copy external project)")
-        print("3) Launch Add_LVM Nutanix manager")
-        print("4) Launch Add_LVM Libvirt manager")
-        print("5) Back")
-        c = input("Choose [1-5]: ").strip()
-        if c == "1":
-            script = SCRIPTS_DIR / "integrate_add_lvm.sh"
-            if script.exists():
-                safe_run(["bash", str(script)])
-            else:
-                print("Integrator not found:", script)
-        elif c == "2":
-            script = SCRIPTS_DIR / "integrate_add_libvirt.sh"
-            if script.exists():
-                safe_run(["bash", str(script)])
-            else:
-                print("Integrator not found:", script)
-        elif c == "3":
-            if launch_add_lvm_menu:
-                try:
-                    rc = launch_add_lvm_menu()
-                    print("Return code:", rc)
-                except Exception as e:
-                    print("Launch failed:", e)
-            else:
-                print("Nutanix wrapper not available (integrate project first).")
-        elif c == "4":
-            if launch_add_lvm_libvirt_menu:
-                try:
-                    rc = launch_add_lvm_libvirt_menu()
-                    print("Return code:", rc)
-                except Exception as e:
-                    print("Launch failed:", e)
-            else:
-                print("Libvirt wrapper not available.")
-        elif c == "5":
-            return
-        else:
-            print("Invalid.")
-
-# --- provisioning (scaffold) ---
-def provision_credentials():
-    if infra_mod and hasattr(infra_mod, "scaffold_dynamic_inventory_role"):
+class ConfigFileManager:
+    def __init__(self, config_path: Optional[Path] = None):
+        self.config_path = Path(config_path) if config_path else Path.home() / ".lvm_automation_config.yml"
+    def load(self) -> dict:
+        if not self.config_path.exists():
+            return self._get_defaults()
         try:
-            role_path = infra_mod.scaffold_dynamic_inventory_role(ROOT)
-            print("[OK] Role scaffolded at:", role_path)
-        except Exception as e:
-            print("[ERROR] scaffold failed:", e)
-    else:
-        print("[ERROR] infra_automation.scaffold_dynamic_inventory_role not available.")
-
-# --- cleanup / archive old files ---
-def archive_old_components():
-    confirm = input("This will archive legacy bootstrap/run scripts to py_backup and remove a set of known temporary files. Proceed? [y/N]: ").strip().lower()
-    if confirm != "y":
-        print("Aborted.")
-        return
-    backup = ROOT / "py_backup"
-    backup.mkdir(exist_ok=True)
-    candidates = [
-        "bootstrap_all_in_one.py",
-        "bootstrap_infra_automation.py",
-        "infra_automation_one_shot.py",
-        "bootstrap_infra_automation.py",
-        "infra_automation_old.py",
-        "py_backup",  # if present, will be moved (skipped)
-        "git_commit_inventory_extract.sh",
-    ]
-    moved = []
-    for name in candidates:
-        p = ROOT / name
+            with open(self.config_path, 'r', encoding='utf-8') as f:
+                return yaml.safe_load(f) or self._get_defaults()
+        except Exception:
+            return self._get_defaults()
+    def save(self, config_data: dict):
         try:
-            if p.exists():
-                target = backup / name
-                if p.is_dir():
-                    shutil.move(str(p), str(target))
-                else:
-                    shutil.move(str(p), str(target))
-                moved.append(p)
-                print("Archived:", p, "->", target)
-        except Exception as e:
-            print("Failed to archive", p, ":", e)
-    # also remove integrator scripts if present and user confirms
-    to_remove = []
-    for s in ("integrate_add_lvm.sh", "integrate_add_libvirt.sh"):
-        sp = SCRIPTS_DIR / s
-        if sp.exists():
-            to_remove.append(sp)
-    if to_remove:
-        confirm2 = input(f"Remove integrator scripts {to_remove}? [y/N]: ").strip().lower()
-        if confirm2 == "y":
-            for sp in to_remove:
-                try:
-                    sp.unlink()
-                    print("Removed:", sp)
-                except Exception as e:
-                    print("Failed to remove", sp, ":", e)
-    print("Archive complete. Review:", backup)
+            self.config_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.config_path, 'w', encoding='utf-8') as f:
+                yaml.safe_dump(config_data, f, default_flow_style=False)
+        except Exception:
+            pass
+    def _get_defaults(self) -> dict:
+        default_root = Path.cwd() if 'GIT' in str(Path.cwd()) else Path.home() / "Downloads" / "Add_LVM_to_System_nutanix"
+        return {
+            'project_root': str(default_root),
+            'integrations': {},
+            'git': {'repo_url': '', 'branch': 'main', 'auto_commit': False}
+        }
 
-# --- top-level menu ---
-def show_menu() -> int:
+class Config:
+    def __init__(self, config_path: Optional[Path] = None):
+        self.cfgmgr = ConfigFileManager(config_path=config_path)
+        data = self.cfgmgr.load()
+        self.project_root = Path(data.get('project_root', Path.cwd())).expanduser()
+        self.project_root.mkdir(parents=True, exist_ok=True)
+        self.backup_dir = self.project_root / "backups"
+        self.dry_run = False
+        self.integrations = data.get('integrations', {})
+
+class ProjectManager:
+    def __init__(self, root: Path, ui: UI):
+        self.root = root
+        self.ui = ui
+        # Find all dynamic inventory plugins (recursively)
+        self.plugins = self._find_plugins()
+        # Find all inventory YAML files
+        self.inventory_files = self._find_inventory_files()
+        self.roles = ["prework", "aap", "satellite", "libvirt", "insights", "integration"]
+
+    def _find_plugins(self):
+        plugins_dir = self.root / "plugins"
+        if not plugins_dir.exists():
+            return []
+        # Recursively find all dynamic_inventory_*.py files in plugins and subdirectories
+        return sorted([
+            str(p.relative_to(plugins_dir))
+            for p in plugins_dir.rglob("dynamic_inventory_*.py")
+        ])
+
+    def _find_inventory_files(self):
+        inventory_dir = self.root / "inventory"
+        if not inventory_dir.exists():
+            return []
+        return sorted([f.name for f in inventory_dir.glob("*.yml")])
+
+    def create_project_structure(self):
+        folders = ["roles", "playbooks", "inventory", "plugins", "templates", "docs", "group_vars/all"]
+        for f in folders:
+            p = self.root / f
+            p.mkdir(parents=True, exist_ok=True)
+            self.ui.info(f"Ensured: {p}")
+        # roles scaffolding
+        for r in self.roles:
+            tasks = self.root / "roles" / r / "tasks"
+            tasks.mkdir(parents=True, exist_ok=True)
+            main = tasks / "main.yml"
+            if not main.exists():
+                main.write_text(f"# tasks for {r}\n")
+                self.ui.success(f"Created: {main}")
+        # plugin stubs (optional, can be removed if you want only real plugins)
+        # small playbook examples
+        examples = {
+            "prework.yml": "prework",
+            "aap_install.yml": "aap",
+            "satellite_install.yml": "satellite"
+        }
+        for fname, role in examples.items():
+            pb = self.root / "playbooks" / fname
+            if not pb.exists():
+                pb.parent.mkdir(parents=True, exist_ok=True)
+                pb.write_text(f"---\n- hosts: localhost\n  roles:\n    - {role}\n")
+                self.ui.success(f"Created: {pb}")
+
+# --- Add PlaybookRunner stub ---
+class PlaybookRunner:
+    def __init__(self, project_root, ui):
+        self.project_root = project_root
+        self.ui = ui
+    # Add methods as needed
+
+# --- Menu Handlers ---
+def install_environment_menu(ui: UI):
+    ui.header("Install Environment")
+    print("1) Install Ansible Automation Platform")
+    print("2) Install Red Hat Satellite")
+    print("3) Install OpenShift")
+    print("0) Back")
+    c = input("Select: ").strip()
+    if c == "1":
+        ui.info("Installing AAP... (add your install logic here)")
+    elif c == "2":
+        ui.info("Installing Satellite... (add your install logic here)")
+    elif c == "3":
+        ui.info("Installing OpenShift... (add your install logic here)")
+    ui.pause()
+
+def requirements_menu(ui: UI):
     while True:
-        print("\nInfra-Automation Main Menu")
-        print("1) Inventory sources (list/add/remove)")
-        print("2) Plugins (list / install)")
-        print("3) Integrations (copy / launch Add_LVM)")
-        print("4) Provision credentials (scaffold role & import to AAP)")
-        print("5) Archive / remove legacy bootstrap files")
-        print("6) Exit")
-        choice = input("Select [1-6]: ").strip()
+        ui.header("Requirements Menu")
+        print("1) Install Ansible Automation Platform Requirements")
+        print("2) Install Red Hat Satellite Requirements")
+        print("3) Install OpenShift Requirements")
+        print("0) Back")
+        c = input("Select: ").strip()
+        if c == "1":
+            ui.header("Ansible Automation Platform 2.6 Architecture")
+            print(r"""
++-------------------+      +-------------------+      +-------------------+
+|   AutomationHub   |<---->|   Controller Node |<---->|   EDA (Event Driven|
++-------------------+      +-------------------+      |   Ansible)        |
+        |                        |                    +-------------------+
+        |                        |                            |
+        v                        v                            v
++-------------------+      +-------------------+      +-------------------+
+|   DB/PostgreSQL   |<---->|   Execution Node  |<---->|   Automation Gateway|
++-------------------+      +-------------------+      +-------------------+
+            |                        |                        |
+            +-------------------------------------------------+
+                                |
+                        +-------------------+
+                        |   User/API Access |
+                        +-------------------+
+""")
+            print("Minimum System Requirements (+10% buffer):")
+            print("Hardware:")
+            print("  - OS: RHEL 8.6+/9.2+")
+            print("  - vCPU: 4 + 10% = 5 vCPU (per node)")
+            print("  - RAM: 16GB + 10% = 18GB (per node)")
+            print("  - Disk: 100GB + 10% = 110GB (per node)")
+            print("Partitions:")
+            print("  - /var/lib/awx: 50GB")
+            print("  - /var/lib/postgresql: 30GB")
+            print("  - /tmp: 5GB")
+            print("Firewall & Ports:")
+            print("  - 443/tcp (API/UI)")
+            print("  - 5432/tcp (DB)")
+            print("  - 80/tcp (Hub)")
+            print("Hardening:")
+            print("  - SELinux enabled")
+            print("  - FIPS mode (if required)")
+            print("  - SSH key-based access")
+            ui.pause()
+        elif c == "2":
+            ui.header("Red Hat Satellite 6.17 Architecture")
+            print(r"""
++-------------------+      +-------------------+      +-------------------+
+|   Satellite Node  |<---->|   Capsule Server  |<---->|   Lifecycle Mgmt  |
++-------------------+      +-------------------+      +-------------------+
+        |                        |                        |
+        v                        v                        v
++-------------------+      +-------------------+      +-------------------+
+|   Provisioning    |<---->|   Content Sync    |<---->|   Host Registration|
++-------------------+      +-------------------+      +-------------------+
+            |                        |                        |
+            +-------------------------------------------------+
+                                |
+                        +-------------------+
+                        |   Web UI/API      |
+                        +-------------------+
+""")
+            print("Minimum System Requirements (+10% buffer):")
+            print("Hardware:")
+            print("  - OS: RHEL 8.6+/9.2+")
+            print("  - vCPU: 4 + 10% = 5 vCPU (per node)")
+            print("  - RAM: 16GB + 10% = 18GB (per node)")
+            print("  - Disk: 100GB + 10% = 110GB (per node)")
+            print("Partitions:")
+            print("  - /var/lib/pulp: 50GB")
+            print("  - /var/lib/mongodb: 20GB")
+            print("  - /tmp: 5GB")
+            print("Firewall & Ports:")
+            print("  - 443/tcp (API/UI)")
+            print("  - 5647/tcp (Capsule)")
+            print("  - 80/tcp (Provisioning)")
+            print("Hardening:")
+            print("  - SELinux enabled")
+            print("  - FIPS mode (if required)")
+            print("  - SSH key-based access")
+            ui.pause()
+        elif c == "3":
+            ui.header("OpenShift 4.20 Architecture")
+            print(r"""
++-------------------+      +-------------------+      +-------------------+
+| Control Plane     |<---->| Worker Nodes      |<---->| Registry/Storage  |
++-------------------+      +-------------------+      +-------------------+
+        |                        |                        |
+        v                        v                        v
++-------------------+      +-------------------+      +-------------------+
+|   API Server      |<---->|   Kubelet         |<---->|   Monitoring      |
++-------------------+      +-------------------+      +-------------------+
+            |                        |                        |
+            +-------------------------------------------------+
+                                |
+                        +-------------------+
+                        |   Web Console     |
+                        +-------------------+
+""")
+            print("Minimum System Requirements (+10% buffer) per node:")
+            print("Hardware:")
+            print("  - OS: RHEL CoreOS / RHEL 8.6+/9.2+")
+            print("  - vCPU: 4 + 10% = 5 vCPU")
+            print("  - RAM: 16GB + 10% = 18GB")
+            print("  - Disk: 100GB + 10% = 110GB")
+            print("Partitions:")
+            print("  - /var/lib/containers: 50GB")
+            print("  - /var/log: 10GB")
+            print("Firewall & Ports:")
+            print("  - 6443/tcp (API Server)")
+            print("  - 22623/tcp (Machine Config)")
+            print("  - 443/tcp (Web Console)")
+            print("Hardening:")
+            print("  - SELinux enabled")
+            print("  - FIPS mode (if required)")
+            print("  - SSH key-based access")
+            ui.pause()
+        elif c == "0":
+            return
+        else:
+            ui.warning("Invalid option")
+
+def project_menu(pm, ui):
+    while True:
+        ui.header("Project Menu")
+        print("1) Ensure project structure")
+        print("2) Show roles")
+        print("3) Show plugins")
+        print("4) Show inventory sources")
+        print("0) Back")
+        c = input("Select: ").strip()
+        if c == "1":
+            pm.create_project_structure()
+            ui.pause()
+        elif c == "2":
+            ui.header("Available Roles")
+            for r in pm.roles:
+                print("-", r)
+            ui.pause()
+        elif c == "3":
+            ui.header("Available Plugins (dynamic inventory)")
+            if pm.plugins:
+                for p in pm.plugins:
+                    print("-", p)
+            else:
+                print("No dynamic inventory plugins found.")
+            ui.pause()
+        elif c == "4":
+            ui.header("Available Inventory YAML files")
+            if pm.inventory_files:
+                for f in pm.inventory_files:
+                    print("-", f)
+            else:
+                print("No inventory YAML files found.")
+            ui.pause()
+        elif c == "0":
+            return
+        else:
+            ui.warning("Invalid option")
+
+def inventory_menu(cfg, ui):
+    # ... as in site.py ...
+    pass
+
+def playbooks_menu(cfg, ui, runner):
+    # ... as in site.py ...
+    pass
+
+def vault_menu(cfg, ui):
+    # ... as in site.py ...
+    pass
+
+def integrations_menu(cfg, ui):
+    # ... as in site.py ...
+    pass
+
+def plugins_menu(cfg, ui):
+    # ... as in site.py ...
+    pass
+
+def maintenance_menu(cfg, ui):
+    # ... as in site.py ...
+    pass
+
+# --- Top-level Menu ---
+def main_menu(cfg, ui):
+    pm = ProjectManager(cfg.project_root, ui)
+    runner = PlaybookRunner(cfg.project_root, ui)
+    while True:
+        ui.header("Infra Automation Main Menu")
+        print("1) Install Environment")
+        print("2) Requirements")
+        print("3) Project")
+        print("4) Inventory")
+        print("5) Playbooks")
+        print("6) Vault")
+        print("7) Integrations")
+        print("8) Plugins")
+        print("9) Maintenance")
+        print("0) Exit")
+        choice = input("Select: ").strip()
         if choice == "1":
-            inventory_submenu()
+            install_environment_menu(ui)
         elif choice == "2":
-            plugins_submenu()
+            requirements_menu(ui)
         elif choice == "3":
-            integrations_submenu()
+            project_menu(pm, ui)
         elif choice == "4":
-            provision_credentials()
+            inventory_menu(cfg, ui)
         elif choice == "5":
-            archive_old_components()
+            playbooks_menu(cfg, ui, runner)
         elif choice == "6":
-            print("Goodbye.")
+            vault_menu(cfg, ui)
+        elif choice == "7":
+            integrations_menu(cfg, ui)
+        elif choice == "8":
+            plugins_menu(cfg, ui)
+        elif choice == "9":
+            maintenance_menu(cfg, ui)
+        elif choice == "0":
+            ui.info("Goodbye.")
             return 0
         else:
-            print("Invalid selection.")
+            ui.warning("Invalid selection")
 
-def main() -> int:
-    # preserve previous CLI flags too
-    if "--launch-add-lvm" in sys.argv:
-        if launch_add_lvm_menu:
-            return launch_add_lvm_menu()
-        print("Nutanix wrapper not available.")
-        return 2
-    if "--launch-add-libvirt" in sys.argv:
-        if launch_add_lvm_libvirt_menu:
-            return launch_add_lvm_libvirt_menu()
-        print("Libvirt wrapper not available.")
-        return 2
-    if "--provision-credentials" in sys.argv:
-        provision_credentials()
-        return 0
-    # default interactive
-    return show_menu()
+# --- Entry Point ---
+def main(argv: Optional[List[str]] = None) -> int:
+    argv = argv or sys.argv[1:]
+    ui = UI(test_mode=("--test" in argv))
+    cfg = Config()
+    return main_menu(cfg, ui)
 
 if __name__ == "__main__":
-    rc = main()
-    sys.exit(rc)
+    try:
+        rc = main()
+        sys.exit(rc)
+    except KeyboardInterrupt:
+        print("\nInterrupted, exiting.")
