@@ -1,8 +1,8 @@
 # Core Python Requirements for LVM Automation
 
 # Ansible and Core
-ansible>=2.9.0,<8.0.0
-ansible-core>=2.14.0,<2.16.0
+ansible>=2.9.0,<13.0.0
+ansible-core>=2.14.0,<2.20.0
 ansible-runner>=2.3.0
 
 # YAML Processing
