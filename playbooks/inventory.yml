@@ -1,0 +1,36 @@
+---
+# inventory.yml - Sample inventory file
+---
+all:
+ children:
+ rhel_servers:
+- hosts:
+ rhel8-server:
+ ansible_host: 192.168.1.10
+ ansible_user: ansible
+ ansible_ssh_private_key_file: ~/.ssh/id_rsa
+ rhel9-server:
+ ansible_host: 192.168.1.11 
+ ansible_user: ansible
+ ansible_ssh_private_key_file: ~/.ssh/id_rsa
+  vars:
+ # Nutanix connection details - consider using ansible-vault
+    nutanix_host: "prism-central.example.com"
+    nutanix_username: "admin"
+    nutanix_password: "{{ vault_nutanix_password }}"
+    storage_container_uuid: "{{ vault_storage_container_uuid }}"
+ 
+ # Notification settings
+    admin_email: "admin@example.com"
+ 
+ # Email/SMTP Configuration (configure for your environment)
+ # Uncomment and configure the following for custom SMTP settings
+ # mail_smtp_host: "smtp.example.com"
+ # mail_smtp_port: 587
+ # mail_smtp_username: "{{ vault_smtp_username }}"
+ # mail_smtp_password: "{{ vault_smtp_password }}"
+ # mail_from: "lvm-automation@example.com"
+ # mail_use_tls: true
+ 
+ # LVM monitoring settings
+    disk_usage_threshold: 90

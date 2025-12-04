@@ -1,0 +1,31 @@
+# Example configuration for Foreman dynamic inventory plugin
+# Place this file in your inventory directory or reference it in your playbook
+# Usage: ansible-inventory -i foreman.yml --list
+
+plugin: foreman
+url: https://foreman.example.com
+api_token: "{{ lookup('env','FOREMAN_API_TOKEN') }}"
+fallback: true
+search: "operatingsystem=RedHat"
+
+hosts:
+  - foreman-host1.example.com
+  - foreman-host2.example.com
+
+groups:
+  foreman_hosts:
+    hosts:
+      - foreman-host1.example.com
+      - foreman-host2.example.com
+  foreman_all:
+    hosts:
+      - foreman-host1.example.com
+      - foreman-host2.example.com
+
+hostvars:
+  foreman-host1.example.com:
+    ansible_host: 192.168.9.11
+    organization: Org1
+  foreman-host2.example.com:
+    ansible_host: 192.168.9.12
+    organization: Org2

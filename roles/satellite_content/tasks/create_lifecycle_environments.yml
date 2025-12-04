@@ -1,0 +1,59 @@
+---
+# Create lifecycle environments for RHEL content management
+
+- name: "[INFO] Creating lifecycle environments"
+  ansible.builtin.debug:
+    msg: "Creating lifecycle environments for RHEL content management"
+
+- name: "[LIFECYCLE] Create DEV lifecycle environment"
+  theforeman.foreman.lifecycle_environment:
+    server_url: "{{ satellite_server_url }}"
+    username: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    organization: "{{ satellite_organization }}"
+- name: "DEV"
+    label: "dev"
+    description: "Development Environment"
+    prior: "Library"
+    state: present
+  register: dev_env_result
+
+- name: "[LIFECYCLE] Create TEST lifecycle environment"
+  theforeman.foreman.lifecycle_environment:
+    server_url: "{{ satellite_server_url }}"
+    username: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    organization: "{{ satellite_organization }}"
+- name: "TEST"
+    label: "test"
+    description: "Testing Environment"
+    prior: "DEV"
+    state: present
+  register: test_env_result
+  when: dev_env_result is succeeded
+
+- name: "[LIFECYCLE] Create PROD lifecycle environment"
+  theforeman.foreman.lifecycle_environment:
+    server_url: "{{ satellite_server_url }}"
+    username: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    organization: "{{ satellite_organization }}"
+- name: "PROD"
+    label: "prod"
+    description: "Production Environment"
+    prior: "TEST"
+    state: present
+  register: prod_env_result
+  when: test_env_result is succeeded
+
+- name: "[VALIDATION] Display lifecycle environment creation results"
+  ansible.builtin.debug:
+    msg: |
+      [SUCCESS] Lifecycle environments created successfully:
+      • DEV Environment: {{ 'Created' if (dev_env_result.changed | default(false)) else 'Already exists' }}
+      • TEST Environment: {{ 'Created' if (test_env_result.changed | default(false)) else 'Already exists' }}
+      • PROD Environment: {{ 'Created' if (prod_env_result.changed | default(false)) else 'Already exists' }}
+
+- name: "[INFO] Lifecycle environments configuration completed"
+  ansible.builtin.debug:
+    msg: "Lifecycle environments setup completed successfully"

@@ -1,0 +1,41 @@
+---
+# LVM Extension Orchestrator Tasks
+
+- name: Check if LVM extension is needed
+  ansible.builtin.set_fact:
+    extension_needed: "{{ usage_percent | int > threshold_percent | int }}"
+  when: usage_percent is defined
+
+- name: Orchestrate LVM extension
+  when: extension_needed | default(false)
+  block:
+- name: Inspect current LVM configuration
+      include_role:
+- name: lvm_system_inspection
+
+- name: Perform smart LVM extension
+      include_role:
+- name: lvm_smart_extend
+  vars:
+    vg_name: "{{ detected_vg_name }}"
+    lv_name: "{{ detected_lv_name }}"
+    mount_point: "{{ detected_mount_point }}"
+
+- name: Create ServiceNow ticket
+      include_role:
+- name: servicenow_ticket_management
+  vars:
+    ticket_type: "incident"
+    short_description: "LVM Extension completed on {{ inventory_hostname }}"
+    description: "Extended {{ lv_name }} by {{ extend_percent }}%"
+
+- name: Send completion alert
+      include_role:
+- name: disk_usage_alerting
+  vars:
+    alert_type: "success"
+    alert_message: "LVM extension completed successfully"
+
+- name: Log orchestration result
+  ansible.builtin.debug:
+    msg: "LVM extension orchestration {{ 'completed' if extension_needed else 'not needed' }}"

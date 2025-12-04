@@ -1,0 +1,22 @@
+---
+- name: Setup Red Hat Insights on target host
+- hosts: all
+  become: true
+  gather_facts: true
+
+  tasks:
+- name: Ensure insights-client is installed
+      ansible.builtin.package:
+- name: insights-client
+        state: present
+
+- name: Register system with Red Hat Insights
+      ansible.builtin.command: insights-client --register
+      register: insights_register
+      changed_when: "'Successfully registered' in insights_register.stdout"
+
+- name: Display Insights registration status
+      ansible.builtin.debug:
+        msg: |
+          Insights registration output:
+          {{ insights_register.stdout }}

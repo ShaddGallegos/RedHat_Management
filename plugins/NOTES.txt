@@ -1,0 +1,2 @@
+#   export INSIGHTS_USER=your_username
+#   export INSIGHTS_PASSWORD=your_password

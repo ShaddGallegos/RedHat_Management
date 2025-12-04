@@ -1,0 +1,16 @@
+---
+- name: Splunk Integration Rulebook
+- hosts: all
+ 
+ sources:
+ - ansible.eda.splunk:
+ url: "{{ splunk_url }}"
+ token: "{{ splunk_token }}"
+ search: 'search index=main sourcetype=disk_usage | where usage_percent > 80'
+ 
+ rules:
+- name: Process Splunk disk alerts
+ condition: event.result.usage_percent > 80
+ action:
+ run_playbook:
+- name: playbooks/extend_lvm.yml

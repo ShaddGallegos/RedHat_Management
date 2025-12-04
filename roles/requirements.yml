@@ -1,0 +1,49 @@
+---
+collections:
+ # AAP/Tower Management
+- name: awx.awx
+   version: ">=21.0.0"
+ 
+ # Event-Driven Ansible
+- name: ansible.eda
+   version: ">=1.0.0"
+ 
+ # ServiceNow Integration
+- name: servicenow.itsm
+   version: ">=2.0.0"
+ 
+ # General Utilities
+- name: community.general
+   version: ">=6.0.0"
+ 
+ # POSIX Utilities
+- name: ansible.posix
+   version: ">=1.5.0"
+ 
+ # Windows Support (optional)
+- name: ansible.windows
+   version: ">=1.14.0"
+ 
+ # VMware/Nutanix
+- name: community.vmware
+   version: ">=3.0.0"
+ 
+ # Crypto/Vault
+- name: community.crypto
+   version: ">=2.0.0"
+ 
+ # Docker (if needed)
+- name: community.docker
+   version: ">=3.0.0"
+ 
+ # Kubernetes (if needed)
+- name: kubernetes.core
+   version: ">=2.4.0"
+ 
+ # Network Automation
+- name: ansible.netcommon
+   version: ">=5.0.0"
+ 
+ # Utils
+- name: ansible.utils
+   version: ">=2.10.0"

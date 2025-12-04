@@ -1,0 +1,6 @@
+- connection: local
+  gather_facts: false
+- hosts: localhost
+- name: Test role disk_usage_alerting
+  roles:
+  - role: disk_usage_alerting

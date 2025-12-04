@@ -1,0 +1,68 @@
+---
+- ansible.builtin.command: ansible-rulebook --version
+  changed_when: false
+  failed_when: false
+- name: Check if ansible-rulebook is installed
+  register: rulebook_check
+- ansible.builtin.fail:
+    msg:
+    - 'ERROR: ansible-rulebook not found'
+    - 'Install with: pip3 install ansible-rulebook'
+- name: Fail if ansible-rulebook not found
+  when: rulebook_check.rc != 0
+- ansible.builtin.stat:
+    path: '{{ playbook_dir }}/../.env'
+- name: Check if .env file exists
+  register: env_file
+- ansible.builtin.debug:
+    msg: Loading environment from .env...
+- name: Display environment info
+  when: env_file.stat.exists
+- ansible.builtin.stat:
+    path: '{{ eda_rulebook }}'
+- name: Verify rulebook exists
+  register: rulebook_file
+- ansible.builtin.fail:
+    msg: Rulebook not found at {{ eda_rulebook }}
+- name: Fail if rulebook not found
+  when: not rulebook_file.stat.exists
+- ansible.builtin.stat:
+    path: '{{ eda_inventory }}'
+- name: Verify inventory exists
+  register: inventory_file
+- ansible.builtin.debug:
+    msg:
+    - Starting Event Driven Ansible...
+    - 'Rulebook: {{ eda_rulebook }}'
+    - 'Inventory: {{ eda_inventory }}'
+    - 'Verbose: {{ eda_verbose }}'
+- name: Display starting message
+- ansible.builtin.shell: 'nohup ansible-rulebook --rulebook {{ eda_rulebook }} --inventory
+    {{ eda_inventory }} {% if eda_verbose %}--verbose{% endif %} > {{ playbook_dir
+    }}/../logs/eda_controller.log 2>&1 & echo $! > {{ playbook_dir }}/../logs/eda_controller.pid
+
+    '
+  args:
+    creates: '{{ playbook_dir }}/../logs/eda_controller.pid'
+- name: Start EDA controller
+  register: eda_start
+- ansible.builtin.pause:
+    seconds: 5
+- name: Wait for EDA to initialize
+  when: eda_start.changed
+- ansible.builtin.shell: "if [ -f {{ playbook_dir }}/../logs/eda_controller.pid ];\
+    \ then\n  PID=$(cat {{ playbook_dir }}/../logs/eda_controller.pid);\n  if ps -p\
+    \ $PID > /dev/null; then echo \"running\"; else echo \"stopped\"; fi;\nelse\n\
+    \  echo \"not_started\";\nfi\n"
+  changed_when: false
+- name: Check EDA process status
+  register: eda_status
+- ansible.builtin.debug:
+    msg:
+    - 'EDA Controller Status: {{ eda_status.stdout }}'
+    - 'Log file: {{ playbook_dir }}/../logs/eda_controller.log'
+    - 'PID file: {{ playbook_dir }}/../logs/eda_controller.pid'
+    - ''
+    - 'To view logs: tail -f {{ playbook_dir }}/../logs/eda_controller.log'
+    - 'To stop: kill $(cat {{ playbook_dir }}/../logs/eda_controller.pid)'
+- name: Display EDA status

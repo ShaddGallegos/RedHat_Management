@@ -1,0 +1,45 @@
+---
+- name: Provision node via Red Hat Satellite
+  hosts: localhost
+  gather_facts: false
+  collections:
+    - theforeman.foreman
+  vars_prompt:
+    - name: satellite_hostname
+      prompt: "Satellite FQDN"
+      private: no
+    - name: satellite_username
+      prompt: "Satellite API username"
+      private: no
+    - name: satellite_password
+      prompt: "Satellite API password"
+      private: yes
+      default: "REMOVED_EXAMPLE_PASSWORD"
+    - name: new_host_name
+      prompt: "New node hostname (FQDN)"
+      private: no
+    - name: new_host_mac
+      prompt: "New node MAC address"
+      private: no
+    - name: hostgroup
+      prompt: "Satellite host group"
+      private: no
+    - name: organization
+      prompt: "Satellite organization"
+      private: no
+  tasks:
+    - name: Create new host in Satellite
+      theforeman.foreman.host:
+        server_url: "https://{{ satellite_hostname }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        name: "{{ new_host_name }}"
+        mac: "{{ new_host_mac }}"
+        hostgroup: "{{ hostgroup }}"
+        organization: "{{ organization }}"
+        build: true
+        state: present
+        validate_certs: false
+    - name: Show host creation result
+      ansible.builtin.debug:
+        msg: "Node {{ new_host_name }} created and build triggered in Satellite."

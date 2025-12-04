@@ -1,0 +1,48 @@
+---
+# Network configuration tasks
+
+- name: Set hostname in /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^{{ satellite_ip }}'
+    line: "{{ satellite_ip }} {{ satellite_hostname }}"
+    backup: true
+  become: true
+
+- name: Verify DNS resolution
+  ansible.builtin.command: nslookup {{ satellite_hostname }}
+  register: dns_check
+  ignore_errors: true
+  changed_when: false
+
+- name: Open required firewall ports
+  ansible.posix.firewalld:
+    port: "{{ item }}"
+    permanent: true
+    state: enabled
+    immediate: true
+  loop: "{{ satellite_firewall_ports }}"
+  become: true
+  notify: reload firewalld
+
+- name: Configure network interfaces
+  ansible.builtin.shell: |
+    nmcli con show | grep -q {{ internet_interface }} || nmcli con add type ethernet ifname {{ internet_interface }}
+  become: true
+  ignore_errors: true
+  changed_when: false
+
+- name: Configure provisioning interface
+  ansible.builtin.shell: |
+    nmcli con show | grep -q {{ provisioning_interface }} || nmcli con add type ethernet ifname {{ provisioning_interface }}
+  become: true
+  ignore_errors: true
+  changed_when: false
+
+- name: Configure DNS settings
+  ansible.builtin.template:
+    src: resolv.conf.j2
+    dest: /etc/resolv.conf
+    backup: true
+  become: true
+  when: configure_dns | default(false)

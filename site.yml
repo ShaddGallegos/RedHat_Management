@@ -1,0 +1,184 @@
+---
+# Red Hat Satellite 6.17 Complete Deployment Site Playbook
+# This playbook orchestrates the complete Satellite deployment in proper order
+# Author: ShaddGallegos
+# Date: September 4, 2025
+
+- name: "Red Hat Satellite 6.17 Complete Deployment"
+  hosts: satellite_servers
+  become: yes
+  gather_facts: yes
+  vars_files:
+    - group_vars/all.yml
+
+  pre_tasks:
+    - name: "Display deployment information"
+      debug:
+        msg:
+          - "=============================================="
+          - "Starting Red Hat Satellite 6.17 Deployment"
+          - "Target Server: {{ inventory_hostname }}"
+          - "Deployment Date: {{ ansible_date_time.iso8601 }}"
+          - "Roles to be executed in order:"
+          - "  1. satellite_build (Core installation)"
+          - "  2. satellite_pxe_services (PXE/DHCP/TFTP)"
+          - "  3. satellite_content (Repository management)"
+          - "  4. satellite_provisioning (Node workflows)"
+          - "=============================================="
+
+    - name: "Validate system requirements"
+      assert:
+        that:
+          - ansible_facts['memtotal_mb'] >= 16384
+          - ansible_facts['architecture'] == "x86_64"
+          - ansible_facts['os_family'] == "RedHat"
+        fail_msg: "System does not meet minimum requirements for Satellite"
+        success_msg: "System requirements validated successfully"
+
+    - name: "Check if deployment is already in progress"
+      stat:
+        path: /tmp/satellite_deployment_lock
+      register: deployment_lock
+
+    - name: "Create deployment lock file"
+      file:
+        path: /tmp/satellite_deployment_lock
+        state: touch
+        mode: '0644'
+      when: not deployment_lock.stat.exists
+
+  roles:
+    # Phase 1: Core Satellite Installation and Configuration
+    - role: satellite_build
+      when: satellite_build_enabled | default(true)
+      tags:
+        - satellite_build
+        - phase1
+        - core
+
+    # Phase 2: PXE Services Configuration (depends on Satellite being installed)
+    - role: satellite_pxe_services
+      when: 
+        - satellite_pxe_enabled | default(true)
+        - satellite_build_enabled | default(true)
+      tags:
+        - satellite_pxe_services
+        - phase2
+        - pxe
+
+    # Phase 3: Content Management (depends on Satellite and PXE services)
+    - role: satellite_content
+      when:
+        - satellite_content_enabled | default(true)
+        - satellite_build_enabled | default(true)
+      tags:
+        - satellite_content
+        - phase3
+        - content
+
+    # Phase 4: Provisioning Workflows (depends on all previous phases)
+    - role: satellite_provisioning
+      when:
+        - satellite_provisioning_enabled | default(true)
+        - satellite_build_enabled | default(true)
+        - satellite_pxe_enabled | default(true)
+        - satellite_content_enabled | default(true)
+      tags:
+        - satellite_provisioning
+        - phase4
+        - provisioning
+
+  post_tasks:
+    - name: "Generate deployment summary"
+      template:
+        src: templates/deployment_summary.j2
+        dest: /root/satellite_deployment_summary.md
+        mode: '0644'
+    - name: "Display deployment completion"
+      debug:
+        msg:
+          - "=============================================="
+          - "Red Hat Satellite 6.17 Deployment Complete!"
+          - "=============================================="
+          - "Services Status:"
+          - "  [DEPLOYED] Satellite Core: {{ 'Deployed' if satellite_build_enabled | default(true) else 'Skipped' }}"
+          - "  [DEPLOYED] PXE Services: {{ 'Deployed' if satellite_pxe_enabled | default(true) else 'Skipped' }}"
+          - "  [DEPLOYED] Content Management: {{ 'Deployed' if satellite_content_enabled | default(true) else 'Skipped' }}"
+          - "  [DEPLOYED] Provisioning Workflows: {{ 'Deployed' if satellite_provisioning_enabled | default(true) else 'Skipped' }}"
+          - ""
+          - "Next Steps:"
+          - "  1. Access Satellite Web UI: https://{{ ansible_fqdn }}"
+          - "  2. Login with: {{ satellite_admin_user }}/{{ satellite_admin_password }}"
+          - "  3. Review deployment summary: /root/satellite_deployment_summary.md"
+          - "  4. Test node provisioning with provisioning workflows"
+          - "=============================================="
+
+    - name: "Validate Satellite services are running"
+      systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - foreman
+        - httpd
+        - tftp.socket
+        - dhcpd
+        - libvirtd
+      ignore_errors: yes
+      register: service_status
+
+    - name: "Display service status"
+      debug:
+        msg: "Service {{ item.item }} is {{ 'running' if item.state == 'started' else 'not running' }}"
+      loop: "{{ service_status.results }}"
+      when: service_status is defined
+
+    - name: "Remove deployment lock file"
+      file:
+        path: /tmp/satellite_deployment_lock
+        state: absent
+
+  handlers:
+    - name: restart satellite services
+      systemd:
+        name: "{{ item }}"
+        state: restarted
+      loop:
+        - foreman
+        - httpd
+        - tftp.socket
+        - dhcpd
+        - libvirtd
+      ignore_errors: yes
+
+# Optional: Node Provisioning Playbook (separate play for managed nodes)
+- name: "Provision Managed Nodes (Optional)"
+  hosts: managed_nodes
+  become: yes
+  gather_facts: yes
+  vars_files:
+    - group_vars/all.yml
+
+  tasks:
+    - name: "Display node provisioning information"
+      debug:
+        msg:
+          - "=============================================="
+          - "Starting Node Provisioning via Satellite"
+          - "Satellite Server: {{ groups['satellite_servers'][0] }}"
+          - "Node: {{ inventory_hostname }}"
+          - "=============================================="
+      when: groups['managed_nodes'] is defined and inventory_hostname in groups['managed_nodes']
+
+    - name: "Register node with Satellite"
+      include_role:
+        name: satellite_provisioning
+        tasks_from: register_node
+      when: 
+        - groups['managed_nodes'] is defined 
+        - inventory_hostname in groups['managed_nodes']
+        - satellite_provisioning_enabled | default(true)
+
+  tags:
+    - node_provisioning
+    - optional

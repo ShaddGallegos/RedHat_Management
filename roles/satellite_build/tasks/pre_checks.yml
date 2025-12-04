@@ -1,0 +1,44 @@
+---
+# Pre-installation checks and validation
+
+- name: Load Satellite config from environment if exists
+  ansible.builtin.slurp:
+    src: "{{ lookup('env','HOME') }}/.satellite/conf/env.yml"
+  register: env_conf_content
+  ignore_errors: true
+  delegate_to: localhost
+
+- name: Parse Satellite config file
+  ansible.builtin.set_fact:
+    satellite_config_vars: "{{ env_conf_content['content'] | b64decode | from_yaml }}"
+  when: env_conf_content is defined and env_conf_content.content is defined
+
+- name: Gather system facts
+  ansible.builtin.setup:
+
+- name: Check minimum RAM requirements
+  ansible.builtin.assert:
+    that:
+      - ansible_memtotal_mb >= (satellite_min_ram_gb * 1024)
+    fail_msg: "Insufficient RAM. Required: {{ satellite_min_ram_gb }}GB, Available: {{ ansible_memtotal_mb // 1024 }}GB"
+    success_msg: "RAM requirement satisfied: {{ ansible_memtotal_mb // 1024 }}GB available"
+
+- name: Check swap space
+  ansible.builtin.assert:
+    that:
+      - ansible_swaptotal_mb >= (satellite_min_swap_gb * 1024)
+    fail_msg: "Insufficient swap space. Required: {{ satellite_min_swap_gb }}GB, Available: {{ ansible_swaptotal_mb // 1024 }}GB"
+    success_msg: "Swap requirement satisfied: {{ ansible_swaptotal_mb // 1024 }}GB available"
+  ignore_errors: true
+
+- name: Validate network connectivity
+  ansible.builtin.uri:
+    url: "https://cdn.redhat.com"
+    method: HEAD
+    timeout: 10
+  ignore_errors: true
+  register: connectivity_check
+
+- name: Display connectivity status
+  ansible.builtin.debug:
+    msg: "Internet connectivity: {{ 'OK' if (connectivity_check is defined and connectivity_check.status is defined and connectivity_check.status == 200) else 'Limited' }}"

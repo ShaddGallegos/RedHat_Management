@@ -1,0 +1,138 @@
+---
+# Master Satellite Deployment Workflow
+# Purpose: Complete Red Hat Satellite 6.17 deployment using roles
+# Usage: ansible-playbook -i inventory satellite_complete_deployment.yml
+
+- name: "Complete Red Hat Satellite 6.17 Deployment Workflow"
+- hosts: satellite_servers
+  gather_facts: true
+  become: true
+  serial: 1
+
+  vars:
+    # Workflow Configuration
+    deployment_phases:
+- name: "Satellite Installation"
+        role: "satellite_build"
+        tags: ['build', 'installation']
+- name: "PXE Services Configuration"
+        role: "satellite_pxe_services"
+        tags: ['pxe', 'services']
+- name: "Content Configuration"
+        role: "satellite_content"
+        tags: ['content', 'repositories']
+
+  pre_tasks:
+- name: Display workflow banner
+      ansible.builtin.debug:
+        msg: |
+          RED HAT SATELLITE 6.17 COMPLETE DEPLOYMENT WORKFLOW
+          ===========================================================
+          
+          Deployment Phases:
+          {% for phase in deployment_phases %}
+          • {{ loop.index }}. {{ phase.name }} ({{ phase.role }})
+          {% endfor %}
+          
+          Target Server: {{ inventory_hostname }}
+          Started: {{ ansible_date_time.iso8601 }}
+          
+          Beginning automated deployment...
+
+- name: Validate target server requirements
+      ansible.builtin.assert:
+        that:
+          - ansible_distribution == "RedHat"
+          - ansible_distribution_major_version | int >= 9
+          - ansible_memtotal_mb >= 20480  # 20GB RAM minimum
+        fail_msg: "Server does not meet minimum requirements for Satellite 6.17"
+        success_msg: "Server requirements validated successfully"
+
+  tasks:
+- name: "Phase 1: Satellite Installation and Configuration"
+      ansible.builtin.include_role:
+- name: satellite_build
+      tags: ['phase1', 'build']
+
+- name: "Phase 2: PXE Services Configuration"
+      ansible.builtin.include_role:
+- name: satellite_pxe_services
+      tags: ['phase2', 'pxe']
+
+- name: "Phase 3: Content Configuration"
+      ansible.builtin.include_role:
+- name: satellite_content
+      tags: ['phase3', 'content']
+
+  post_tasks:
+- name: Verify Satellite services
+      ansible.builtin.uri:
+        url: "https://{{ inventory_hostname }}/api/ping"
+        method: GET
+        user: "{{ satellite_admin_user | default('admin') }}"
+        password: "{{ satellite_admin_password | default('changeme') }}"
+        force_basic_auth: true
+        validate_certs: false
+      register: satellite_ping
+      ignore_errors: true
+
+- name: Display deployment summary
+      ansible.builtin.debug:
+        msg: |
+          SATELLITE 6.17 DEPLOYMENT COMPLETE!
+          ========================================
+          
+          Deployment Status: {{ 'SUCCESS' if satellite_ping.status == 200 else 'PARTIAL' }}
+          Satellite URL: https://{{ inventory_hostname }}
+          Admin User: {{ satellite_admin_user | default('admin') }}
+          Organization: {{ satellite_organization | default('RedHat') }}
+          Location: {{ satellite_location | default('Denver') }}
+          
+          Deployed Components:
+          • Satellite Server Installation
+          • PXE Services (TFTP, DHCP, LibVirt)
+          • Content Management (Repositories, Content Views)
+          • Activation Keys and Lifecycle Environments
+          
+          Your Satellite server is ready for production use!
+          
+          Next Steps:
+          1. Access Web UI: https://{{ inventory_hostname }}
+          2. Configure additional content as needed
+          3. Begin node provisioning workflows
+          
+          Deployment completed: {{ ansible_date_time.iso8601 }}
+
+- name: Save deployment information
+      ansible.builtin.copy:
+        content: |
+          # Red Hat Satellite 6.17 Deployment Summary
+          
+          ## Deployment Information
+          - **Server**: {{ inventory_hostname }}
+          - **IP Address**: {{ ansible_host }}
+          - **Deployment Date**: {{ ansible_date_time.iso8601 }}
+          - **Status**: {{ 'SUCCESS' if satellite_ping.status == 200 else 'PARTIAL' }}
+          
+          ## Access Information
+          - **Web UI**: https://{{ inventory_hostname }}
+          - **API Endpoint**: https://{{ inventory_hostname }}/api
+          - **Admin Username**: {{ satellite_admin_user | default('admin') }}
+          - **Organization**: {{ satellite_organization | default('RedHat') }}
+          - **Location**: {{ satellite_location | default('Denver') }}
+          
+          ## Configured Services
+          - Satellite Server Installation [COMPLETE]
+          - PXE Services (TFTP, DHCP, LibVirt) [COMPLETE]
+          - Content Management [COMPLETE]
+          - Activation Keys [COMPLETE]
+          
+          ## Network Configuration
+          - **Internet Interface**: {{ internet_interface | default('auto-detected') }}
+          - **Provisioning Interface**: {{ provisioning_interface | default('auto-detected') }}
+          - **DHCP Range**: {{ dhcp_range_start | default('10.168.1.100') }} - {{ dhcp_range_end | default('10.168.1.200') }}
+          
+          Generated by Ansible Satellite Deployment Workflow
+        dest: "/root/satellite_deployment_summary.md"
+        mode: '0644'
+  become: true

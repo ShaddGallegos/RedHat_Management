@@ -1,0 +1,12 @@
+---
+community_collections:
+- community.general
+- nutanix.ncp
+- ansible.posix
+- ansible.eda
+redhat_collections:
+- redhat.rhel_system_roles
+- redhat.insights
+- redhat.satellite
+- servicenow.itsm
+- ansible.controller

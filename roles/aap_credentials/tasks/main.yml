@@ -1,0 +1,26 @@
+---
+- name: Include master defaults
+  ansible.builtin.include_vars:
+  file: "{{ playbook_dir }}/../vars/master_defaults.yml"
+
+- name: Include vault variables
+  ansible.builtin.include_vars:
+  file: "{{ playbook_dir }}/../group_vars/all/vault.yml"
+
+- name: Create custom credential types
+  ansible.builtin.include_tasks: create_credential_types.yml
+
+- name: Create ServiceNow credential
+  ansible.builtin.include_tasks: servicenow_credential.yml
+
+- name: Create Nutanix credential
+  ansible.builtin.include_tasks: nutanix_credential.yml
+
+- name: Create Splunk credential
+  ansible.builtin.include_tasks: splunk_credential.yml
+
+- name: Create Machine credential
+  ansible.builtin.include_tasks: machine_credential.yml
+
+- name: Create Vault credential
+  ansible.builtin.include_tasks: vault_credential.yml

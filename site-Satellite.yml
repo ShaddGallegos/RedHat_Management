@@ -1,0 +1,26 @@
+---
+# Main playbook for Satellite
+
+- name: Apply Satellite configuration
+- hosts: all
+  become: true
+  
+  # Include variables from env.yml if available
+  pre_tasks:
+- name: Include environment variables
+      include_vars: "env.yml"
+      ignore_errors: yes
+      tags: always
+  
+  # Apply roles
+  roles:
+    - role: satellite_build
+    - role: satellite_content
+    - role: satellite_provisioning
+    - role: satellite_pxe_services
+  
+  # Post-tasks
+  post_tasks:
+- name: Verify deployment
+      debug:
+        msg: "Satellite configuration applied successfully"

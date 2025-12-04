@@ -1,0 +1,28 @@
+---
+- ansible.builtin.stat:
+    path: '{{ playbook_dir }}/../logs/eda_controller.pid'
+- name: Check if PID file exists
+  register: pid_file
+- ansible.builtin.slurp:
+    src: '{{ playbook_dir }}/../logs/eda_controller.pid'
+- name: Read PID
+  register: eda_pid
+  when: pid_file.stat.exists
+- ansible.builtin.command: kill {{ eda_pid.content | b64decode | trim }}
+  failed_when: false
+- name: Stop EDA process
+  register: stop_result
+  when: pid_file.stat.exists
+- ansible.builtin.file:
+    path: '{{ playbook_dir }}/../logs/eda_controller.pid'
+    state: absent
+- name: Remove PID file
+  when: pid_file.stat.exists
+- ansible.builtin.debug:
+    msg: EDA Controller stopped
+- name: Display stop message
+  when: stop_result is changed
+- ansible.builtin.debug:
+    msg: EDA Controller was not running
+- name: Display not running message
+  when: not pid_file.stat.exists

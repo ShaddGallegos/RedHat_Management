@@ -1,0 +1,96 @@
+---
+# Role: satellite_content
+# Purpose: Configure Satellite content including repositories, content views, and activation keys
+
+# Satellite Configuration
+satellite_server_url: "https://{{ satellite_hostname | default('satellite.prod.spg') }}"
+satellite_username: "{{ vault_satellite_username | default('admin') }}"
+satellite_password: "{{ vault_satellite_password | default('REMOVED_EXAMPLE_PASSWORD') }}"  # sanitized (was hardcoded)
+satellite_organization: "{{ vault_satellite_organization | default('RedHat') }}"
+satellite_location: "{{ vault_satellite_location | default('Denver') }}"
+
+# Content Configuration
+enable_rhel_repositories: true
+create_content_views: true
+create_activation_keys: true
+configure_sync_plans: true
+
+# RHEL Versions to configure
+rhel_versions:
+  - "8"
+  - "9"
+  - "10"
+
+# Repository Sets to Enable
+repository_sets:
+  rhel8:
+    - "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
+    - "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
+    - "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
+    - "Red Hat Satellite Client 6 for RHEL 8 x86_64 (RPMs)"
+    - "Red Hat Satellite Utils 6.16 for RHEL 8 x86_64 (RPMs)"
+  rhel9:
+    - "Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)"
+    - "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)"
+    - "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (Kickstart)"
+    - "Red Hat Satellite Client 6 for RHEL 9 x86_64 (RPMs)"
+    - "Red Hat Satellite Utils 6.17 for RHEL 9 x86_64 (RPMs)"
+  rhel10:
+    - "Red Hat Enterprise Linux 10 for x86_64 - AppStream (RPMs)"
+    - "Red Hat Enterprise Linux 10 for x86_64 - BaseOS (RPMs)"
+    - "Red Hat Enterprise Linux 10 for x86_64 - BaseOS (Kickstart)"
+    - "Red Hat Satellite Client 6 for RHEL 10 x86_64 (RPMs)"
+
+# Content Views
+content_views:
+- name: "RHEL8-CV"
+    description: "RHEL 8 Content View"
+    repositories:
+      - "Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs x86_64 8"
+      - "Red Hat Enterprise Linux 8 for x86_64 - BaseOS RPMs x86_64 8"
+- name: "RHEL9-CV"
+    description: "RHEL 9 Content View"
+    repositories:
+      - "Red Hat Enterprise Linux 9 for x86_64 - AppStream RPMs x86_64 9"
+      - "Red Hat Enterprise Linux 9 for x86_64 - BaseOS RPMs x86_64 9"
+- name: "RHEL10-CV"
+    description: "RHEL 10 Content View"
+    repositories:
+      - "Red Hat Enterprise Linux 10 for x86_64 - AppStream RPMs x86_64 10"
+      - "Red Hat Enterprise Linux 10 for x86_64 - BaseOS RPMs x86_64 10"
+
+# Lifecycle Environments
+lifecycle_environments:
+- name: "Development"
+    description: "Development Environment"
+    prior: "Library"
+- name: "Testing"
+    description: "Testing Environment"
+    prior: "Development"
+- name: "Production"
+    description: "Production Environment"
+    prior: "Testing"
+
+# Activation Keys
+activation_keys:
+- name: "RHEL8-AK"
+    description: "RHEL 8 Activation Key"
+    content_view: "RHEL8-CV"
+    lifecycle_environment: "Library"
+- name: "RHEL9-AK"
+    description: "RHEL 9 Activation Key"
+    content_view: "RHEL9-CV"
+    lifecycle_environment: "Library"
+- name: "RHEL10-AK"
+    description: "RHEL 10 Activation Key"
+    content_view: "RHEL10-CV"
+    lifecycle_environment: "Library"
+
+# Sync Configuration
+sync_plan_name: "Daily Sync"
+sync_plan_interval: "daily"
+sync_plan_enabled: true
+
+# Async Configuration
+async_timeout: 300
+async_poll_interval: 10

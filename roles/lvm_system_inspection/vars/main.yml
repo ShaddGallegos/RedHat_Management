@@ -1,0 +1,24 @@
+---
+# vars/main.yml - Role-specific variables for lvm_system_inspection
+
+# Supported RHEL versions
+lvm_supported_rhel_versions:
+  - "8"
+  - "9"
+
+# Supported distributions
+lvm_supported_distributions:
+  - "RedHat"
+
+# Supported filesystems
+lvm_supported_filesystems:
+  - "ext4"
+  - "xfs"
+
+# Minimum supported kernel version
+lvm_min_supported_kernel: "4.18"
+
+# Constants used in calculations
+lvm_mb_to_gb_conversion: 1024.0
+lvm_gb_to_mb_conversion: 1024.0
+

@@ -1,0 +1,13 @@
+---
+# Lvm Smart Extend Defaults
+
+lvm_extend_threshold_percent: 80
+lvm_extend_percent: 20
+lvm_min_extend_gb: 10
+lvm_vg_name: "vg_data"
+lvm_lv_name: "lv_data"
+lvm_mount_point: "/"
+lvm_notify_email: "sysadmin@example.com"
+lvm_enable_email_alert: true
+lvm_enable_webhook: false
+lvm_webhook_url: "http://localhost:5000/webhook/lvm_extend"

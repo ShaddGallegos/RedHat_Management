@@ -1,0 +1,16 @@
+---
+version: 1
+rulesets:
+- name: Disk Usage Syslog Alert
+    sources:
+- name: syslog_source
+        source:
+          ansible.eda.syslog:
+            host: 0.0.0.0
+            port: 514
+    rules:
+- name: Disk Usage Critical
+        condition: event.message is search("disk usage") and event.message is search("90%")
+        action:
+          run_playbook:
+- name: playbooks/extend_disk_on_alert.yml

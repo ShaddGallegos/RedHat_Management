@@ -1,0 +1,24 @@
+---
+# Lvm System Inspection Defaults
+
+lvm_inspect_mount_points:
+  - "/"
+  - "/var"
+  - "/home"
+
+lvm_inspect_vg_names:
+  - "vg_data"
+  - "vg_root"
+
+lvm_inspect_lv_names:
+  - "lv_data"
+  - "lv_root"
+
+lvm_inspect_email: "sysadmin@example.com"
+lvm_inspect_enable_email_alert: true
+lvm_inspect_enable_webhook: false
+lvm_inspect_webhook_url: "http://localhost:5000/webhook/lvm_inspect"
+
+lvm_inspect_report_format: "text"   # or "json"
+lvm_inspect_critical_threshold_percent: 90
+lvm_inspect_warning_threshold_percent: 80

@@ -1,0 +1,192 @@
+---
+# Configure Satellite API for Node Provisioning
+# Create hostgroups, operating systems, and provisioning templates
+
+- name: Get organization and location IDs
+  uri:
+    url: "{{ satellite_url }}/api/organizations"
+    method: GET
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: org_list
+
+- name: Set organization ID
+  ansible.builtin.set_fact:
+    org_id: "{{ org_list.json.results | selectattr('name', 'equalto', satellite_organization) | map(attribute='id') | first }}"
+
+- name: Get location ID
+  uri:
+    url: "{{ satellite_url }}/api/locations"
+    method: GET
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: location_list
+
+- name: Set location ID
+  ansible.builtin.set_fact:
+    location_id: "{{ location_list.json.results | selectattr('name', 'equalto', satellite_location) | map(attribute='id') | first }}"
+
+- name: Create installation media for RHEL 9.6
+  uri:
+    url: "{{ satellite_url }}/api/media"
+    method: POST
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      medium:
+- name: "RHEL_9_x86_64"
+        path: "http://{{ satellite_ip }}/pub/content/dist/rhel9/9.6/x86_64/baseos/os/"
+        os_family: "Redhat"
+        organization_ids: ["{{ org_id }}"]
+        location_ids: ["{{ location_id }}"]
+    status_code: [201, 422]
+  register: media_result
+
+- name: Get or create RHEL 9.6 operating system
+  uri:
+    url: "{{ satellite_url }}/api/operatingsystems"
+    method: GET
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: false
+  register: os_list
+
+- name: Find RHEL 9.6 OS ID
+  ansible.builtin.set_fact:
+    rhel_os_id: "{{ os_list.json.results | selectattr('name', 'equalto', 'RHEL') | selectattr('major', 'equalto', '9') | selectattr('minor', 'equalto', '6') | map(attribute='id') | first | default('') }}"
+
+- name: Create RHEL 9.6 OS if not exists
+  uri:
+    url: "{{ satellite_url }}/api/operatingsystems"
+    method: POST
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      operatingsystem:
+- name: "RHEL"
+        major: "9"
+        minor: "6"
+        family: "Redhat"
+        release_name: "RHEL 9.6"
+        description: "Red Hat Enterprise Linux 9.6"
+    status_code: [201, 422]
+  when: rhel_os_id == ""
+  register: os_create
+
+- name: Update RHEL OS ID after creation
+  ansible.builtin.set_fact:
+    rhel_os_id: "{{ os_create.json.id }}"
+  when: rhel_os_id == "" and os_create.status == 201
+
+- name: Create compute profiles for different node sizes
+  uri:
+    url: "{{ satellite_url }}/api/compute_profiles"
+    method: POST
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      compute_profile:
+- name: "{{ item.name }}"
+    status_code: [201, 422]
+  loop:
+    - { name: "1-Small-Node", cpu: 1, memory: 2147483648 }
+    - { name: "2-Medium-Node", cpu: 2, memory: 4294967296 }
+    - { name: "3-Large-Node", cpu: 4, memory: 8589934592 }
+    - { name: "4-XL-Node", cpu: 8, memory: 17179869184 }
+  register: compute_profiles
+
+- name: Create subnet for node provisioning
+  uri:
+    url: "{{ satellite_url }}/api/subnets"
+    method: POST
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      subnet:
+- name: "PXE-Provisioning-Network"
+        network: "10.168.0.0"
+        mask: "{{ netmask }}"
+        gateway: "{{ gateway }}"
+        dns_primary: "{{ dns_servers[0] }}"
+        dns_secondary: "{{ dns_servers[1] | default('') }}"
+        from: "{{ dhcp_range_start }}"
+        to: "{{ dhcp_range_end }}"
+        boot_mode: "DHCP"
+        dhcp_id: 1
+        dns_id: 1
+        tftp_id: 1
+        ipam: "DHCP"
+        organization_ids: ["{{ org_id }}"]
+        location_ids: ["{{ location_id }}"]
+    status_code: [201, 422]
+  register: subnet_result
+
+- name: Import Ansible roles for node configuration
+  uri:
+    url: "{{ satellite_url }}/api/ansible_roles/import"
+    method: POST
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    headers:
+      Content-Type: "application/json"
+    body_format: json
+    body:
+      proxy_id: 1
+    status_code: [200, 202]
+  register: ansible_import
+  ignore_errors: true
+  when: import_ansible_roles | default(false)
+
+- name: Display Satellite API configuration results
+  ansible.builtin.debug:
+    msg: |
+      SATELLITE API CONFIGURATION RESULTS:
+      
+      Organization & Location:
+      • Organization ID: {{ org_id }}
+      • Location ID: {{ location_id }}
+      
+      Installation Media:
+      • RHEL_9_x86_64: {{ 'Created' if (media_result is defined and media_result.status is defined and media_result.status == 201) else 'Configured' }}
+      
+      Operating System:
+      • RHEL 9.6 ID: {{ rhel_os_id }}
+      
+      Compute Profiles:
+      • Small/Medium/Large/XL Nodes: [CONFIGURED]
+      
+      Network:
+      • PXE Subnet: {{ 'Created' if (subnet_result is defined and subnet_result.status is defined and subnet_result.status == 201) else 'Configured' }}
+      • DHCP Range: {{ dhcp_range_start }} - {{ dhcp_range_end }}
+      
+      Ansible Roles:
+      • Import Status: {{ 'Initiated' if (ansible_import is defined and ansible_import.status is defined and ansible_import.status in [200, 202]) else 'Skipped' }}
+      
+      Ready for Node Host Group creation!

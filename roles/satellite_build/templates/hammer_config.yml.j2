@@ -1,0 +1,13 @@
+# Hammer CLI configuration for Satellite admin
+:foreman:
+  :host: 'https://{{ satellite_hostname }}'
+  :username: '{{ satellite_admin_user }}'
+  :password: '{{ satellite_config_vars.admin_password | default("changeme") }}'
+  :request_timeout: 120
+  :session_timeout: 60
+
+:ui:
+  :interactive: false
+
+:log_dir: '~/.foreman/log'
+:log_level: 'error'

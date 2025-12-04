@@ -1,0 +1,6 @@
+- connection: local
+  gather_facts: false
+- hosts: localhost
+- name: Test role disk_integration_with_snow
+  roles:
+  - role: disk_integration_with_snow

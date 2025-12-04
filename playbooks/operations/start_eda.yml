@@ -1,0 +1,4 @@
+- connection: local
+  gather_facts: true
+- hosts: localhost
+- name: Start Event Driven Ansible Controller

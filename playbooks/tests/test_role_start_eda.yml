@@ -1,0 +1,6 @@
+- connection: local
+  gather_facts: false
+- hosts: localhost
+- name: Test role start_eda
+  roles:
+  - role: start_eda

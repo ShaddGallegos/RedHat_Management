@@ -1,0 +1,23 @@
+---
+# Encrypted vault file - Sensitive credentials
+# Generated: {{ ansible_date_time.iso8601 }}
+
+# AAP Controller Credentials
+vault_aap_controller_password: "{{ vault_vars.aap_controller_password }}"
+
+# EDA Controller Credentials
+vault_eda_controller_password: "{{ vault_vars.eda_controller_password }}"
+
+# ServiceNow Credentials
+vault_snow_password: "{{ vault_vars.snow_password }}"
+
+# Nutanix Credentials
+vault_nutanix_password: "{{ vault_vars.nutanix_password }}"
+
+# Splunk Credentials
+vault_splunk_token: "{{ vault_vars.splunk_token }}"
+
+# Email Credentials
+{% if vault_vars.smtp_password %}
+vault_smtp_password: "{{ vault_vars.smtp_password }}"
+{% endif %}

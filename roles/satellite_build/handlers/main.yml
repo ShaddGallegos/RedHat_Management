@@ -1,0 +1,28 @@
+---
+# Handlers for satellite_build role
+
+- name: reload firewalld
+  ansible.builtin.systemd:
+- name: firewalld
+    state: reloaded
+  become: true
+
+- name: restart satellite services
+  ansible.builtin.systemd:
+- name: "{{ item }}"
+    state: restarted
+  loop:
+    - httpd
+    - foreman
+    - pulpcore-api
+    - pulpcore-content
+    - pulpcore-worker@1
+    - pulpcore-worker@2
+  become: true
+  ignore_errors: true
+
+- name: restart dhcpd
+  ansible.builtin.systemd:
+- name: dhcpd
+    state: restarted
+  become: true
