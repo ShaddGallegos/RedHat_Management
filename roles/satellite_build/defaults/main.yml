@@ -1,0 +1,48 @@
+---
+# Role: satellite_build
+# Purpose: Complete Red Hat Satellite 6.17 server installation and configuration
+# Dependencies: RHEL 9 system with valid subscription
+
+# Satellite Configuration
+satellite_hostname: "{{ inventory_hostname }}"
+satellite_ip: "{{ ansible_host }}"
+satellite_admin_user: "admin"
+satellite_admin_password: "{{ vault_satellite_password | default('changeme') }}"
+satellite_organization: "{{ vault_satellite_organization | default('RedHat') }}"
+satellite_location: "{{ vault_satellite_location | default('Denver') }}"
+
+# Network Configuration
+internet_interface: "{{ ansible_default_ipv4.interface | default('eth0') }}"
+provisioning_interface: "{{ discovered_provisioning_interface | default('eth1') }}"
+
+# Storage Requirements (GB)
+satellite_storage_pulp_gb: 500
+satellite_storage_pgsql_gb: 100
+satellite_storage_mongodb_gb: 50
+
+# System Requirements
+satellite_min_ram_gb: 20
+satellite_min_swap_gb: 4
+
+# Package Management
+unlock_packages: true
+install_python_deps: true
+
+# Insights Configuration
+configure_insights: true
+insights_display_name: "{{ satellite_hostname }}"
+
+# Firewall Ports
+satellite_firewall_ports:
+  - "80/tcp"
+  - "443/tcp"
+  - "8140/tcp"
+  - "5646/tcp"
+  - "9090/tcp"
+
+# Required Collections
+satellite_collections:
+  - community.general
+  - ansible.posix
+  - redhat.satellite
+  - theforeman.foreman

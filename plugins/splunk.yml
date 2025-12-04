@@ -1,0 +1,8 @@
+plugin: splunk
+url: https://splunk.example.com
+token: "{{ lookup('env','SPLUNK_API_TOKEN') }}"
+search: 'search index=assets sourcetype=inventory | fields host,env,role'
+host_field: host
+group_by: env
+verify_ssl: true
+timeout: 60

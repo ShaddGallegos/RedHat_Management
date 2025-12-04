@@ -1,0 +1,29 @@
+---
+# Tasks to prompt for environment variables and write to defaults/main.yml
+- name: Prompt for environment variables
+  vars_prompt:
+    - name: api_url
+      prompt: "Enter API URL for this integration (e.g., https://console.redhat.com)"
+      private: no
+    - name: api_token
+      prompt: "Enter API token (leave blank if not required)"
+      private: yes
+    - name: hosts
+      prompt: "Enter comma-separated hostnames (e.g., host1.example.com,host2.example.com)"
+      private: no
+    - name: groups
+      prompt: "Enter comma-separated group names (e.g., group1,group2)"
+      private: no
+    - name: integration
+      prompt: "Enter integration name (e.g., Libvirt, Satellite, AWS, etc.)"
+      private: no
+
+- name: Set host list
+  set_fact:
+    host_list: "{{ hosts.split(',') }}"
+    group_list: "{{ groups.split(',') }}"
+
+- name: Write variables to defaults/main.yml
+  template:
+    src: defaults.j2
+    dest: "{{ role_path }}/defaults/main.yml"

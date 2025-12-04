@@ -1,0 +1,50 @@
+---
+- name: Automated LVM Extension
+- hosts: all
+  gather_facts: true
+ 
+  vars:
+    threshold_percent: 80
+    extend_percent: 20
+    min_extend_gb: 10
+    snow_enabled: true
+ 
+  tasks:
+- name: Check disk usage
+ ansible.builtin.shell: df -h / | tail -1 | awk '{print $5}' | sed 's/%//'
+ register: disk_usage
+ changed_when: false
+ 
+- name: Determine if extension needed
+ ansible.builtin.set_fact:
+ needs_extension: "{{ disk_usage.stdout | int > threshold_percent }}"
+ 
+- name: Create ServiceNow ticket
+ servicenow.itsm.incident:
+ instance: "{{ lookup('env', 'SNOW_INSTANCE') }}"
+ username: "{{ lookup('env', 'SNOW_USERNAME') }}"
+ password: "{{ lookup('env', 'SNOW_PASSWORD') }}"
+ state: new
+ short_description: "LVM Extension Required - {{ inventory_hostname }}"
+ description: |
+ Automated LVM extension triggered
+ Current usage: {{ disk_usage.stdout }}%
+ Threshold: {{ threshold_percent }}%
+ priority: "{{ 2 if disk_usage.stdout | int > 90 else 3 }}"
+ register: snow_ticket
+ when: needs_extension and snow_enabled
+ 
+- name: Extend LVM
+ ansible.builtin.include_role:
+- name: lvm_smart_extend
+ when: needs_extension
+ 
+- name: Update ServiceNow ticket
+ servicenow.itsm.incident:
+ instance: "{{ lookup('env', 'SNOW_INSTANCE') }}"
+ username: "{{ lookup('env', 'SNOW_USERNAME') }}"
+ password: "{{ lookup('env', 'SNOW_PASSWORD') }}"
+ state: resolved
+ number: "{{ snow_ticket.record.number }}"
+ close_notes: "LVM extension completed successfully"
+ when: needs_extension and snow_enabled

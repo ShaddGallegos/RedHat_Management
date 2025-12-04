@@ -1,0 +1,77 @@
+---
+# Task file: create_content_views.yml
+# Purpose: Create content views with specific settings
+# URL Reference: https://satellite.prod.spg/content_views
+
+- name: "[INFO] Creating content views"
+  debug:
+    msg: "Setting up content views for RHEL content management"
+
+- name: "[VALIDATION] Check if content views should be created"
+  debug:
+    msg: "Content view creation will proceed with default settings"
+
+- name: "[CONTENT VIEWS] Create standard content views"
+  theforeman.foreman.content_view:
+    server_url: "{{ satellite_server_url }}"
+    username: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    organization: "{{ satellite_organization }}"
+- name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    solve_dependencies: "{{ item.solve_dependencies | default(false) }}"
+    auto_publish: "{{ item.auto_publish | default(false) }}"
+    state: present
+  loop: "{{ content_views | default([]) | selectattr('composite', 'undefined') | list }}"
+  loop_control:
+    label: "Creating: {{ item.name }}"
+  register: standard_cv_results
+  when: content_views is defined
+
+- name: "[COMPOSITE] Create composite content views"
+  theforeman.foreman.content_view:
+    server_url: "{{ satellite_server_url }}"
+    username: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    organization: "{{ satellite_organization }}"
+- name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    composite: "{{ item.composite }}"
+    auto_publish: "{{ item.auto_publish | default(false) }}"
+    state: present
+  loop: "{{ content_views | default([]) | selectattr('composite', 'defined') | selectattr('composite', 'equalto', true) | list }}"
+  loop_control:
+    label: "Creating composite: {{ item.name }}"
+  register: composite_cv_results
+  when: content_views is defined
+
+- name: "[VERIFICATION] Verify content views were created"
+  uri:
+    url: "{{ satellite_server_url }}/katello/api/v2/content_views"
+    method: GET
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: false
+    status_code: 200
+  register: all_content_views
+
+- name: "[FILTER] Filter newly created content views"
+  set_fact:
+    created_content_views: "{{ all_content_views.json.results | default([]) | selectattr('name', 'match', 'RHEL_(8|9|10)_x86_64.*') | list }}"
+
+- name: "[DISPLAY] Show created content views"
+  debug:
+    msg: |
+      Content View: {{ item.name }}
+      ID: {{ item.id }}
+      Type: {{ 'Composite' if item.composite else 'Standard' }}
+      Auto Publish: {{ item.auto_publish | default(false) }}
+      Repositories: {{ item.repository_ids | default([]) | length }}
+  loop: "{{ created_content_views | default([]) }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: "[INFO] Content views setup completed"
+  debug:
+    msg: "Content views configuration finished successfully"

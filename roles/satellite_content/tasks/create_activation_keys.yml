@@ -1,0 +1,59 @@
+---
+# Task File: create_activation_keys.yml
+# Purpose: Create activation keys for each promoted content view
+
+- name: "[INFO] Creating activation keys"
+  debug:
+    msg: "Setting up activation keys for content views"
+
+- name: "[SET DEFAULT] Set default activation keys"
+  set_fact:
+    activation_keys:
+      # RHEL 8 Activation Keys (using Library environment initially)
+- name: "AK-RHEL-8-Library"
+        description: "Activation Key for RHEL 8 Library Environment"
+        lifecycle_environment: "Library"
+        content_view: "RHEL8-CV"
+        
+      # RHEL 9 Activation Keys (using Library environment initially)
+- name: "AK-RHEL-9-Library"
+        description: "Activation Key for RHEL 9 Library Environment"
+        lifecycle_environment: "Library"
+        content_view: "RHEL9-CV"
+        
+      # RHEL 10 Activation Keys (using Library environment initially)
+- name: "AK-RHEL-10-Library"
+        description: "Activation Key for RHEL 10 Library Environment"
+        lifecycle_environment: "Library"
+        content_view: "RHEL10-CV"
+  when: activation_keys is not defined
+
+- name: "[ACTIVATION KEYS] Create activation keys for each content view and lifecycle environment"
+  theforeman.foreman.activation_key:
+    server_url: "{{ satellite_server_url }}"
+    username: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    organization: "{{ satellite_organization | default('Default Organization') }}"
+- name: "{{ item.name }}"
+    description: "{{ item.description }}"
+    lifecycle_environment: "{{ item.lifecycle_environment }}"
+    content_view: "{{ item.content_view }}"
+    auto_attach: true
+    state: present
+  loop: "{{ activation_keys }}"
+  register: activation_key_creation
+  tags: activation_keys
+
+- name: "[DISPLAY] Show created activation keys"
+  debug:
+    msg:
+      - "✓ Activation Key Created: {{ item.item.name }}"
+      - "  Content View: {{ item.item.content_view }}"
+      - "  Lifecycle Environment: {{ item.item.lifecycle_environment }}"
+  loop: "{{ activation_key_creation.results }}"
+  when: item.changed
+  tags: activation_keys
+
+- name: "[INFO] Activation keys setup completed"
+  debug:
+    msg: "Activation keys configuration finished successfully"

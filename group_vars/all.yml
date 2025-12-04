@@ -1,0 +1,11 @@
+---
+# Global variables for all hosts
+disk_usage_threshold: 90
+extend_percentage: 20
+
+# Webhook settings
+webhook_host: "localhost"
+webhook_port: 5000
+
+# Notification settings 
+notification_enabled: true

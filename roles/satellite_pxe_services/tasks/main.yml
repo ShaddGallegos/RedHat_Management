@@ -1,0 +1,44 @@
+---
+# Main tasks for satellite_pxe_services role
+
+- name: Verify Python dependencies
+  ansible.builtin.pip:
+- name: netaddr
+    state: present
+  become: true
+  ignore_errors: true
+
+- name: Include PXE services configuration
+  ansible.builtin.include_tasks: configure_pxe_services.yml
+  when: configure_tftp | bool or configure_dhcp | bool
+  tags: ['pxe_services']
+
+- name: Include libvirt configuration
+  ansible.builtin.include_tasks: configure_libvirt.yml
+  when: configure_libvirt | bool
+  tags: ['libvirt']
+
+- name: Include Satellite API configuration
+  ansible.builtin.include_tasks: configure_satellite_api.yml
+  when: configure_satellite_api | bool
+  tags: ['satellite_api']
+
+- name: Display PXE services summary
+  ansible.builtin.debug:
+    msg: |
+      SATELLITE PXE SERVICES ROLE COMPLETE:
+      
+      Services Configured:
+      • TFTP Server: {{ 'Enabled' if configure_tftp else 'Disabled' }}
+      • DHCP Server: {{ 'Enabled' if configure_dhcp else 'Disabled' }}
+      • LibVirt: {{ 'Enabled' if configure_libvirt else 'Disabled' }}
+      • Satellite API: {{ 'Configured' if configure_satellite_api else 'Skipped' }}
+      
+      Network Configuration:
+      • Interface: {{ primary_interface }}
+      • DHCP Range: {{ dhcp_range_start }} - {{ dhcp_range_end }}
+      • PXE Server: {{ satellite_ip }}
+      • LibVirt Network: {{ libvirt_network }}
+      
+      Ready for Node Provisioning!
+  tags: ['summary']

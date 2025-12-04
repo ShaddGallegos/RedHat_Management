@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: red_hat_satellite_maint_remediation
+  author: GitHub Copilot
+  description: Red_Hat_Satellite_Maint-Remediation role
+  company: Personal
+  license: MIT
+  min_ansible_version: 2.9
+  platforms:
+- name: RHEL
+      versions:
+        - 9

@@ -1,0 +1,37 @@
+---
+- name: Display category header
+  ansible.builtin.debug:
+    msg: "\n=== {{ category.name }} ==="
+
+- name: Prompt for variables in category
+  ansible.builtin.pause:
+    prompt: "{{ item.prompt }}{% if item.default is defined %} [{{ item.default }}]{% endif %}: "
+  register: var_input
+  loop: "{{ category.vars }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Process variable inputs
+  ansible.builtin.set_fact:
+    collected_vars: >-
+      {{
+        collected_vars | combine({
+          item.item.name: (
+            item.user_input if item.user_input != '' 
+            else item.item.default | default('')
+          )
+        })
+      }}
+    sensitive_vars: >-
+      {{
+        sensitive_vars | combine({
+          item.item.name: (
+            item.user_input if item.user_input != ''
+            else item.item.default | default('')
+          )
+        }) if item.item.sensitive | default(false) else sensitive_vars
+      }}
+  loop: "{{ var_input.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  no_log: "{{ item.item.sensitive | default(false) }}"

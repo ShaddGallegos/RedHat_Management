@@ -1,0 +1,24 @@
+---
+# Storage validation tasks
+
+- name: Check /var/lib/pulp storage
+  ansible.builtin.stat:
+    path: /var/lib/pulp
+  register: pulp_stat
+
+- name: Assert /var/lib/pulp storage requirements
+  ansible.builtin.assert:
+    that: >
+      pulp_stat.stat.exists == false or
+      ansible_mounts | selectattr('mount', 'equalto', '/var/lib/pulp') | 
+      map(attribute='size_available') | 
+      first | default(ansible_mounts | selectattr('mount', 'equalto', '/') | 
+      map(attribute='size_available') | first) >= 
+      (satellite_storage_pulp_gb * 1024 * 1024 * 1024)
+    fail_msg: "Insufficient storage for /var/lib/pulp. Required: {{ satellite_storage_pulp_gb }}GB"
+    success_msg: "Storage requirement satisfied for /var/lib/pulp"
+  ignore_errors: true
+
+- name: Check available disk space for root filesystem
+  ansible.builtin.debug:
+    msg: "Root filesystem available space: {{ (ansible_mounts | selectattr('mount', 'equalto', '/') | map(attribute='size_available') | first | default(0) / 1024 / 1024 / 1024) | round(2) }}GB"

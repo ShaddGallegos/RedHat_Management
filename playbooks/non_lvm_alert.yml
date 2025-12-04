@@ -1,0 +1,87 @@
+---
+- name: Handle Non-LVM High Disk Usage Alert
+- hosts: all
+  gather_facts: true
+  become: true
+ collections:
+ - community.general
+ 
+  tasks:
+- name: Get detailed filesystem information
+ ansible.builtin.command: df -h {{ mount_point }}
+ register: df_output
+ changed_when: false
+ 
+- name: Get disk information
+ ansible.builtin.command: lsblk -o NAME,SIZE,TYPE,MOUNTPOINT {{ device }}
+ register: disk_info
+ changed_when: false
+ 
+- name: Check for possible cleanup options
+ ansible.builtin.command: find {{ mount_point }} -type f -size +100M -exec ls -lh {} \; | sort -k5 -hr | head -10
+ register: large_files
+ changed_when: false
+ ignore_errors: true
+ 
+- name: Get partition information
+ ansible.builtin.command: parted -l
+ register: partition_info
+ changed_when: false
+ ignore_errors: true
+ 
+- name: Log detailed information
+ ansible.builtin.debug:
+ msg: |
+ Non-LVM filesystem high disk usage alert for {{ inventory_hostname }}
+ 
+ Mount point: {{ mount_point }}
+ Device: {{ device }}
+ Current usage: {{ usage_percent }}%
+ 
+ Disk space information:
+ {{ df_output.stdout }}
+ 
+ Device information:
+ {{ disk_info.stdout }}
+ 
+ Largest files in {{ mount_point }} (potential cleanup targets):
+ {{ large_files.stdout if large_files.rc == 0 else 'Could not retrieve large files' }}
+ 
+ Partition information:
+ {{ partition_info.stdout if partition_info.rc == 0 else 'Could not retrieve partition information' }}
+ 
+ This is a non-LVM filesystem and requires manual intervention.
+ A ServiceNow ticket has been created: {{ snow_ticket_created | default('No') }}
+ 
+- name: Send alert email with details
+ community.general.mail:
+ to: "{{ item }}"
+ subject: "MANUAL ACTION REQUIRED: Non-LVM filesystem at {{ usage_percent }}% on {{ inventory_hostname }}"
+ body: |
+ A high disk usage alert has been detected on a non-LVM filesystem:
+ 
+ System: {{ inventory_hostname }}
+ Mount point: {{ mount_point }}
+ Device: {{ device }}
+ Current usage: {{ usage_percent }}%
+ 
+ Potential large files that could be cleaned up:
+ {{ large_files.stdout if large_files.rc == 0 else 'Could not retrieve large files' | truncate(500) }}
+ 
+ Since this is a non-LVM filesystem, manual intervention is required.
+ A ServiceNow ticket has been created for further action.
+ 
+ Recommended actions:
+ 1. Review and clean up unnecessary files
+ 2. Consider converting to LVM if possible
+ 3. Plan for filesystem resize operations if needed
+ 
+ This is an automated alert from the disk monitoring system.
+ smtp_host: "{{ mail_smtp_host | default('localhost') }}"
+ smtp_port: "{{ mail_smtp_port | default(25) }}"
+ loop:
+ - "{{ user_email | default('user@example.com') }}"
+ - "{{ admin_email | default('admin@example.com') }}"
+ - "{{ operations_email | default('operations@example.com') }}"
+ ignore_errors: true
+ when: send_notifications | default(true) | bool

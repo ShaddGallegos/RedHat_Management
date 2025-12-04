@@ -1,0 +1,122 @@
+---
+- name: Monitor Disk Usage and Send Alerts to EDA
+- hosts: all
+  gather_facts: true
+  become: false
+ 
+  vars:
+    webhook_url: "{{ webhook_url | default('http://localhost:5000/webhook') }}"
+    threshold_percent: "{{ threshold_percent | default(90) }}"
+ 
+  tasks:
+- name: Gather mount information
+      setup:
+        gather_subset:
+          - mounts
+ 
+- name: Get OS information
+      setup:
+        gather_subset:
+          - distribution
+ 
+- name: Check for LVM volumes
+  become: true
+      command: lvs --noheadings -o lv_name,vg_name
+      register: lvm_volumes
+      changed_when: false
+      ignore_errors: true
+ 
+- name: Process mounts and send alerts for high usage
+      block:
+- name: Check each mount point
+          ansible.builtin.set_fact:
+            mount_data: "{{ mount_data | default([]) + [item | combine({'usage_percent': ((item.size_total - item.size_available) / item.size_total * 100) | round(2)})] }}"
+          loop: "{{ ansible_mounts }}"
+          loop_control:
+            label: "{{ item.mount }}"
+ 
+- name: Filter high usage mount points
+          ansible.builtin.set_fact:
+            high_usage_mounts: "{{ mount_data | selectattr('usage_percent', 'ge', threshold_percent | int) | list }}"
+ 
+- name: Debug high usage mounts
+          debug:
+            msg: "Found {{ high_usage_mounts | length }} mount points with usage >= {{ threshold_percent }}%: {{ high_usage_mounts | map(attribute='mount') | list }}"
+          when: high_usage_mounts | length > 0
+ 
+- name: Determine if mount is LVM-based
+          ansible.builtin.set_fact:
+            lvm_info: "{{ lvm_info | default({}) | combine({item.mount: {'is_lvm': false, 'vg_name': '', 'lv_name': ''}}) }}"
+          loop: "{{ high_usage_mounts }}"
+          loop_control:
+            label: "{{ item.mount }}"
+ 
+- name: Check which high usage mounts are LVM
+  become: true
+          shell: >
+            set -o pipefail && 
+            findmnt -n -o SOURCE "{{ item.mount }}" | 
+            grep -q "/dev/mapper" && 
+            echo "LVM: $(findmnt -n -o SOURCE {{ item.mount }} | sed 's/.*\/dev\/mapper\///')"
+          register: lvm_check
+          changed_when: false
+          failed_when: false
+          loop: "{{ high_usage_mounts }}"
+          loop_control:
+            label: "{{ item.mount }}"
+ 
+- name: Process LVM check results
+          ansible.builtin.set_fact:
+            lvm_info: >
+              {{ lvm_info | combine({
+                item.item.mount: {
+                  'is_lvm': item.rc == 0,
+                  'vg_name': (item.stdout | regex_search('LVM: ([^-]*)-(.*)', '\\1') | first) if item.rc == 0 else '',
+                  'lv_name': (item.stdout | regex_search('LVM: ([^-]*)-(.+)', '\\2') | first) if item.rc == 0 else '',
+                  'device': item.item.device
+                }
+              })
+              }}
+          loop: "{{ lvm_check.results }}"
+          loop_control:
+            label: "{{ item.item.mount }}"
+ 
+- name: Send webhook alert for each high usage mount point
+          uri:
+            url: "{{ webhook_url }}"
+            method: POST
+            body_format: json
+            body:
+              hostname: "{{ inventory_hostname }}"
+              disk_usage_percent: "{{ item.usage_percent }}"
+              mount_point: "{{ item.mount }}"
+              device: "{{ item.device }}"
+              is_lvm: "{{ lvm_info[item.mount].is_lvm }}"
+              vg_name: "{{ lvm_info[item.mount].vg_name }}"
+              lv_name: "{{ lvm_info[item.mount].lv_name }}"
+              os_family: "{{ ansible_distribution }}"
+              os_version: "{{ ansible_distribution_major_version }}"
+              vm_name: "{{ vm_name | default(inventory_hostname) }}"
+              user_email: "{{ user_email | default('user@example.com') }}"
+              admin_email: "{{ admin_email | default('admin@example.com') }}"
+              operations_email: "{{ operations_email | default('operations@example.com') }}"
+            status_code: [200, 201, 202]
+          delegate_to: localhost
+          loop: "{{ high_usage_mounts }}"
+          loop_control:
+            label: "{{ item.mount }} ({{ item.usage_percent }}%)"
+          register: webhook_results
+          ignore_errors: true
+ 
+- name: Display webhook results
+          debug:
+            msg: "Sent {{ high_usage_mounts | length }} webhook alerts. Results: {{ webhook_results | json_query('results[*].{status: status, mount: item.mount}') }}"
+ 
+      always:
+- name: Summary of disk usage across system
+          debug:
+            msg: |
+              Disk Usage Summary for {{ inventory_hostname }}:
+              {% for mount in ansible_mounts %}
+              * {{ mount.mount }}: {{ ((mount.size_total - mount.size_available) / mount.size_total * 100) | round(2) }}% used ({{ (mount.size_available / 1024 / 1024 / 1024) | round(2) }} GB free)
+              {% endfor %}

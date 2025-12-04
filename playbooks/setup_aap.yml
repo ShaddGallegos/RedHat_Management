@@ -1,0 +1,184 @@
+---
+- name: Setup Ansible Automation Platform and Credentials
+  hosts: localhost
+  gather_facts: false
+  vars_prompt:
+    - name: aap_admin_username
+      prompt: "Enter Ansible Automation Platform admin username"
+      private: no
+    - name: aap_admin_password
+      prompt: "Enter Ansible Automation Platform admin password"
+      private: yes
+      default: "r3dh4t7!"
+    - name: aap_controller_host
+      prompt: "Enter AAP Controller base URL (e.g. https://aap.example.com)"
+      private: no
+      default: "https://aap.example.com"
+    - name: aap_organization
+      prompt: "Enter AAP Organization name"
+      private: no
+      default: "Default"
+    - name: project_git_url
+      prompt: "Enter Git URL for Project (leave blank for sample repo)"
+      private: no
+      default: "https://github.com/shaddgallegos/AnsibleSatellite.git"
+    - name: satellite_admin_username
+      prompt: "Enter Satellite admin username"
+      private: no
+    - name: satellite_admin_password
+      prompt: "Enter Satellite admin password"
+      private: yes
+      default: "r3dh4t7!"
+    - name: satellite_hostname
+      prompt: "Enter Satellite hostname (FQDN)"
+      private: no
+    - name: satellite_ip
+      prompt: "Enter Satellite IP address"
+      private: no
+    - name: insights_username
+      prompt: "Enter Red Hat Insights username"
+      private: no
+    - name: insights_password
+      prompt: "Enter Red Hat Insights password"
+      private: yes
+      default: "r3dh4t7!"
+    - name: libvirt_ssh_user
+      prompt: "Enter SSH username for Libvirt system"
+      private: no
+    - name: libvirt_ssh_password
+      prompt: "Enter SSH password for Libvirt system"
+      private: yes
+      default: "r3dh4t7!"
+    - name: github_username
+      prompt: "Enter GitHub username"
+      private: no
+    - name: github_password
+      prompt: "Enter GitHub password or token"
+      private: yes
+      default: "r3dh4t7!"
+    - name: machine_credential_name
+      prompt: "Enter name for machine credential"
+      private: no
+
+  tasks:
+    - name: Display collected input summary (placeholder for future automation)
+      ansible.builtin.debug:
+        msg: |
+          Collected input values:
+          AAP Admin Username: {{ aap_admin_username }}
+          Controller URL: {{ aap_controller_host }}
+          Organization: {{ aap_organization }}
+          Satellite Admin Username: {{ satellite_admin_username }}
+          Satellite Hostname: {{ satellite_hostname }} / IP: {{ satellite_ip }}
+          Insights Username: {{ insights_username }}
+          Libvirt SSH User: {{ libvirt_ssh_user }}
+          GitHub Username: {{ github_username }}
+          Machine Credential Name: {{ machine_credential_name }}
+          (Passwords hidden; default educational password applied where not provided.)
+
+          NOTE: AWX / AAP resource creation follows below.
+
+    # Collection presence assumed; remove placeholder role import to satisfy syntax check.
+
+    - name: Create / update Machine credential
+      awx.awx.credential:
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        name: "{{ machine_credential_name }}"
+        credential_type: Machine
+        organization: "{{ aap_organization }}"
+        inputs:
+          username: "{{ libvirt_ssh_user }}"
+          password: "{{ libvirt_ssh_password }}"
+        state: present
+        validate_certs: false
+      delegate_to: localhost
+
+    - name: Create / update Project (Git)
+      awx.awx.project:
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        name: "Satellite Project"
+        organization: "{{ aap_organization }}"
+        scm_type: git
+        scm_url: "{{ project_git_url }}"
+        update_project: true
+        wait: true
+        state: present
+        validate_certs: false
+      delegate_to: localhost
+
+    - name: Create / update Inventory
+      awx.awx.inventory:
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        name: "Satellite Inventory"
+        organization: "{{ aap_organization }}"
+        state: present
+        validate_certs: false
+      delegate_to: localhost
+
+    - name: Add host to inventory (Satellite)
+      awx.awx.host:
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        inventory: "Satellite Inventory"
+        name: "{{ satellite_hostname }}"
+        variables:
+          ansible_host: "{{ satellite_ip }}"
+        state: present
+        validate_certs: false
+      delegate_to: localhost
+
+    - name: Create / update Credential for Satellite API
+      awx.awx.credential:
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        name: "Satellite API Password"
+        credential_type: "Vault"  # Placeholder type; adjust if custom Satellite credential type exists
+        organization: "{{ aap_organization }}"
+        inputs:
+          vault_password: "{{ satellite_admin_password }}"
+        state: present
+        validate_certs: false
+      delegate_to: localhost
+
+    - name: Create / update Job Template (Satellite Ping)
+      awx.awx.job_template:
+        controller_host: "{{ aap_controller_host }}"
+        controller_username: "{{ aap_admin_username }}"
+        controller_password: "{{ aap_admin_password }}"
+        name: "Satellite Ping"
+        organization: "{{ aap_organization }}"
+        inventory: "Satellite Inventory"
+        project: "Satellite Project"
+        playbook: "ping.yml"  # Assume playbook exists in repo
+        credential: "{{ machine_credential_name }}"
+        state: present
+        validate_certs: false
+        survey_enabled: true
+        survey_spec:
+          name: "Satellite Ping Survey"
+          description: "Provide Satellite admin password if override needed"
+          spec:
+            - question_name: "Satellite admin password"
+              type: password
+              variable: satellite_admin_password
+              required: false
+              default: "{{ satellite_admin_password }}"
+      delegate_to: localhost
+
+    - name: Summary of created / updated AAP resources
+      ansible.builtin.debug:
+        msg: |
+          Resources ensured:
+            - Machine credential: {{ machine_credential_name }}
+            - Project: Satellite Project ({{ project_git_url }})
+            - Inventory: Satellite Inventory (host {{ satellite_hostname }} -> {{ satellite_ip }})
+            - Satellite API credential: Satellite API Password
+            - Job Template: Satellite Ping (with survey)

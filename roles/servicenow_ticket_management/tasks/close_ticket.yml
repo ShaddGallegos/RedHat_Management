@@ -1,0 +1,32 @@
+---
+# Tasks to close a ServiceNow ticket
+
+- name: Validate required variables for ticket closure
+  ansible.builtin.assert:
+    that:
+      - snow_ticket_number is defined
+      - servicenow_instance is defined
+      - servicenow_username is defined
+      - servicenow_password is defined
+    fail_msg: "Missing required variables for ServiceNow ticket closure"
+
+- name: Set default close variables if not provided
+  ansible.builtin.set_fact:
+    ticket_close_code: "{{ close_code | default(resolution_code) | default('Solved (Permanently)') }}"
+    ticket_close_notes: "{{ close_notes | default(resolution_notes) | default('Issue resolved by Ansible automation') }}"
+
+- name: Close ServiceNow incident
+  servicenow.itsm.incident:
+    instance: "{{ servicenow_instance }}"
+    username: "{{ servicenow_username }}"
+    password: "{{ servicenow_password }}"
+    state: closed
+    number: "{{ snow_ticket_number }}"
+    close_code: "{{ ticket_close_code }}"
+    close_notes: "{{ ticket_close_notes }}"
+  register: snow_close_result
+  delegate_to: localhost
+
+- name: Log ticket closure
+  ansible.builtin.debug:
+    msg: "ServiceNow ticket {{ snow_ticket_number }} closed successfully. Close code: {{ ticket_close_code }}. Notes: {{ ticket_close_notes }}"

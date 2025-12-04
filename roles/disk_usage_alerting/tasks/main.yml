@@ -1,0 +1,63 @@
+---
+# Disk Usage Alerting Tasks
+- name: Gather disk usage facts
+  ansible.builtin.setup:
+    gather_subset:
+      - hardware
+      - mounts
+
+- name: Check disk usage thresholds
+  ansible.builtin.set_fact:
+    disk_alerts: "{{ ansible_mounts | selectattr('size_total', 'defined') | 
+      selectattr('mount', 'match', '^/') | 
+      map(attribute='mount') | 
+      list }}"
+
+- name: Calculate usage percentages
+  ansible.builtin.set_fact:
+    high_usage_mounts: []
+
+- name: Identify high usage mount points
+  ansible.builtin.set_fact:
+    high_usage_mounts: "{{ high_usage_mounts + [item] }}"
+  loop: "{{ ansible_mounts }}"
+  when:
+    - item.size_total is defined
+    - item.size_available is defined
+    - ((item.size_total - item.size_available) * 100 / item.size_total) | int > threshold_percent | default(80) | int
+
+- name: Send alert for high disk usage
+  ansible.builtin.uri:
+    url: "{{ eda_webhook_url | default('http://localhost:5000/webhook') }}"
+    method: POST
+    body_format: json
+    body:
+      hostname: "{{ inventory_hostname }}"
+      mount_point: "{{ item.mount }}"
+      usage_percent: "{{ ((item.size_total - item.size_available) * 100 / item.size_total) | int }}"
+      severity: "{{ 'critical' if ((item.size_total - item.size_available) * 100 / item.size_total) | int > critical_threshold_percent | default(90) | int else 'warning' }}"
+      timestamp: "{{ ansible_date_time.iso8601 }}"
+    status_code: [200, 201, 202]
+  loop: "{{ high_usage_mounts }}"
+  when: high_usage_mounts | length > 0
+  ignore_errors: true
+
+- name: Send email alert
+  community.general.mail:
+    host: "{{ mail_smtp_host | default('localhost') }}"
+    port: "{{ mail_smtp_port | default(25) }}"
+    to: "{{ alert_email_recipients }}"
+    subject: "Disk Usage Alert - {{ inventory_hostname }}"
+    body: |
+      High disk usage detected on {{ inventory_hostname }}:
+      {% for mount in high_usage_mounts %}
+      - {{ mount.mount }}: {{ ((mount.size_total - mount.size_available) * 100 / mount.size_total) | int }}% used
+      {% endfor %}
+  when:
+    - high_usage_mounts | length > 0
+    - send_email_alerts | default(true) | bool
+  ignore_errors: true
+
+- name: Log alert status
+  ansible.builtin.debug:
+    msg: "Sent {{ high_usage_mounts | length }} disk usage alerts"

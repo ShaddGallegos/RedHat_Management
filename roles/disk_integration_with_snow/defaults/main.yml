@@ -1,0 +1,2 @@
+---
+is_new_disk: '{{ disk_created | default(false) }}'

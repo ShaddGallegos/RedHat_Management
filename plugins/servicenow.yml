@@ -1,0 +1,30 @@
+# Example configuration for ServiceNow dynamic inventory plugin
+# Place this file in your inventory directory or reference it in your playbook
+# Usage: ansible-inventory -i servicenow.yml --list
+
+plugin: servicenow
+api_url: https://servicenow.example.com/api/now/table/host
+api_token: "{{ lookup('env','SERVICENOW_API_TOKEN') }}"
+fallback: true
+
+hosts:
+  - servicenow-host1.example.com
+  - servicenow-host2.example.com
+
+groups:
+  servicenow_hosts:
+    hosts:
+      - servicenow-host1.example.com
+      - servicenow-host2.example.com
+  servicenow_all:
+    hosts:
+      - servicenow-host1.example.com
+      - servicenow-host2.example.com
+
+hostvars:
+  servicenow-host1.example.com:
+    ansible_host: 192.168.6.11
+    cmdb_id: SN12345
+  servicenow-host2.example.com:
+    ansible_host: 192.168.6.12
+    cmdb_id: SN67890

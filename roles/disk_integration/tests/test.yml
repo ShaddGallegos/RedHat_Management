@@ -1,0 +1,5 @@
+---
+- hosts: localhost
+  remote_user: root
+  roles:
+    - /home/sgallego/Downloads/GIT/Add_LVM_to_System_nutanix/roles/disk_integration

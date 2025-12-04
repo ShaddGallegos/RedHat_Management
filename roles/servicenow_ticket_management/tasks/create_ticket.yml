@@ -1,0 +1,64 @@
+---
+# Tasks to create a new ServiceNow ticket
+
+- name: Validate required variables for ticket creation
+  ansible.builtin.assert:
+    that:
+      - hostname is defined
+      - disk_usage_percent is defined or usage_percent is defined
+      - user_email is defined or caller is defined
+      - servicenow_instance is defined
+      - servicenow_username is defined
+      - servicenow_password is defined
+    fail_msg: "Missing required variables for ServiceNow ticket creation"
+
+- name: Set default values for ticket creation
+  ansible.builtin.set_fact:
+    ticket_caller: "{{ user_email | default(caller) | default('ansible@example.com') }}"
+    ticket_usage: "{{ disk_usage_percent | default(usage_percent) | default('Unknown') }}"
+    ticket_mount: "{{ mount_point | default('/') }}"
+    ticket_vg: "{{ vg_name | default('Unknown') }}"
+    ticket_lv: "{{ lv_name | default('Unknown') }}"
+    ticket_extend_percent: "{{ extend_percent | default(20) }}"
+    ticket_priority: "{{ priority | default(servicenow_ticket_impact) | default('2') }}"
+    ticket_urgency: "{{ urgency | default(servicenow_ticket_urgency) | default('2') }}"
+    ticket_assignment_group: "{{ assignment_group | default(servicenow_ticket_assignment_group) | default('Linux Admins') }}"
+
+- name: Create ServiceNow incident ticket
+  servicenow.itsm.incident:
+    instance: "{{ servicenow_instance }}"
+    username: "{{ servicenow_username }}"
+    password: "{{ servicenow_password }}"
+    state: new
+    caller: "{{ ticket_caller }}"
+    short_description: "AUTOMATED: High disk usage detected on {{ hostname }} - LVM extension required"
+    description: |
+      AUTOMATED LVM EXTENSION ALERT
+
+      System: {{ hostname }}
+      Current Disk Usage: {{ ticket_usage }}%
+      Mount Point: {{ ticket_mount }}
+      Volume Group: {{ ticket_vg }}
+      Logical Volume: {{ ticket_lv }}
+
+      Action Required: Automatic LVM extension will be attempted
+      Expected Growth: {{ ticket_extend_percent }}% of current volume size
+
+      This ticket was automatically created by the LVM monitoring system.
+    priority: "{{ ticket_priority }}"
+    urgency: "{{ ticket_urgency }}"
+    category: "{{ servicenow_ticket_category | default('Infrastructure') }}"
+    subcategory: "Storage"
+    assignment_group: "{{ ticket_assignment_group }}"
+    work_notes: "Ticket created automatically by EDA LVM monitoring system at {{ ansible_date_time.iso8601 }}"
+  register: snow_ticket
+  delegate_to: localhost
+
+- name: Store ticket number for subsequent operations
+  ansible.builtin.set_fact:
+    snow_ticket_number: "{{ snow_ticket.record.number | default('N/A') }}"
+    snow_ticket_sys_id: "{{ snow_ticket.record.sys_id | default('N/A') }}"
+
+- name: Log ticket creation
+  ansible.builtin.debug:
+    msg: "ServiceNow ticket {{ snow_ticket_number }} created for {{ hostname }}"

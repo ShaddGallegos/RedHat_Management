@@ -1,0 +1,40 @@
+# Example configuration for AAP dynamic inventory plugin
+# Place this file in your inventory directory or reference it in your playbook
+# Usage: ansible-inventory -i aap.yml --list
+
+plugin: aap  # Name of the plugin (must match plugin Python file)
+api_url: http://aap.example.com/api/v2/hosts  # API endpoint for host discovery (optional)
+api_token: "{{ lookup('env','AAP_API_TOKEN') }}"  # API token (recommended to use environment variable)
+fallback: true  # Use static inventory if API is unavailable
+
+# Optional: Specify static hosts/groups if not using API
+hosts:
+  - aap-controller1.example.com
+  - aap-controller2.example.com
+  - aap-executor.example.com
+
+groups:
+  controllers:
+    hosts:
+      - aap-controller1.example.com
+      - aap-controller2.example.com
+  executors:
+    hosts:
+      - aap-executor.example.com
+  aap_all:
+    hosts:
+      - aap-controller1.example.com
+      - aap-controller2.example.com
+      - aap-executor.example.com
+
+# Optional: Host variables
+hostvars:
+  aap-controller1.example.com:
+    ansible_host: 192.168.1.11
+    role: controller
+  aap-controller2.example.com:
+    ansible_host: 192.168.1.12
+    role: controller
+  aap-executor.example.com:
+    ansible_host: 192.168.1.13
+    role: executor

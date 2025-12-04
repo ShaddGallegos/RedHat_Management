@@ -1,0 +1,30 @@
+---
+- name: LVM Health Check
+- hosts: all
+  gather_facts: true
+ 
+  tasks:
+- name: Gather LVM facts
+ ansible.builtin.setup:
+ gather_subset:
+ - hardware
+ 
+- name: Check disk usage
+ ansible.builtin.shell: df -h
+ register: disk_usage
+ changed_when: false
+ 
+- name: Check LVM status
+ ansible.builtin.command: lvs
+ register: lvm_status
+ changed_when: false
+ 
+- name: Display results
+ ansible.builtin.debug:
+ msg:
+ - "=== {{ inventory_hostname }} ==="
+ - "Disk Usage:"
+ - "{{ disk_usage.stdout_lines }}"
+ - ""
+ - "LVM Status:"
+ - "{{ lvm_status.stdout_lines }}"
