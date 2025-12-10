@@ -1,4 +1,0 @@
----
-eda_inventory: '{{ playbook_dir }}/../inventory/hosts'
-eda_rulebook: '{{ playbook_dir }}/../rulebook.yml'
-eda_verbose: true

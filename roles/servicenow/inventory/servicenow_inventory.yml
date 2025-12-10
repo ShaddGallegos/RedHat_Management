@@ -1,0 +1,7 @@
+---
+# Example ServiceNow inventory using dynamic plugin
+plugin: servicenow_inventory
+instance: https://your-instance.service-now.com
+username: your-username
+password: your-password
+query: sys_class_name=cmdb_ci_server

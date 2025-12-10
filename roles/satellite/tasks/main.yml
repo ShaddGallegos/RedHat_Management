@@ -1,1 +1,7 @@
-# tasks for satellite
+---
+# Satellite composite entry
+- import_tasks: install.yml
+- import_tasks: configure.yml
+- import_tasks: test.yml
+- import_tasks: backup.yml
+- import_tasks: restore.yml

@@ -1,3 +1,0 @@
-- name: Placeholder sync plan task
-  debug:
-    msg: "Configure sync plans task goes here"

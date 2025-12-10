@@ -1,8 +1,0 @@
-Refactoring
-This file is a prototype to make it proper it will need:
-
-- Move each major class to its own file (e.g., ui.py, config.py, vault.py, etc.).
-- Create a main.py that imports and runs the menu.
-- Add a utils.py for shared helpers (validation, logging, etc.).
-- Replace repeated menu code with a generic menu handler.
-- Add type hints and docstrings as you go.

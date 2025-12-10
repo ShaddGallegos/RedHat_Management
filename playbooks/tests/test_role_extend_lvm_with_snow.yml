@@ -1,6 +1,0 @@
-- connection: local
-  gather_facts: false
-- hosts: localhost
-- name: Test role extend_lvm_with_snow
-  roles:
-  - role: extend_lvm_with_snow

@@ -1,244 +1,43 @@
 ---
-- ansible.builtin.shell: 'echo "- - -" > /sys/class/scsi_host/host{{ item }}/scan
+# Integrate a new disk into an existing LVM structure
+- name: Resolve target disk name
+  ansible.builtin.set_fact:
+    target_disk_name: "{{ target_disk | regex_replace('^/dev/', '') }}"
 
-    '
-  ignore_errors: true
-  loop: '{{ range(0, 10) | list }}'
-- name: Rescan SCSI buses for new disk
-- ansible.builtin.pause:
-    prompt: Waiting for new disk detection...
-    seconds: 10
-- name: Wait for new disk to be detected
-- ansible.builtin.shell: 'lsblk -J -o NAME,TYPE,SIZE,MOUNTPOINT
-
-    '
-  changed_when: false
-- name: Get current block devices before integration
-  register: lsblk_before
-- ansible.builtin.shell: "# Find disks that are not currently part of any VG\nfor\
-    \ disk in $(lsblk -rno NAME,TYPE | awk '$2==\"disk\" {print \"/dev/\"$1}'); do\n\
-    \  if ! pvdisplay $disk 2>/dev/null | grep -q \"VG Name\"; then\n    size=$(lsblk\
-    \ -rno SIZE $disk | head -1)\n    # Convert size to GB for comparison\n    size_gb=$(echo\
-    \ $size | sed 's/G//' | sed 's/T/*1000/' | bc 2>/dev/null || echo $size | sed\
-    \ 's/[^0-9.]//g')\n    expected_size={{ new_disk_size_gb }}\n    # Allow for small\
-    \ variations in size\n    if (( $(echo \"$size_gb >= $expected_size * 0.95 &&\
-    \ $size_gb <= $expected_size * 1.05\" | bc -l) )); then\n      echo $disk\n  \
-    \    exit 0\n    fi\n  fi\ndone\necho \"not_found\"\n"
-  changed_when: false
-  delay: 5
-- name: Find the new disk device
-  register: new_disk_detection
-  retries: 12
-  until: new_disk_detection.stdout != "not_found"
-- ansible.builtin.fail:
-    msg: New disk with size {{ new_disk_size_gb }}GB was not detected after {{ scan_timeout
-      }} seconds
-- name: Fail if new disk not detected
-  when: new_disk_detection.stdout == "not_found"
-- ansible.builtin.set_fact:
-    new_disk_device: '{{ new_disk_detection.stdout }}'
-- name: Set new disk device variable
-- community.general.parted:
-    device: '{{ new_disk_device }}'
-    label: gpt
-- name: Create partition table on new disk
-- community.general.parted:
-    device: '{{ new_disk_device }}'
-    flags:
-    - lvm
-    number: 1
-    part_end: 100%
-    part_start: 1MiB
+- name: Fail if target disk is not detected in facts
+  ansible.builtin.fail:
+    msg: "Target disk {{ target_disk }} not found in ansible_facts.devices; set target_disk to a valid block device."
+  when: target_disk_name not in ansible_facts.devices
+- name: Install LVM2
+  ansible.builtin.package:
+    name: lvm2
     state: present
-- name: Create LVM partition on new disk
-- community.general.lvg:
-    pvs: '{{ new_disk_device }}1'
-    state: present
-    vg: temp_vg_for_pv_creation
-- name: Create physical volume on new disk
-  register: pv_creation
-- block:
-  - community.general.lvg:
-      state: absent
-      vg: temp_vg_for_pv_creation
-- name: Remove temporary VG
-  - community.general.lvg:
-      pvs: '{{ new_disk_device }}1'
-      state: present
-      vg: '{{ vg_name }}'
-- name: Extend existing VG with new PV
-- name: Remove temporary VG and add PV to existing VG
-- community.general.lvol:
-    lv: '{{ lv_name }}'
-    size: +20%VG
-    vg: '{{ vg_name }}'
-- name: Extend Logical Volume with new space
-  register: lv_extend_result
-- ansible.builtin.shell: 'blkid -o value -s TYPE /dev/{{ vg_name }}/{{ lv_name }}
 
-    '
-  changed_when: false
-- name: Get filesystem type
-  register: fs_type
-- ansible.builtin.shell: 'resize2fs /dev/{{ vg_name }}/{{ lv_name }}
+- name: Create Physical Volume (PV)
+  ansible.builtin.command: pvcreate "{{ target_disk }}"
+  register: pvcreate_result
+  changed_when: "'successfully created' in pvcreate_result.stdout or pvcreate_result.rc == 0"
+  failed_when: pvcreate_result.rc not in [0,5]  # rc 5 if already initialized
 
-    '
-- name: Resize ext4 filesystem
-  register: resize2fs_result
-  when:
-  - fs_type.stdout == "ext4"
-  - lv_extend_result is changed
-- ansible.builtin.shell: 'xfs_growfs {{ mount_point }}
+- name: Create Volume Group (VG)
+  community.general.lvg:
+    vg: "{{ vg_name }}"
+    pvs: "{{ target_disk }}"
 
-    '
-- name: Resize XFS filesystem
-  register: xfs_resize_result
-  when:
-  - fs_type.stdout == "xfs"
-  - lv_extend_result is changed
-- ansible.builtin.shell: 'tune2fs -c 0 -i 0 /dev/{{ vg_name }}/{{ lv_name }}
+- name: Create Logical Volume (LV)
+  community.general.lvol:
+    vg: "{{ vg_name }}"
+    lv: "{{ lv_name }}"
+    size: "{{ lv_size }}"
 
-    '
-- name: Optimize ext4 filesystem with tune2fs
-  register: tune2fs_result
-  when:
-  - fs_type.stdout in ["ext4", "ext3", "ext2"]
-  - lv_extend_result is changed
-- ansible.builtin.shell: 'df -h {{ mount_point }}
+- name: Create Filesystem
+  community.general.filesystem:
+    fstype: "{{ fs_type }}"
+    dev: "/dev/{{ vg_name }}/{{ lv_name }}"
 
-    '
-  changed_when: false
-- name: Verify final disk usage
-  register: final_df
-- ansible.builtin.debug:
-    msg: '=== Disk Integration Completed Successfully ===
-
-      New Disk Device: {{ new_disk_device }}
-
-      New Disk Size: {{ new_disk_size_gb }}GB
-
-      Volume Group: {{ vg_name }}
-
-      Logical Volume: {{ lv_name }}
-
-      Filesystem Type: {{ fs_type.stdout }}
-
-      Mount Point: {{ mount_point }}
-
-
-      Final Disk Usage:
-
-      {{ final_df.stdout }}
-
-
-      Operations Performed:
-
-      - Created partition table and LVM partition
-
-      - Added PV to existing VG: {{ vg_name }}
-
-      - Extended LV: {{ lv_name }}
-
-      {% if resize2fs_result is defined and resize2fs_result is changed %}
-
-      - Resized ext4 filesystem: Success
-
-      {% endif %}
-
-      {% if xfs_resize_result is defined and xfs_resize_result is changed %}
-
-      - Resized XFS filesystem: Success
-
-      {% endif %}
-
-      {% if tune2fs_result is defined and tune2fs_result is changed %}
-
-      - Optimized filesystem with tune2fs: Success
-
-      {% endif %}
-
-      '
-- name: Display integration results
-- ansible.builtin.uri:
-    body:
-      action: lvm_extension_completed
-      final_usage: '{{ final_df.stdout_lines[1] }}'
-      hostname: '{{ inventory_hostname }}'
-      method: new_disk_integration
-      new_disk_device: '{{ new_disk_device }}'
-      success: true
-    body_format: json
-    method: POST
-    status_code:
-    - 200
-    - 201
-    url: http://localhost:5000/webhook/completion
-  ignore_errors: true
-- name: Send completion notification
-- community.general.mail:
-    body: 'Disk Integration Process Completed Successfully
-
-
-      Server: {{ inventory_hostname }}
-
-      Volume Group: {{ vg_name }}
-
-      Logical Volume: {{ lv_name }}
-
-      Mount Point: {{ mount_point }}
-
-      New Disk Device: {{ new_disk_device }}
-
-      New Disk Size: {{ new_disk_size_gb }}GB
-
-
-      Integration Results:
-
-      {% if pv_creation is defined and pv_creation is changed %}
-
-      - Created Physical Volume: Success
-
-      {% endif %}
-
-      {% if lv_extend_result is defined and lv_extend_result is changed %}
-
-      - Extended Logical Volume: Success
-
-      {% endif %}
-
-      {% if resize2fs_result is defined and resize2fs_result is changed %}
-
-      - Resized ext4 filesystem: Success
-
-      {% endif %}
-
-      {% if xfs_resize_result is defined and xfs_resize_result is changed %}
-
-      - Resized XFS filesystem: Success
-
-      {% endif %}
-
-      {% if tune2fs_result is defined and tune2fs_result is changed %}
-
-      - Optimized filesystem with tune2fs: Success
-
-      {% endif %}
-
-
-      Final Status: {{ final_df.stdout_lines[1] | default(''Status check failed'')
-      }}
-
-
-      The automated LVM extension process is now complete.
-
-      Your filesystem has been successfully expanded by 20%.
-
-
-      Timestamp: {{ ansible_date_time.iso8601 }}
-
-      '
-    subject: Disk Integration Complete - {{ inventory_hostname }}
-    to: '{{ admin_email | default(''admin@example.com'') }}'
-  ignore_errors: true
-- name: Send disk integration success email
-  when: admin_email is defined
+- name: Mount Filesystem
+  ansible.builtin.mount:
+    path: "{{ mount_point }}"
+    src: "/dev/{{ vg_name }}/{{ lv_name }}"
+    fstype: "{{ fs_type }}"
+    state: mounted

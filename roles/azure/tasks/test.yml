@@ -1,0 +1,4 @@
+---
+- name: Azure test placeholder
+  ansible.builtin.debug:
+    msg: "Implement Azure testing here."

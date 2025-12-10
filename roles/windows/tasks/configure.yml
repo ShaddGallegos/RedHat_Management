@@ -1,0 +1,4 @@
+---
+- name: Windows configure placeholder
+  ansible.builtin.debug:
+    msg: "Implement Windows configuration here."

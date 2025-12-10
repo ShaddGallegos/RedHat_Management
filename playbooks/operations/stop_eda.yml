@@ -1,4 +1,0 @@
-- connection: local
-  gather_facts: false
-- hosts: localhost
-- name: Stop Event Driven Ansible Controller

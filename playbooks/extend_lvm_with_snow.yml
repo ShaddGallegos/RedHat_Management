@@ -1,6 +1,0 @@
-  become: true
-  collections:
-  - community.general
-  gather_facts: true
-- hosts: all
-- name: Enhanced LVM Extension with ServiceNow Integration

@@ -1,0 +1,4 @@
+---
+- name: Windows install placeholder
+  ansible.builtin.debug:
+    msg: "Implement Windows install here."

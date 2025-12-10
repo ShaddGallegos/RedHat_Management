@@ -1,6 +1,0 @@
-- connection: local
-  gather_facts: false
-- hosts: localhost
-- name: Test role lvm_smart_extend
-  roles:
-  - role: lvm_smart_extend

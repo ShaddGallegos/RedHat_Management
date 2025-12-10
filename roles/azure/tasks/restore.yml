@@ -1,0 +1,4 @@
+---
+- name: Azure restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement Azure restore here."

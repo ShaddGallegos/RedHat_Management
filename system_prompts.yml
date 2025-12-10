@@ -1,0 +1,146 @@
+---
+- name: Collect management system prompts (Satellite, AAP, IdM, Insights)
+  hosts: localhost
+  gather_facts: true
+
+  vars_prompt:
+    # Satellite
+    - name: satellite_domain
+      prompt: "Satellite domain (e.g. hostname -d)"
+      private: no
+      default: "{{ ansible_domain | default('example.com') }}"
+    - name: satellite_primary_interface
+      prompt: "Primary interface for Satellite services (DHCP/DNS/TFTP)"
+      private: no
+      default: "{{ ansible_default_ipv4.interface | default('enp2s0') }}"
+    - name: satellite_fqdn
+      prompt: "Satellite FQDN"
+      private: no
+      default: "{{ ansible_fqdn | default('satellite.' + (ansible_domain | default('example.com'))) }}"
+    - name: satellite_fqdn_ip
+      prompt: "Satellite FQDN IP (leave blank to auto-detect)"
+      private: no
+      default: "{{ ansible_default_ipv4.address | default('') }}"
+    - name: satellite_gateway
+      prompt: "Gateway for primary interface (leave blank to auto-detect)"
+      private: no
+      default: "{{ ansible_default_ipv4.gateway | default('') }}"
+    - name: satellite_nameserver
+      prompt: "Nameserver to publish via DHCP (leave blank to auto-detect)"
+      private: no
+      default: "{{ (ansible_dns.nameservers | first) | default('') if ansible_dns is defined else '' }}"
+    - name: satellite_dhcp_range_start
+      prompt: "DHCP range start (leave blank to auto-compute)"
+      private: no
+      default: ""
+    - name: satellite_dhcp_range_end
+      prompt: "DHCP range end (leave blank to auto-compute)"
+      private: no
+      default: ""
+    - name: satellite_pxeserver
+      prompt: "PXE/TFTP server IP (leave blank to use primary IP)"
+      private: no
+      default: ""
+    - name: satellite_initial_admin_email
+      prompt: "Initial Satellite admin email"
+      private: no
+      default: "admin@{{ ansible_domain | default('example.com') }}"
+    - name: satellite_admin_user
+      prompt: "Satellite admin username"
+      private: no
+      default: "admin"
+    - name: satellite_admin_password
+      prompt: "Satellite admin password"
+      private: yes
+    - name: satellite_mail_relay
+      prompt: "Satellite SMTP relay host:port (leave blank to skip)"
+      private: no
+      default: ""
+    - name: satellite_mail_relay_credentials
+      prompt: "Satellite SMTP relay credentials (user:pass) leave blank if not required"
+      private: yes
+      default: ""
+
+    # AAP
+    - name: aap_admin_user
+      prompt: "AAP admin user"
+      private: no
+      default: "admin"
+    - name: aap_admin_password
+      prompt: "AAP admin password"
+      private: yes
+    - name: automation_hub_token
+      prompt: "Ansible Automation Hub token (leave blank if not needed)"
+      private: yes
+      default: ""
+
+    # IdM
+    - name: idm_domain
+      prompt: "IdM domain"
+      private: no
+      default: "{{ ansible_domain | default('example.com') }}"
+    - name: idm_realm
+      prompt: "IdM realm (usually domain uppercased)"
+      private: no
+      default: "{{ (ansible_domain | default('example.com')) | upper }}"
+    - name: idm_admin_password
+      prompt: "IdM admin password"
+      private: yes
+    - name: idm_directory_manager_password
+      prompt: "IdM Directory Manager password"
+      private: yes
+
+    # Insights
+    - name: insights_account
+      prompt: "Red Hat Insights account number"
+      private: no
+      default: "000000"
+    - name: insights_username
+      prompt: "Red Hat Insights username"
+      private: no
+      default: "insights-user"
+    - name: insights_password
+      prompt: "Red Hat Insights password"
+      private: yes
+
+  tasks:
+    - name: Build combined variable set
+      set_fact:
+        management_vars:
+          satellite_domain: "{{ satellite_domain }}"
+          satellite_primary_interface: "{{ satellite_primary_interface }}"
+          satellite_fqdn: "{{ satellite_fqdn }}"
+          satellite_fqdn_ip: "{{ satellite_fqdn_ip }}"
+          satellite_gateway: "{{ satellite_gateway }}"
+          satellite_nameserver: "{{ satellite_nameserver }}"
+          satellite_dhcp_range_start: "{{ satellite_dhcp_range_start }}"
+          satellite_dhcp_range_end: "{{ satellite_dhcp_range_end }}"
+          satellite_pxeserver: "{{ satellite_pxeserver }}"
+          satellite_initial_admin_email: "{{ satellite_initial_admin_email }}"
+          satellite_admin_user: "{{ satellite_admin_user }}"
+          satellite_admin_password: "{{ satellite_admin_password }}"
+          satellite_mail_relay: "{{ satellite_mail_relay }}"
+          satellite_mail_relay_credentials: "{{ satellite_mail_relay_credentials }}"
+          aap_admin_user: "{{ aap_admin_user }}"
+          aap_admin_password: "{{ aap_admin_password }}"
+          automation_hub_token: "{{ automation_hub_token }}"
+          idm_domain: "{{ idm_domain }}"
+          idm_realm: "{{ idm_realm }}"
+          idm_admin_password: "{{ idm_admin_password }}"
+          idm_directory_manager_password: "{{ idm_directory_manager_password }}"
+          insights_account: "{{ insights_account }}"
+          insights_username: "{{ insights_username }}"
+          insights_password: "{{ insights_password }}"
+
+    - name: Write merged variables to env.local.generated.yml
+      copy:
+        dest: "./env.local.generated.yml"
+        mode: '0600'
+        content: |
+          # Generated by system_prompts.yml on {{ ansible_date_time.iso8601 }}
+          # Move secrets into your vault and reference them as needed.
+          {{ management_vars | to_nice_yaml(indent=2) }}
+
+    - name: Display where the generated file was written
+      debug:
+        msg: "Wrote combined management variables to ./env.local.generated.yml"

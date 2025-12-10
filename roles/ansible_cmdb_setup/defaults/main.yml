@@ -1,0 +1,12 @@
+---
+ansible_cmdb_install: true
+ansible_cmdb_hostgroups: []          # If empty, use first host of each non-default group; fallback to 'all'
+ansible_cmdb_primary_host_override: ""
+ansible_cmdb_inventory_path: "/etc/ansible"
+ansible_cmdb_inventory_file: "hosts"
+ansible_cmdb_data_dir: "/var/www/html/ansible-cmdb"
+ansible_cmdb_hostfacts: ""
+ansible_cmdb_cron_user: root
+ansible_cmdb_cron_special_time: daily
+ansible_cmdb_expose_via_nginx: false
+ansible_cmdb_nginx_server_name: "_"

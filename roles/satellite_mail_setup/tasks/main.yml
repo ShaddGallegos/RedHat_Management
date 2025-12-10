@@ -1,0 +1,65 @@
+---
+# Entry point for satellite mail + stack bootstrap
+
+- name: Load vaulted/env variables
+  ansible.builtin.include_vars:
+    file: "{{ satellite_mail_vault_file | default('~/.ansible/conf/env.yml') }}"
+  ignore_errors: false
+  no_log: true
+
+- name: Determine install targets from defaults or overrides
+  set_fact:
+    sms_selected_targets: "{{ satellite_mail_targets | default(['satellite','aap','openshift']) }}"
+
+- name: Validate required secrets are provided
+  ansible.builtin.include_tasks: validate.yml
+
+- name: Render master variables file for stack
+  ansible.builtin.template:
+    src: master_vars.yml.j2
+    dest: "{{ satellite_mail_master_vars_dest | default('./master_vars.yml') }}"
+    mode: '0640'
+  delegate_to: localhost
+  run_once: true
+  no_log: true
+
+- name: Render installer inventory for selected targets
+  ansible.builtin.template:
+    src: generated_inventory.yml.j2
+    dest: "{{ satellite_mail_inventory_dest | default('./installer_inventory.yml') }}"
+    mode: '0640'
+  delegate_to: localhost
+  run_once: true
+  no_log: true
+
+- name: Ensure libvirt VM exists for Satellite (POC)
+  when: "'satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: provision_libvirt.yml
+
+- name: Pre-work for admin/root on Satellite host
+  when: "'satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: prework.yml
+
+- name: Configure network basics (hosts/resolv)
+  when: "'satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: network.yml
+
+- name: Install and configure Satellite
+  when: "'satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: satellite_install.yml
+
+- name: Configure Satellite mail server (Postfix)
+  when: "'satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: satellite_mail.yml
+
+- name: Configure IdM server (placeholder/minimal)
+  when: "'satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: idm.yml
+
+- name: Install Ansible Automation Platform (placeholder)
+  when: "'aap' in sms_selected_targets"
+  ansible.builtin.include_tasks: aap.yml
+
+- name: Configure OpenShift integration (placeholder)
+  when: "'openshift' in sms_selected_targets"
+  ansible.builtin.include_tasks: openshift.yml

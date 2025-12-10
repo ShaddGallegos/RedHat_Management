@@ -1,6 +1,0 @@
----
-- name: Setup EDA Controller for Disk Usage Alerting
-- hosts: localhost
-  gather_facts: false
-  roles:
-    - role: eda_configuration

@@ -1,2 +1,9 @@
 ---
-scan_timeout: 60
+# Default variables for disk integration
+
+target_disk: "/dev/sdb"
+vg_name: "data_vg"
+lv_name: "data_lv"
+lv_size: "100%FREE"
+mount_point: "/data"
+fs_type: "xfs"

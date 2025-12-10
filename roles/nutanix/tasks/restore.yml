@@ -1,0 +1,4 @@
+---
+- name: Nutanix restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement Nutanix restore/undo here."
