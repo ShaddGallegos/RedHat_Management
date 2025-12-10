@@ -1,0 +1,12 @@
+---
+- name: Install IdM server packages (placeholder)
+  ansible.builtin.package:
+    name:
+      - ipa-server
+      - ipa-server-dns
+    state: present
+  become: true
+
+- name: Placeholder IdM configuration
+  ansible.builtin.debug:
+    msg: "Run ipa-server-install with appropriate realm/domain options here."

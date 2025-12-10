@@ -1,8 +1,0 @@
----
-- name: Red_Hat_Satellite_Maint-Remediation playbook
-- hosts: localhost
-  connection: local
-  become: true
-
-  roles:
-    - role: ../roles/Red_Hat_Satellite_Maint-Remediation

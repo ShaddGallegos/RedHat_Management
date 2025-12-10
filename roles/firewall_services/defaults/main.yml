@@ -1,0 +1,72 @@
+---
+firewall_services_enabled: true
+firewall_services_profiles_enabled:
+  - satellite
+  - aap
+  - eda
+  - idm
+  - insights
+  - rhc
+  - ansible_cmdb
+
+firewall_services_definitions:
+  satellite:
+    services:
+      - dhcp
+      - dns
+      - http
+      - https
+      - tftp
+    ports:
+      - 5647/tcp   # katello agent/ goferd
+      - 9090/tcp   # smart proxy
+      - 8000/tcp   # template service
+      - 8140/tcp   # puppet
+      - 7911/tcp   # dhcp omapi
+  aap:
+    services:
+      - http
+      - https
+    ports:
+      - 27199/tcp  # receptor
+      - 9443/tcp   # controller api/https
+  eda:
+    services:
+      - http
+      - https
+    ports:
+      - 5000/tcp   # eda api
+      - 5001/tcp   # eda ui
+  idm:
+    services:
+      - kerberos
+      - kpasswd
+      - ldap
+      - ldaps
+      - dns
+    ports:
+      - 80/tcp
+      - 443/tcp
+      - 88/tcp
+      - 88/udp
+      - 389/tcp
+      - 389/udp
+      - 636/tcp
+      - 464/tcp
+      - 464/udp
+      - 123/udp
+  insights:
+    services: []
+    ports:
+      - 443/tcp
+  rhc:
+    services: []
+    ports:
+      - 443/tcp
+  ansible_cmdb:
+    services:
+      - http
+    ports: []
+
+# Optional zone override (default: public)
+firewall_zone: public

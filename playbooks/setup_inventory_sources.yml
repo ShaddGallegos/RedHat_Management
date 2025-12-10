@@ -1,8 +1,0 @@
-  - collections:
-      - ansible.controller
-    connection: local
-    gather_facts: false
-    hosts: localhost
-    name: Setup AAP inventory sources from this repo
-    roles:
-      - aap_inventory_sources

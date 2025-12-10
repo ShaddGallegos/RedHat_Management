@@ -1,6 +1,0 @@
-- connection: local
-  gather_facts: false
-- hosts: localhost
-- name: Test role lvm_system_inspection
-  roles:
-  - role: lvm_system_inspection

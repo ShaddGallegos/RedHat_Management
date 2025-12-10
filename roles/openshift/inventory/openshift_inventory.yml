@@ -1,0 +1,4 @@
+---
+# Placeholder OpenShift inventory example
+# Provide your dynamic inventory plugin or static hosts here.
+plugin: kubernetes.core.k8s

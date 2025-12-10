@@ -1,6 +1,0 @@
-- connection: local
-  gather_facts: false
-- hosts: localhost
-- name: Test role aap_project_setup
-  roles:
-  - role: aap_project_setup

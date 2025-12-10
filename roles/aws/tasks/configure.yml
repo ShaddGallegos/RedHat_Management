@@ -1,0 +1,4 @@
+---
+- name: AWS configure placeholder
+  ansible.builtin.debug:
+    msg: "Implement AWS configuration here."

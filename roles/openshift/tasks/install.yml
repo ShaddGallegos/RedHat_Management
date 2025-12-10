@@ -1,0 +1,4 @@
+---
+- name: OpenShift install placeholder
+  ansible.builtin.debug:
+    msg: "Implement OpenShift install here."

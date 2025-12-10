@@ -1,7 +1,0 @@
----
-# Example inventory config to run the CLI using env lookups, or to invoke the script directly.
-# Example usage (CLI): export NUTANIX_HOST=host NUTANIX_USERNAME=user NUTANIX_PASSWORD=pass && plugins/inventory/nutanix.py --list
-plugin: community.general.nested   # placeholder if using plugin wrapper; this repo provides the CLI script in plugins/inventory
-# For direct CLI usage, set env vars:
-# NUTANIX_HOST, NUTANIX_USERNAME, NUTANIX_PASSWORD, NUTANIX_PORT (optional)
-# Example below uses env lookups in Ansible inventory file to call the script via local_exec or include_vars if wrapped.

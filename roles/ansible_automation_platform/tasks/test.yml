@@ -1,0 +1,4 @@
+---
+- name: AAP test placeholder
+  ansible.builtin.debug:
+    msg: "Implement AAP validation here."

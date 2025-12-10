@@ -1,0 +1,4 @@
+---
+- name: OpenShift restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement OpenShift restore/undo here."

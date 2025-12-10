@@ -1,4 +1,0 @@
-  become: true
-  gather_facts: true
-- hosts: all
-- name: Complete Disk Integration with LVM and ServiceNow

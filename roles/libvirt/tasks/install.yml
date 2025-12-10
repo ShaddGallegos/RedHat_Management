@@ -1,0 +1,4 @@
+---
+- name: Libvirt install placeholder
+  ansible.builtin.debug:
+    msg: "Implement libvirt install here."

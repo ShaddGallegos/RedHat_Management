@@ -1,0 +1,4 @@
+---
+- name: Updates and patching restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement rollback or restore-from-backup steps here."

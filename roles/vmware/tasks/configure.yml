@@ -1,0 +1,4 @@
+---
+- name: VMware configure placeholder
+  ansible.builtin.debug:
+    msg: "Implement VMware configuration here."

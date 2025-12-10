@@ -1,0 +1,35 @@
+# Master variables for Satellite + AAP + Insights stack
+
+satellite_fqdn: {{ satellite_fqdn | default('satellite.example.com') }}
+satellite_org: {{ satellite_org | default('Default_Org') }}
+satellite_location: {{ satellite_location | default('Default_Location') }}
+satellite_admin_user: {{ satellite_admin_user | default('admin') }}
+satellite_admin_password: {{ satellite_admin_password | default('') }}
+satellite_mail_relay: {{ satellite_mail_relay | default('') }}
+satellite_mail_relay_credentials: {{ satellite_mail_relay_credentials | default('') }}
+
+# Libvirt host details
+libvirt_host: {{ libvirt_host | default('kaso.prod.spg') }}
+satellite_vm_name: {{ satellite_vm_name | default('satellite-poc') }}
+satellite_vm_hostname: {{ satellite_vm_hostname | default('satellite-poc.example.com') }}
+satellite_vm_memory_mb: {{ satellite_vm_memory_mb | default(16384) }}
+satellite_vm_vcpus: {{ satellite_vm_vcpus | default(4) }}
+satellite_vm_disk_size_gb: {{ satellite_vm_disk_size_gb | default(200) }}
+satellite_vm_disk_name: {{ satellite_vm_disk_name | default('satellite-poc.qcow2') }}
+satellite_vm_pool: {{ satellite_vm_pool | default('default') }}
+satellite_vm_network: {{ satellite_vm_network | default('default') }}
+satellite_vm_root_pubkey: {{ satellite_vm_root_pubkey | default('ssh-rsa AAAA...rootkey') }}
+satellite_admin_pubkey: {{ satellite_admin_pubkey | default('ssh-rsa AAAA...adminkey') }}
+satellite_root_pubkey: {{ satellite_root_pubkey | default('ssh-rsa AAAA...rootkey') }}
+
+# AAP vars
+aap_inventory_path: {{ aap_inventory_path | default('/tmp/aap_inventory.yml') }}
+aap_admin_password: {{ aap_admin_password | default('') }}
+
+# Insights
+insights_account: {{ insights_account | default('000000') }}
+insights_username: {{ insights_username | default('insights-user') }}
+insights_password: {{ insights_password | default('') }}
+
+# General packages
+satellite_base_packages: {{ satellite_base_packages | default(['vim','git','firewalld']) }}

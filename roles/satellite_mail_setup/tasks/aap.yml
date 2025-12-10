@@ -1,0 +1,8 @@
+---
+- name: Install/enable repos for AAP (placeholder)
+  ansible.builtin.debug:
+    msg: "Configure AAP repos and install bundle here."
+
+- name: Placeholder AAP setup
+  ansible.builtin.debug:
+    msg: "Run setup.sh or automation-controller installer with inventory generated earlier."

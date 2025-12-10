@@ -1,0 +1,5 @@
+options rotate timeout:2 attempts:1
+search {{ satellite_search_domain | default('prod.spg') }}
+{% for ns in satellite_nameservers %}
+nameserver {{ ns }}
+{% endfor %}

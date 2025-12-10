@@ -1,0 +1,20 @@
+---
+reboot_timeout: 600
+update_distro_packages: "*"
+update_distro_packages_excludes: []
+update_reboot_kernel: false
+update_rhel_allow_erasing: false
+update_rhel_bugfix: false
+update_rhel_clean_cache: true
+update_rhel_connect_timeout: 10
+update_rhel_force_reboot: false
+update_rhel_force_run: false
+update_rhel_ignore_errors: false
+update_rhel_nobest: false
+update_rhel_post_reboot_delay: 30
+update_rhel_pre_reboot_delay: 10
+update_rhel_security_only: false
+update_rhel_show_updates: false
+update_rhel_skip_broken: true
+update_rhel_test_command: "whoami"
+update_rhel_verbose: true

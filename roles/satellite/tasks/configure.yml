@@ -1,0 +1,4 @@
+---
+- name: Satellite configure placeholder
+  ansible.builtin.debug:
+    msg: "Implement Satellite configuration here."

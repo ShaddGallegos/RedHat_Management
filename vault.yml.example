@@ -14,6 +14,7 @@ vault_rh_credentials_token: "your_rh_token"
 
 # Satellite credentials
 vault_satellite_admin_password: "r3dh4t7!"
+vault_satellite_mail_relay_credentials: "user:pass"  # Credentials for SMTP relay (if required)
 
 # Ansible credentials
 vault_ansible_admin_password: "r3dh4t7!"

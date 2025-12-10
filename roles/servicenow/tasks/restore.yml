@@ -1,0 +1,4 @@
+---
+- name: ServiceNow restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement ServiceNow restore here."

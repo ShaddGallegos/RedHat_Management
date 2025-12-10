@@ -1,6 +1,0 @@
-- connection: local
-  gather_facts: false
-- hosts: localhost
-- name: Test role install_redhat_collections
-  roles:
-  - role: install_redhat_collections

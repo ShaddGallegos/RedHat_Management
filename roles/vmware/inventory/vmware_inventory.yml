@@ -1,0 +1,8 @@
+---
+# Example VMware inventory using dynamic plugin
+plugin: vmware_inventory
+hostname: vcenter.example.com
+username: administrator@vsphere.local
+password: your-password
+validate_certs: false
+with_tags: true

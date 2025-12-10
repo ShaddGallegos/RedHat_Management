@@ -1,6 +1,0 @@
-- connection: local
-  gather_facts: false
-- hosts: localhost
-- name: Test role servicenow_ticket_management
-  roles:
-  - role: servicenow_ticket_management

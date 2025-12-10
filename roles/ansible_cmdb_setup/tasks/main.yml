@@ -1,0 +1,81 @@
+---
+# Install and configure ansible-cmdb on the designated primary host for each hostgroup.
+# Assumes RHEL/CentOS/Rocky/Alma-based systems with dnf/yum.
+
+- name: Determine target hostgroups for ansible-cmdb primary selection
+  ansible.builtin.set_fact:
+    ansible_cmdb_hostgroups_effective: >-
+      {{ (ansible_cmdb_hostgroups | default([])) | length > 0
+         | ternary(
+            ansible_cmdb_hostgroups,
+            ((group_names | difference(['all', 'ungrouped'])) | length > 0
+             | ternary(group_names | difference(['all', 'ungrouped']), ['all']))
+          ) }}
+
+- name: Build primary host list from enabled hostgroups
+  ansible.builtin.set_fact:
+    ansible_cmdb_primary_hosts: "{{ (ansible_cmdb_primary_hosts | default([])) + [groups[item][0]] }}"
+  loop: "{{ ansible_cmdb_hostgroups_effective }}"
+  when: groups[item] is defined and groups[item] | length > 0
+
+- name: Apply explicit primary host override when provided
+  ansible.builtin.set_fact:
+    ansible_cmdb_primary_hosts: ["{{ ansible_cmdb_primary_host_override }}"]
+  when: ansible_cmdb_primary_host_override is defined and ansible_cmdb_primary_host_override | length > 0
+
+- name: Deduplicate primary host list
+  ansible.builtin.set_fact:
+    ansible_cmdb_primary_hosts: "{{ (ansible_cmdb_primary_hosts | default([])) | unique }}"
+
+- name: Flag if this host is a primary
+  ansible.builtin.set_fact:
+    ansible_cmdb_is_primary_host: "{{ inventory_hostname in (ansible_cmdb_primary_hosts | default([])) }}"
+
+- name: Skip ansible-cmdb setup on non-primary hosts
+  ansible.builtin.debug:
+    msg: "Skipping ansible-cmdb setup on {{ inventory_hostname }}; primaries: {{ ansible_cmdb_primary_hosts | default([]) }}"
+  when: not (ansible_cmdb_is_primary_host | default(false))
+
+- block:
+    - name: Assert required variables
+      ansible.builtin.assert:
+        that:
+          - ansible_cmdb_install | default(true) | bool
+          - ansible_cmdb_data_dir is defined
+        fail_msg: "ansible_cmdb_data_dir must be set."
+
+    - name: Ensure ansible-cmdb package present
+      ansible.builtin.package:
+        name: ansible-cmdb
+        state: present
+      become: true
+      when: ansible_cmdb_install | default(true) | bool
+
+    - name: Ensure data directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_cmdb_data_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0750'
+      become: true
+
+    - name: Install cron job to refresh ansible-cmdb
+      ansible.builtin.cron:
+        name: "Generate ansible-cmdb HTML"
+        special_time: "{{ ansible_cmdb_cron_special_time }}"
+        user: "{{ ansible_cmdb_cron_user }}"
+        job: >-
+          cd {{ ansible_cmdb_inventory_path }} &&
+          ansible-cmdb -t html_fancy
+          {% if ansible_cmdb_hostfacts | length > 0 %}-p hostfacts='{{ ansible_cmdb_hostfacts }}'{% endif %}
+          -f {{ ansible_cmdb_data_dir }}/index.html
+          {{ ansible_cmdb_inventory_file }}
+      become: true
+      when: ansible_cmdb_install | default(true) | bool
+
+    - name: Optionally expose via simple nginx (when enabled)
+      ansible.builtin.include_tasks: nginx.yml
+      when: ansible_cmdb_expose_via_nginx | default(false) | bool
+
+  when: ansible_cmdb_is_primary_host | default(false)
