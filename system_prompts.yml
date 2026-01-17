@@ -124,33 +124,44 @@
       private: true
 
   tasks:
+    - name: Stat user env.yml (user-level)
+      stat:
+        path: "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
+      register: controller_env_yml
+
+    - name: Load user env.yml into `user_env` if present
+      include_vars:
+        file: "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
+        name: user_env
+      when: controller_env_yml.stat.exists
+
     - name: Build combined variable set
       set_fact:
         management_vars:
-          satellite_domain: "{{ satellite_domain }}"
-          satellite_primary_interface: "{{ satellite_primary_interface }}"
-          satellite_fqdn: "{{ satellite_fqdn }}"
-          satellite_fqdn_ip: "{{ satellite_fqdn_ip }}"
-          satellite_gateway: "{{ satellite_gateway }}"
-          satellite_nameserver: "{{ satellite_nameserver }}"
-          satellite_dhcp_range_start: "{{ satellite_dhcp_range_start }}"
-          satellite_dhcp_range_end: "{{ satellite_dhcp_range_end }}"
-          satellite_pxeserver: "{{ satellite_pxeserver }}"
-          satellite_initial_admin_email: "{{ satellite_initial_admin_email }}"
-          satellite_admin_user: "{{ satellite_admin_user }}"
-          satellite_admin_password: "{{ satellite_admin_password }}"
-          satellite_mail_relay: "{{ satellite_mail_relay }}"
-          satellite_mail_relay_credentials: "{{ satellite_mail_relay_credentials }}"
-          aap_admin_user: "{{ aap_admin_user }}"
-          aap_admin_password: "{{ aap_admin_password }}"
-          automation_hub_token: "{{ automation_hub_token }}"
-          idm_domain: "{{ idm_domain }}"
-          idm_realm: "{{ idm_realm }}"
-          idm_admin_password: "{{ idm_admin_password }}"
-          idm_directory_manager_password: "{{ idm_directory_manager_password }}"
-          insights_account: "{{ insights_account }}"
-          insights_username: "{{ insights_username }}"
-          insights_password: "{{ insights_password }}"
+          satellite_domain: "{{ user_env.satellite_domain | default(satellite_domain) }}"
+          satellite_primary_interface: "{{ user_env.satellite_primary_interface | default(satellite_primary_interface) }}"
+          satellite_fqdn: "{{ user_env.satellite_fqdn | default(satellite_fqdn) }}"
+          satellite_fqdn_ip: "{{ user_env.satellite_fqdn_ip | default(satellite_fqdn_ip) }}"
+          satellite_gateway: "{{ user_env.satellite_gateway | default(satellite_gateway) }}"
+          satellite_nameserver: "{{ user_env.satellite_nameserver | default(satellite_nameserver) }}"
+          satellite_dhcp_range_start: "{{ user_env.satellite_dhcp_range_start | default(satellite_dhcp_range_start) }}"
+          satellite_dhcp_range_end: "{{ user_env.satellite_dhcp_range_end | default(satellite_dhcp_range_end) }}"
+          satellite_pxeserver: "{{ user_env.satellite_pxeserver | default(satellite_pxeserver) }}"
+          satellite_initial_admin_email: "{{ user_env.satellite_initial_admin_email | default(satellite_initial_admin_email) }}"
+          satellite_admin_user: "{{ user_env.satellite_admin_user | default(satellite_admin_user) }}"
+          satellite_admin_password: "{{ user_env.satellite_admin_password | default(satellite_admin_password) }}"
+          satellite_mail_relay: "{{ user_env.satellite_mail_relay | default(satellite_mail_relay) }}"
+          satellite_mail_relay_credentials: "{{ user_env.satellite_mail_relay_credentials | default(satellite_mail_relay_credentials) }}"
+          aap_admin_user: "{{ user_env.aap_admin_user | default(aap_admin_user) }}"
+          aap_admin_password: "{{ user_env.aap_admin_password | default(aap_admin_password) }}"
+          automation_hub_token: "{{ user_env.automation_hub_token | default(automation_hub_token) }}"
+          idm_domain: "{{ user_env.idm_domain | default(idm_domain) }}"
+          idm_realm: "{{ user_env.idm_realm | default(idm_realm) }}"
+          idm_admin_password: "{{ user_env.idm_admin_password | default(idm_admin_password) }}"
+          idm_directory_manager_password: "{{ user_env.idm_directory_manager_password | default(idm_directory_manager_password) }}"
+          insights_account: "{{ user_env.insights_account | default(insights_account) }}"
+          insights_username: "{{ user_env.insights_username | default(insights_username) }}"
+          insights_password: "{{ user_env.insights_password | default(insights_password) }}"
 
     - name: Write merged variables to env.local.generated.yml
       copy:
