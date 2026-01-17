@@ -1,0 +1,4 @@
+---
+- name: Linux other install placeholder
+  ansible.builtin.debug:
+    msg: "Implement other Linux install here."

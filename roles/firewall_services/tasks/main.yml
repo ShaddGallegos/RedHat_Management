@@ -1,0 +1,57 @@
+---
+- name: Skip firewall configuration when disabled
+  ansible.builtin.debug:
+    msg: "firewall_services_enabled is false; skipping"
+  when: not firewall_services_enabled | bool
+
+- block:
+    - name: Ensure firewalld is installed
+      ansible.builtin.package:
+        name: firewalld
+        state: present
+      become: true
+
+    - name: Ensure firewalld is running
+      ansible.builtin.service:
+        name: firewalld
+        state: started
+        enabled: true
+      become: true
+
+    - name: Build merged service/port list
+      ansible.builtin.set_fact:
+        firewall_services_to_apply: >-
+          {{ firewall_services_profiles_enabled
+             | map('extract', firewall_services_definitions)
+             | list
+             | select('defined')
+             | list }}
+
+    - name: Flatten services and ports
+      ansible.builtin.set_fact:
+        firewall_services_unique: "{{ firewall_services_to_apply | map(attribute='services') | sum(start=[]) | unique }}"
+        firewall_ports_unique: "{{ firewall_services_to_apply | map(attribute='ports') | sum(start=[]) | unique }}"
+
+    - name: Allow services
+      ansible.builtin.firewalld:
+        service: "{{ item }}"
+        permanent: true
+        immediate: true
+        state: enabled
+        zone: "{{ firewall_zone }}"
+      loop: "{{ firewall_services_unique }}"
+      when: firewall_services_unique | length > 0
+      become: true
+
+    - name: Allow ports
+      ansible.builtin.firewalld:
+        port: "{{ item }}"
+        permanent: true
+        immediate: true
+        state: enabled
+        zone: "{{ firewall_zone }}"
+      loop: "{{ firewall_ports_unique }}"
+      when: firewall_ports_unique | length > 0
+      become: true
+
+  when: firewall_services_enabled | bool

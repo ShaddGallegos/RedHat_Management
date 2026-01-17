@@ -1,0 +1,4 @@
+---
+- name: AWS restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement AWS restore here."

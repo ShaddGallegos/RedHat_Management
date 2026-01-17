@@ -1,0 +1,30 @@
+---
+- name: Install nginx
+  ansible.builtin.package:
+    name: nginx
+    state: present
+  become: true
+
+- name: Ensure nginx service enabled and started
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+  become: true
+
+- name: Deploy nginx site for ansible-cmdb
+  ansible.builtin.template:
+    src: ansible_cmdb_nginx.conf.j2
+    dest: /etc/nginx/conf.d/ansible_cmdb.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Reload nginx
+  become: true
+
+- name: Ensure SELinux allows httpd to read ansible_cmdb_data_dir
+  when: ansible_selinux is defined and ansible_selinux.status == 'enabled'
+  ansible.builtin.command: >-
+    chcon -Rt httpd_sys_content_t {{ ansible_cmdb_data_dir }}
+  changed_when: true
+  become: true

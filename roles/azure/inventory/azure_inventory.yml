@@ -1,0 +1,11 @@
+---
+# Example Azure inventory using azure_rm plugin
+plugin: azure.azcollection.azure_rm
+include_vm_resource_groups:
+  - rg-demo
+auth_source: auto
+conditional_tags:
+  - Environment
+keyed_groups:
+  - key: tags.Environment
+    prefix: env

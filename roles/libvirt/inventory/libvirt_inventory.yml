@@ -1,0 +1,7 @@
+---
+# Example Libvirt inventory using dynamic plugin
+plugin: dynamic_inventory_libvirt
+uri: qemu:///system
+# Example filters
+patterns:
+  - "*.example.com"

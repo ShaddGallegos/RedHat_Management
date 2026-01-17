@@ -1,0 +1,4 @@
+---
+plugin: satellite_inventory
+# Example Satellite dynamic inventory configuration.
+# Adjust URL/token parameters inside the plugin or via env vars.

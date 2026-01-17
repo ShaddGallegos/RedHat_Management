@@ -1,0 +1,4 @@
+---
+- name: Windows restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement Windows restore here."
