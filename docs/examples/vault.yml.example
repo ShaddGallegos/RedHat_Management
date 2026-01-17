@@ -3,21 +3,21 @@
 # This is a template - replace with actual values and encrypt with ansible-vault
 
 # General credentials
-vault_admin_password: "{{ admin_password | default('changeme') }}"
+vault_admin_password: "r3dh4t7!"
 
 # Red Hat credentials
 vault_redhat_username: "your_redhat_username"
-vault_redhat_password: "{{ redhat_password | default('changeme') }}"
+vault_redhat_password: "your_redhat_password"
 vault_redhat_pool_id: "your_redhat_pool_id"
 vault_redhat_token: "your_redhat_token"
 vault_rh_credentials_token: "your_rh_token"
 
 # Satellite credentials
-vault_satellite_admin_password: "{{ satellite_admin_password | default('changeme') }}"
-vault_satellite_mail_relay_credentials: "{{ satellite_mail_relay_credentials | default('user:pass') }}"  # Credentials for SMTP relay (if required)
+vault_satellite_admin_password: "r3dh4t7!"
+vault_satellite_mail_relay_credentials: "user:pass"  # Credentials for SMTP relay (if required)
 
 # Ansible credentials
-vault_ansible_admin_password: "{{ ansible_admin_password | default('changeme') }}"
+vault_ansible_admin_password: "r3dh4t7!"
 vault_ansible_galaxy_token: "your_ansible_galaxy_token"
 
 # GitHub credentials

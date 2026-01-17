@@ -7,101 +7,121 @@
     # Satellite
     - name: satellite_domain
       prompt: "Satellite domain (e.g. hostname -d)"
-      private: no
+      private: false
       default: "{{ ansible_domain | default('example.com') }}"
+
     - name: satellite_primary_interface
       prompt: "Primary interface for Satellite services (DHCP/DNS/TFTP)"
-      private: no
+      private: false
       default: "{{ ansible_default_ipv4.interface | default('enp2s0') }}"
+
     - name: satellite_fqdn
       prompt: "Satellite FQDN"
-      private: no
+      private: false
       default: "{{ ansible_fqdn | default('satellite.' + (ansible_domain | default('example.com'))) }}"
+
     - name: satellite_fqdn_ip
       prompt: "Satellite FQDN IP (leave blank to auto-detect)"
-      private: no
+      private: false
       default: "{{ ansible_default_ipv4.address | default('') }}"
+
     - name: satellite_gateway
       prompt: "Gateway for primary interface (leave blank to auto-detect)"
-      private: no
+      private: false
       default: "{{ ansible_default_ipv4.gateway | default('') }}"
+
     - name: satellite_nameserver
       prompt: "Nameserver to publish via DHCP (leave blank to auto-detect)"
-      private: no
+      private: false
       default: "{{ (ansible_dns.nameservers | first) | default('') if ansible_dns is defined else '' }}"
+
     - name: satellite_dhcp_range_start
       prompt: "DHCP range start (leave blank to auto-compute)"
-      private: no
+      private: false
       default: ""
+
     - name: satellite_dhcp_range_end
       prompt: "DHCP range end (leave blank to auto-compute)"
-      private: no
+      private: false
       default: ""
+
     - name: satellite_pxeserver
       prompt: "PXE/TFTP server IP (leave blank to use primary IP)"
-      private: no
+      private: false
       default: ""
+
     - name: satellite_initial_admin_email
       prompt: "Initial Satellite admin email"
-      private: no
+      private: false
       default: "admin@{{ ansible_domain | default('example.com') }}"
+
     - name: satellite_admin_user
       prompt: "Satellite admin username"
-      private: no
+      private: false
       default: "admin"
+
     - name: satellite_admin_password
       prompt: "Satellite admin password"
-      private: yes
+      private: true
+
     - name: satellite_mail_relay
       prompt: "Satellite SMTP relay host:port (leave blank to skip)"
-      private: no
+      private: false
       default: ""
+
     - name: satellite_mail_relay_credentials
       prompt: "Satellite SMTP relay credentials (user:pass) leave blank if not required"
-      private: yes
+      private: true
       default: ""
 
     # AAP
     - name: aap_admin_user
       prompt: "AAP admin user"
-      private: no
+      private: false
       default: "admin"
+
     - name: aap_admin_password
       prompt: "AAP admin password"
-      private: yes
+      private: true
+
     - name: automation_hub_token
       prompt: "Ansible Automation Hub token (leave blank if not needed)"
-      private: yes
+      private: true
       default: ""
 
     # IdM
     - name: idm_domain
       prompt: "IdM domain"
-      private: no
+      private: false
       default: "{{ ansible_domain | default('example.com') }}"
+
     - name: idm_realm
       prompt: "IdM realm (usually domain uppercased)"
-      private: no
+      private: false
       default: "{{ (ansible_domain | default('example.com')) | upper }}"
+
     - name: idm_admin_password
       prompt: "IdM admin password"
-      private: yes
+      private: true
+
     - name: idm_directory_manager_password
       prompt: "IdM Directory Manager password"
-      private: yes
+      private: true
 
     # Insights
     - name: insights_account
       prompt: "Red Hat Insights account number"
-      private: no
+      private: false
       default: "000000"
+
     - name: insights_username
       prompt: "Red Hat Insights username"
-      private: no
+      private: false
       default: "insights-user"
+
     - name: insights_password
       prompt: "Red Hat Insights password"
-      private: yes
+      private: true
 
   tasks:
     - name: Build combined variable set
