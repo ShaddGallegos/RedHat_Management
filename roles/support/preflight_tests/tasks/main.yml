@@ -1,0 +1,54 @@
+
+- name: "Preflight: Check installer connectivity"
+  ansible.builtin.ping:
+
+- name: "Preflight: Check Satellite API"
+  ansible.builtin.uri:
+    url: "{{ satellite_url }}"
+    method: GET
+    status_code: 200
+  register: satellite_api
+  ignore_errors: true
+
+- name: "Preflight: Check AAP API"
+  ansible.builtin.uri:
+    url: "{{ aap_url }}"
+    method: GET
+    status_code: 200
+  register: aap_api
+  ignore_errors: true
+
+
+- name: "Preflight: Check IdM API"
+  ansible.builtin.uri:
+    url: "{{ idm_url }}"
+    method: GET
+    status_code: 200
+  register: idm_api
+  ignore_errors: true
+
+- name: "Preflight: Check Insights API"
+  ansible.builtin.uri:
+    url: "{{ insights_url }}"
+    method: GET
+    status_code: 200
+  register: insights_api
+  ignore_errors: true
+
+- name: "Preflight: Check RHC API"
+  ansible.builtin.uri:
+    url: "{{ rhc_url }}"
+
+- name: "Assert all APIs are reachable"
+  ansible.builtin.assert:
+    that:
+      - satellite_api.status == 200
+      - aap_api.status == 200
+      - idm_api.status == 200
+      - insights_api.status == 200
+      - rhc_api.status == 200
+    fail_msg: "One or more APIs are not reachable. See previous tasks for details."
+  ignore_errors: true
+
+- name: "Generate preflight report"
+  ansible.builtin.include_tasks: report.yml

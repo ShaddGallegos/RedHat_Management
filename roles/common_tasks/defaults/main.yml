@@ -1,0 +1,25 @@
+---
+# Default variables for common tasks role
+
+# Repository configuration
+repositories: []
+
+# Time synchronization
+ntp_servers:
+  - "0.rhel.pool.ntp.org"
+  - "1.rhel.pool.ntp.org"
+
+# Compliance/SCAP configuration
+scap_file: null
+scap_profile: "xccdf_org.ssgproject.content_profile_cis"
+
+# Global parameters
+mandatory_global_parameters: []
+mandatory_os_config: []
+
+# Environment type
+environment: "development"
+environment_type: "development"
+
+# System update strategy
+update_strategy: "latest"  # latest or security

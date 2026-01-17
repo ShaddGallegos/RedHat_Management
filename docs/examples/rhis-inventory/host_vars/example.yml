@@ -1,0 +1,5 @@
+# Example host_vars for a single host
+ansible_user: rhis
+ansible_ssh_private_key_file: ~/.ssh/id_rsa
+roles_to_apply:
+  - libvirt_host

@@ -1,0 +1,18 @@
+---
+# Ansible Galaxy collections required for RHIS
+
+collections:
+  - name: community.general
+    version: ">=5.0.0"
+  
+  - name: ansible.posix
+    version: ">=1.4.0"
+  
+  - name: ansible.netcommon
+    version: ">=3.0.0"
+  
+  - name: community.crypto
+    version: ">=2.0.0"
+  
+  - name: redhat.rhel_system_roles
+    version: ">=1.0.0"

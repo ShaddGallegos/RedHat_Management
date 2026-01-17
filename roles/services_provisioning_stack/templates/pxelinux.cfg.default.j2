@@ -1,0 +1,77 @@
+---
+# PXE Boot Menu Configuration
+
+DEFAULT menu.c32
+PROMPT 0
+TIMEOUT 300
+TOTALTIMEOUT 6000
+
+MENU TITLE RHIS Provisioning Environment
+MENU BACKGROUND background.png
+MENU COLOR tabmsg 37;40 #80ffffff #00000000
+MENU COLOR cmdmark 37;40 #80ffffff #00000000
+MENU COLOR cmdline 0;37;40 #c0ffffff #00000000
+MENU COLOR msg07 37;40 #80ffffff #00000000
+
+# Label: RHEL 9 Minimal Installation
+LABEL rhel9-minimal
+    MENU LABEL RHEL 9 - Minimal Installation
+    KERNEL rhel9/vmlinuz
+    APPEND initrd=rhel9/initrd.img inst.repo=http://10.168.0.1/rhel9/baseos ks=http://10.168.0.1/kickstarts/rhel9-baseos-minimal.ks console=tty0 console=ttyS0,115200n8
+
+# Label: RHEL 10 Minimal Installation
+LABEL rhel10-minimal
+    MENU LABEL RHEL 10 - Minimal Installation
+    KERNEL rhel10/vmlinuz
+    APPEND initrd=rhel10/initrd.img inst.repo=http://10.168.0.1/rhel10/baseos ks=http://10.168.0.1/kickstarts/rhel10-baseos-minimal.ks console=tty0 console=ttyS0,115200n8
+
+# Label: RHEL 9 Full Stack
+LABEL rhel9-fullstack
+    MENU LABEL RHEL 9 - Full Stack (Development Tools)
+    KERNEL rhel9/vmlinuz
+    APPEND initrd=rhel9/initrd.img inst.repo=http://10.168.0.1/rhel9/baseos ks=http://10.168.0.1/kickstarts/rhel9-fullstack.ks console=tty0 console=ttyS0,115200n8
+
+# Label: RHEL 10 Full Stack
+LABEL rhel10-fullstack
+    MENU LABEL RHEL 10 - Full Stack (Development Tools)
+    KERNEL rhel10/vmlinuz
+    APPEND initrd=rhel10/initrd.img inst.repo=http://10.168.0.1/rhel10/baseos ks=http://10.168.0.1/kickstarts/rhel10-fullstack.ks console=tty0 console=ttyS0,115200n8
+
+# Label: Local Boot (Existing System)
+LABEL localboot
+    MENU LABEL Local Boot (Existing System)
+    LOCALBOOT 0
+
+# Label: RHEL 9 Rescue Mode
+LABEL rhel9-rescue
+    MENU LABEL RHEL 9 - Rescue Mode
+    KERNEL rhel9/vmlinuz
+    APPEND initrd=rhel9/initrd.img inst.rescue console=tty0 console=ttyS0,115200n8
+
+# Label: RHEL 10 Rescue Mode
+LABEL rhel10-rescue
+    MENU LABEL RHEL 10 - Rescue Mode
+    KERNEL rhel10/vmlinuz
+    APPEND initrd=rhel10/initrd.img inst.rescue console=tty0 console=ttyS0,115200n8
+
+# Label: Memory Diagnostic
+LABEL memtest
+    MENU LABEL Memory Test (memtest86)
+    KERNEL memtest
+    APPEND -
+
+# Label: System Reboot
+LABEL reboot
+    MENU LABEL Reboot System
+    COM32 reboot.c32
+    TEXT HELP
+    Reboot the system
+    ENDTEXT
+
+# Label: Power Off
+LABEL poweroff
+    MENU LABEL Power Off
+    COM32 poweroff.c32
+    TEXT HELP
+    Power off the system
+    ENDTEXT

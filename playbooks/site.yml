@@ -1,0 +1,276 @@
+---
+# RedHat_Management - Unified Deployment Orchestration
+# Main entry point for interactive setup and deployment
+# Supports: Satellite 6.18 | AAP 2.6 | IdM | OpenShift 4.21
+# Platforms: Libvirt (Primary), Bare Metal, AWS, GCP, Azure, Nutanix, VMware
+
+- name: RedHat_Management Unified Deployment Orchestration
+  hosts: localhost
+  gather_facts: yes
+  vars_files:
+    - "{{ playbook_dir }}/defaults/global.yml"
+  
+  vars:
+    project_base_dir: "{{ playbook_dir }}"
+    secrets_file: "{{ ansible_user_dir }}/.ansible/conf/env.yml"
+    supported_scenarios:
+      - "satellite"
+      - "aap"
+      - "idm"
+      - "openshift"
+      - "satellite_aap"
+      - "satellite_idm"
+      - "satellite_openshift"
+      - "aap_idm"
+      - "aap_openshift"
+      - "idm_openshift"
+      - "satellite_aap_idm"
+      - "satellite_aap_openshift"
+      - "satellite_idm_openshift"
+      - "aap_idm_openshift"
+      - "satellite_aap_idm_openshift"
+    
+    supported_platforms:
+      - "libvirt"
+      - "baremetal"
+      - "aws"
+      - "gcp"
+      - "azure"
+      - "nutanix"
+      - "vmware"
+    
+    supported_os:
+      - "rhel-9"
+      - "rhel-10"
+  
+  tasks:
+    # Phase 1: Welcome and Project Initialization
+    - name: Display Welcome Banner
+      block:
+        - name: Show project header
+          ansible.builtin.debug:
+            msg: |
+              
+                                                                              
+                 RedHat_Management - Enterprise Automation Platform          
+                                                                              
+                 Unified Deployment Framework                                
+                 Satellite 6.18 | AAP 2.6 | IdM | OpenShift 4.21           
+                                                                              
+              
+              
+              This wizard will guide you through setting up a complete
+              Red Hat Management stack on your chosen infrastructure platform.
+      
+    # Phase 2: Verify Ansible Installation and Connectivity
+    - name: Verify Ansible and System Requirements
+      block:
+        - name: Check Ansible version
+          ansible.builtin.command: ansible --version
+          register: ansible_version
+          failed_when: ansible_version.rc != 0
+        
+        - name: Verify virt-manager is available (for Libvirt)
+          ansible.builtin.command: which virt-manager
+          register: virt_manager_check
+          ignore_errors: yes
+        
+        - name: Check if secrets file exists
+          ansible.builtin.stat:
+            path: "{{ secrets_file }}"
+          register: secrets_stat
+        
+        - name: Display system requirements status
+          ansible.builtin.debug:
+            msg: |
+              Ansible Version: {{ ansible_version.stdout_lines[0] }}
+              Virt-Manager Available: {{ 'Yes' if virt_manager_check.rc == 0 else 'No (needed for Libvirt)' }}
+              Secrets File: {{ 'Configured' if secrets_stat.stat.exists else 'Not found - will be created' }}
+      
+      tags: ["verify"]
+    
+    # Phase 3: Import Setup Workflow
+    - name: Include Setup Framework
+      ansible.builtin.include_tasks: "{{ project_base_dir }}/playbooks/setup_framework.yml"
+      tags: ["setup", "interactive"]
+    
+    # Phase 4: Import Inventory Generation
+    - name: Include Inventory Generator
+      ansible.builtin.include_tasks: "{{ project_base_dir }}/playbooks/generate_inventory.yml"
+      tags: ["inventory"]
+    
+    # Phase 5: Display Deployment Plan
+    - name: Display Deployment Configuration
+      ansible.builtin.debug:
+        msg: |
+          
+                 DEPLOYMENT CONFIGURATION SUMMARY                 
+          
+           Scenario:        {{ deployment_scenario }}
+           Platform:        {{ deployment_platform }}
+           OS Version:      {{ deployment_os }}
+           Base Directory:  {{ project_base_dir }}
+           Secrets File:    {{ secrets_file }}
+           Inventory:       {{ project_base_dir }}/inventory/hosts
+           Ansible Config:  {{ project_base_dir }}/ansible.cfg
+          
+          
+          Components to deploy:
+          {% for component in deployment_components %}
+          - {{ component }}
+          {% endfor %}
+      when: deployment_scenario is defined
+      tags: ["summary"]
+    
+    # Phase 6: Validate Configuration
+    - name: Validate Deployment Configuration
+      block:
+        - name: Validate scenario
+          ansible.builtin.assert:
+            that:
+              - deployment_scenario in supported_scenarios
+            fail_msg: "Invalid scenario: {{ deployment_scenario }}"
+        
+        - name: Validate platform
+          ansible.builtin.assert:
+            that:
+              - deployment_platform in supported_platforms
+            fail_msg: "Invalid platform: {{ deployment_platform }}"
+        
+        - name: Validate OS
+          ansible.builtin.assert:
+            that:
+              - deployment_os in supported_os
+            fail_msg: "Invalid OS: {{ deployment_os }}"
+      
+      when: deployment_scenario is defined
+      tags: ["validate"]
+    
+    # Phase 7: Ask for Deployment Confirmation
+    - name: Confirm Deployment
+      ansible.builtin.pause:
+        prompt: |
+          
+          ⚠  DEPLOYMENT CONFIRMATION REQUIRED ⚠
+          
+          Configuration:
+          - Scenario:   {{ deployment_scenario }}
+          - Platform:   {{ deployment_platform }}
+          - OS:         {{ deployment_os }}
+          
+          Ready to proceed with deployment? (yes/no)
+      register: deployment_confirmation
+      when: deployment_scenario is defined
+      tags: ["confirm"]
+    
+    # Phase 8: Execute Deployment Orchestration
+    - name: Execute Deployment Orchestration
+      block:
+        - name: Import Libvirt Deployment
+          ansible.builtin.include_tasks: "{{ project_base_dir }}/playbooks/deploy_libvirt.yml"
+          when: 
+            - deployment_platform == "libvirt"
+            - deployment_confirmation.user_input | lower == "yes"
+          tags: ["libvirt", "deploy"]
+        
+        - name: Import Baremetal Deployment
+          ansible.builtin.include_tasks: "{{ project_base_dir }}/playbooks/deploy_baremetal.yml"
+          when: 
+            - deployment_platform == "baremetal"
+            - deployment_confirmation.user_input | lower == "yes"
+          tags: ["baremetal", "deploy"]
+        
+        - name: Import AWS Deployment
+          ansible.builtin.include_tasks: "{{ project_base_dir }}/playbooks/deploy_aws.yml"
+          when: 
+            - deployment_platform == "aws"
+            - deployment_confirmation.user_input | lower == "yes"
+          tags: ["aws", "deploy"]
+        
+        - name: Post-Deployment Validation
+          ansible.builtin.include_tasks: "{{ project_base_dir }}/playbooks/validate_deployment.yml"
+          when: deployment_confirmation.user_input | lower == "yes"
+          tags: ["validate", "post-deploy"]
+      
+      when: deployment_scenario is defined
+      tags: ["orchestration"]
+    
+    # Phase 9: Display Deployment Summary
+    - name: Display Deployment Summary
+      ansible.builtin.debug:
+        msg: |
+          
+                           DEPLOYMENT COMPLETED                         
+          
+          
+          Components Deployed:
+          {% for component in deployment_components %}
+           {{ component }}
+          {% endfor %}
+          
+          Access Information:
+          - ansible-cmdb Dashboard: http://satellite:8081
+          - Satellite Console: https://satellite:443
+          - AAP Console: https://aap-controller:443
+          - IdM Web UI: https://idm.example.com
+          - OpenShift Console: https://ocp-console.example.com:6443
+          
+          Next Steps:
+          1. Access ansible-cmdb for infrastructure visibility
+          2. Configure Satellite organizations and activation keys
+          3. Set up AAP credentials and job templates
+          4. Configure IdM users and groups
+          5. Configure OpenShift project quotas and policies
+      when: deployment_scenario is defined
+      tags: ["summary"]
+
+  pre_tasks:
+    - name: Load or create secrets file
+      block:
+        - name: Check if secrets file exists
+          ansible.builtin.stat:
+            path: "{{ secrets_file }}"
+          register: secrets_stat
+        
+        - name: Create secrets file if not exists
+          block:
+            - name: Create ~/.ansible/conf directory
+              ansible.builtin.file:
+                path: "{{ ansible_user_dir }}/.ansible/conf"
+                state: directory
+                mode: '0700'
+            
+            - name: Create empty vault-encrypted secrets file
+              ansible.builtin.copy:
+                dest: "{{ secrets_file }}"
+                content: "# Vault-encrypted secrets\n# Edit with: ansible-vault edit {{ secrets_file }}\n"
+                mode: '0600'
+          when: not secrets_stat.stat.exists
+
+  handlers:
+    - name: Reload Ansible Configuration
+      ansible.builtin.debug:
+        msg: "Reloading Ansible configuration..."
+
+---
+# Play 2: Setup Completion Message
+- name: Display Setup Completion
+  hosts: localhost
+  gather_facts: no
+  
+  tasks:
+    - name: Show completion message
+      ansible.builtin.debug:
+        msg: |
+          
+          
+                                                                          
+                    RedHat_Management Setup Completed!                 
+                                                                          
+             Your enterprise automation platform is ready to use.        
+                                                                          
+             Documentation: {{ playbook_dir }}/doc/README.md             
+             Inventory:     {{ playbook_dir }}/inventory/hosts          
+             Configuration: {{ playbook_dir }}/group_vars/               
+                                                                          
+          

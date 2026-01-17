@@ -1,0 +1,40 @@
+---
+# Libvirt VM Provisioner - Main Tasks
+
+- name: Display Configuration
+  ansible.builtin.debug:
+    msg: |
+      Libvirt VM Provisioning Configuration
+      ======================================
+      VM Name:        {{ libvirt_vm_name }}
+      CPUs:           {{ libvirt_vm_cpus }}
+      Memory:         {{ libvirt_vm_memory }} MB
+      Disk:           {{ libvirt_vm_disk }} GB
+      Network:        {{ libvirt_vm_network }}
+      ISO File:       {{ libvirt_iso_file }}
+      Kickstart:      {{ libvirt_kickstart_file }}
+
+- name: Validate Prerequisites
+  ansible.builtin.include_tasks: validate.yml
+
+- name: Setup Logging
+  ansible.builtin.include_tasks: logging.yml
+
+- name: Setup Kickstart Delivery
+  ansible.builtin.include_tasks: http_server.yml
+
+- name: Create Virtual Machine
+  ansible.builtin.include_tasks: create_vm.yml
+
+- name: Monitor Installation
+  ansible.builtin.include_tasks: monitor.yml
+
+- name: Verify VM Creation
+  ansible.builtin.include_tasks: verify.yml
+
+- name: Display VM Information
+  ansible.builtin.include_tasks: display_info.yml
+
+- name: Cleanup
+  ansible.builtin.include_tasks: cleanup.yml
+  when: libvirt_cleanup_http_server or libvirt_cleanup_temp_files

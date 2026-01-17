@@ -1,0 +1,12 @@
+---
+# Default variables for os role
+os_enabled: true
+os_version: "1.0"
+
+# OS configuration
+configure_firewall: true
+enable_selinux: true
+configure_network: true
+
+# Package management
+install_required_packages: true

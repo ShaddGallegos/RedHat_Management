@@ -1,0 +1,41 @@
+---
+# Satellite 6.18 Installation Playbook
+# Installs and configures Red Hat Satellite 6.18
+
+- name: "Satellite 6.18 | Installation"
+  hosts: "satellite"
+  gather_facts: yes
+  pre_tasks:
+    - name: "Satellite | Validate prerequisites"
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family == 'RedHat'
+          - ansible_distribution_major_version | int >= 8
+          - ansible_memtotal_mb | int >= 12288
+        fail_msg: "Satellite 6.18 requires RHEL 8+, 12GB+ RAM"
+
+  roles:
+    - role: "satellite_6_18_deployment"
+      tags: ["install", "satellite"]
+    - role: "redhat_products/satellite/satellite_base"
+      tags: ["install", "satellite"]
+
+  post_tasks:
+    - name: "Satellite | Verify web UI"
+      ansible.builtin.uri:
+        url: "https://{{ inventory_hostname }}/web/"
+        validate_certs: no
+        status_code: [200, 301, 302]
+      register: web_ui
+      until: web_ui is succeeded
+      retries: 10
+      delay: 30
+      tags: ["verify", "satellite"]
+
+    - name: "Satellite | Display installation results"
+      ansible.builtin.debug:
+        msg: |
+          Satellite 6.18 Installation Complete
+          Web UI: https://{{ inventory_hostname }}/web/
+          SSH: ssh root@{{ inventory_hostname }}
+      tags: ["satellite"]

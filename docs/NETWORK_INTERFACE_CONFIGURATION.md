@@ -1,0 +1,392 @@
+# Network Interface Configuration
+
+## Dual Network Configuration for satellite.prod.spg
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────┐
+│          satellite.prod.spg (KVM Virtual Machine)       │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │ eth0: External Network (libvirt NAT)             │  │
+│  ├──────────────────────────────────────────────────┤  │
+│  │ • Connection Type: DHCP (Auto)                   │  │
+│  │ • IP Source: libvirt DHCP Server                 │  │
+│  │ • Network: 192.168.x.0/24 (NAT from host)       │  │
+│  │ • Gateway: libvirt default gateway               │  │
+│  │ • Purpose: External connectivity, package mgmt  │  │
+│  │ • Status: Autoconnect enabled                    │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                         │
+│  ┌──────────────────────────────────────────────────┐  │
+│  │ eth1: Private Network (Provisioning Services)    │  │
+│  ├──────────────────────────────────────────────────┤  │
+│  │ • Connection Type: Static IP                      │  │
+│  │ • IP Address: 10.168.0.1/16                       │  │
+│  │ • Netmask: 255.255.0.0                            │  │
+│  │ • Gateway: 10.168.0.1 (local)                     │  │
+│  │ • Purpose: DHCP, DNS, TFTP, PXE provisioning     │  │
+│  │ • Status: Autoconnect enabled                     │  │
+│  │ • Services: DHCP, DNS, TFTP/PXE running here     │  │
+│  └──────────────────────────────────────────────────┘  │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
+         │                                    │
+         └────────────────────────────────────┘
+          libvirt Virtual Network (2 bridges)
+```
+
+## Network Interface Details
+
+### Primary Interface: eth0 (External - libvirt NAT)
+
+**Purpose**: External connectivity and package management
+
+**Configuration**:
+```yaml
+Connection Name: eth0
+Interface: eth0
+Type: Ethernet
+Method: DHCP (Automatic)
+Autoconnect: Yes
+```
+
+**Obtained From**: libvirt default NAT network
+- IP Assignment: DHCP from libvirt host
+- Typical Range: 192.168.122.0/24 (or configured libvirt NAT range)
+- Gateway: libvirt gateway (192.168.122.1 or similar)
+- DNS: libvirt DNS relay (8.8.8.8)
+
+**Use Cases**:
+- YUM/DNF package updates
+- Satellite content synchronization
+- External API calls
+- System time synchronization
+- Log forwarding
+
+**NetworkManager Configuration**:
+```bash
+nmcli connection add type ethernet \
+  con-name eth0 \
+  ifname eth0 \
+  ipv4.method auto \
+  autoconnect yes
+```
+
+### Secondary Interface: eth1 (Private - Provisioning Network)
+
+**Purpose**: Internal provisioning services network (10.168.0.0/16)
+
+**Configuration**:
+```yaml
+Connection Name: eth1
+Interface: eth1
+Type: Ethernet
+Method: Static
+IP Address: 10.168.0.1
+Netmask: 255.255.0.0 (/16)
+Gateway: 10.168.0.1
+Autoconnect: Yes
+```
+
+**Network Details**:
+- **Network Address**: 10.168.0.0
+- **Netmask**: 255.255.0.0
+- **CIDR**: 10.168.0.0/16
+- **Host Bits**: 16 bits (65,536 addresses)
+- **Usable IPs**: 65,534 (10.168.0.1 - 10.168.255.254)
+- **Broadcast**: 10.168.255.255
+
+**Services Running on eth1**:
+1. **DHCP Server** (port 67/UDP)
+   - Manages automatic IP allocation
+   - Range: 10.168.50.0 - 10.168.200.255
+   - Serves 38,401 IP addresses
+
+2. **DNS Server** (port 53/UDP,TCP)
+   - BIND DNS server
+   - Zones: example.com, prod.example.com, lab.example.com
+   - Resolver: 10.168.0.1
+
+3. **TFTP Server** (port 69/UDP)
+   - Boot file delivery
+   - Root: /var/lib/tftpboot
+
+4. **PXE Boot Service** (port 4011/UDP)
+   - Network boot menu
+   - 10 boot options available
+
+**NetworkManager Configuration**:
+```bash
+nmcli connection add type ethernet \
+  con-name eth1 \
+  ifname eth1 \
+  ipv4.addresses 10.168.0.1/16 \
+  ipv4.method manual \
+  autoconnect yes
+```
+
+## Routing and Traffic Flow
+
+### Egress Traffic (Outbound)
+```
+Satellite (10.168.0.1) 
+    → eth1 (10.168.0.0/16) Provisioning Network
+    → (Internal only, no egress)
+
+Satellite (eth0 DHCP IP)
+    → eth0 (libvirt NAT Network)
+    → libvirt gateway
+    → Host network
+    → Internet/External resources
+```
+
+### Ingress Traffic (Inbound)
+
+#### From Host/External
+```
+Host → libvirt NAT gateway → eth0 → Satellite (DHCP IP)
+```
+
+#### From Provisioning Network Clients
+```
+Client (10.168.x.x)
+    ↓ (PXE/DHCP)
+    → eth1 (10.168.0.1)
+    ↓ (TFTP port 69)
+    → Boot files
+    ↓ (HTTP/Kickstart)
+    → Satellite provisioning
+```
+
+## Interface Priority and Routing
+
+### Default Route
+- **Default Gateway**: Via eth0 (external network)
+- **Scope**: External traffic (updates, downloads, etc.)
+- **Primary**: eth0 route table
+
+### Static Routes
+- **10.168.0.0/16**: Via eth1 (local provisioning only)
+- **Scope**: Internal provisioning network only
+- **Primary**: eth1 route table
+
+## Network Configuration Files
+
+### Network Manager Connections
+```
+/etc/NetworkManager/system-connections/
+├── eth0.nmconnection      (DHCP - External)
+└── eth1.nmconnection      (Static - Private)
+```
+
+### Interface Configuration Example
+
+#### eth0.nmconnection
+```ini
+[connection]
+id=eth0
+uuid=<auto-generated>
+type=802-3-ethernet
+interface-name=eth0
+autoconnect=yes
+autoconnect-priority=0
+
+[ipv4]
+method=auto
+
+[ipv6]
+method=auto
+```
+
+#### eth1.nmconnection
+```ini
+[connection]
+id=eth1
+uuid=<auto-generated>
+type=802-3-ethernet
+interface-name=eth1
+autoconnect=yes
+autoconnect-priority=1
+
+[ipv4]
+method=manual
+addresses=10.168.0.1/16
+gateway=10.168.0.1
+```
+
+## Verification Commands
+
+### Check Network Interfaces
+```bash
+# List all interfaces
+ip link show
+nmcli device
+
+# Show interface status
+nmcli connection show --active
+
+# Check eth0 (external)
+ip addr show eth0
+ip route show dev eth0
+
+# Check eth1 (private)
+ip addr show eth1
+ip route show dev eth1
+```
+
+### Verify DHCP (eth0)
+```bash
+# Show DHCP configuration
+nmcli connection show eth0
+
+# Check DHCP lease
+journalctl -u NetworkManager -f | grep "DHCP"
+```
+
+### Verify Static IP (eth1)
+```bash
+# Verify IP configuration
+ip addr show eth1
+
+# Test connectivity on eth1
+ping 10.168.0.1
+```
+
+### Check Routing
+```bash
+# Show routing table
+ip route show
+
+# Show routing per interface
+ip route show dev eth0
+ip route show dev eth1
+
+# Test external connectivity (via eth0)
+ping 8.8.8.8
+
+# Test internal connectivity (via eth1)
+ping 10.168.0.1
+```
+
+### Check DNS Resolution
+```bash
+# Show resolv.conf
+cat /etc/resolv.conf
+
+# Test DNS via eth1
+dig @10.168.0.1 satellite.prod.spg.example.com
+```
+
+## Dual Network Advantages
+
+1. **Network Isolation**
+   - External traffic separate from internal provisioning
+   - Security boundary between networks
+   - Reduced attack surface
+
+2. **Performance**
+   - Provisioning traffic isolated from external traffic
+   - No contention for bandwidth
+   - Optimized for provisioning workloads
+
+3. **Scalability**
+   - Independent network management per interface
+   - Dual routing policies
+   - Each network can scale independently
+
+4. **Flexibility**
+   - Easy to add more provisioning networks
+   - Can modify eth0 without affecting eth1
+   - Independent troubleshooting
+
+5. **Reliability**
+   - Provisioning services remain available even if external network issues
+   - No single point of failure for internal provisioning
+   - Can test provisioning independently
+
+## Configuration Management
+
+### Ansible Variables
+```yaml
+# Primary Interface (External - libvirt NAT)
+provisioning_primary_interface: "eth0"
+provisioning_primary_interface_type: "ethernet"
+provisioning_primary_connection_type: "dhcp"
+provisioning_primary_autoconnect: true
+
+# Secondary Interface (Private - Provisioning)
+provisioning_secondary_interface: "eth1"
+provisioning_interface_ip: "10.168.0.1"
+provisioning_interface_netmask: "255.255.0.0"
+provisioning_interface_gateway: "10.168.0.1"
+provisioning_secondary_connection_type: "static"
+provisioning_secondary_autoconnect: true
+```
+
+### Deployment
+```bash
+# Configure both interfaces
+ansible-playbook playbooks/provisioning_services_setup.yml \
+  -i inventory/hosts \
+  -b
+```
+
+## Troubleshooting
+
+### eth0 Not Getting IP (DHCP)
+```bash
+# Restart NetworkManager
+sudo systemctl restart NetworkManager
+
+# Check DHCP
+sudo nmcli connection up eth0
+journalctl -u NetworkManager | grep dhcp
+
+# Verify libvirt network
+virsh net-list
+virsh net-info default
+```
+
+### eth1 Not Responding
+```bash
+# Verify IP configuration
+ip addr show eth1
+
+# Bring interface up
+sudo nmcli connection up eth1
+
+# Verify services on eth1
+sudo netstat -tlnp | grep :67
+sudo netstat -tlnp | grep :53
+sudo netstat -tlnp | grep :69
+```
+
+### Routing Issues
+```bash
+# Check default route
+ip route show | grep default
+
+# Verify both interfaces in routing
+ip route show
+
+# Test connectivity per interface
+ping -I eth0 8.8.8.8        # External
+ping -I eth1 10.168.0.1     # Internal
+```
+
+## Summary
+
+**eth0**: External network connectivity via libvirt NAT DHCP
+- Dynamic IP assignment
+- External resource access
+- System updates and downloads
+
+**eth1**: Internal provisioning network (10.168.0.0/16)
+- Static IP: 10.168.0.1
+- DHCP/DNS/TFTP/PXE services
+- System provisioning via PXE boot
+
+Both interfaces autoconnect and operate independently, providing complete isolation between external and provisioning networks.

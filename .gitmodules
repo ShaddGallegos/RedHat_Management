@@ -1,0 +1,9 @@
+[submodule "contrib/rhis-builder"]
+	path = contrib/rhis-builder
+	url = https://github.com/parmstro/labbuilder2.git
+[submodule "contrib/rhis-builder-baremetal-init"]
+	path = contrib/rhis-builder-baremetal-init
+	url = https://github.com/parmstro/rhis-builder-baremetal-init.git
+[submodule "contrib/rhis-builder-inventory"]
+	path = contrib/rhis-builder-inventory
+	url = https://github.com/parmstro/rhis-builder-inventory.git

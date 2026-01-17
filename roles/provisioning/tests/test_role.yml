@@ -1,0 +1,12 @@
+---
+# Test: provisioning role basic functionality
+- name: Test provisioning role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    provisioning_enabled: true
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - provisioning_enabled is defined

@@ -1,0 +1,18 @@
+---
+# Default variables for orchestration_master role
+orchestration_master_enabled: true
+orchestration_master_version: "1.0"
+orchestration_master_timeout: 86400
+orchestration_master_max_retries: 10
+
+# Supported scenarios
+deploy_infrastructure: true
+configure_os: true
+deploy_products: true
+run_tests: true
+
+# Feature toggles
+configure_aap_rbac: true
+configure_satellite_api: true
+configure_satellite_content: true
+deploy_idm_replicas: false

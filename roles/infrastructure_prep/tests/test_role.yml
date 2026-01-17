@@ -1,0 +1,12 @@
+---
+# Test: infrastructure_prep role basic functionality
+- name: Test infrastructure_prep role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    infrastructure_prep_enabled: true
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - infrastructure_prep_enabled is defined

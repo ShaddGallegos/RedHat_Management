@@ -1,0 +1,4 @@
+---
+- name: Nutanix test placeholder
+  ansible.builtin.debug:
+    msg: "Implement Nutanix validation here."

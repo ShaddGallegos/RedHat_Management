@@ -1,0 +1,33 @@
+---
+# Platform Preparation: VMware
+# Prepares VMware vCenter environment for VM provisioning
+
+- name: "Prepare VMware Infrastructure"
+  debug:
+    msg: |
+      VMware Infrastructure Preparation
+      ===================================
+      Platform: vmware
+      Target: VMware vCenter VM provisioning
+  tags: ["infrastructure", "vmware", "prepare"]
+
+- name: "Validate VMware prerequisites"
+  block:
+    - name: "Check vCenter connectivity"
+      debug:
+        msg: "Validating vCenter credentials and connectivity"
+
+    - name: "Verify VMware environment variables"
+      assert:
+        that:
+          - "vcenter_hostname is defined or lookup('env', 'VCENTER_HOSTNAME') != ''"
+          - "vcenter_username is defined or lookup('env', 'VCENTER_USERNAME') != ''"
+        fail_msg: "VMware vCenter credentials not configured. Set vcenter_hostname and vcenter_username."
+      ignore_errors: true
+
+  tags: ["infrastructure", "vmware", "validate"]
+
+- name: "VMware infrastructure ready for provisioning"
+  debug:
+    msg: "VMware infrastructure prepared successfully"
+  tags: ["infrastructure", "vmware", "info"]

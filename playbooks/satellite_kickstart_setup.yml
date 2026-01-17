@@ -1,0 +1,52 @@
+---
+# Satellite Kickstart Repository and Sync Configuration Playbook
+# Creates kickstart repository with weekly sync job and lifecycle integration
+
+- name: Configure Satellite Kickstart Repository with Weekly Sync
+  hosts: satellite
+  gather_facts: yes
+  
+  vars:
+    satellite_url: "https://{{ inventory_hostname }}"
+    satellite_username: "admin"
+    # satellite_password: use vault
+
+  roles:
+    - role: satellite_os_configuration
+      vars:
+        satellite_os_config_enabled: true
+        create_operatingsystems: false
+        create_install_media: false
+        create_kickstart_repo: true
+        configure_sync_job: true
+
+  post_tasks:
+    - name: Display Kickstart Configuration
+      ansible.builtin.debug:
+        msg: |
+          ✅ Satellite Kickstart Configuration Complete
+          
+          Kickstart Repository:
+          - Name: Kickstart Files Repository
+          - Product: RHIS Infrastructure
+          - Content Type: file
+          - URL: https://{{ inventory_hostname }}/pub/kickstarts
+          - Download Policy: immediate
+          
+          Sync Job:
+          - Name: Kickstart Repository Weekly Sync
+          - Schedule: Weekly (Every Sunday at 2:00 AM)
+          - Repository: Kickstart Files Repository
+          - Enabled: Yes
+          
+          Available Kickstarts:
+          - rhel9-baseos-minimal.ks
+          - rhel10-baseos-minimal.ks
+          - rhel9-fullstack.ks
+          - rhel10-fullstack.ks
+          
+          Integration with Satellite:
+          1. Kickstarts available in provisioning templates
+          2. Weekly sync keeps repository current
+          3. Ready for inclusion in content views
+          4. Can be promoted through lifecycle environments

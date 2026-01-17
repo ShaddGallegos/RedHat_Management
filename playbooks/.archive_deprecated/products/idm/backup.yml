@@ -1,0 +1,38 @@
+---
+# Identity Management Backup Playbook
+# Creates backup of IdM configuration and LDAP data
+
+- name: "Identity Management | Backup"
+  hosts: "idm"
+  gather_facts: yes
+  vars:
+    backup_dir: "/var/backups/idm"
+    backup_retention_days: 30
+
+  tasks:
+    - name: "IdM | Create backup directory"
+      ansible.builtin.file:
+        path: "{{ backup_dir }}"
+        state: "directory"
+        mode: "0700"
+      tags: ["backup"]
+
+    - name: "IdM | Backup IPA database"
+      ansible.builtin.command: |
+        ipa-backup --log={{ backup_dir }}/ipa-backup_{{ ansible_date_time.date }}.log
+      async: 1800
+      poll: 30
+      tags: ["backup"]
+
+    - name: "IdM | Backup configuration"
+      community.general.archive:
+        path:
+          - "/etc/ipa"
+          - "/var/lib/ipa"
+        dest: "{{ backup_dir }}/idm_config_{{ ansible_date_time.date }}.tar.gz"
+        mode: "0600"
+      tags: ["backup"]
+
+    - name: "IdM | Backup complete"
+      ansible.builtin.debug:
+        msg: "IdM backup created: {{ backup_dir }}"

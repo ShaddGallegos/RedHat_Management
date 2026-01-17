@@ -1,0 +1,75 @@
+---
+# AAP Role-Based Access Control (RBAC) Configuration
+
+# Organizations
+aap_organizations:
+  - name: "Default"
+    description: "Default organization"
+  - name: "Production"
+    description: "Production workloads and automation"
+  - name: "Development"
+    description: "Development and testing environments"
+
+# Teams
+aap_teams:
+  - name: "Platform Admins"
+    organization: "Default"
+    description: "Platform administration team"
+  - name: "Satellite Operators"
+    organization: "Production"
+    description: "Satellite platform operators"
+  - name: "Developers"
+    organization: "Development"
+    description: "Development team members"
+
+# Users
+aap_users:
+  - name: "satellite_operator"
+    email: "operator@example.com"
+    password: "{{ aap_operator_password | default('') }}"
+    is_superuser: false
+    is_active: true
+
+  - name: "aap_developer"
+    email: "developer@example.com"
+    password: "{{ aap_developer_password | default('') }}"
+    is_superuser: false
+    is_active: true
+
+# Roles (built-in AAP roles)
+aap_system_roles:
+  - name: "System Administrator"
+    permissions: ["all"]
+  - name: "Organization Administrator"
+    permissions: ["org_admin"]
+  - name: "Team Lead"
+    permissions: ["team_lead"]
+  - name: "Auditor"
+    permissions: ["audit"]
+
+# User-Team Assignments
+aap_user_team_assignments:
+  - username: "satellite_operator"
+    teams:
+      - "Satellite Operators"
+  - username: "aap_developer"
+    teams:
+      - "Developers"
+
+# Team-Role Assignments
+aap_team_role_assignments:
+  - team: "Platform Admins"
+    organization: "Default"
+    role: "System Administrator"
+  - team: "Satellite Operators"
+    organization: "Production"
+    role: "Organization Administrator"
+  - team: "Developers"
+    organization: "Development"
+    role: "Team Lead"
+
+# RBAC Feature Flags
+aap_rbac_enabled: true
+aap_enforce_rbac: true
+aap_audit_logging: true
+aap_session_timeout: 3600

@@ -1,0 +1,7 @@
+---
+# Placeholder for Event-Driven Automation (EDA)
+# This role configures decision environments and event source integrations
+
+- name: EDA configuration placeholder
+  ansible.builtin.debug:
+    msg: "AAP Event-Driven Automation - implementation pending"

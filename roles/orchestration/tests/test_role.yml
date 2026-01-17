@@ -1,0 +1,12 @@
+---
+# Test: orchestration role basic functionality
+- name: Test orchestration role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    orchestration_enabled: true
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - orchestration_enabled is defined

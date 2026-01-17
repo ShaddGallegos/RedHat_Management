@@ -1,0 +1,124 @@
+---
+# Configure Network Infrastructure for RHIS
+- name: Validate Network Configuration
+  block:
+    - name: Get current network configuration
+      ansible.builtin.command: ip route show
+      register: current_routes
+      changed_when: false
+
+    - name: Display Network Validation
+      ansible.builtin.debug:
+        msg: |
+          Network Infrastructure Configuration Summary:
+          
+          Primary Subnet: {{ primary_subnet.network }}/{{ primary_subnet.prefix }}
+          Gateway: {{ primary_subnet.gateway }}
+          Broadcast: {{ primary_subnet.broadcast }}
+          
+          Current Routes:
+          {{ current_routes.stdout }}
+
+  when: network_config_enabled
+  tags: ["network", "validation"]
+
+- name: Configure Primary Subnet (10.168.0.0/16)
+  block:
+    - name: Display Primary Subnet Configuration
+      ansible.builtin.debug:
+        msg: |
+          Configuring Primary RHIS Subnet:
+          
+          Network: {{ primary_subnet.network }}/{{ primary_subnet.prefix }}
+          Netmask: {{ primary_subnet.netmask }}
+          Gateway: {{ primary_subnet.gateway }}
+          
+          DHCP Configuration:
+          - Enabled: {{ dhcp_primary.enabled }}
+          - Range: {{ dhcp_primary.range_start }} - {{ dhcp_primary.range_end }}
+          - Lease Time: {{ dhcp_primary.lease_time }}
+          - DNS Servers: {{ dhcp_primary.dns_servers | join(', ') }}
+          - NTP Servers: {{ dhcp_primary.ntp_servers | join(', ') }}
+          
+          DNS Configuration:
+          - Primary Resolver: {{ dns_primary.resolver_1 }}
+          - Secondary Resolver: {{ dns_primary.resolver_2 }}
+          - Search Domain: {{ dns_primary.search_domain }}
+
+  when: network_config_enabled
+  tags: ["network", "primary_subnet"]
+
+- name: Configure Host Group Subnets
+  block:
+    - name: Display Host Group Subnets
+      ansible.builtin.debug:
+        msg: |
+          Configuring Host Group Subnets within 10.168.0.0/16:
+          
+          {% for group in host_groups %}
+          {{ loop.index }}. {{ group.name }}
+             Subnet: {{ group.subnet }}
+             Gateway: {{ group.gateway }}
+             DHCP Range: {{ group.dhcp_range }}
+             Description: {{ group.description }}
+          {% endfor %}
+
+  when: network_config_enabled
+  tags: ["network", "host_groups"]
+
+- name: Configure Static Host Reservations
+  block:
+    - name: Display Static Host Reservations
+      ansible.builtin.debug:
+        msg: |
+          Static Host Reservations:
+          
+          {% for host in static_hosts %}
+          - {{ host.hostname }}.{{ host.domain }}
+            IP: {{ host.ip_address }}
+            MAC: {{ host.mac_address }}
+            Subnet: {{ host.subnet }}
+          {% endfor %}
+
+  when: network_config_enabled
+  tags: ["network", "static_hosts"]
+
+- name: Configure Firewall Rules
+  block:
+    - name: Display Firewall Configuration
+      ansible.builtin.debug:
+        msg: |
+          Network Firewall Rules for 10.168.0.0/16:
+          
+          {% for rule in firewall_rules %}
+          - Source: {{ rule.source_subnet }}
+            Destination: {{ rule.destination }}
+            Service: {{ rule.service }}
+            Port: {{ rule.port }}/{{ rule.protocol }}
+            Action: {{ rule.action }}
+          {% endfor %}
+
+  when: network_config_enabled
+  tags: ["network", "firewall"]
+
+- name: Network Configuration Complete
+  block:
+    - name: Display Final Configuration Summary
+      ansible.builtin.debug:
+        msg: |
+          ✅ Network Infrastructure Configuration Complete
+          
+          Primary Network: {{ primary_subnet.network }}/{{ primary_subnet.prefix }}
+          Host Groups Configured: {{ host_groups | length }}
+          Static Hosts Configured: {{ static_hosts | length }}
+          Firewall Rules Configured: {{ firewall_rules | length }}
+          
+          Subnets Configured:
+          {% for group in host_groups %}
+          - {{ group.name }}: {{ group.subnet }}
+          {% endfor %}
+          
+          Ready for provisioning and host registration!
+
+  when: network_config_enabled
+  tags: ["network", "summary"]

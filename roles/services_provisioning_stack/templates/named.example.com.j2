@@ -1,0 +1,32 @@
+$TTL 3600
+@   IN  SOA satellite.prod.spg.example.com. hostmaster.example.com. (
+            2026011601  ; Serial
+            3600        ; Refresh (1 hour)
+            1800        ; Retry (30 minutes)
+            604800      ; Expire (7 days)
+            86400 )     ; Minimum TTL (24 hours)
+
+    IN  NS  satellite.prod.spg.example.com.
+    IN  A   10.168.0.10
+
+; A Records for example.com
+satellite.prod.spg      IN  A   10.168.0.10
+idm.prod.spg            IN  A   10.168.0.20
+aap.prod.spg            IN  A   10.168.0.30
+
+; CNAME records
+www                     IN  CNAME   satellite.prod.spg
+ns                      IN  CNAME   satellite.prod.spg
+
+; MX records
+@                       IN  MX  10  mail.example.com.
+
+; Service records
+_xmpp-server._tcp       IN  SRV 10 0 5269 satellite.prod.spg.example.com.
+
+; Infrastructure hosts
+infrastructure-gw       IN  A   10.168.0.1
+infrastructure-dns      IN  A   10.168.0.1
+infrastructure-dhcp     IN  A   10.168.0.1
+infrastructure-tftp     IN  A   10.168.0.1
+infrastructure-pxe      IN  A   10.168.0.1

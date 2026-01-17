@@ -1,0 +1,12 @@
+---
+# Test: prompts role basic functionality
+- name: Test prompts role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    prompts_enabled: true
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - prompts_enabled is defined

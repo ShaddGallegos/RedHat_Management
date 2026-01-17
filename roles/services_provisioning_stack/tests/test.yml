@@ -1,0 +1,32 @@
+---
+# Test playbook for services_provisioning_stack role
+
+- name: Test services_provisioning_stack configuration
+  hosts: localhost
+  gather_facts: true
+  vars:
+    provisioning_host: "satellite.prod.spg"
+    provisioning_secondary_interface: "eth1"
+    provisioning_interface_ip: "10.168.0.1"
+  
+  tasks:
+    - name: Verify provisioning role variables
+      debug:
+        msg: |
+          Testing services_provisioning_stack role
+          ==========================================
+          Provisioning Host: {{ provisioning_host }}
+          Secondary Interface: {{ provisioning_secondary_interface }}
+          Interface IP: {{ provisioning_interface_ip }}
+          DHCP Enabled: {{ dhcp_enabled }}
+          DNS Enabled: {{ dns_enabled }}
+          TFTP Enabled: {{ tftp_enabled }}
+          PXE Enabled: {{ pxe_enabled }}
+
+    - name: Test required variables exist
+      assert:
+        that:
+          - provisioning_host is defined
+          - provisioning_secondary_interface is defined
+          - provisioning_interface_ip is defined
+        fail_msg: "Required provisioning variables not defined"

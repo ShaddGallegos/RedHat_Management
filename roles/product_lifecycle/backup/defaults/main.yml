@@ -1,0 +1,7 @@
+---
+product_name: "product"
+backup_type: "full"  # Options: database, configuration, full
+backup_dir: "/var/backups"
+backup_retention_days: 30
+product_backup_paths: []
+skip_backup: false

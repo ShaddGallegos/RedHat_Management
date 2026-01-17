@@ -1,0 +1,7 @@
+---
+# Placeholder for satellite host management
+# This role manages host registration, host collections, and provisioning
+
+- name: Host management placeholder
+  ansible.builtin.debug:
+    msg: "Satellite host management - implementation pending"

@@ -1,0 +1,68 @@
+---
+# Red Hat Management Framework - Interactive Deployment
+# This is the single entry point for all deployments using consolidated roles
+# All playbooks have been consolidated into this orchestration structure
+
+- name: Red Hat Management Framework - Setup & Deployment
+  hosts: localhost
+  gather_facts: yes
+  
+  vars:
+    base_dir: "{{ playbook_dir }}"
+  
+  pre_tasks:
+    - name: Load vault configuration
+      ansible.builtin.include_role:
+        name: load_vaulted_env
+      vars:
+        role_path: "{{ playbook_dir }}/roles"
+    
+    - name: Display deployment header
+      ansible.builtin.debug:
+        msg: |
+          ================================================================================
+          Red Hat Management Enterprise Automation Framework
+          Interactive Deployment & Configuration Setup
+          ================================================================================ 
+
+  tasks:
+    - name: Step 1 - Interactive Configuration Setup
+      ansible.builtin.include_role:
+        name: deployment_setup
+      vars:
+        setup_mode: interactive
+    
+    - name: Step 2 - Generate Deployment Inventory
+      ansible.builtin.include_role:
+        name: inventory_generator
+    
+    - name: Step 3 - Prepare Infrastructure
+      ansible.builtin.include_role:
+        name: infrastructure_prep
+      when: deployment_platform == "libvirt"
+    
+    - name: Step 4 - Deploy Components
+      ansible.builtin.include_role:
+        name: "{{ item }}_{{ component_version[item] | default('latest') }}_deployment"
+      loop: "{{ deployment_components }}"
+      vars:
+        component_version:
+          satellite: 6_18
+          aap: 2_6
+          idm: latest
+          openshift: 4_21
+  
+  post_tasks:
+    - name: Display completion summary
+      ansible.builtin.debug:
+        msg: |
+          ================================================================================
+          Deployment Complete
+
+          Access Points:
+          - ansible-cmdb:  http://localhost:8081
+          - Satellite:     https://satellite.example.com
+          - AAP:           https://controller.example.com
+          - IdM:           https://idm.example.com
+          - OpenShift:     https://console.apps.example.com
+          ================================================================================

@@ -1,0 +1,24 @@
+---
+# VMware Setup Role Defaults
+
+# Enable/disable VMware setup
+vmware_setup_enabled: true
+
+# vSphere credentials
+vmware_hostname: "{{ vmware_hostname | default('vcenter.example.com') }}"
+vmware_username: "{{ vmware_username | default('administrator@vsphere.local') }}"
+vmware_password: "{{ vmware_password | default('') }}"
+vmware_validate_certs: false
+
+# vSphere configuration
+vmware_datacenter: "{{ vmware_datacenter | default('Datacenter') }}"
+vmware_cluster: "{{ vmware_cluster | default('Cluster') }}"
+vmware_datastore: "{{ vmware_datastore | default('Datastore') }}"
+vmware_network: "{{ vmware_network | default('VM Network') }}"
+vmware_folder: "{{ vmware_folder | default('/vm') }}"
+
+# Resource tags
+vmware_resource_tags:
+  Project: RedHat
+  Environment: Lab
+  Managed: Ansible

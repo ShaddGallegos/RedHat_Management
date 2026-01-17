@@ -1,0 +1,16 @@
+<network>
+  <name>external</name>
+  <uuid>{{ uuid_external | default('00000000-0000-0000-0000-000000000000') }}</uuid>
+  <forward mode="nat">
+    <nat>
+      <port start="1024" end="65535"/>
+    </nat>
+  </forward>
+  <bridge name="virbr0" stp="on" delay="0"/>
+  <mac address="{{ mac_address_external | default('52:54:00:12:34:56') }}"/>
+  <ip address="{{ libvirt_external_network_gw }}" netmask="255.255.255.0">
+    <dhcp>
+      <range start="{{ libvirt_external_network | regex_replace('\.0/24$', '.2') }}" end="{{ libvirt_external_network | regex_replace('\.0/24$', '.254') }}"/>
+    </dhcp>
+  </ip>
+</network>

@@ -1,0 +1,109 @@
+---
+# Default variables for satellite_os_configuration role
+satellite_os_config_enabled: true
+satellite_os_config_version: "1.0"
+satellite_os_config_timeout: 1800
+
+# Satellite Connection
+satellite_url: "https://satellite.example.com"
+satellite_username: "admin"
+# satellite_password: use vault!
+satellite_validate_ssl: true
+satellite_organization: "Default Organization"
+
+# Feature toggles
+create_operatingsystems: true
+create_install_media: true
+create_kickstart_repo: true
+configure_sync_job: true
+
+# Operating Systems Configuration
+operatingsystems:
+  - name: "RHEL 9"
+    major: 9
+    minor: 0
+    family: "Redhat"
+    password_hash: "SHA512"
+    organization: "{{ satellite_organization }}"
+    tags: ["rhis", "rhel9", "production"]
+
+  - name: "RHEL 10"
+    major: 10
+    minor: 0
+    family: "Redhat"
+    password_hash: "SHA512"
+    organization: "{{ satellite_organization }}"
+    tags: ["rhis", "rhel10", "production"]
+
+# Install Media Configuration
+install_media:
+  - name: "RHEL 9 BaseOS Installation Media"
+    os: "RHEL 9"
+    path: "http://cdn.redhat.com/content/dist/rhel/rhel-9/rhel-9-x86_64/baseos/os"
+    media_type: "BaseOS"
+    organization: "{{ satellite_organization }}"
+    tags: ["rhis", "rhel9", "baseos", "installation"]
+
+  - name: "RHEL 10 BaseOS Installation Media"
+    os: "RHEL 10"
+    path: "http://cdn.redhat.com/content/dist/rhel/rhel-10/rhel-10-x86_64/baseos/os"
+    media_type: "BaseOS"
+    organization: "{{ satellite_organization }}"
+    tags: ["rhis", "rhel10", "baseos", "installation"]
+
+# Kickstart Repository Configuration
+kickstart_repository:
+  name: "Kickstart Files Repository"
+  organization: "{{ satellite_organization }}"
+  product: "RHIS Infrastructure"
+  content_type: "file"
+  description: "Repository for RHEL 9 and RHEL 10 kickstart files"
+  url: "https://satellite.example.com/pub/kickstarts"
+  download_policy: "immediate"
+  tags: ["rhis", "kickstart", "provisioning"]
+
+# Sync Jobs Configuration
+sync_jobs:
+  - name: "Kickstart Repository Weekly Sync"
+    repository: "Kickstart Files Repository"
+    product: "RHIS Infrastructure"
+    sync_date: "2024-01-01 02:00:00"
+    interval: "weekly"
+    day_of_week: 0  # Sunday
+    enabled: true
+    organization: "{{ satellite_organization }}"
+    tags: ["rhis", "sync", "kickstart"]
+
+# Partition Tables Configuration
+partition_tables:
+  - name: "RHEL 9/10 LVM Standard"
+    os_family: "Redhat"
+    layout: |
+      <%#
+      RHEL 9/10 LVM-based Partition Table for RHIS
+      Compliance-ready with separated mount points
+      %>
+      <%= snippet 'pxelinux_discovery' %>
+      NETWORK --bootproto=dhcp --hostname=localhost.localdomain
+      zerombr
+      clearpart --initlabel --all
+      part /boot --fstype=ext4 --size=1024
+      part /boot/efi --fstype=efi --size=256
+      part pv.01 --fstype=lvmpv --size=1 --grow
+      volgroup vg_rhel pv.01
+      logvol swap --vgname=vg_rhel --size=4096 --name=lv_swap
+      logvol / --vgname=vg_rhel --size=10240 --name=lv_root --fstype=xfs
+      logvol /home --vgname=vg_rhel --size=2048 --name=lv_home --fstype=xfs
+      logvol /tmp --vgname=vg_rhel --size=2048 --name=lv_tmp --fstype=xfs
+      logvol /var --vgname=vg_rhel --size=5120 --name=lv_var --fstype=xfs
+      logvol /var/log --vgname=vg_rhel --size=2048 --name=lv_var_log --fstype=xfs
+      logvol /var/log/audit --vgname=vg_rhel --size=1024 --name=lv_audit --fstype=xfs
+    organization: "{{ satellite_organization }}"
+    tags: ["rhis", "partitioning", "lvm"]
+
+# Bootdisk Configuration
+bootdisk_iso:
+  enabled: true
+  include_kickstart: true
+  include_customization: false
+  organization: "{{ satellite_organization }}"

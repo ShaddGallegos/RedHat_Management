@@ -1,0 +1,5 @@
+# Host-specific vars for AAP host
+# Reuse SSH password from inventory all:vars for privilege escalation if set
+ansible_become_pass: "{{ global_admin_password }}"
+aap_admin_user: "admin"
+aap_admin_password: "{{ global_admin_password }}"

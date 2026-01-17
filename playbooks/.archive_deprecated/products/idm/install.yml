@@ -1,0 +1,37 @@
+---
+# Identity Management Installation Playbook
+# Installs and configures FreeIPA Identity Management
+
+- name: "Identity Management | Installation"
+  hosts: "idm"
+  gather_facts: yes
+  pre_tasks:
+    - name: "IdM | Validate prerequisites"
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family == 'RedHat'
+          - ansible_distribution_major_version | int >= 8
+        fail_msg: "IdM requires RHEL 8+"
+
+  roles:
+    - role: "redhat_products/idm/idm_base"
+      tags: ["install", "idm"]
+
+  post_tasks:
+    - name: "IdM | Test LDAP connectivity"
+      ansible.builtin.shell: |
+        ldapsearch -H ldapi:// -D 'cn=Directory Manager' \
+        -w {{ idm_dm_password | default('') }} \
+        -b 'o=ipaca' -s base 'objectClass=*' cn
+      register: ldap_check
+      ignore_errors: yes
+      tags: ["verify", "idm"]
+
+    - name: "IdM | Display installation results"
+      ansible.builtin.debug:
+        msg: |
+          Identity Management Installation Complete
+          Realm: {{ ansible_fqdn | upper }}
+          LDAP: ldap://{{ inventory_hostname }}
+          IPA Web UI: https://{{ inventory_hostname }}/ipa/ui/
+      tags: ["idm"]

@@ -1,0 +1,25 @@
+---
+# TFTP Boot Server Role Defaults
+# Default variables for TFTP server configuration
+
+# TFTP Server IP (will use ansible_default_ipv4.address if not set)
+tftp_server_ip: "{{ ansible_default_ipv4.address }}"
+
+# Enable TFTP service
+tftp_enable: true
+
+# Enable firewall rules (for firewalld)
+tftp_enable_firewall: true
+
+# TFTP Root Directory
+tftp_root: /var/lib/tftpboot
+
+# ISO Directory
+tftp_iso_dir: "{{ tftp_root }}/iso"
+
+# Project root for syncing files
+project_root: "{{ lookup('env', 'PROJECT_ROOT') | default('/run/media/sgallego/SD_Card/GIT/RedHat_Management') }}"
+
+# DHCP Server Configuration (optional, for reference)
+dhcp_tftp_server: "{{ tftp_server_ip }}"
+dhcp_boot_file: pxelinux.0

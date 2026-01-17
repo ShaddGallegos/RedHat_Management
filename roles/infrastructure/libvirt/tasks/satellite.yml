@@ -1,0 +1,28 @@
+---
+# Register libvirt host in Satellite when requested
+- name: Register libvirt host in Satellite
+  block:
+    - name: Install subscription-manager
+      ansible.builtin.package:
+        name: subscription-manager
+        state: present
+
+    - name: Register with Satellite
+      ansible.builtin.command: >
+        subscription-manager register
+        --serverurl=https://{{ satellite_fqdn }}/rhsm
+        --org='{{ satellite_org | default("Default_Org") }}'
+        --username={{ satellite_admin_user }}
+        --password={{ satellite_admin_password }}
+        --auto-attach
+      register: sat_register
+      changed_when: 'The system has been registered' in sat_register.stdout or 'already registered' in sat_register.stdout
+      no_log: true
+
+  when: libvirt_register_in_satellite | default(false)
+  vars:
+    satellite_fqdn: "{{ satellite_fqdn | default('satellite.example.com') }}"
+    satellite_org: "{{ satellite_org | default('Default_Org') }}"
+    satellite_admin_user: "{{ satellite_admin_user | default('admin') }}"
+    satellite_admin_password: "{{ satellite_admin_password | default('') }}"
+

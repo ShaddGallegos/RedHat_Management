@@ -1,0 +1,14 @@
+---
+# Test the network_infrastructure_config role
+- name: Test network_infrastructure_config Role
+  hosts: localhost
+  gather_facts: true
+  
+  tasks:
+    - name: Run network_infrastructure_config role
+      include_role:
+        name: network_infrastructure_config
+
+    - name: Test role completed successfully
+      ansible.builtin.debug:
+        msg: "✓ network_infrastructure_config role test completed successfully"

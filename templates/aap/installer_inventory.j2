@@ -1,0 +1,25 @@
+[installer]
+localhost
+
+[satellite]
+satellite.{{ ansible_domain }} ansible_host={{ satellite_ip }}
+
+[aap]
+aap.{{ ansible_domain }} ansible_host={{ aap_ip }}
+
+[idm]
+idm.{{ ansible_domain }} ansible_host={{ idm_ip }}
+
+[git]
+git.{{ ansible_domain }} ansible_host={{ git_ip }}
+
+[openshift]
+openshift.{{ ansible_domain }} ansible_host={{ openshift_ip }}
+
+[devnode]
+devnode.{{ ansible_domain }} ansible_host={{ devnode_ip }}
+
+[all:vars]
+ansible_user=admin
+ansible_password={{ global_admin_password }}
+ansible_become=true

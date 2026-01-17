@@ -1,0 +1,7 @@
+# Host-specific vars for satellite.prod.spg
+ansible_user: "root"
+ansible_admin_password: "{{ (lookup('pipe', 'ansible-vault view $HOME/.ansible/conf/env.yml --vault-password-file $HOME/.ansible/conf/.vault_pass.txt') | from_yaml).global_admin_password }}"
+ansible_password: "{{ (lookup('pipe', 'ansible-vault view $HOME/.ansible/conf/env.yml --vault-password-file $HOME/.ansible/conf/.vault_pass.txt') | from_yaml).global_admin_password }}"
+ansible_become: true
+ansible_connection: ssh
+ansible_ssh_private_key_file: "/home/{{ lookup('env', 'USER') | default('root') }}/.ssh/id_rsa"

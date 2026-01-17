@@ -1,0 +1,38 @@
+---
+# AAP 2.6 Backup Playbook
+# Creates backup of AAP configuration and data
+
+- name: "AAP 2.6 | Backup"
+  hosts: "aap"
+  gather_facts: yes
+  vars:
+    backup_dir: "/var/backups/aap"
+    backup_retention_days: 30
+
+  tasks:
+    - name: "AAP | Create backup directory"
+      ansible.builtin.file:
+        path: "{{ backup_dir }}"
+        state: "directory"
+        mode: "0700"
+      tags: ["backup"]
+
+    - name: "AAP | Backup database"
+      ansible.builtin.shell: |
+        pg_dump automation_hub > {{ backup_dir }}/automation_hub_{{ ansible_date_time.iso8601 }}.sql
+      environment:
+        PGPASSWORD: "{{ pg_password | default('') }}"
+      tags: ["backup"]
+
+    - name: "AAP | Backup configuration"
+      community.general.archive:
+        path:
+          - "/etc/ansible-automation-platform"
+          - "/var/lib/automation-controller"
+        dest: "{{ backup_dir }}/aap_config_{{ ansible_date_time.date }}.tar.gz"
+        mode: "0600"
+      tags: ["backup"]
+
+    - name: "AAP | Backup complete"
+      ansible.builtin.debug:
+        msg: "AAP backup created: {{ backup_dir }}"

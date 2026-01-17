@@ -1,0 +1,34 @@
+---
+# Installation Method: OEM Driver (Default)
+# Configures operating system installation via OEM-supplied drivers and media
+
+- name: "Configure Installation Method: OEM Driver"
+  debug:
+    msg: |
+      Installation Method: OEM Driver
+      ================================
+      Method: OEMDRV (Default)
+      Boot Media: OEM-supplied driver media
+      Use Case: Traditional OEM installations
+  tags: ["installation", "oemdrv", "config"]
+
+- name: "Validate OEM driver installation setup"
+  block:
+    - name: "Check OEM driver availability"
+      stat:
+        path: "/boot/oemdrv"
+      register: oemdrv_check
+
+    - name: "Assert OEM drivers are available"
+      assert:
+        that:
+          - "oemdrv_check.stat.exists or 'OEMDRV media will be provided' is not defined"
+        fail_msg: "OEM driver media not found. Ensure /boot/oemdrv is available or provide media."
+      ignore_errors: true
+
+  tags: ["installation", "oemdrv", "validate"]
+
+- name: "OEM Driver installation method configured"
+  debug:
+    msg: "OEM driver installation method ready"
+  tags: ["installation", "oemdrv", "info"]

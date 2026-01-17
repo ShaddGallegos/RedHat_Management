@@ -1,0 +1,46 @@
+---
+# Satellite Content Lifecycle Management
+# Manages repositories, content views, and lifecycle environments
+
+- name: Verify Satellite connectivity
+  ansible.builtin.uri:
+    url: "https://{{ groups['satellite'][0] }}/api/status"
+    user: "admin"
+    password: "{{ satellite_admin_password | default('') }}"
+    method: GET
+    validate_certs: false
+    status_code: 200
+  register: satellite_status
+  failed_when: false
+  tags: [satellite_content, verify]
+
+- name: Display Satellite connection status
+  ansible.builtin.debug:
+    msg: "Satellite API Status: {{ satellite_status.status }}"
+  when: satellite_status.status is defined
+  tags: [satellite_content, verify]
+
+- name: Enable product repositories
+  ansible.builtin.include_tasks: repositories.yml
+  tags: [satellite_content, repositories]
+
+- name: Create lifecycle environments
+  ansible.builtin.include_tasks: lifecycle_environments.yml
+  tags: [satellite_content, lifecycle]
+
+- name: Manage content views
+  ansible.builtin.include_tasks: content_views.yml
+  tags: [satellite_content, views]
+
+- name: Promote content through environments
+  ansible.builtin.include_tasks: promote_content.yml
+  when: satellite_content_promote | default(false)
+  tags: [satellite_content, promotion]
+
+- name: Sync content repositories
+  ansible.builtin.include_tasks: sync_content.yml
+  tags: [satellite_content, sync]
+
+- name: Validate content deployment
+  ansible.builtin.include_tasks: validate.yml
+  tags: [satellite_content, validate]

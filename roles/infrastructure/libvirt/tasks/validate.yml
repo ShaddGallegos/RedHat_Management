@@ -1,0 +1,21 @@
+---
+# Validate libvirt installation and configuration
+- name: Validate libvirt installation
+  ansible.builtin.command: virsh list
+  changed_when: false
+  register: virsh_list
+
+- name: Display virsh status
+  ansible.builtin.debug:
+    msg: "Libvirt is operational. Active VMs: {{ virsh_list.stdout_lines | length - 2 }}"
+
+- name: Check libvirtd service status
+  ansible.builtin.systemd:
+    name: libvirtd
+  register: libvirtd_service
+  failed_when: libvirtd_service.status.ActiveState != 'active'
+
+- name: Validate network configurations
+  ansible.builtin.command: "virsh net-list --all"
+  changed_when: false
+

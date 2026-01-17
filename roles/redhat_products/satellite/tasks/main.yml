@@ -1,0 +1,123 @@
+---
+# Satellite Product Role - Wrapper
+# Orchestrates all Satellite 6.18 deployment and configuration tasks
+# Coordinates base, API, content, hosts, and reporting components
+
+- name: "RED HAT SATELLITE - Initialize"
+  debug:
+    msg: |
+      Red Hat Satellite 6.18 Deployment
+      ===================================
+      Version: 6.18
+      Scenario: {{ deployment_scenario | default('undefined') }}
+      Platform: {{ deployment_platform | default('undefined') }}
+  tags: ["satellite", "products"]
+
+- name: "Validate Satellite configuration"
+  assert:
+    that:
+      - deployment_scenario is defined
+      - scenario_config.products is defined
+      - "'satellite' in scenario_config.products"
+    fail_msg: "Satellite deployment requires 'satellite' in scenario products"
+  tags: ["satellite", "validate"]
+
+- name: "Execute Satellite installation workflow"
+  block:
+    - name: "Pre-deployment checks"
+      include_role:
+        name: "redhat_products/satellite"
+        tasks_from: "satellite_prechecks/main.yml"
+        apply:
+          tags: ["satellite", "prechecks"]
+      tags: ["satellite"]
+
+    - name: "Deploy Satellite base components"
+      include_role:
+        name: "redhat_products/satellite"
+        tasks_from: "satellite_base/main.yml"
+        apply:
+          tags: ["satellite", "base"]
+      tags: ["satellite"]
+
+    - name: "Configure Satellite API"
+      include_role:
+        name: "redhat_products/satellite"
+        tasks_from: "satellite_api/main.yml"
+        apply:
+          tags: ["satellite", "api"]
+      when: configure_satellite_api | default(true)
+      tags: ["satellite"]
+
+    - name: "Configure Satellite content management"
+      include_role:
+        name: "redhat_products/satellite"
+        tasks_from: "satellite_content/main.yml"
+        apply:
+          tags: ["satellite", "content"]
+      when: configure_satellite_content | default(true)
+      tags: ["satellite"]
+
+    - name: "Configure Satellite hosts"
+      include_role:
+        name: "redhat_products/satellite"
+        tasks_from: "satellite_hosts/main.yml"
+        apply:
+          tags: ["satellite", "hosts"]
+      when: configure_satellite_hosts | default(true)
+      tags: ["satellite"]
+
+    - name: "Configure Satellite post-deployment"
+      include_role:
+        name: "redhat_products/satellite"
+        tasks_from: "satellite_postcfg/main.yml"
+        apply:
+          tags: ["satellite", "postcfg"]
+      when: configure_satellite_postcfg | default(true)
+      tags: ["satellite"]
+
+    - name: "Deploy Satellite reporting"
+      include_role:
+        name: "redhat_products/satellite"
+        tasks_from: "satellite_reporting/main.yml"
+        apply:
+          tags: ["satellite", "reporting"]
+      when: deploy_satellite_reporting | default(true)
+      tags: ["satellite"]
+
+  rescue:
+    - name: "Capture Satellite deployment error"
+      debug:
+        msg: |
+          Satellite deployment encountered an error.
+          Review logs for specific failure information.
+      tags: ["satellite", "error"]
+
+    - name: "Satellite deployment failed - detailed error"
+      fail:
+        msg: |
+          ❌ SATELLITE DEPLOYMENT FAILED
+          
+          Common causes:
+          1. Insufficient disk space (Satellite requires 500GB+ for content)
+          2. Repository synchronization failures
+          3. Database connection issues
+          4. Invalid subscription/credentials
+          5. Port conflicts (80, 443, 5432, etc.)
+          6. Firewall restrictions
+          
+          Recovery steps:
+          1. Verify disk space: Available disk must exceed 500GB
+          2. Check repository sync status
+          3. Verify database connectivity
+          4. Confirm subscription credentials
+          5. Review firewall and port configurations
+          6. Check SELinux/AppArmor policies if enforcing
+          
+          Check logs above for detailed error information.
+  tags: ["satellite"]
+
+- name: "Satellite deployment completed"
+  debug:
+    msg: "Red Hat Satellite deployment complete."
+  tags: ["satellite", "info"]

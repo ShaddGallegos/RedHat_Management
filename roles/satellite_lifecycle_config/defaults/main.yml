@@ -1,0 +1,108 @@
+---
+# Default variables for satellite_lifecycle_config role
+satellite_lifecycle_config_enabled: true
+satellite_lifecycle_config_version: "1.0"
+satellite_lifecycle_config_timeout: 1800
+
+# Satellite Connection
+satellite_url: "https://satellite.example.com"
+satellite_username: "admin"
+# satellite_password: use vault!
+satellite_validate_ssl: true
+satellite_organization: "Default Organization"
+
+# Feature toggles
+create_lifecycle_environments: true
+create_content_views: true
+create_filters: false
+publish_content_views: false
+promote_content_views: false
+
+# Lifecycle Environments
+lifecycle_environments:
+  - name: "Development"
+    description: "Development environment"
+    prior: "Library"
+    organization: "{{ satellite_organization }}"
+    tags: ["rhis", "development"]
+
+  - name: "Staging"
+    description: "Staging/QA environment"
+    prior: "Development"
+    organization: "{{ satellite_organization }}"
+    tags: ["rhis", "staging"]
+
+  - name: "Production"
+    description: "Production environment"
+    prior: "Staging"
+    organization: "{{ satellite_organization }}"
+    tags: ["rhis", "production"]
+
+# Content Views
+content_views:
+  - name: "RHIS_BaseOS"
+    description: "RHIS Base OS Content View"
+    organization: "{{ satellite_organization }}"
+    repositories:
+      - "RHEL 9 BaseOS"
+      - "RHEL 9 AppStream"
+    tags: ["rhis", "baseos"]
+
+  - name: "RHIS_AppStack"
+    description: "RHIS Application Stack Content View"
+    organization: "{{ satellite_organization }}"
+    repositories:
+      - "RHEL 9 AppStream"
+    tags: ["rhis", "appstack"]
+
+  - name: "RHIS_RHEL10_BaseOS"
+    description: "RHIS RHEL 10 Base OS Content View"
+    organization: "{{ satellite_organization }}"
+    repositories:
+      - "RHEL 10 BaseOS"
+      - "RHEL 10 AppStream"
+    tags: ["rhis", "rhel10", "baseos"]
+
+# Content View Filters
+content_view_filters:
+  - name: "Security_Errata"
+    content_view: "RHIS_BaseOS"
+    organization: "{{ satellite_organization }}"
+    description: "Filter for security errata only"
+    filter_type: "erratum"
+    inclusion: true
+    tags: ["rhis", "filter", "security"]
+
+  - name: "Exclude_Deprecated"
+    content_view: "RHIS_AppStack"
+    organization: "{{ satellite_organization }}"
+    description: "Exclude deprecated packages"
+    filter_type: "package"
+    inclusion: false
+    tags: ["rhis", "filter"]
+
+# Composite Content Views
+composite_content_views:
+  - name: "RHIS_Complete_Stack"
+    description: "Complete RHIS content stack"
+    organization: "{{ satellite_organization }}"
+    auto_publish: true
+    components:
+      - name: "RHIS_BaseOS"
+        latest: true
+      - name: "RHIS_AppStack"
+        latest: true
+    tags: ["rhis", "composite"]
+
+# Content View Versions to Promote
+promote_versions:
+  - content_view: "RHIS_BaseOS"
+    version: 1
+    promote_to:
+      - "Development"
+      - "Staging"
+    organization: "{{ satellite_organization }}"
+
+# Validation
+satellite_lifecycle_validate_connectivity: true
+satellite_lifecycle_test_promotion: false

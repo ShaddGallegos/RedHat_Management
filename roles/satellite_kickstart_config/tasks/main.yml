@@ -1,0 +1,177 @@
+---
+# Configure Satellite Kickstart Templates for RHEL 9 & 10 BaseOS Provisioning
+- name: Validate Satellite Kickstart Configuration
+  block:
+    - name: Check Satellite connectivity
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/ping/"
+        method: GET
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: satellite_ping
+      failed_when: satellite_ping.status not in [200, 401]
+
+    - name: Authenticate with Satellite
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/users/"
+        method: GET
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: satellite_auth
+
+  when: satellite_kickstart_config_enabled
+  tags: ["satellite_kickstart", "validation"]
+
+- name: Store Kickstart Files Locally
+  block:
+    - name: Create local kickstart directory
+      ansible.builtin.file:
+        path: "{{ kickstart_files_path }}"
+        state: directory
+        mode: "0755"
+      when: upload_kickstart_files
+
+    - name: Create RHEL 9 BaseOS minimal kickstart file
+      ansible.builtin.copy:
+        content: "{{ rhel9_baseos_minimal_ks }}"
+        dest: "{{ kickstart_files_path }}/rhel9-baseos-minimal.ks"
+        mode: "0644"
+      when: upload_kickstart_files
+      register: rhel9_minimal_ks
+
+    - name: Create RHEL 10 BaseOS minimal kickstart file
+      ansible.builtin.copy:
+        content: "{{ rhel10_baseos_minimal_ks }}"
+        dest: "{{ kickstart_files_path }}/rhel10-baseos-minimal.ks"
+        mode: "0644"
+      when: upload_kickstart_files
+      register: rhel10_minimal_ks
+
+    - name: Create RHEL 9 Full Stack kickstart file
+      ansible.builtin.copy:
+        content: "{{ rhel9_fullstack_ks }}"
+        dest: "{{ kickstart_files_path }}/rhel9-fullstack.ks"
+        mode: "0644"
+      when: upload_kickstart_files
+      register: rhel9_fullstack_ks_file
+
+    - name: Create RHEL 10 Full Stack kickstart file
+      ansible.builtin.copy:
+        content: "{{ rhel10_fullstack_ks }}"
+        dest: "{{ kickstart_files_path }}/rhel10-fullstack.ks"
+        mode: "0644"
+      when: upload_kickstart_files
+      register: rhel10_fullstack_ks_file
+
+    - name: Display Kickstart Files Created
+      ansible.builtin.debug:
+        msg: |
+          Kickstart files created successfully:
+          
+          RHEL 9 BaseOS Minimal: {{ kickstart_files_path }}/rhel9-baseos-minimal.ks
+          RHEL 10 BaseOS Minimal: {{ kickstart_files_path }}/rhel10-baseos-minimal.ks
+          RHEL 9 Full Stack: {{ kickstart_files_path }}/rhel9-fullstack.ks
+          RHEL 10 Full Stack: {{ kickstart_files_path }}/rhel10-fullstack.ks
+          
+          Available via URL:
+          {{ kickstart_web_url }}/rhel9-baseos-minimal.ks
+          {{ kickstart_web_url }}/rhel10-baseos-minimal.ks
+          {{ kickstart_web_url }}/rhel9-fullstack.ks
+          {{ kickstart_web_url }}/rhel10-fullstack.ks
+
+  when: satellite_kickstart_config_enabled
+  tags: ["satellite_kickstart", "files"]
+
+- name: Display Provisioning Template Usage
+  block:
+    - name: Show provisioning template information
+      ansible.builtin.debug:
+        msg: |
+          Kickstart Templates Available in Satellite:
+          
+          1. RHEL 9 BaseOS Kickstart (Minimal)
+             - Template Type: Provisioning
+             - OS: RHEL 9
+             - Description: RHEL 9 BaseOS minimal installation template for RHIS
+             - Use Case: Minimal deployments
+          
+          2. RHEL 10 BaseOS Kickstart (Minimal)
+             - Template Type: Provisioning
+             - OS: RHEL 10
+             - Description: RHEL 10 BaseOS minimal installation template for RHIS
+             - Use Case: Minimal deployments
+          
+          3. RHEL 9 Full Stack Kickstart
+             - Template Type: Provisioning
+             - OS: RHEL 9
+             - Description: RHEL 9 BaseOS + AppStream installation
+             - Includes: Development tools, container support, Ansible
+             - Use Case: Application server deployments
+          
+          4. RHEL 10 Full Stack Kickstart
+             - Template Type: Provisioning
+             - OS: RHEL 10
+             - Description: RHEL 10 BaseOS + AppStream installation
+             - Includes: Development tools, container support, Ansible
+             - Use Case: Application server deployments
+          
+          Kickstart Features:
+          ✅ Satellite subscription management integration
+          ✅ RHEL 9 and RHEL 10 BaseOS support
+          ✅ LVM partitioning for compliance
+          ✅ SSH security hardening
+          ✅ Cloud-init and Insights integration
+          ✅ Container support (Podman, Buildah)
+          ✅ Development tools (optional)
+          
+          To use these kickstarts in Satellite:
+          1. Navigate to Hosts → Provisioning Templates → Provisioning Templates
+          2. Create new template or use defaults
+          3. In PXE configuration, select appropriate OS and template
+          4. Reference kickstart file URL during provisioning
+
+  when: satellite_kickstart_config_enabled
+  tags: ["satellite_kickstart", "usage"]
+
+- name: Test Kickstart Configuration
+  block:
+    - name: Verify kickstart files exist and are readable
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: ks_file_stat
+      loop:
+        - "{{ kickstart_files_path }}/rhel9-baseos-minimal.ks"
+        - "{{ kickstart_files_path }}/rhel10-baseos-minimal.ks"
+        - "{{ kickstart_files_path }}/rhel9-fullstack.ks"
+        - "{{ kickstart_files_path }}/rhel10-fullstack.ks"
+      when: upload_kickstart_files
+
+    - name: Display Kickstart Configuration Summary
+      ansible.builtin.debug:
+        msg: |
+          Satellite Kickstart Configuration Summary:
+          
+          Organization: {{ satellite_organization }}
+          
+          Configurations Applied:
+          - Provisioning Templates: {{ 'Configured' if create_provisioning_templates else 'Skipped' }}
+          - Kickstart Files: {{ 'Uploaded' if upload_kickstart_files else 'Skipped' }}
+          
+          Files Created:
+          {% for stat in ks_file_stat.results %}
+          - {{ stat.stat.path }}: {{ stat.stat.exists | ternary('✓ Exists', '✗ Not found') }} ({{ stat.stat.size | default('N/A') }} bytes)
+          {% endfor %}
+          
+          Kickstart Web URL: {{ kickstart_web_url }}
+          
+          Next Steps:
+          1. Verify kickstart files in Satellite web interface
+          2. Create provisioning templates in Satellite
+          3. Assign templates to activation keys
+          4. Configure PXE boot parameters
+          5. Test provisioning with activation keys
+
+  when: satellite_kickstart_config_enabled
+  tags: ["satellite_kickstart", "test"]

@@ -1,0 +1,30 @@
+---
+# Defaults for organized os_libvirt role (copied from libvirt_host)
+libvirt_packages:
+  - libvirt
+  - libvirt-daemon
+  - libvirt-daemon-driver-qemu
+  - qemu-kvm
+  - libvirt-client
+  - virt-install
+  - libguestfs-tools
+  - podman
+  - podman-docker
+
+libvirt_foreman_user: foreman
+libvirt_local_admin: root
+libvirt_internal_network_name: libvirt_internal
+libvirt_external_network_name: libvirt_external
+libvirt_external_iface: enp1s0
+libvirt_external_bridge: virbr-ext
+libvirt_internal_bridge: virbr-int
+libvirt_internal_gateway: 10.168.0.1
+libvirt_internal_netmask: 255.255.0.0
+Red_Hat_Products_libvirt_internal_dhcp_start: 10.168.1.10
+libvirt_internal_dhcp_end: 10.168.254.250
+libvirt_register_in_satellite: false
+libvirt_ssh_user: foreman
+libvirt_default_os: "RedHat 10"
+libvirt_kickstart_template_name: libvirt_kickstart
+libvirt_pxe_template_name: libvirt_pxe
+libvirt_hostgroup_name: libvirt-hosts

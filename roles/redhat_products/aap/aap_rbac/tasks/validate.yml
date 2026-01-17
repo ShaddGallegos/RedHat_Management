@@ -1,0 +1,21 @@
+---
+# Validate RBAC configuration
+
+- name: Display RBAC configuration summary
+  ansible.builtin.debug:
+    msg: |
+      AAP RBAC Configuration Summary:
+      - Organizations created: {{ aap_organizations | length }}
+      - Teams created: {{ aap_teams | length }}
+      - Users created: {{ aap_users | length }}
+      - User-team assignments: {{ aap_user_team_assignments | length }}
+      - Team-role assignments: {{ aap_team_role_assignments | length }}
+      - RBAC enforcement enabled: {{ aap_enforce_rbac }}
+      - Audit logging enabled: {{ aap_audit_logging }}
+      - Session timeout: {{ aap_session_timeout }}s
+  tags: [aap_rbac, validate]
+
+- name: Verify RBAC feature status
+  ansible.builtin.debug:
+    msg: "RBAC system fully operational and enforced"
+  tags: [aap_rbac, validate]

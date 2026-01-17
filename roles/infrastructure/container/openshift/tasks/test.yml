@@ -1,0 +1,4 @@
+---
+- name: OpenShift test placeholder
+  ansible.builtin.debug:
+    msg: "Implement OpenShift validation here."

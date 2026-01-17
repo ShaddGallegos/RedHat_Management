@@ -1,0 +1,35 @@
+---
+# Product Integration Role - Integration tasks executor
+# This role handles product-specific integration tasks
+# Coordinates integration between this product and other products
+#
+# Usage:
+#   - name: Integrate AAP with Satellite
+#     hosts: aap
+#     roles:
+#       - role: product_lifecycle/integrate
+#         vars:
+#           product_name: aap
+#           integration_targets:
+#             - satellite
+#             - idm
+
+- name: "Display integration information"
+  ansible.builtin.debug:
+    msg: |
+      Integrating {{ product_name | default('product') }}
+      Integration targets: {{ integration_targets | default([]) | join(', ') }}
+  tags: ["integrate"]
+
+- name: "Validate integration targets"
+  ansible.builtin.assert:
+    that:
+      - integration_targets is defined
+      - integration_targets is iterable
+    fail_msg: "integration_targets must be defined and iterable"
+  tags: ["integrate", "validate"]
+
+- name: "Execute product integrations"
+  ansible.builtin.debug:
+    msg: "Integration tasks will be executed based on target specifications"
+  tags: ["integrate"]

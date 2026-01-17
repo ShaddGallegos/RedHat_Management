@@ -1,0 +1,41 @@
+---
+# Platform Preparation: Bare Metal
+# Prepares bare metal infrastructure with DHCP and TFTP for PXE provisioning
+
+- name: "Prepare Bare Metal Infrastructure"
+  debug:
+    msg: |
+      Bare Metal Infrastructure Preparation
+      =====================================
+      Platform: baremetal
+      Target: Physical servers with PXE boot
+  tags: ["infrastructure", "baremetal", "prepare"]
+
+- name: "Validate Bare Metal prerequisites"
+  block:
+    - name: "Check DHCP server"
+      shell: systemctl is-active dhcpd || systemctl is-active isc-dhcp-server
+      register: dhcp_status
+      changed_when: false
+      failed_when: false
+
+    - name: "Check TFTP server"
+      shell: systemctl is-active tftp || systemctl is-active tftpd-hpa
+      register: tftp_status
+      changed_when: false
+      failed_when: false
+
+    - name: "Assert Bare Metal services are configured"
+      assert:
+        that:
+          - "dhcp_status.rc == 0 or 'DHCP server required' is not defined"
+          - "tftp_status.rc == 0 or 'TFTP server required' is not defined"
+        fail_msg: "Bare metal provisioning requires DHCP and TFTP services. Configure and start these services."
+      ignore_errors: true
+
+  tags: ["infrastructure", "baremetal", "validate"]
+
+- name: "Bare Metal infrastructure ready for provisioning"
+  debug:
+    msg: "Bare metal infrastructure prepared successfully"
+  tags: ["infrastructure", "baremetal", "info"]

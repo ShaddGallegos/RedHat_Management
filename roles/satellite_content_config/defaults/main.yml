@@ -1,0 +1,118 @@
+---
+# Default variables for satellite_content_config role
+satellite_content_config_enabled: true
+satellite_content_config_version: "1.0"
+satellite_content_config_timeout: 3600
+
+# Satellite Connection
+satellite_url: "https://satellite.example.com"
+satellite_username: "admin"
+# satellite_password: use vault!
+satellite_validate_ssl: true
+satellite_organization: "Default Organization"
+satellite_location: "Default Location"
+
+# Feature toggles
+create_organizations: true
+create_locations: true
+create_products: false
+create_repositories: false
+synchronize_repositories: false
+enable_repository_sets: true
+
+# Repository Sets Configuration - Enable RHEL yum repos for each product
+# These are the official Red Hat repository sets that should be enabled
+repository_sets_to_enable:
+  - name: "Red Hat Enterprise Linux Server (v. 9 for x86_64)"
+    product: "Red Hat Enterprise Linux Server"
+    basearch: "x86_64"
+    releasever: "9"
+
+  - name: "Red Hat Enterprise Linux AppStream (v. 9 for x86_64)"
+    product: "Red Hat Enterprise Linux Server"
+    basearch: "x86_64"
+    releasever: "9"
+
+  - name: "Red Hat Enterprise Linux Server (v. 10 for x86_64)"
+    product: "Red Hat Enterprise Linux Server"
+    basearch: "x86_64"
+    releasever: "10"
+
+  - name: "Red Hat Enterprise Linux AppStream (v. 10 for x86_64)"
+    product: "Red Hat Enterprise Linux Server"
+    basearch: "x86_64"
+    releasever: "10"
+
+# Organizations Configuration
+organizations:
+  - name: "{{ satellite_organization }}"
+    description: "Default organization for RHIS"
+    state: present
+    tags: ["rhis", "default"]
+
+# Locations Configuration
+locations:
+  - name: "{{ satellite_location }}"
+    description: "Default location for RHIS"
+    state: present
+    tags: ["rhis", "default"]
+
+# Products Configuration (Custom products)
+products:
+  - name: "RHIS_Custom_Products"
+    organization: "{{ satellite_organization }}"
+    description: "Custom RHIS products"
+    tags: ["rhis", "products"]
+
+# Repositories Configuration
+repositories:
+  - name: "RHEL_9_BaseOS"
+    product: "Red Hat Enterprise Linux Server"
+    organization: "{{ satellite_organization }}"
+    content_type: "yum"
+    url: "https://cdn.redhat.com/content/dist/rhel/rhel-9/rhel-9-x86_64/baseos/os"
+    tags: ["rhis", "rhel", "baseos"]
+
+  - name: "RHEL_9_AppStream"
+    product: "Red Hat Enterprise Linux Server"
+    organization: "{{ satellite_organization }}"
+    content_type: "yum"
+    url: "https://cdn.redhat.com/content/dist/rhel/rhel-9/rhel-9-x86_64/appstream/os"
+    tags: ["rhis", "rhel", "appstream"]
+
+  - name: "RHEL_10_BaseOS"
+    product: "Red Hat Enterprise Linux Server"
+    organization: "{{ satellite_organization }}"
+    content_type: "yum"
+    url: "https://cdn.redhat.com/content/dist/rhel/rhel-10/rhel-10-x86_64/baseos/os"
+    tags: ["rhis", "rhel", "baseos", "rhel10"]
+
+  - name: "RHEL_10_AppStream"
+    product: "Red Hat Enterprise Linux Server"
+    organization: "{{ satellite_organization }}"
+    content_type: "yum"
+    url: "https://cdn.redhat.com/content/dist/rhel/rhel-10/rhel-10-x86_64/appstream/os"
+    tags: ["rhis", "rhel", "appstream", "rhel10"]
+
+# Sync Plans
+create_sync_plans: true
+sync_plans:
+  - name: "Daily_Sync"
+    organization: "{{ satellite_organization }}"
+    description: "Daily repository synchronization"
+    sync_date: "2024-01-01 00:00:00"
+    interval: "daily"
+    enabled: true
+    tags: ["rhis", "sync"]
+
+  - name: "Weekly_Sync"
+    organization: "{{ satellite_organization }}"
+    description: "Weekly repository synchronization"
+    sync_date: "2024-01-01 02:00:00"
+    interval: "weekly"
+    enabled: true
+    tags: ["rhis", "sync"]
+
+# Validation
+satellite_content_validate_connectivity: true
+satellite_content_test_sync: false

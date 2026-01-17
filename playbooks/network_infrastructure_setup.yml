@@ -1,0 +1,58 @@
+---
+# Network Infrastructure Configuration Playbook
+# Creates and configures the 10.168.0.0/16 subnet with DHCP and DNS
+
+- name: Configure Network Infrastructure (10.168.0.0/16)
+  hosts: localhost
+  gather_facts: yes
+  
+  roles:
+    - role: network_infrastructure_config
+      vars:
+        network_config_enabled: true
+
+  post_tasks:
+    - name: Display Network Configuration Summary
+      ansible.builtin.debug:
+        msg: |
+          ✅ Network Infrastructure Configuration Complete
+          
+          Primary Subnet: 10.168.0.0/16
+          ├── Network: 10.168.0.0
+          ├── Netmask: 255.255.0.0
+          ├── Gateway: 10.168.0.1
+          └── Broadcast: 10.168.255.255
+          
+          DHCP Configuration:
+          ├── Enabled: Yes
+          ├── Range: 10.168.50.0 - 10.168.200.255
+          ├── Lease Time: 86400 seconds (24 hours)
+          ├── DNS Servers: 10.168.0.53, 10.168.1.53, 8.8.8.8
+          └── NTP Servers: 10.168.0.1, 8.8.8.8
+          
+          Host Group Subnets:
+          ├── Infrastructure (10.168.0.0/24)
+          │   └── Core services: Satellite, IdM, AAP
+          ├── Application-Servers (10.168.1.0/24)
+          │   └── Production application deployments
+          ├── Container-Hosts (10.168.2.0/24)
+          │   └── Kubernetes and container infrastructure
+          ├── Database-Servers (10.168.3.0/24)
+          │   └── Database tier services
+          ├── Development (10.168.100.0/24)
+          │   └── Development and testing
+          └── Reserved-Internal (10.168.240.0/21)
+              └── Future expansion
+          
+          Static Host Reservations:
+          ├── satellite.prod.example.com: 10.168.0.10
+          ├── idm.prod.example.com: 10.168.0.20
+          └── aap.prod.example.com: 10.168.0.30
+          
+          Firewall Rules Configured:
+          ├── DNS (UDP/53): 10.168.0.0/16 → Any
+          ├── DHCP (UDP/67): 10.168.0.0/16 → Any
+          ├── Satellite (TCP/443): 10.168.0.0/16 → 10.168.0.0/24
+          └── SSH (TCP/22): 10.168.0.0/16 → 10.168.0.0/24
+          
+          Status: Ready for infrastructure deployment

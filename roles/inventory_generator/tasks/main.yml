@@ -1,0 +1,121 @@
+---
+# Inventory Generator Role
+# Consolidated from generate_inventory.yml playbook
+
+- name: Load deployment configuration
+  ansible.builtin.include_vars:
+    ansible.builtin.file: "{{ base_dir }}/group_vars/deployment_config.yml"
+
+- name: Generate inventory for selected platform
+  block:
+    - name: Generate Libvirt inventory
+      ansible.builtin.copy:
+        dest: "{{ base_dir }}/inventory/hosts"
+        content: |
+          # Auto-generated inventory for {{ deployment_platform }}
+          # Generated at: {{ ansible_date_time.iso8601 }}
+
+          [all:vars]
+          ansible_connection=local
+          deployment_platform={{ deployment_platform }}
+          deployment_os={{ deployment_os }}
+          deployment_scenario={{ deployment_scenario }}
+
+          [libvirt_host]
+          localhost ansible_connection=local
+
+          [satellite]
+          satellite.{{ libvirt_network_cidr | regex_replace('\.0/24', '.10') }}
+
+          [aap_controllers]
+          aap_controller_1.{{ libvirt_network_cidr | regex_replace('\.0/24', '.20') }}
+          aap_controller_2.{{ libvirt_network_cidr | regex_replace('\.0/24', '.21') }}
+          aap_controller_3.{{ libvirt_network_cidr | regex_replace('\.0/24', '.22') }}
+
+          [idm_servers]
+          idm.{{ libvirt_network_cidr | regex_replace('\.0/24', '.30') }}
+
+          [openshift_masters]
+          openshift_master_1.{{ libvirt_network_cidr | regex_replace('\.0/24', '.40') }}
+          openshift_master_2.{{ libvirt_network_cidr | regex_replace('\.0/24', '.41') }}
+          openshift_master_3.{{ libvirt_network_cidr | regex_replace('\.0/24', '.42') }}
+
+          [openshift_workers]
+          openshift_worker_1.{{ libvirt_network_cidr | regex_replace('\.0/24', '.50') }}
+          openshift_worker_2.{{ libvirt_network_cidr | regex_replace('\.0/24', '.51') }}
+
+          [deployment_components]
+          {% for component in deployment_components %}
+          [{{ component }}]
+          # Component: {{ component }}
+          {% endfor %}
+      when: deployment_platform == "libvirt"
+
+    - name: Generate AWS inventory
+      ansible.builtin.copy:
+        dest: "{{ base_dir }}/inventory/hosts"
+        content: |
+          # Auto-generated inventory for AWS
+          # Generated at: {{ ansible_date_time.iso8601 }}
+
+          [all:vars]
+          ansible_connection=aws
+          deployment_platform=aws
+          deployment_os={{ deployment_os }}
+          deployment_scenario={{ deployment_scenario }}
+
+          [aws_instances]
+          # AWS instances will be populated automatically
+
+          [satellite:children]
+          # Satellite instances
+
+          [aap_controllers:children]
+          # AAP controller instances
+
+          [idm_servers:children]
+          # IdM instances
+
+          [openshift_masters:children]
+          # OpenShift master instances
+
+          [openshift_workers:children]
+          # OpenShift worker instances
+      when: deployment_platform == "aws"
+
+- name: Create component-specific group_vars
+  block:
+    - name: Create all.yml with common variables
+      ansible.builtin.copy:
+        dest: "{{ base_dir }}/group_vars/all.yml"
+        content: |
+          ---
+          # Global variables for all hosts
+          deployment_scenario: {{ deployment_scenario }}
+          deployment_components: {{ deployment_components | to_nice_yaml | indent(2) }}
+          deployment_platform: {{ deployment_platform }}
+          deployment_os: {{ deployment_os }}
+          base_dir: {{ base_dir }}
+
+    - name: Create platform-specific group_vars
+      ansible.builtin.copy:
+        dest: "{{ base_dir }}/group_vars/{{ deployment_platform }}.yml"
+        content: |
+          ---
+          # Platform-specific variables for {{ deployment_platform }}
+          platform: {{ deployment_platform }}
+          {% if deployment_platform == "libvirt" %}
+          libvirt_network_cidr: {{ libvirt_network_cidr }}
+          libvirt_storage_path: {{ libvirt_storage_path }}
+          libvirt_vms: {{ libvirt_vms | to_nice_yaml | indent(2) }}
+          {% endif %}
+
+          - name: Display inventory summary
+            ansible.builtin.debug:
+              msg: |
+                Inventory Generated Successfully
+
+                Platform: {{ deployment_platform }}
+                Inventory: {{ base_dir }}/inventory/hosts
+                Group Vars: {{ base_dir }}/group_vars/
+                Ready for component deployment

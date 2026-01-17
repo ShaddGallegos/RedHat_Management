@@ -1,0 +1,14 @@
+---
+# Test: redhat_products/aap role basic functionality
+- name: Test AAP role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    aap_enabled: true
+    aap_version: "2.6"
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - aap_enabled is defined
+          - aap_version is defined

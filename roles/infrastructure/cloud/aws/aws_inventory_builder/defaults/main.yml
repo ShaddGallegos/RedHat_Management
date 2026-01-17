@@ -1,0 +1,17 @@
+---
+# AWS Inventory Builder Role Defaults
+
+# Enable/disable inventory building
+aws_inventory_builder_enabled: true
+
+# Inventory output path
+aws_inventory_output_path: "{{ playbook_dir }}/inventory/generated/aws_inventory.yml"
+
+# AWS region for inventory
+aws_region: us-east-1
+
+# Include tags for inventory filtering
+aws_inventory_include_tags:
+  - redhat
+  - lab
+  - demo

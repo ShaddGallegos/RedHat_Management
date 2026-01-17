@@ -1,0 +1,15 @@
+---
+# Test: satellite_content_config role
+- name: Test satellite_content_config role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    satellite_content_config_enabled: true
+    satellite_url: "https://satellite.example.com"
+    satellite_username: "admin"
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - satellite_content_config_enabled is defined
+          - satellite_url is defined

@@ -1,0 +1,31 @@
+---
+# Generic testing tasks
+
+- name: "Test | Create test report directory"
+  ansible.builtin.file:
+    path: "{{ test_report_dir }}"
+    state: "directory"
+    mode: "0755"
+  tags: ["test", "report"]
+
+- name: "Test | Connectivity tests"
+  ansible.builtin.include_tasks: "tests/connectivity.yml"
+  when: "'connectivity' in test_categories"
+  tags: ["test", "connectivity"]
+
+- name: "Test | Service tests"
+  ansible.builtin.include_tasks: "tests/services.yml"
+  when: "'services' in test_categories"
+  tags: ["test", "services"]
+
+- name: "Test | API tests"
+  ansible.builtin.include_tasks: "tests/api.yml"
+  when: "'api' in test_categories"
+  tags: ["test", "api"]
+
+- name: "Test | Generate test report"
+  ansible.builtin.template:
+    src: "test_report.j2"
+    dest: "{{ test_report_dir }}/test_report_{{ ansible_date_time.date }}.html"
+  when: test_generate_report | bool
+  tags: ["test", "report"]

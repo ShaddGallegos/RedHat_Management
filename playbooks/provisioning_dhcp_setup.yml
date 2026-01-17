@@ -1,0 +1,40 @@
+---
+# DHCP Server Only Setup Playbook
+# Configures DHCP service on secondary ethernet for 10.168.0.0/16
+
+- name: Configure DHCP Server
+  hosts: satellite
+  gather_facts: true
+  become: true
+  
+  vars:
+    provisioning_secondary_interface: "eth1"
+    provisioning_interface_ip: "10.168.0.1"
+    setup_dhcp_only: true
+  
+  roles:
+    - role: services_provisioning_stack
+      tags: dhcp
+
+  post_tasks:
+    - name: Verify DHCP configuration
+      block:
+        - name: Check DHCP service status
+          systemd:
+            name: dhcpd
+            state: started
+          register: dhcp_status
+
+        - name: Display DHCP configuration
+          command: cat /etc/dhcp/dhcpd.conf
+          register: dhcp_config
+          changed_when: false
+
+        - name: Show DHCP status
+          debug:
+            msg: |
+              DHCP Server Status:
+              • Service: {{ dhcp_status.status.ActiveState }}
+              • Subnet: 10.168.0.0/16
+              • Range: 10.168.50.0 - 10.168.200.255
+              • Lease Time: 24 hours

@@ -1,0 +1,22 @@
+---
+# Default variables for redhat_products/idm role
+idm_enabled: true
+idm_version: "3.0"
+idm_realm: "EXAMPLE.COM"
+idm_domain: "example.com"
+idm_hostname: "idm.example.com"
+idm_port: 636
+idm_timeout: 1800
+idm_max_retries: 3
+
+# Admin configuration
+idm_admin_username: "admin"
+# idm_admin_password: use vault!
+# idm_dm_password: use vault!
+
+# Features
+deploy_idm_replicas: false
+idm_enable_replication: false
+
+# Replication
+idm_replica_hostnames: []

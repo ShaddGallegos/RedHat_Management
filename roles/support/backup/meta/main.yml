@@ -1,0 +1,10 @@
+---
+# Backup Role - Common backup functionality for all products
+
+galaxy_info:
+  author: "Red Hat Management"
+  description: "Generic backup role for RHIS products"
+  company: "Red Hat"
+  license: "Apache License 2.0"
+
+dependencies: []

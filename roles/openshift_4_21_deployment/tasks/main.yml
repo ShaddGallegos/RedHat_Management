@@ -1,0 +1,341 @@
+---
+# OpenShift 4.21 Deployment Role
+# Deploys and configures OpenShift Container Platform 4.21
+# Provides containerized application platform with Kubernetes orchestration
+
+- name: "OpenShift 4.21: Verify Prerequisites"
+  block:
+    - name: Check system resources
+      ansible.builtin.debug:
+        msg: |
+          OpenShift 4.21 System Requirements:
+          CPU Cores: {{ ansible_processor_vcpus }} (minimum 8 recommended)
+          Memory: {{ ansible_memtotal_mb // 1024 }}GB (minimum 16GB recommended)
+          Disk: Check available space (minimum 50GB per node)
+
+          Cluster Configuration:
+          - Masters: 3 nodes (minimum for HA)
+          - Workers: 2+ nodes
+          - Total: 5+ nodes minimum
+
+    - name: Check required tools
+      ansible.builtin.command: "{{ item }} --version"
+      loop:
+        - oc
+        - kubectl
+      register: tools_check
+      failed_when: false
+      changed_when: false
+
+    - name: Report tool availability
+      ansible.builtin.debug:
+        msg: |
+          OpenShift Tools Status:
+          {% for result in tools_check.results %}
+          {{ result.item }}: {% if result.rc == 0 %} Available{% else %} Not installed{% endif %}
+          {% endfor %}
+
+- name: "OpenShift 4.21: Install Required Packages"
+  block:
+    - name: Install OpenShift prerequisites
+      ansible.builtin.yum:
+        name:
+          - git
+          - wget
+          - jq
+          - tar
+          - gzip
+          - python3-pyyaml
+        state: present
+      become: true
+
+    - name: Install container runtime tools
+      ansible.builtin.yum:
+        name:
+          - podman
+          - podman-docker
+          - skopeo
+        state: present
+      become: true
+
+    - name: Enable container services
+      systemd:
+        name: podman
+        state: started
+        enabled: yes
+      become: true
+
+- name: "OpenShift 4.21: Prepare Installation Directories"
+  block:
+    - name: Create OpenShift installation directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+      become: true
+      loop:
+        - /opt/openshift
+        - /opt/openshift/install-config
+        - /opt/openshift/pull-secrets
+        - /opt/openshift/credentials
+        - /var/lib/openshift
+
+    - name: Create OpenShift data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+      become: true
+      loop:
+        - /var/lib/openshift/etcd
+        - /var/lib/openshift/kubelet
+        - /var/lib/openshift/cri-o
+        - /var/lib/openshift/logs
+
+- name: "OpenShift 4.21: Download OpenShift Tools"
+  block:
+    - name: "Note: Manual download required"
+      ansible.builtin.debug:
+        msg: |
+          OpenShift 4.21 Installation:
+
+          1. Download openshift-install from:
+             https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest-4.21/
+             Save to: /opt/openshift/openshift-install
+
+          2. Download oc client from:
+             https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest-4.21/
+             Save to: /usr/local/bin/oc
+
+          3. Extract pull secret from:
+             https://console.redhat.com/openshift/install/pull-secret
+             Save to: /opt/openshift/pull-secrets/pull-secret.txt
+
+- name: "OpenShift 4.21: Create Installation Configuration"
+  block:
+    - name: Create install-config.yaml
+      ansible.builtin.copy:
+        dest: /opt/openshift/install-config/install-config.yaml
+        content: |
+          apiVersion: v1
+          baseDomain: {{ domain_name | default('example.com') }}
+          compute:
+          - hyperthreading: Enabled
+            name: worker
+            replicas: {{ ocp_worker_count | default(2) }}
+            resources:
+              limits:
+                cpu: "{{ ocp_worker_cpu | default(4) }}"
+                memory: "{{ ocp_worker_memory | default('8Gi') }}"
+          controlPlane:
+            hyperthreading: Enabled
+            name: master
+            replicas: 3
+            resources:
+              limits:
+                cpu: "{{ ocp_master_cpu | default(8) }}"
+                memory: "{{ ocp_master_memory | default('16Gi') }}"
+          metadata:
+            name: {{ ocp_cluster_name | default('openshift') }}
+          networking:
+            clusterNetwork:
+            - cidr: 10.128.0.0/14
+              hostPrefix: 23
+            machineNetwork:
+            - cidr: 192.168.122.0/24
+            networkType: OVNKubernetes
+            serviceNetwork:
+            - 172.30.0.0/16
+          platform:
+            libvirt:
+              network:
+                if: virbr-rhm
+              ansible.builtin.uri: qemu:///system
+          pullSecret: '{% raw %}{{ pull_secret_content }}{% endraw %}'
+          sshKey: '{% raw %}{{ ssh_public_key }}{% endraw %}'
+          imageContentSources:
+          - mirrors:
+            - quay.io/openshift-release-dev/ocp-release
+            source: quay.io/openshift-release-dev/ocp-release
+          - mirrors:
+            - quay.io/openshift-release-dev/ocp-v4.0-art-dev
+            source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
+        owner: root
+        group: root
+        mode: '0600'
+      become: true
+
+- name: "OpenShift 4.21: Configure Network"
+  block:
+    - name: Configure firewall for OpenShift
+      ansible.posix.firewalld:
+        port: "{{ item }}/tcp"
+        permanent: yes
+        state: enabled
+        immediate: yes
+      become: true
+      loop:
+        - 443     # Kubernetes API
+        - 6443    # API server
+        - 22623   # Machine config server
+        - 80      # HTTP (ingress)
+        - 443     # HTTPS (ingress)
+      ignore_errors: yes
+
+    - name: Configure additional UDP ports
+      ansible.posix.firewalld:
+        port: "{{ item }}/udp"
+        permanent: yes
+        state: enabled
+        immediate: yes
+      become: true
+      loop:
+        - 53      # DNS
+        - 5353    # mDNS
+      ignore_errors: yes
+
+- name: "OpenShift 4.21: Create Storage Configuration"
+  block:
+    - name: Create storage class configuration
+      ansible.builtin.copy:
+        dest: /opt/openshift/storage-class.yaml
+        content: |
+          apiVersion: storage.k8s.io/v1
+          kind: StorageClass
+          metadata:
+            name: libvirt-storage
+          provisioner: libvirt.io/csi-driver
+          allowVolumeExpansion: true
+          parameters:
+            pool: rhmanagement
+            fstype: ext4
+          reclaimPolicy: Delete
+          volumeBindingMode: WaitForFirstConsumer
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+
+- name: "OpenShift 4.21: Configure Container Image Registry"
+  block:
+    - name: Create image registry configuration
+      ansible.builtin.copy:
+        dest: /opt/openshift/image-registry-config.yaml
+        content: |
+          apiVersion: imageregistry.operator.openshift.io/v1
+          kind: Config
+          metadata:
+            name: cluster
+          spec:
+            storage:
+              pvc:
+                claim: image-registry-storage
+            replicas: 2
+            routes:
+            - name: public-routes
+              hostname: registry.{{ domain_name | default('example.com') }}
+              termination: reencrypt
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+
+- name: "OpenShift 4.21: Create Ingress Configuration"
+  block:
+    - name: Create ingress controller configuration
+      ansible.builtin.copy:
+        dest: /opt/openshift/ingress-config.yaml
+        content: |
+          apiVersion: operator.openshift.io/v1
+          kind: IngressController
+          metadata:
+            name: default
+            namespace: openshift-ingress-operator
+          spec:
+            replicas: 2
+            endpointPublishingStrategy:
+              type: HostNetwork
+            domain: apps.{{ domain_name | default('example.com') }}
+            nodePlacement:
+              nodeSelector:
+                matchLabels:
+                  node-role.kubernetes.io/worker: ''
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+
+- name: "OpenShift 4.21: Display Installation Instructions"
+  block:
+    - name: "Display OpenShift Setup Summary"
+      ansible.builtin.debug:
+        msg: |
+
+                    OpenShift 4.21 Ready for Installation
+
+
+           Cluster Configuration:
+             Cluster Name: {{ ocp_cluster_name | default('openshift') }}
+             Base Domain: {{ domain_name | default('example.com') }}
+             API URL: https://api.{{ ocp_cluster_name | default('openshift') }}.{{ domain_name | default('example.com') }}:6443
+             Apps URL: https://apps.{{ ocp_cluster_name | default('openshift') }}.{{ domain_name | default('example.com') }}
+
+           Node Configuration:
+             Masters: 3 nodes
+               CPU: {{ ocp_master_cpu | default(8) }} cores each
+               Memory: {{ ocp_master_memory | default('16Gi') }} each
+             Workers: {{ ocp_worker_count | default(2) }} nodes
+               CPU: {{ ocp_worker_cpu | default(4) }} cores each
+               Memory: {{ ocp_worker_memory | default('8Gi') }} each
+
+           Networking:
+             Cluster Network: 10.128.0.0/14
+             Service Network: 172.30.0.0/16
+             Machine Network: 192.168.122.0/24
+             Network Type: OVNKubernetes
+
+           Storage:
+             Storage Class: libvirt-storage
+             Pool: rhmanagement
+             Filesystem: ext4
+
+           Installation Files:
+             Config: /opt/openshift/install-config/install-config.yaml
+             Storage: /opt/openshift/storage-class.yaml
+             Registry: /opt/openshift/image-registry-config.yaml
+             Ingress: /opt/openshift/ingress-config.yaml
+             Pull Secrets: /opt/openshift/pull-secrets/
+
+          ▶  Installation Steps:
+             1. Download openshift-install and oc tools
+             2. Create pull-secret.txt from Red Hat console
+             3. Configure SSH keys for access
+             4. Copy install-config.yaml to working directory
+             5. Run: openshift-install create cluster
+             6. Monitor: openshift-install wait-for install-complete
+
+          ⏱  Expected Installation Time:
+             30-45 minutes (depending on network and system resources)
+
+           Post-Installation:
+             - Configure storage classes
+             - Deploy image registry
+             - Configure ingress controller
+             - Set up authentication (LDAP via IdM)
+             - Deploy monitoring and logging
+
+           Integration with Other Components:
+             - Satellite: Content delivery for base OS
+             - AAP: Automation and orchestration
+             - IdM: User authentication (LDAP/Kerberos)
+             - ansible-cmdb: Infrastructure visibility
+
+handlers:
+  - name: restart openshift services
+    ansible.builtin.shell: |
+      systemctl restart kubelet
+    become: true

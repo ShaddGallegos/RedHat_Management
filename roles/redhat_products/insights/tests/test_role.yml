@@ -1,0 +1,12 @@
+---
+# Test: redhat_products/insights role basic functionality
+- name: Test Insights role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    insights_enabled: true
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - insights_enabled is defined

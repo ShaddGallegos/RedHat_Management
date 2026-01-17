@@ -1,0 +1,95 @@
+---
+# AAP (Ansible Automation Platform) Product Role - Wrapper
+# Orchestrates all AAP deployment and configuration tasks
+# Coordinates AAP base, controllers, EDA, and RBAC components
+
+- name: "ANSIBLE AUTOMATION PLATFORM (AAP) - Initialize"
+  debug:
+    msg: |
+      Ansible Automation Platform Deployment
+      =========================================
+      Version: AAP 2.6+
+      Scenario: {{ deployment_scenario | default('undefined') }}
+      Platform: {{ deployment_platform | default('undefined') }}
+  tags: ["aap", "products"]
+
+- name: "Validate AAP configuration"
+  assert:
+    that:
+      - deployment_scenario is defined
+      - scenario_config.products is defined
+      - "'aap' in scenario_config.products"
+    fail_msg: "AAP deployment requires 'aap' in scenario products"
+  tags: ["aap", "validate"]
+
+- name: "Execute AAP installation workflow"
+  block:
+    - name: "Deploy AAP base components"
+      include_role:
+        name: "redhat_products/aap"
+        tasks_from: "aap_base/main.yml"
+        apply:
+          tags: ["aap", "base"]
+      tags: ["aap"]
+
+    - name: "Configure AAP RBAC (Role Based Access Control)"
+      include_role:
+        name: "redhat_products/aap"
+        tasks_from: "aap_rbac/main.yml"
+        apply:
+          tags: ["aap", "rbac"]
+      when: configure_aap_rbac | default(true)
+      tags: ["aap"]
+
+    - name: "Deploy AAP callbacks"
+      include_role:
+        name: "redhat_products/aap"
+        tasks_from: "aap_callbacks/main.yml"
+        apply:
+          tags: ["aap", "callbacks"]
+      when: configure_aap_callbacks | default(true)
+      tags: ["aap"]
+
+    - name: "Deploy Event Driven Automation (EDA)"
+      include_role:
+        name: "redhat_products/aap"
+        tasks_from: "aap_eda/main.yml"
+        apply:
+          tags: ["aap", "eda"]
+      when: deploy_aap_eda | default(true)
+      tags: ["aap"]
+
+  rescue:
+    - name: "Capture deployment error details"
+      debug:
+        msg: |
+          AAP deployment encountered an error.
+          Review logs for specific failure information.
+      tags: ["aap", "error"]
+
+    - name: "AAP deployment failed - detailed error"
+      fail:
+        msg: |
+          ❌ AAP DEPLOYMENT FAILED
+          
+          Common causes:
+          1. Insufficient system resources (CPU, memory, disk)
+          2. Network connectivity issues
+          3. Invalid credentials or permissions
+          4. Port conflicts (8080, 443, 5432, etc.)
+          5. Previous installation conflicts
+          
+          Recovery steps:
+          1. Check system resources: {{ ansible_processor_vcpus }} CPUs, {{ ansible_memtotal_mb }} MB RAM
+          2. Verify network connectivity to all hosts
+          3. Confirm credentials and permissions
+          4. Check for port conflicts
+          5. Review error logs for specifics
+          
+          Check logs above for detailed error information.
+  tags: ["aap"]
+
+- name: "AAP deployment completed"
+  debug:
+    msg: "Ansible Automation Platform deployment complete."
+  tags: ["aap", "info"]

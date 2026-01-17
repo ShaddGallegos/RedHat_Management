@@ -1,0 +1,94 @@
+---
+# IDM (FreeIPA) Base Configuration Defaults
+
+# Realm and Domain Settings
+idm_realm: "EXAMPLE.COM"
+idm_domain: "idm.example.com"
+idm_hostname: "idm.example.com"
+idm_ip_address: "192.168.122.100"
+
+# IDM Admin Credentials
+idm_admin_user: "admin"
+idm_admin_password: "{{ idm_admin_pwd | default('') }}"
+idm_dm_password: "{{ idm_dm_pwd | default('') }}"
+
+# User Configuration
+idm_users:
+  - username: "satellite_admin"
+    givenname: "Satellite"
+    sn: "Administrator"
+    mail: "satellite@example.com"
+    password: "{{ idm_user_password | default('') }}"
+    groups:
+      - "admins"
+
+  - username: "aap_admin"
+    givenname: "AAP"
+    sn: "Administrator"
+    mail: "aap@example.com"
+    password: "{{ idm_user_password | default('') }}"
+    groups:
+      - "admins"
+
+  - username: "regular_user"
+    givenname: "Regular"
+    sn: "User"
+    mail: "user@example.com"
+    password: "{{ idm_user_password | default('') }}"
+    groups:
+      - "users"
+
+# Group Configuration
+idm_groups:
+  - name: "admins"
+    description: "Administrative users"
+    gidnumber: 2000
+
+  - name: "operators"
+    description: "Operators group"
+    gidnumber: 2001
+
+  - name: "users"
+    description: "Regular users"
+    gidnumber: 2002
+
+# Sudo Rules
+idm_sudo_rules:
+  - name: "admins_all"
+    user_groups: "admins"
+    host_groups: "all"
+    commands: "all"
+    allow: true
+
+  - name: "operators_limited"
+    user_groups: "operators"
+    host_groups: "servers"
+    commands: "/usr/bin/ansible-playbook"
+    allow: true
+
+# DNS Configuration
+idm_setup_dns: true
+idm_forwarders:
+  - "8.8.8.8"
+  - "8.8.4.4"
+idm_reverse_zone: "122.168.192.in-addr.arpa."
+
+# Kerberos Settings
+idm_krbpwd_expiration_notice: 4
+idm_krb_ticket_lifetime: 86400
+idm_krb_renewal_lifetime: 604800
+
+# LDAP Settings
+idm_ldap_base_dn: "dc=example,dc=com"
+idm_schema_compat_enabled: true
+
+# Integration Settings
+idm_enable_satellite_integration: true
+idm_enable_aap_integration: true
+idm_enable_insights_integration: false
+
+# Security Settings
+idm_tls_enabled: true
+idm_require_strong_password: true
+idm_password_history_length: 5
+idm_password_expiration_days: 90

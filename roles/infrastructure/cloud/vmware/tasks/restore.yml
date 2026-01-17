@@ -1,0 +1,4 @@
+---
+- name: VMware restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement VMware restore here."

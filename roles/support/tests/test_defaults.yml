@@ -1,0 +1,12 @@
+---
+# Test: support defaults
+- name: Test support defaults
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - support
+  tasks:
+    - name: Verify defaults loaded
+      assert:
+        that:
+          - support_enabled is defined

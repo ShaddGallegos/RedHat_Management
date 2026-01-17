@@ -1,0 +1,10 @@
+<%# AAP provisioning callback finish template %>
+#!/bin/bash
+set -euo pipefail
+CALLBACK_URL="{{ aap_callback_url }}"
+HOST_CONFIG_KEY="{{ aap_callback_key }}"
+for i in {1..5}; do
+  curl -k -s -X POST -d host_config_key=${HOST_CONFIG_KEY} ${CALLBACK_URL} && exit 0
+  sleep 10
+done
+exit 0

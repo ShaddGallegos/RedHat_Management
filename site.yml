@@ -1,0 +1,63 @@
+---
+# RHIS - Red Hat Infrastructure Standard Deployment
+# Main orchestration entry point
+# 
+# Usage:
+#   Interactive mode:
+#     ansible-playbook site.yml
+#   
+#   Non-interactive mode:
+#     ansible-playbook site.yml \
+#       -e deployment_scenario=satellite_aap \
+#       -e deployment_platform=libvirt \
+#       -e deployment_os=rhel-9
+#   
+#   Selective phase execution:
+#     ansible-playbook site.yml -t phase1,phase2
+
+- name: "RHIS Deployment Orchestration"
+  hosts: localhost
+  gather_facts: yes
+  
+  vars:
+    # Default values - override via CLI with -e flag
+    deployment_scenario: "full_stack"
+    deployment_platform: "libvirt"
+    deployment_os: "rhel-9"
+    install_method: "oemdrv"
+    project_base_dir: "{{ playbook_dir }}"
+  
+  pre_tasks:
+    - name: "Display welcome"
+      debug:
+        msg: |
+          ╔════════════════════════════════════════════════════════╗
+          ║   RHIS - Red Hat Infrastructure Standard Deployment    ║
+          ║   Version 2.0 - Production Ready                       ║
+          ╚════════════════════════════════════════════════════════╝
+      tags: ["always"]
+    
+    - name: "Gather deployment facts"
+      debug:
+        msg: |
+          Starting deployment with:
+            Scenario: {{ deployment_scenario }}
+            Platform: {{ deployment_platform }}
+            OS: {{ deployment_os }}
+            Method: {{ install_method }}
+      tags: ["always"]
+  
+  roles:
+    - role: orchestration_master
+      tags: ["orchestration"]
+  
+  post_tasks:
+    - name: "Deployment summary"
+      debug:
+        msg: |
+          ✓ Deployment orchestration complete
+          
+          Check logs for detailed information:
+            - logs/deployment_*
+            - logs/orchestration_*
+      tags: ["always"]

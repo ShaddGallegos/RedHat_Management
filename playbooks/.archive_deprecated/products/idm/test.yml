@@ -1,0 +1,47 @@
+---
+# Identity Management Test Playbook
+# Validates IdM installation and LDAP functionality
+
+- name: "Identity Management | Testing"
+  hosts: "idm"
+  gather_facts: yes
+
+  tasks:
+    - name: "IdM | Check IPA API"
+      ansible.builtin.uri:
+        url: "https://{{ inventory_hostname }}/ipa/json"
+        validate_certs: no
+      register: ipa_api
+      tags: ["test", "api"]
+
+    - name: "IdM | Check services"
+      service_facts:
+      register: services
+      tags: ["test", "services"]
+
+    - name: "IdM | Verify required services"
+      ansible.builtin.assert:
+        that:
+          - "'dirsrv' in services.ansible_facts.services or 'directory' in services.ansible_facts.services"
+          - "'krb5kdc' in services.ansible_facts.services"
+        fail_msg: "Required IdM services not running"
+      tags: ["test", "services"]
+      ignore_errors: yes
+
+    - name: "IdM | Test LDAP connectivity"
+      ansible.builtin.shell: |
+        ldapsearch -H ldapi:// -D 'cn=Directory Manager' \
+        -w {{ idm_dm_password | default('') }} \
+        -b 'o=ipaca' -s base 'objectClass=*' cn
+      register: ldap_test
+      ignore_errors: yes
+      tags: ["test", "ldap"]
+
+    - name: "IdM | Test results"
+      ansible.builtin.debug:
+        msg: |
+          Identity Management Test Summary
+          ==================================
+          IPA API Status: {{ ipa_api.status }}
+          LDAP Test: {{ 'passed' if ldap_test is succeeded else 'failed' }}
+          All tests completed

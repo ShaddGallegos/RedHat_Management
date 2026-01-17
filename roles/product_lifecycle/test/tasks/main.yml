@@ -1,0 +1,37 @@
+---
+# Product Testing Role - Test tasks executor
+# This role handles product-specific testing tasks
+# Uses the generic testing role from roles/support/testing for standardized testing
+#
+# Usage:
+#   - name: Test AAP
+#     hosts: aap
+#     roles:
+#       - role: product_lifecycle/test
+#         vars:
+#           product_name: aap
+#           test_types:
+#             - connectivity
+#             - services
+#             - api
+
+- name: "Display test information"
+  ansible.builtin.debug:
+    msg: |
+      Testing {{ product_name | default('product') }}
+      Test types: {{ test_types | default(['connectivity', 'services']) | join(', ') }}
+  tags: ["test"]
+
+- name: "Call generic testing role"
+  ansible.builtin.include_role:
+    name: support/testing
+  vars:
+    test_host: "{{ inventory_hostname }}"
+    test_service_names: "{{ product_services | default([]) }}"
+    test_api_endpoints: "{{ product_api_endpoints | default([]) }}"
+  tags: ["test"]
+
+- name: "Display test results"
+  ansible.builtin.debug:
+    msg: "Testing complete for {{ product_name }}"
+  tags: ["test"]

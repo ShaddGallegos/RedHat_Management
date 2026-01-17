@@ -1,0 +1,11 @@
+---
+# Default variables for ansible_cmdb_setup role
+ansible_cmdb_setup_enabled: false
+ansible_cmdb_setup_version: "1.0"
+
+# CMDB configuration
+ansible_cmdb_output_format: "html"
+ansible_cmdb_output_directory: "/var/www/ansible-cmdb"
+
+# Feature toggles
+ansible_cmdb_setup_generate_docs: true

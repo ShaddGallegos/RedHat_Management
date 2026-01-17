@@ -1,0 +1,57 @@
+---
+# TFTP/PXE Setup Playbook
+# Configures TFTP and PXE boot services on secondary ethernet
+
+- name: Configure TFTP and PXE Boot Services
+  hosts: satellite
+  gather_facts: true
+  become: true
+  
+  vars:
+    provisioning_secondary_interface: "eth1"
+    provisioning_interface_ip: "10.168.0.1"
+    setup_tftp_pxe_only: true
+  
+  roles:
+    - role: services_provisioning_stack
+      tags:
+        - tftp
+        - pxe
+
+  post_tasks:
+    - name: Verify TFTP/PXE configuration
+      block:
+        - name: Check xinetd service status
+          systemd:
+            name: xinetd
+            state: started
+          register: tftp_status
+
+        - name: Verify TFTP root directory
+          stat:
+            path: /var/lib/tftpboot
+          register: tftp_root
+
+        - name: Verify PXE menu file
+          stat:
+            path: /var/lib/tftpboot/pxelinux.cfg/default
+          register: pxe_menu
+
+        - name: Show TFTP/PXE status
+          debug:
+            msg: |
+              TFTP/PXE Boot Status:
+              • xinetd Service: {{ tftp_status.status.ActiveState }}
+              • TFTP Root: {{ tftp_root.stat.exists | ternary('Present', 'Missing') }}
+              • PXE Menu: {{ pxe_menu.stat.exists | ternary('Present', 'Missing') }}
+              • Boot Port: 69/UDP
+              • Menu Options: RHEL 9, RHEL 10, Rescue, Memtest, Local Boot
+
+    - name: Display PXE menu
+      command: cat /var/lib/tftpboot/pxelinux.cfg/default
+      register: pxe_menu_contents
+      changed_when: false
+
+    - name: Show PXE menu
+      debug:
+        msg: "{{ pxe_menu_contents.stdout_lines | first(10) }}"

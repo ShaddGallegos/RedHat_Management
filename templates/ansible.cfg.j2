@@ -1,0 +1,53 @@
+[defaults]
+vault_password_file = ~/.ansible/conf/.vault_pass.txt
+# inventory plugin directory (project-relative or absolute)
+inventory_plugins = {{ inventory_plugins | default('./plugins/inventory') }}
+# General settings
+vault_password_file = ~/.ansible/conf/.vault_pass.txt
+# General settings
+host_key_checking = False
+retry_files_enabled = False
+inventory = {{ ansible_inventory | default('./inventory/hosts.generated') }}
+interpreter_python = auto_silent
+ansible_managed = Ansible managed: {file} modified on %Y-%m-%d %H:%M:%S by {uid} on {host}
+collections_path = ./collections:~/.ansible/collections:/usr/share/ansible/collections
+roles_path = ./roles:~/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles
+
+# Output settings
+stdout_callback = default
+result_format = yaml
+bin_ansible_callbacks = True
+display_skipped_hosts = False
+
+# Warning settings
+command_warnings = False
+deprecation_warnings = False
+system_warnings = False
+
+[inventory]
+unparsed_is_failed = False
+
+[privilege_escalation]
+become = True
+become_method = sudo
+become_user = root
+
+[ssh_connection]
+pipelining = True
+ssh_args = -o ControlMaster=auto -o ControlPersist=60s -o StrictHostKeyChecking=no
+
+[galaxy]
+server_list = published, validated, community_galaxy
+
+[galaxy_server.published]
+url = https://console.redhat.com/api/automation-hub/content/published/
+auth_url = https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+token = {{ lookup('vars', 'rh_credentials_token', default=lookup('vars', 'automation_hub_token', default='')) }}
+
+[galaxy_server.validated]
+url = https://console.redhat.com/api/automation-hub/content/validated/
+auth_url = https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+token = {{ lookup('vars', 'rh_credentials_token', default=lookup('vars', 'automation_hub_token', default='')) }}
+
+[galaxy_server.community_galaxy]
+url = https://galaxy.ansible.com/

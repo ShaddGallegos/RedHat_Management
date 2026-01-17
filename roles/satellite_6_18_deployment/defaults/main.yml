@@ -1,0 +1,10 @@
+---
+# Default variables for satellite_6_18_deployment role
+satellite_6_18_deployment_enabled: false
+satellite_6_18_deployment_version: "1.0"
+
+# RHIS-specific Satellite configuration
+satellite_rhis_environment: "production"
+
+# Feature toggles
+satellite_6_18_deployment_validate_config: true

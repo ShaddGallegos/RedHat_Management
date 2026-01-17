@@ -1,0 +1,12 @@
+---
+# Test: integration defaults
+- name: Test integration defaults
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - integration
+  tasks:
+    - name: Verify defaults loaded
+      assert:
+        that:
+          - integration_enabled is defined

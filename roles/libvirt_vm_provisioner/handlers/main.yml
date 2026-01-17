@@ -1,0 +1,31 @@
+---
+# Handlers for Libvirt VM Provisioner
+
+- name: Stop HTTP server
+  ansible.builtin.wait_for:
+    path: "/proc/{{ libvirt_http_server_pid }}"
+    state: absent
+    delay: 1
+    timeout: 10
+  ignore_errors: yes
+  become: yes
+
+- name: Clean up temp directory
+  ansible.builtin.file:
+    path: "{{ libvirt_kickstart_http_dir }}"
+    state: absent
+  ignore_errors: yes
+
+- name: Destroy VM on failure
+  virt:
+    name: "{{ libvirt_vm_name }}"
+    state: destroyed
+  ignore_errors: yes
+  become: yes
+
+- name: Undefine VM on failure
+  virt:
+    name: "{{ libvirt_vm_name }}"
+    ansible.builtin.command: undefine
+  ignore_errors: yes
+  become: yes

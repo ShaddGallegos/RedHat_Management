@@ -1,0 +1,7 @@
+---
+# Backup task placeholder
+# This will be implemented with role-specific backup procedures
+- name: "{{ role_name | default('Component') }} - Backup placeholder"
+  ansible.builtin.debug:
+    msg: "Backup procedures for {{ role_name | default('this component') }} not yet implemented"
+  tags: [backup, skip_backup]

@@ -1,0 +1,45 @@
+---
+# Bare Metal Provisioner Role
+# Handles PXE boot, DHCP, and physical server provisioning
+# This role orchestrates bare metal infrastructure deployment
+
+- name: "BAREMETAL PROVISIONING - Initialize"
+  debug:
+    msg: |
+      Bare Metal Provisioner
+      =====================
+      Platform: {{ deployment_platform | default('baremetal') }}
+      Deployment: {{ deployment_scenario | default('undefined') }}
+      
+  tags: ["baremetal", "provisioning"]
+
+- name: "Validate baremetal platform configuration"
+  assert:
+    that:
+      - deployment_platform is defined
+      - deployment_platform == "baremetal"
+    fail_msg: "Baremetal provisioner requires deployment_platform to be 'baremetal'"
+  tags: ["baremetal", "validate"]
+
+- name: "Baremetal provisioning workflow"
+  block:
+    - name: "Check infrastructure_manager for provisioning capability"
+      debug:
+        msg: "Delegating baremetal provisioning to infrastructure_manager role"
+      tags: ["provisioning"]
+
+    - name: "Call infrastructure_manager for baremetal infrastructure setup"
+      include_role:
+        name: "infrastructure_manager"
+        tasks_from: "prepare_baremetal"
+      when: deploy_infrastructure | default(true)
+      tags: ["provisioning", "infrastructure"]
+
+  rescue:
+    - name: "Baremetal provisioning failed"
+      fail:
+        msg: |
+          Baremetal provisioning failed for {{ deployment_scenario }}.
+          Ensure DHCP and TFTP services are configured on infrastructure host.
+          See logs above for details.
+  tags: ["baremetal"]

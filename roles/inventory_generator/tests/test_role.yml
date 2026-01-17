@@ -1,0 +1,12 @@
+---
+# Test: inventory_generator role basic functionality
+- name: Test inventory_generator role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    inventory_generator_enabled: true
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - inventory_generator_enabled is defined

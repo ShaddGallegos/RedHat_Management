@@ -1,0 +1,69 @@
+---
+# Provisioning Services Complete Setup Playbook
+# Deploys DHCP, DNS, PXE, and TFTP services on satellite.prod.spg
+# Secondary ethernet interface: eth1
+# Network: 10.168.0.0/16
+
+- name: Deploy Provisioning Services Stack
+  hosts: satellite
+  gather_facts: true
+  become: true
+  
+  vars:
+    provisioning_host: "satellite.prod.spg"
+    provisioning_secondary_interface: "eth1"
+    provisioning_interface_ip: "10.168.0.1"
+  
+  roles:
+    - role: services_provisioning_stack
+      tags:
+        - provisioning_services
+        - dhcp
+        - dns
+        - tftp
+        - pxe
+
+  post_tasks:
+    - name: Display provisioning services summary
+      debug:
+        msg: |
+          
+          ╔════════════════════════════════════════════════════════════════════╗
+          ║         PROVISIONING SERVICES DEPLOYMENT COMPLETE                 ║
+          ╠════════════════════════════════════════════════════════════════════╣
+          ║                                                                    ║
+          ║  Host: {{ provisioning_host }}                                    ║
+          ║  Interface: {{ provisioning_secondary_interface }}                ║
+          ║  IP Address: {{ provisioning_interface_ip }}                      ║
+          ║  Network: 10.168.0.0/16                                          ║
+          ║                                                                    ║
+          ║  ✓ DHCP Server Configured                                        ║
+          ║    • Range: 10.168.50.0 - 10.168.200.255                        ║
+          ║    • Lease: 24 hours                                            ║
+          ║    • Nameservers: 10.168.0.1, 10.168.1.53, 8.8.8.8            ║
+          ║                                                                    ║
+          ║  ✓ DNS Server Configured                                         ║
+          ║    • Zones: example.com, prod.example.com                       ║
+          ║    • Resolver: 10.168.0.1:53                                     ║
+          ║    • Options: rotate, timeout:2, attempts:3                     ║
+          ║                                                                    ║
+          ║  ✓ TFTP Server Configured                                        ║
+          ║    • Root: /var/lib/tftpboot                                     ║
+          ║    • Port: 69/UDP                                               ║
+          ║                                                                    ║
+          ║  ✓ PXE Boot Menu Configured                                      ║
+          ║    • Bootloader: pxelinux.0                                      ║
+          ║    • Options: RHEL 9, RHEL 10, Rescue, Memtest                 ║
+          ║                                                                    ║
+          ║  ✓ Resolv.conf Updated                                           ║
+          ║    • Nameserver: 10.168.0.1                                      ║
+          ║    • Search: example.com prod.example.com lab.example.com       ║
+          ║    • Options: rotate                                            ║
+          ║                                                                    ║
+          ║  ✓ Firewall Rules Applied                                        ║
+          ║    • DHCP (67/UDP), DNS (53), TFTP (69/UDP)                    ║
+          ║    • PXE (4011/UDP)                                             ║
+          ║                                                                    ║
+          ║  Ready for automated system provisioning!                        ║
+          ║                                                                    ║
+          ╚════════════════════════════════════════════════════════════════════╝

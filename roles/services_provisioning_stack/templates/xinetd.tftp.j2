@@ -1,0 +1,22 @@
+---
+# TFTP Service Configuration (xinetd)
+
+# Description: TFTP server
+# Location: /var/lib/tftpboot
+# This provides support for boot ROMs.
+
+service tftp
+{
+    socket_type			= dgram
+    protocol			= udp
+    wait				= yes
+    user				= tftp
+    server				= /usr/sbin/in.tftpd
+    server_args			= -s {{ tftp_root }} -m /etc/tftpd.rules -v -v -v
+    disable				= no
+    per_source			= 11
+    cps				= 100 2
+    flags				= IPv4
+    log_on_success		+= DURATION USERID
+    log_on_failure		+= USERID
+}

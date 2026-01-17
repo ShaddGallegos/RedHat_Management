@@ -1,0 +1,34 @@
+#!/bin/bash
+# Pre-commit hook for RHIS project
+
+# Exit on error
+set -e
+
+echo "Running RHIS pre-commit validation..."
+
+# 1. Syntax check
+echo "[1/4] Checking Ansible syntax..."
+for file in *.yml playbooks/*.yml; do
+  if [ -f "$file" ]; then
+    ansible-playbook --syntax-check "$file" > /dev/null || exit 1
+  fi
+done
+
+# 2. YAML validation
+echo "[2/4] Validating YAML files..."
+for file in $(git diff --cached --name-only | grep -E '\.(yml|yaml)$'); do
+  if [ -f "$file" ]; then
+    python3 -c "import yaml; yaml.safe_load(open('$file'))" || exit 1
+  fi
+done
+
+# 3. Variable naming check
+echo "[3/4] Checking variable naming convention..."
+python3 ci-cd/scripts/validate_variables.py > /dev/null || true
+
+# 4. Documentation check
+echo "[4/4] Checking documentation..."
+python3 ci-cd/scripts/validate_docs.py > /dev/null || true
+
+echo "✓ Pre-commit validation passed!"
+exit 0

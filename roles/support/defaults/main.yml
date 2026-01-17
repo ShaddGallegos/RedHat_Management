@@ -1,0 +1,17 @@
+---
+# Default variables for support role
+support_enabled: true
+support_version: "1.0"
+
+# Support operations
+run_preflight_checks: true
+run_tests: false
+backup_and_restore: false
+configure_cmdb: true
+
+# Backup configuration
+backup_destination: "/backup/rhis"
+backup_retention_days: 30
+
+# Feature toggles
+support_validate_deployment: true
