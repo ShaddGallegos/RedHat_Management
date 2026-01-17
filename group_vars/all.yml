@@ -1,0 +1,288 @@
+# Example URLs
+aap_url: "https://{{ aap.aap_hostname }}"
+satellite_url: "https://{{ satellite.satellite_hostname }}"
+# AAP installer bundle (path on installer host)
+aap_installer_inventory: "{{ aap.aap_path_to_local_tar_gz_installer | default('inventory/generated_inventory.ini') }}"
+aap_bundle_filename: "{{ aap.aap_path_to_local_tar_gz_installer | default('ansible-automation-platform-containerized-setup-bundle-2.6-4-x86_64.tar.gz') }}"
+aap_admin_user: "{{ aap.aap_admin_username }}"
+aap_admin_password: "{{ aap.aap_admin_password }}"
+
+# Satellite admin for API/module actions
+satellite_admin_user: "{{ satellite.satellite_admin_username }}"
+satellite_admin_password: "{{ satellite.satellite_admin_password }}"
+
+# IDM admin
+idm_admin_password: "{{ idm.idm_admin_password }}"
+idm_directory_manager_password: "{{ idm.idm_directory_manager_password }}"
+# Product-specific firewall and SELinux settings
+firewall_product_rules:
+  satellite:
+    services:
+      - https
+      - http
+      - dns
+      - dhcp
+    ports:
+      - 5647/tcp
+      - 9090/tcp
+    selinux_mode: enforcing
+  aap:
+    services:
+      - https
+      - http
+    ports:
+      - 443/tcp
+      - 80/tcp
+    selinux_mode: enforcing
+  idm:
+    services:
+      - ldap
+      - ldaps
+      - kerberos
+      - dns
+    ports:
+      - 389/tcp
+      - 636/tcp
+      - 88/tcp
+      - 464/tcp
+    selinux_mode: enforcing
+  insights:
+    services:
+      - https
+    ports:
+      - 443/tcp
+    selinux_mode: permissive
+  dhcp:
+    services:
+      - dhcp
+    ports:
+      - 67/udp
+      - 68/udp
+    selinux_mode: enforcing
+  dns:
+    services:
+      - dns
+    ports:
+      - 53/tcp
+      - 53/udp
+    selinux_mode: enforcing
+# Central defaults for RedHat_Management
+
+# Platform endpoints
+
+# Access
+admin_username: "admin"
+admin_password: "REMOVED_AAP_PASSWORD"
+# AAP installer bundle (path on installer host)
+installer_bundle_path: "files/ansible-automation-platform-containerized-setup-bundle-2.6-4-x86_64.tar.gz"
+
+# AAP installer inventory file name within bundle
+
+# Local AAP bundle filename in files/
+
+# Controller admin and root machine credential for controller
+
+# Satellite admin for API/module actions
+ansible_root_password: "REMOVED_AAP_PASSWORD"
+
+# Domain and networking for Satellite
+project_domain: "prod.spg"
+private_cidr: "10.168.0.0/16"
+
+# Integration toggles
+selected_integrations:
+  - satellite
+  - patching_merged
+  - firewall
+
+# Logging
+ansible_log_path: "logs/ansible.log"
+
+# Global admin alias (used by some role defaults)
+global_admin_password: "REMOVED_AAP_PASSWORD"
+
+# Libvirt / compute defaults
+libvirt:
+  ansible_root_password: "{{ global_admin_password }}"
+  libvirt_pool: default
+  libvirt_external_network: virbr0
+  libvirt_external_network_ip: 192.168.122.1
+  satellite_admin_password: "{{ global_admin_password }}"
+  libvirt_internal_network: virbr1
+  libvirt_internal_network_ip: 10.168.0.1
+  libvirt_internal_network_netmask: 255.255.0.0
+  global_admin_password: "{{ global_admin_password }}"
+  satellite_vm_memory_mb: 25000
+  satellite_vm_vcpus: 8
+  satellite_vm_disk_gb: 200
+  satellite_root_ssh_pubkey: ""
+  idm_admin_password: "{{ global_admin_password }}"
+  idm_directory_manager_password: "{{ global_admin_password }}"
+  libvirt_network_devices:
+    - name: enp1s0
+      type: nat
+      network: libvirt_external_network
+      ip: dhcp
+      description: "External NAT network (libvirt DHCP)"
+    - name: enp2s0
+      type: private
+      network: libvirt_internal_network
+      ip: 10.168.151.127
+      netmask: 255.255.0.0
+      gateway: 10.168.0.1
+      description: "Private Red Hat Management network"
+
+  idm_vm_memory_mb: 16384
+  idm_vm_vcpus: 4
+  idm_vm_disk_gb: 80
+  idm_root_ssh_pubkey: ""
+  idm_network_devices:
+    - name: enp1s0
+      type: nat
+      network: libvirt_external_network
+      ip: dhcp
+      description: "External NAT network (libvirt DHCP)"
+    - name: enp2s0
+      type: private
+      network: libvirt_internal_network
+      ip: 10.168.151.125
+      netmask: 255.255.0.0
+      gateway: 10.168.0.1
+      description: "Private Red Hat Management network"
+
+  aap_vm_memory_mb: 16384
+  aap_vm_vcpus: 8
+  aap_vm_disk_gb: 120
+  aap_root_ssh_pubkey: ""
+  aap_network_devices:
+    - name: enp1s0
+      type: nat
+      network: libvirt_external_network
+      ip: dhcp
+      description: "External NAT network (libvirt DHCP)"
+    - name: enp2s0
+      type: private
+      network: libvirt_internal_network
+      ip: 10.168.151.126
+      netmask: 255.255.0.0
+      gateway: 10.168.0.1
+      description: "Private Red Hat Management network"
+
+# IDM
+idm:
+  idm_domain: prod.spg
+  idm_hostname: idm.prod.spg
+  idm_primary_interface: enp2s0
+  idm_ip: 10.168.151.125
+  idm_subnet_mask_bits: 16
+  idm_gateway: 10.168.0.1
+  idm_admin_username: admin
+  idm_admin_password: "{{ global_admin_password }}"
+  idm_ldap_base_dn: "dc=prod,dc=spg"
+  idm_kerberos_realm: "PROD.SPG"
+  idm_directory_manager_password: "{{ aap_password | default(aap_admin_password) }}"
+  idm_enable_dns: true
+  idm_dns_forwarders:
+    - 10.168.0.1
+
+# Satellite
+satellite:
+  satellite_ip: 10.168.151.127
+  satellite_admin_username: admin
+  satellite_admin_password: "REMOVED_AAP_PASSWORD"
+  rhel_versions: [8, 9, 10]
+  satellite_version: "6.18"
+  satellite_domain: prod.spg
+  satellite_hostname: satellite.prod.spg
+  satellite_subnet_mask_bits: 16
+  satellite_gateway: 10.168.0.1
+  satellite_primary_interface: enp2s0
+  satellite_dhcp_network: 10.168.0.0
+  satellite_dhcp_network_mask: 255.255.0.0
+  satellite_dhcp_range_start: '10.168.10.1'
+  satellite_dhcp_range_end: '10.168.10.254'
+  satellite_pxeserver: "{{ satellite_hostname }}"
+  satellite_dhcpserver: "{{ satellite_hostname }}"
+  satellite_nameserver: "{{ satellite_hostname }}"
+  satellite_tftpserver: "{{ satellite_hostname }}"
+  satellite_initial_admin_email: admin@prod.spg
+  enable_rhel_repositories: true
+  configure_sync_plans: true
+  create_lifecycle_environments: true
+  lifecycle_environments: "RHEL{{ major }}.{{ minor }}_x86_64_DEV, RHEL{{ major }}.{{ minor }}_x86_64_TEST, RHEL{{ major }}.{{ minor }}_x86_64_PROD"
+  create_content_views: true
+  create_activation_keys: true
+  foreman_admin_username: admin
+  foreman_admin_password: "{{ global_admin_password }}"
+  scenario: satellite
+  reset_foreman_proxy_dns_forwarders: true
+  foreman_initial_organization: "DefaultOrg"
+  foreman_initial_location: "DefaultLoc"
+  foreman_proxy_register_in_foreman: true
+  foreman_proxy_foreman_base_url: "https://{{ satellite_hostname }}"
+  foreman_proxy_trusted_hosts: "{{ satellite_hostname }}"
+  foreman_trusted_proxies: "{{ satellite_ip }}"
+  enable_foreman_proxy: true
+  enable_foreman_plugin_ansible: true
+  enable_foreman_proxy_plugin_ansible: true
+  foreman_proxy_http: false
+  foreman_proxy_ssl: true
+  foreman_proxy_tftp: true
+  foreman_proxy_tftp_servername: "{{ satellite_ip }}"
+  foreman_proxy_tftp_root: "/var/lib/tftpboot"
+  foreman_proxy_dns: true
+  foreman_proxy_dns_interface: "{{ satellite_primary_interface }}"
+  foreman_proxy_dns_zone: "{{ satellite_domain }}"
+  foreman_proxy_dns_reverse: "{{ satellite_dhcp_network }}"
+  foreman_proxy_dns_forwarders:
+    - "10.168.0.1"
+    - "8.8.8.8"
+  foreman_proxy_dhcp: true
+  foreman_proxy_dhcp_interface: "{{ satellite_primary_interface }}"
+  foreman_proxy_dhcp_gateway: "{{ satellite_gateway }}"
+  foreman_proxy_dhcp_nameservers: "{{ satellite_nameserver }}"
+  foreman_proxy_dhcp_range:
+    start: "{{ satellite_dhcp_range_start }}"
+    end: "{{ satellite_dhcp_range_end }}"
+  foreman_proxy_dhcp_server: "{{ satellite_ip }}"
+  foreman_proxy_dhcp_subnets: "{{ satellite_dhcp_network }}/{{ satellite_subnet_mask_bits }}"
+  foreman_proxy_dhcp_managed: true
+  foreman_proxy_dhcp_pxeserver: "{{ satellite_ip }}"
+  enable_foreman_plugin_virt_who_configure: false
+  enable_foreman_compute_libvirt: true
+
+# AAP
+aap:
+  aap_domain: prod.spg
+  aap_hostname: aap.prod.spg
+  aap_version: "2.6"
+  aap_path_to_local_tar.gz_installer: files/ansible-automation-platform-containerized-setup-bundle-2.6-4-x86_64.tar.gz
+  aap_admin_username: admin
+  aap_admin_password: "{{ global_admin_password }}"
+  aap_primary_interface: enp2s0
+  aap_ip: 10.168.151.126
+  aap_subnet_mask_bits: 16
+  aap_gateway: 10.168.0.1
+  automationgateway: "{{ aap_hostname }}"
+  automationcontroller: "{{ aap_hostname }}"
+  automationhub: "{{ aap_hostname }}"
+  automationeda: "{{ aap_hostname }}"
+  database: "{{ aap_hostname }}"
+  platform_admin_password: "{{ global_admin_password }}"
+  aap_password: "{{ aap_admin_password }}"
+
+# Global settings provided by user
+global:
+  project_name: test-lab
+  domain: prod.spg
+  aap_password: "REMOVED_AAP_PASSWORD"
+  redhat_cdn_username: "shadd@redhat.com"
+  redhat_cdn_password: "REMOVED_AAP_PASSWORD"
+  console_redhat_token: "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI0NzQzYTkzMC03YmJiLTRkZGQtOTgzMS00ODcxNGRlZDc0YjUifQ.eyJpYXQiOjE3NjYxNjA3ODAsImp0aSI6IjY3YjQ2OGQyLTNhZWQtNDk3NC04ODNiLTUzYzVkZmQ1NTNkYiIsImlzcyI6Imh0dHBzOi8vc3NvLnJlZGhhdC5jb20vYXV0aC9yZWFsbXMvcmVkaGF0LWV4dGVybmFsIiwiYXVkIjoiaHR0cHM6Ly9zc28ucmVkaGF0LmNvbS9hdXRoL3JlYWxtcy9yZWRoYXQtZXh0ZXJuYWwiLCJzdWIiOiI1MDAxMDExMyIsInR5cCI6Ik9mZmxpbmUiLCJhenAiOiJjbG91ZC1zZXJ2aWNlcyIsIm5vbmNlIjoiMTFmNDhhNjQtNDdkYy00ZjRjLWFiYWYtMjk3MDA0ZTJhMjM1Iiwic2lkIjoiZmQwN2Q1YmEtN2U0YS00NGQ2LTgwZWUtYmMwZjBjZWM2NWUwIiwic2NvcGUiOiJvcGVuaWQgYXBpLmNvbnNvbGUgYmFzaWMgcm9sZXMgd2ViLW9yaWdpbnMgY2xpZW50X3R5cGUucHJlX2tjMjUgYXBpLmFza19yZWRfaGF0IG9mZmxpbmVfYWNjZXNzIn0.L4oHmHKKqAqsbgXg_r37oFBUkTBbuGWXhX0CQev_j6Skg45xLCWrUKUFzHGWa5oUAULPYl7494xUMX4xF5S5qg"
+  global_admin_password: "REMOVED_AAP_PASSWORD"
+project_name: test-lab
+domain: prod.spg
+compute_platform: libvirt
+
+# Default remote user for AAP tasks (installer account)
+aap_remote_user: "{{ lookup('env','USER') }}"

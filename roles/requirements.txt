@@ -1,0 +1,73 @@
+# Core Python Requirements for LVM Automation
+
+# Ansible and Core
+ansible>=2.9.0,<8.0.0
+ansible-core>=2.14.0,<2.16.0
+ansible-runner>=2.3.0
+
+# YAML Processing
+PyYAML>=6.0
+
+# HTTP/REST APIs
+requests>=2.31.0
+urllib3>=2.0.0
+
+# ServiceNow
+pysnow>=0.7.17
+
+# Red Hat APIs
+insights-client>=3.1.0
+python-redhat-satellite>=0.1.0
+
+# Nutanix
+nutanix-api>=0.1.0
+prism-api>=1.0.0
+
+# JSON/Data Processing
+jsonschema>=4.17.0
+jmespath>=1.0.0
+
+# Encryption/Security
+cryptography>=39.0.0
+paramiko>=3.0.0
+bcrypt>=4.0.0
+
+# Logging
+python-json-logger>=2.0.0
+colorama>=0.4.6
+
+# Configuration
+python-dotenv>=1.0.0
+configparser>=5.3.0
+
+# Date/Time
+python-dateutil>=2.8.2
+pytz>=2023.3
+
+# CLI/Terminal
+rich>=13.3.0
+click>=8.1.0
+tabulate>=0.9.0
+
+# Monitoring/Metrics (optional)
+prometheus-client>=0.16.0
+statsd>=4.0.0
+
+# Testing (for development)
+pytest>=7.2.0
+pytest-ansible>=3.1.0
+pytest-cov>=4.0.0
+pylint>=2.16.0
+black>=23.1.0
+flake8>=6.0.0
+
+# Documentation
+sphinx>=5.3.0
+sphinx-rtd-theme>=1.2.0
+myst-parser>=1.0.0
+
+# Splunk HEC (optional)
+splunk-hec-handler>=1.1.0
+
+# Email notifications (optional)
+sendgrid>=6.10.0

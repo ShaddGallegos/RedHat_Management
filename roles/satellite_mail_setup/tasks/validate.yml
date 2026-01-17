@@ -1,0 +1,9 @@
+---
+- name: Assert required secret variables are set
+  ansible.builtin.assert:
+    that:
+      - satellite_admin_password | length > 0
+      - aap_admin_password | length > 0
+      - insights_password | length > 0
+    fail_msg: "Required secrets missing. Provide them via vars_prompt or in vaulted file {{ satellite_mail_vault_file | default('~/.ansible/conf/env.yml') }}"
+  no_log: true

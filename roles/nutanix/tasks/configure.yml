@@ -1,0 +1,4 @@
+---
+- name: Nutanix configure placeholder
+  ansible.builtin.debug:
+    msg: "Implement Nutanix configuration here."

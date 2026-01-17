@@ -1,0 +1,4 @@
+---
+- name: Linux other configure placeholder
+  ansible.builtin.debug:
+    msg: "Implement other Linux configuration here."

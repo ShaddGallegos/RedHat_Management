@@ -1,0 +1,12 @@
+---
+# Example AWS inventory using AWS EC2 plugin
+plugin: amazon.aws.aws_ec2
+regions:
+  - us-east-1
+  - us-west-2
+filters:
+  tag:Environment: dev
+hostnames:
+  - ip-address
+compose:
+  ansible_host: public_ip_address

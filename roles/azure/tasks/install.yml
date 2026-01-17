@@ -1,0 +1,4 @@
+---
+- name: Azure install placeholder
+  ansible.builtin.debug:
+    msg: "Implement Azure install here."

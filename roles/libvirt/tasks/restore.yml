@@ -1,0 +1,4 @@
+---
+- name: Libvirt restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement libvirt restore here."

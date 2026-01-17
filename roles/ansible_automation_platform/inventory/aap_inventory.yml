@@ -1,0 +1,4 @@
+---
+# Example AAP inventory leveraging inventory_sources helper
+plugin: inventory_sources
+# Adjust script options/env as needed.

@@ -1,0 +1,4 @@
+---
+- name: AAP configure placeholder
+  ansible.builtin.debug:
+    msg: "Implement AAP configuration here."

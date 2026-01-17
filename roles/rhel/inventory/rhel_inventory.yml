@@ -1,0 +1,7 @@
+---
+# Example RHEL inventory (static)
+all:
+  hosts:
+    rhel1.example.com:
+      ansible_user: ec2-user
+      ansible_ssh_private_key_file: ~/.ssh/id_rsa
