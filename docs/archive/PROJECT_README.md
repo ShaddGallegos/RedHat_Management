@@ -39,7 +39,7 @@ make install
 ansible-playbook playbooks/provisioning_services_setup.yml -i inventory/hosts -b
 
 # Verify deployment
-ansible-playbook playbooks/site.yml -i inventory/hosts --syntax-check
+ansible-playbook redhat_management-site.yml -i inventory/hosts --syntax-check
 ```
 
 ---
@@ -210,7 +210,7 @@ ansible-playbook playbooks/provisioning_services_setup.yml -i inventory/hosts -b
 
 ### Complete Stack (Production)
 ```bash
-ansible-playbook playbooks/site.yml -i inventory/hosts -b
+ansible-playbook redhat_management-site.yml -i inventory/hosts -b
 ```
 
 ### Individual Components

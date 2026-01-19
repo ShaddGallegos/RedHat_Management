@@ -507,7 +507,7 @@ done
 
 ```bash
 # Verify defaults loaded
-ansible-playbook playbooks/site.yml --check
+ansible-playbook redhat_management-site.yml --check
 
 # Show role defaults
 grep -r "_enabled" roles/*/defaults/main.yml
