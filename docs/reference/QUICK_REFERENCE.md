@@ -8,19 +8,19 @@ Quick lookup guide for common tasks and commands in RHIS deployments.
 
 ```bash
 # Run playbook
-ansible-playbook site.yml -i inventory/hosts
+ansible-playbook redhat_management-site.yml -i inventory/hosts
 
 # Syntax check
-ansible-playbook site.yml --syntax-check
+ansible-playbook redhat_management-site.yml --syntax-check
 
 # Dry run
-ansible-playbook site.yml -i inventory/hosts --check
+ansible-playbook redhat_management-site.yml -i inventory/hosts --check
 
 # Run with tags
-ansible-playbook site.yml --tags deploy_aap
+ansible-playbook redhat_management-site.yml --tags deploy_aap
 
 # Run specific host
-ansible-playbook site.yml -i inventory/hosts -l satellite.prod.spg
+ansible-playbook redhat_management-site.yml -i inventory/hosts -l satellite.prod.spg
 
 # Vault operations
 ansible-vault create vault.yml

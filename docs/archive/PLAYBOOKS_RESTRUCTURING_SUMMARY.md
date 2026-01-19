@@ -114,19 +114,19 @@
 
 ### Execute Full Deployment
 ```bash
-ansible-playbook site.yml \
+ansible-playbook redhat_management-site.yml \
   -e deployment_scenario=satellite_aap \
   -e deployment_platform=libvirt
 ```
 
 ### Execute Specific Phases
 ```bash
-ansible-playbook site.yml -t phase1,phase2,phase3
+ansible-playbook redhat_management-site.yml -t phase1,phase2,phase3
 ```
 
 ### Execute by Product
 ```bash
-ansible-playbook site.yml -t satellite,aap
+ansible-playbook redhat_management-site.yml -t satellite,aap
 ```
 
 ### Direct Orchestration (Non-Interactive)
@@ -155,11 +155,11 @@ ansible-playbook orchestration.yml \
 
 ### ✅ All Existing Commands Work
 ```bash
-ansible-playbook site.yml                              # ✅ Works
+ansible-playbook redhat_management-site.yml                              # ✅ Works
 ansible-playbook orchestration.yml                     # ✅ Works
-ansible-playbook site.yml -t phase1                    # ✅ Works
-ansible-playbook site.yml -e deployment_scenario=...  # ✅ Works
-ansible-playbook site.yml -t satellite,aap             # ✅ Works
+ansible-playbook redhat_management-site.yml -t phase1                    # ✅ Works
+ansible-playbook redhat_management-site.yml -e deployment_scenario=...  # ✅ Works
+ansible-playbook redhat_management-site.yml -t satellite,aap             # ✅ Works
 ```
 
 ### ⚠️ Deprecated (Do Not Use)
@@ -206,11 +206,11 @@ rm -rf playbooks/.archive_deprecated/
 ### Testing (Recommended)
 ```bash
 # Verify structure
-ansible-playbook site.yml --syntax-check
+ansible-playbook redhat_management-site.yml --syntax-check
 ansible-playbook orchestration.yml --syntax-check
 
 # Test specific scenario
-ansible-playbook site.yml -e deployment_scenario=satellite_only --check -t phase1
+ansible-playbook redhat_management-site.yml -e deployment_scenario=satellite_only --check -t phase1
 ```
 
 ---

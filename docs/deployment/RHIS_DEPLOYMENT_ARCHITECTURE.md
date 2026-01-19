@@ -242,15 +242,15 @@ Component Tags:
 
 ```bash
 # Install Satellite on LibVirt
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "satellite,libvirt,rhel-9,install,configure"
 
 # Full stack on AWS
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "full-stack,aws,rhel-9,install,configure,integrate"
 
 # Only validate
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "validate"
 
 # Multi-product (Sat+AAP+IdM) on Azure

@@ -86,7 +86,7 @@ virsh pool-list
 ### 4. Deploy Infrastructure
 ```bash
 # Run RHIS infrastructure setup
-ansible-playbook site.yml -t libvirt
+ansible-playbook redhat_management-site.yml -t libvirt
 
 # Verify deployment
 virsh list
@@ -188,7 +188,7 @@ ansible-playbook -i inventory/hosts \
   --vault-password-file ~/.ansible/conf/vault.txt
 
 # Or full playbook
-ansible-playbook site.yml \
+ansible-playbook redhat_management-site.yml \
   -e "deployment_platform=libvirt" \
   --tags libvirt
 ```

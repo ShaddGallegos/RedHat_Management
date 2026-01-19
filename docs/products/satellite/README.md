@@ -47,7 +47,7 @@ satellite_admin_email: "admin@example.com"
 
 ### 3. Deploy Satellite
 ```bash
-ansible-playbook site.yml -t satellite
+ansible-playbook redhat_management-site.yml -t satellite
 ```
 
 ### 4. Access Satellite
@@ -116,7 +116,7 @@ ansible-playbook -i inventory/hosts \
   --vault-password-file ~/.ansible/conf/vault.txt
 
 # Or full playbook
-ansible-playbook site.yml \
+ansible-playbook redhat_management-site.yml \
   -e "deployment_scenario=satellite" \
   --tags satellite
 ```

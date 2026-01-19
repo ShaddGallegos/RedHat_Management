@@ -42,7 +42,7 @@ ansible --version
 ansible-inventory -i inventory/hosts -y | head
 
 # Syntax check playbooks
-ansible-playbook site.yml --syntax-check
+ansible-playbook redhat_management-site.yml --syntax-check
 ```
 
 ### Step 4: Run Deployment (15 min)
@@ -52,7 +52,7 @@ ansible-playbook site.yml --syntax-check
 ./scripts/setup/RHIS-installer.sh
 
 # Or direct deployment
-ansible-playbook site.yml
+ansible-playbook redhat_management-site.yml
 
 # Monitor progress
 tail -f logs/deployment.log
@@ -79,7 +79,7 @@ ansible all -m ping
 deployment_scenario: satellite-only
 
 # Deploy
-ansible-playbook site.yml -t satellite
+ansible-playbook redhat_management-site.yml -t satellite
 ```
 
 ### Scenario: AAP-Only  
@@ -89,7 +89,7 @@ ansible-playbook site.yml -t satellite
 deployment_scenario: aap-only
 
 # Deploy
-ansible-playbook site.yml -t aap
+ansible-playbook redhat_management-site.yml -t aap
 ```
 
 ### Scenario: Full Stack
@@ -99,7 +99,7 @@ ansible-playbook site.yml -t aap
 deployment_scenario: full-stack
 
 # Deploy all products
-ansible-playbook site.yml
+ansible-playbook redhat_management-site.yml
 ```
 
 ## Deployment on Different Platforms
@@ -125,7 +125,7 @@ export AWS_ACCESS_KEY_ID=xxxx
 export AWS_SECRET_ACCESS_KEY=xxxx
 
 # Deploy
-ansible-playbook site.yml
+ansible-playbook redhat_management-site.yml
 ```
 
 ### Azure
@@ -135,7 +135,7 @@ ansible-playbook site.yml
 infrastructure_platform: azure
 
 # Set Azure credentials
-ansible-playbook site.yml -e azure_subscription_id=xxxx
+ansible-playbook redhat_management-site.yml -e azure_subscription_id=xxxx
 ```
 
 ## Troubleshooting Quick Fixes

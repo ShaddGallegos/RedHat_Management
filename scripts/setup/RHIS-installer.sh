@@ -1072,7 +1072,7 @@ show_deployment_menu() {
             ;;
         9) 
             print_info "Deploying RedHat Management site..."
-            run_playbook "playbooks/redhat_management-site.yml"
+            run_playbook "redhat_management-site.yml"
             print_success "RedHat Management site deployed"
             pause_menu
             show_deployment_menu

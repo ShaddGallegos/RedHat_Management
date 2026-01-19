@@ -153,10 +153,10 @@ ipactl restart
 
 ```bash
 # Enable profiling
-ANSIBLE_PROFILE_TASKS=1 ansible-playbook site.yml
+ANSIBLE_PROFILE_TASKS=1 ansible-playbook redhat_management-site.yml
 
 # Check task timing
-ansible-playbook site.yml -v | grep duration
+ansible-playbook redhat_management-site.yml -v | grep duration
 ```
 
 ### High CPU Usage
@@ -188,7 +188,7 @@ tail -f logs/deployment.log
 
 ```bash
 # Ansible debug output
-ansible-playbook site.yml -vvv
+ansible-playbook redhat_management-site.yml -vvv
 
 # Bash debug
 bash -x scripts/setup/RHIS-installer.sh

@@ -394,7 +394,7 @@ aws cloudwatch put-dashboard \
         minutes: 2
 
     - name: Run RHIS installation
-      command: ansible-playbook site.yml -i aws_ec2.yml
+      command: ansible-playbook redhat_management-site.yml -i aws_ec2.yml
 ```
 
 ---

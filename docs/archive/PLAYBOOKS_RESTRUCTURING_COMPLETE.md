@@ -283,7 +283,7 @@ ansible-playbook playbooks/products/satellite/install.yml
 
 ```bash
 # Interactive - now simple wrapper
-ansible-playbook site.yml
+ansible-playbook redhat_management-site.yml
 
 # Orchestration - still available
 ansible-playbook orchestration.yml
@@ -328,12 +328,12 @@ roles/configuration_manager/  8KB (credential mgmt)
 
 ```bash
 # These still function identically
-ansible-playbook site.yml -e deployment_scenario=satellite_aap
+ansible-playbook redhat_management-site.yml -e deployment_scenario=satellite_aap
 ansible-playbook orchestration.yml -t phase1,phase2
 
 # Tag-based execution still supported
-ansible-playbook site.yml -t satellite
-ansible-playbook site.yml -t phase4a
+ansible-playbook redhat_management-site.yml -t satellite
+ansible-playbook redhat_management-site.yml -t phase4a
 ```
 
 ### ⚠️ Deprecated (Do Not Use)
@@ -345,7 +345,7 @@ ansible-playbook playbooks/deploy_components-site.yml        ❌
 ansible-playbook playbooks/prompts_and_config.yml            ❌
 
 # Use instead:
-ansible-playbook site.yml                                    ✅
+ansible-playbook redhat_management-site.yml                                    ✅
 ```
 
 ---
@@ -409,14 +409,14 @@ ansible-playbook site.yml                                    ✅
 ### 1. Testing
 ```bash
 # Validate orchestration_master role
-ansible-playbook site.yml --syntax-check
+ansible-playbook redhat_management-site.yml --syntax-check
 ansible-playbook orchestration.yml --syntax-check
 
 # Test specific scenarios
-ansible-playbook site.yml -e deployment_scenario=satellite_only -e deployment_platform=libvirt -t phase1,phase2
+ansible-playbook redhat_management-site.yml -e deployment_scenario=satellite_only -e deployment_platform=libvirt -t phase1,phase2
 
 # Test specific phases
-ansible-playbook site.yml -t phase3
+ansible-playbook redhat_management-site.yml -t phase3
 ```
 
 ### 2. Documentation Updates

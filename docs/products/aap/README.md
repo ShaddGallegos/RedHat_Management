@@ -116,7 +116,7 @@ ansible-playbook -i inventory/hosts \
   roles/aap_2_6_setup/tasks/main.yml
 
 # Or via main playbook
-ansible-playbook site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags aap \
   --vault-password-file ~/.ansible/conf/vault.txt
 ```
