@@ -638,11 +638,19 @@ run_deployment_playbooks() {
     print_info "Tags: ${playbook_tags}"
     log "INFO" "Running playbook with tags: ${playbook_tags}"
     
-    # Prefer the real main playbook, but fall back to a safe placeholder
-    main_playbook="${PLAYBOOKS_DIR}/site.yml"
+    # Prefer the real main playbook at project root (redhat_management-site.yml)
+    main_playbook="${PROJECT_ROOT}/redhat_management-site.yml"
     if ! ansible-playbook "${main_playbook}" --syntax-check -i "${INVENTORY_DIR}/hosts" >/dev/null 2>&1; then
-        print_warning "Main playbook ${main_playbook} failed syntax check — using placeholder playbook"
-        main_playbook="${PLAYBOOKS_DIR}/_placeholder_site.yml"
+        print_warning "Main playbook ${main_playbook} failed syntax check — searching for placeholder playbook"
+        if [[ -f "${PROJECT_ROOT}/_placeholder_site.yml" ]]; then
+            main_playbook="${PROJECT_ROOT}/_placeholder_site.yml"
+        elif [[ -f "${PLAYBOOKS_DIR}/_placeholder_site.yml" ]]; then
+            main_playbook="${PLAYBOOKS_DIR}/_placeholder_site.yml"
+        else
+            print_error "No usable playbook found (checked ${PROJECT_ROOT} and ${PLAYBOOKS_DIR})"
+            log "ERROR" "No usable playbook found"
+            return 1
+        fi
     fi
 
     # Run the selected playbook
@@ -675,7 +683,7 @@ verify_deployment() {
     
     # Run validation playbook
     ansible-playbook \
-        "${PLAYBOOKS_DIR}/site.yml" \
+        "${main_playbook}" \
         --tags "validate" \
         -i "${INVENTORY_DIR}/hosts" \
         -v 2>&1 | tee -a "${LOG_FILE}"

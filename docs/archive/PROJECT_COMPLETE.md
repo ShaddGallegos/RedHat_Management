@@ -280,7 +280,7 @@ dig @10.168.0.1 example.com
 make bootstrap
 
 # 2. Deploy complete site
-ansible-playbook playbooks/site.yml -i inventory/hosts -b
+ansible-playbook redhat_management-site.yml -i inventory/hosts -b
 
 # 3. Run validation
 make test
@@ -414,7 +414,7 @@ RedHat_Management/
 1. Update inventory with real hostnames/IPs
 2. Review and customize group_vars/
 3. Update host_vars/ with host-specific configuration
-4. Execute `ansible-playbook playbooks/site.yml -i inventory/hosts -b`
+4. Execute `ansible-playbook redhat_management-site.yml -i inventory/hosts -b`
 5. Validate using [PROVISIONING_SERVICES_CONFIGURATION.md#verification](docs/PROVISIONING_SERVICES_CONFIGURATION.md#verification)
 
 ### Post-Deployment
