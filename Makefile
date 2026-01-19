@@ -50,8 +50,9 @@ bootstrap: install setup
 setup:
 	@echo "Setting up project environment for $(PROJECT_NAME)..."
 	@if [ -f env.yml.example ] && [ ! -f env.yml ]; then \
-		echo "Creating env.yml from example..."; \
-		cp env.yml.example env.yml; \
+		echo "NOTE: This project no longer creates an env.yml in the repository root."; \
+		echo "Copy the example into your local vaulted config at ~/.ansible/conf/env.yml and edit it there (do NOT commit personal secrets)."; \
+		echo "Example: mkdir -p ~/.ansible/conf && cp env.yml.example ~/.ansible/conf/env.yml"; \
 	fi
 	@if [ -f vault.yml.example ] && [ ! -f vault.yml ]; then \
 		echo "Creating vault.yml from example..."; \

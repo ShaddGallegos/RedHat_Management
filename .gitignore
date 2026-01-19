@@ -2,3 +2,9 @@
 parmstrong.ca
 *.tar
 */vault/*.yml
+
+# Ignore archived playbooks and example/files directories to avoid adding
+# local archives or large file trees to git
+/playbooks/.archive_deprecated/
+/docs/archive/
+/files/
