@@ -48,7 +48,7 @@ Guided wizard for scenario and platform selection.
 
 ### 2. Playbook-Based
 ```bash
-ansible-playbook site.yml
+ansible-playbook redhat_management-site.yml
 ```
 Standard Ansible playbook deployment.
 

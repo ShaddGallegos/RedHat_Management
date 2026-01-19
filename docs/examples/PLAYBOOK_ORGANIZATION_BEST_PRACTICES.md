@@ -84,7 +84,7 @@ scenario tags
 
 Run Satellite-only on AWS:
 ```bash
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "satellite_only,aws,rhel-9"
 ```
 
@@ -92,7 +92,7 @@ ansible-playbook playbooks/redhat_management-site.yml \
 
 Deploy complete platform:
 ```bash
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "full_stack,libvirt,rhel-9"
 ```
 
@@ -100,7 +100,7 @@ ansible-playbook playbooks/redhat_management-site.yml \
 
 Install all components without configuration:
 ```bash
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "install"
 ```
 
@@ -108,7 +108,7 @@ ansible-playbook playbooks/redhat_management-site.yml \
 
 Deploy without monitoring:
 ```bash
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "satellite_aap,libvirt,rhel-9" \
   --skip-tags "monitoring"
 ```
@@ -117,7 +117,7 @@ ansible-playbook playbooks/redhat_management-site.yml \
 
 Run only validation tasks:
 ```bash
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "validate" \
   --skip-tags "install,configure"
 ```
@@ -391,20 +391,20 @@ End
 ansible-playbook playbooks/prompts_and_config.yml
 
 # Direct
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "satellite_only,libvirt,rhel-9"
 ```
 
 ### Scenario 2: Satellite + AAP (Common)
 ```bash
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "satellite_aap,libvirt,rhel-9" \
   -e "deployment_scenario=satellite_aap"
 ```
 
 ### Scenario 3: Full Stack (Complete)
 ```bash
-ansible-playbook playbooks/redhat_management-site.yml \
+ansible-playbook redhat_management-site.yml \
   --tags "full_stack,aws,rhel-9" \
   -e "deployment_platform=aws" \
   -e "deployment_os=rhel-9"

@@ -60,7 +60,7 @@ ocp_ingress_vip: "192.168.1.101"
 
 ### 3. Deploy OpenShift
 ```bash
-ansible-playbook site.yml -t openshift
+ansible-playbook redhat_management-site.yml -t openshift
 ```
 
 ### 4. Access OpenShift
@@ -184,7 +184,7 @@ ansible-playbook -i inventory/openshift.yml \
   --vault-password-file ~/.ansible/conf/vault.txt
 
 # Or full playbook
-ansible-playbook site.yml \
+ansible-playbook redhat_management-site.yml \
   -e "deployment_scenario=openshift" \
   --tags openshift
 ```

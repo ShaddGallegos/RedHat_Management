@@ -406,7 +406,7 @@
               
               To execute deployment with your selected configuration, run:
               
-              ansible-playbook playbooks/redhat_management-site.yml \
+              ansible-playbook redhat_management-site.yml \
                 --tags "{{ (scenario_details.tags + platform_details.tags + os_details.tags) | join(',') }}" \
                 -e "deployment_scenario={{ deployment_scenario }}" \
                 -e "deployment_platform={{ deployment_platform }}" \
@@ -414,7 +414,7 @@
               
               Alternative: Include all components in single run
               
-              ansible-playbook playbooks/redhat_management-site.yml \
+              ansible-playbook redhat_management-site.yml \
                 -e "deployment_scenario={{ deployment_scenario }}" \
                 -e "deployment_platform={{ deployment_platform }}" \
                 -e "deployment_os={{ deployment_os }}"
@@ -454,7 +454,7 @@
           
           # Command to execute deployment
           deployment_command: |
-            ansible-playbook playbooks/redhat_management-site.yml \
+            ansible-playbook redhat_management-site.yml \
               --tags "{{ (scenario_details.tags + platform_details.tags + os_details.tags) | join(',') }}" \
               -e "deployment_scenario={{ deployment_scenario }}" \
               -e "deployment_platform={{ deployment_platform }}" \

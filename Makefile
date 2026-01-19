@@ -32,11 +32,19 @@ help:
 .PHONY: install
 install:
 	@echo "Installing Ansible collections and dependencies..."
-	@if [ -f requirements.txt ]; then \
+	# Prefer a dedicated pip requirements file that contains only pip packages.
+	@if [ -f requirements-pip.txt ]; then \
+		pip install -q -r requirements-pip.txt || true; \
+	elif [ -f requirements.txt ]; then \
 		pip install -q -r requirements.txt || true; \
 	fi
 	@if [ -f requirements.yml ]; then \
-		ansible-galaxy collection install -r requirements.yml -p ./collections || true; \
+		# Use helper script that skips hub installs when token missing \
+		if [ -x scripts/setup/install_collections.sh ]; then \
+			scripts/setup/install_collections.sh || true; \
+		else \
+			ansible-galaxy collection install -r requirements.yml -p ./collections || true; \
+		fi; \
 	fi
 	@echo "Installation completed."
 
@@ -63,14 +71,14 @@ setup:
 # Run the complete site playbook
 .PHONY: site
 site:
-	@echo "Running site.yml playbook..."
-	@ANSIBLE_ROLES_PATH=$(ANSIBLE_ROLES_PATH) $(ANSIBLE_PLAYBOOK) site.yml -i inventory/hosts
+	@echo "Running redhat_management-site.yml playbook..."
+	@ANSIBLE_ROLES_PATH=$(ANSIBLE_ROLES_PATH) $(ANSIBLE_PLAYBOOK) redhat_management-site.yml -i inventory/hosts
 
 # Test playbooks (syntax check)
 .PHONY: test
 test:
 	@echo "Testing playbooks..."
-	@ANSIBLE_ROLES_PATH=$(ANSIBLE_ROLES_PATH) $(ANSIBLE_PLAYBOOK) site.yml --syntax-check
+	@ANSIBLE_ROLES_PATH=$(ANSIBLE_ROLES_PATH) $(ANSIBLE_PLAYBOOK) redhat_management-site.yml --syntax-check
 	@echo "Syntax check passed!"
 
 # Lint Ansible files

@@ -54,7 +54,7 @@ idm_forwarders:
 
 ### 3. Deploy IdM
 ```bash
-ansible-playbook site.yml -t idm
+ansible-playbook redhat_management-site.yml -t idm
 ```
 
 ### 4. Access IdM
@@ -126,7 +126,7 @@ ansible-playbook -i inventory/hosts \
   --vault-password-file ~/.ansible/conf/vault.txt
 
 # Or full playbook
-ansible-playbook site.yml \
+ansible-playbook redhat_management-site.yml \
   -e "deployment_scenario=idm" \
   --tags idm
 ```

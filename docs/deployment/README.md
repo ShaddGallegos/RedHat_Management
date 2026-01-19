@@ -43,7 +43,7 @@ See subdirectories for component-specific documentation:
 ```bash
 # Interactive setup
 cd /run/media/sgallego/SD_Card/GIT/RedHat_Management
-ansible-playbook site.yml
+ansible-playbook redhat_management-site.yml
 
 # Deploy components
 ansible-playbook playbooks/deploy_components.yml

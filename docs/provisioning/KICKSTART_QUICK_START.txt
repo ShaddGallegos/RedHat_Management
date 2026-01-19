@@ -118,7 +118,7 @@ Add to your Satellite deployment playbook:
 
 2. RUN THE PLAYBOOK
 
-ansible-playbook site.yml
+ansible-playbook redhat_management-site.yml
 
 3. VERIFY KICKSTART FILES
 
@@ -334,7 +334,7 @@ NEXT STEPS
    vim defaults/main.yml
 
 3. Deploy to Satellite:
-   ansible-playbook site.yml -e "satellite_kickstart_config_enabled=true"
+   ansible-playbook redhat_management-site.yml -e "satellite_kickstart_config_enabled=true"
 
 4. Verify on Satellite:
    ssh satellite.example.com
