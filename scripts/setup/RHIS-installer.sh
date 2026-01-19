@@ -16,6 +16,12 @@ if [[ -f "${PROJECT_ROOT}/scripts/initialization.sh" ]]; then
     source "${PROJECT_ROOT}/scripts/initialization.sh"
 fi
 
+# Source shared local env helpers (on-demand lookups only)
+if [[ -f "${PROJECT_ROOT}/scripts/lib/local_env.sh" ]]; then
+    # shellcheck disable=SC1090
+    source "${PROJECT_ROOT}/scripts/lib/local_env.sh"
+fi
+
 # Set up directory paths for use in functions
 PLAYBOOKS_DIR="${PROJECT_ROOT}/playbooks"
 INVENTORY_DIR="${PROJECT_ROOT}/inventory"
@@ -874,7 +880,10 @@ generate_env_config() {
     mkdir -p "${PROJECT_ROOT}/.ansible/conf"
     
     # Create env.yml template with structure
-    cat > "${PROJECT_ROOT}/.ansible/conf/env.yml.template" << 'EOF'
+    # Create an example env template under docs/examples to avoid writing
+    # a user-local config into the project root
+    mkdir -p "${PROJECT_ROOT}/docs/examples"
+    cat > "${PROJECT_ROOT}/docs/examples/env.yml.template" << 'EOF'
 ---
 # Ansible Environment Configuration Template
 # Copy to ~/.ansible/conf/env.yml and populate with your values
@@ -917,7 +926,7 @@ azure_client_id: "{{ vault_azure_client_id }}"
 azure_client_secret: "{{ vault_azure_secret }}"
 EOF
     
-    print_success "Environment template created at ${PROJECT_ROOT}/.ansible/conf/env.yml.template"
+    print_success "Environment template created at ${PROJECT_ROOT}/docs/examples/env.yml.template"
 }
 
 generate_host_vars() {
@@ -1969,9 +1978,9 @@ EOF
 # MAIN EXECUTION
 # ============================================================================
 main() {
-    # Initialize credentials before showing menu
-    initialize_credentials
-    
+    # Do NOT initialize credentials automatically. The installer provides
+    # an explicit menu option to configure local credentials so personal
+    # secrets remain local and are only created or modified by operator action.
     while true; do
         show_main_menu
     done

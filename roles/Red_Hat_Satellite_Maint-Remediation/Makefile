@@ -34,9 +34,10 @@ setup:
 		echo "REMOVED_EXAMPLE_PASSWORD" > $(VAULT_PASSWORD_FILE); \
 		chmod 600 $(VAULT_PASSWORD_FILE); \
 	fi
-	@if [ -f env.yml.example ] && [ ! -f env.yml ]; then \
-		echo "Creating env.yml from example..."; \
-		cp env.yml.example env.yml; \
+	if [ -f env.yml.example ] && [ ! -f env.yml ]; then \
+		echo "NOTE: This role no longer creates an env.yml in the role directory."; \
+		echo "Copy the example into your local vaulted config at ~/.ansible/conf/env.yml and edit it there (do NOT commit personal secrets)."; \
+		echo "Example: mkdir -p ~/.ansible/conf && cp env.yml.example ~/.ansible/conf/env.yml"; \
 	fi
 	@if [ -f vault.yml.example ] && [ ! -f vault.yml ]; then \
 		echo "Creating vault.yml from example..."; \

@@ -4,16 +4,16 @@
   ansible.builtin.set_fact:
     control_env_path: "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
 
-- name: Load control env if present
+- name: Load control env if present (only when explicitly enabled)
   ansible.builtin.set_fact:
     control_env: >-
       {{ lookup('file', control_env_path) | default('{}') | from_yaml }}
+  when: use_local_env | default(false) | bool
 
 - name: Resolve admin password
   ansible.builtin.set_fact:
     admin_pass: >-
-      {{ control_env.global_admin_password
-         | default(global_admin_password | default('')) }}
+      {{ (use_local_env | default(false) | bool) | ternary(control_env.global_admin_password | default(''), (global_admin_password | default(''))) }}
 
 - name: Ensure API user exists (collection)
   redhat.satellite.user:
@@ -78,4 +78,4 @@
       hammer_api_user: {{ satellite_api_user | default('hammer_api_user') }}
       hammer_api_token: "{{ satellite_api_token | default('') }}"
     mode: '0600'
-  when: satellite_api_token is defined and satellite_api_token != ''
+    when: (satellite_api_token is defined and satellite_api_token != '') and (use_local_env | default(false) | bool)

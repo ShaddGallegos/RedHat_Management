@@ -31,12 +31,24 @@ if [[ ! -f "$generated_env" ]]; then
   exit 1
 fi
 
-# 2) Seed env.yml if missing
-if [[ ! -f "${ROOT_DIR}/env.yml" ]]; then
-  echo "[INFO] Creating env.yml from env.local.generated.yml"
-  cp "$generated_env" "${ROOT_DIR}/env.yml"
+# 2) Offer to place generated env into a user-local config (never write user secrets into the repo)
+USER_ENV_DIR="${HOME}/.ansible/conf"
+USER_ENV_FILE="${USER_ENV_DIR}/env.yml"
+
+echo "[INFO] A generated environment file is available at: ${generated_env}"
+echo "For security, do NOT store personal credentials or hostnames in the project repository." \
+     "You can move the generated file to your local config directory: ${USER_ENV_FILE}"
+
+read -p "Copy generated env to ${USER_ENV_FILE}? (Y/n): " copy_choice
+copy_choice="${copy_choice:-Y}"
+if [[ "${copy_choice^^}" == "Y" ]]; then
+  mkdir -p "${USER_ENV_DIR}"
+  cp "${generated_env}" "${USER_ENV_FILE}"
+  chmod 600 "${USER_ENV_FILE}"
+  echo "[INFO] Generated env copied to ${USER_ENV_FILE}" 
+  echo "[REMINDER] Encrypt or vault your secrets (ansible-vault encrypt ${USER_ENV_FILE})"
 else
-  echo "[INFO] env.yml already exists; leaving untouched."
+  echo "[INFO] Leaving generated env in place at ${generated_env}. Do not commit it to source control."
 fi
 
 # 3) Seed vault.yml if missing
