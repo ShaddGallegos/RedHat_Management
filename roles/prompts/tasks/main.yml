@@ -13,6 +13,10 @@
 
 - name: Gather Infrastructure Information
   block:
+    # Note: Local user-level config (~/.ansible/conf/env.yml) may exist, but
+    # we do NOT use its values as automatic defaults. Users can opt to lookup
+    # values on-demand via the installer helper scripts. Proceed to prompt.
+
     - name: Prompt for Infrastructure Type
       ansible.builtin.pause:
         prompt: |

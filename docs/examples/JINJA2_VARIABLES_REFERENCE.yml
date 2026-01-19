@@ -353,8 +353,8 @@ infrastructure_config:
 #    Never hard-code credentials in playbooks
 #
 # 3. Store sensitive data in vault:
-#    ansible-vault encrypt env.yml
-#    source env.yml in pre_tasks
+#    ansible-vault encrypt ~/.ansible/conf/env.yml
+#    source ~/.ansible/conf/env.yml in pre_tasks
 #
 # 4. Use filters for security:
 #    - no_log: yes (when displaying passwords)

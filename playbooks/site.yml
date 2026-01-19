@@ -12,7 +12,11 @@
   
   vars:
     project_base_dir: "{{ playbook_dir }}"
-    secrets_file: "{{ ansible_user_dir }}/.ansible/conf/env.yml"
+    # NOTE: Do NOT assume a user-local secrets file. Personal configs must
+    # live only in the user's home and must not be treated as defaults by
+    # the project. If you use a local vaulted env, set `use_local_env=true`
+    # when running playbooks or pass the path explicitly.
+    secrets_file: ""
     supported_scenarios:
       - "satellite"
       - "aap"

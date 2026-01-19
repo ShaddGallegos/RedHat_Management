@@ -14,11 +14,12 @@
   
   vars:
     # File discovery with fallback
+    # NOTE: This archived playbook will only consider a user-local vaulted
+    # env file at `~/.ansible/conf/env.yml`. It will NOT automatically load
+    # a repository-root `env.yml` to avoid accidental commits of secrets.
     params:
       files:
         - "{{ ansible_user_dir }}/.ansible/conf/env.yml"
-        - "{{ playbook_dir }}/env.yml"
-        - "{{ playbook_dir }}/env.yml.example"
       skip: true
     
     # Scenario definitions - use tags for selective execution

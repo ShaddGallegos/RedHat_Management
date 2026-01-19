@@ -21,10 +21,10 @@ cd rhis
 
 ```bash
 # Copy example environment
-cp env.yml.example env.yml
+mkdir -p ~/.ansible/conf && cp env.yml.example ~/.ansible/conf/env.yml
 
 # Edit with your settings
-vi env.yml
+vi ~/.ansible/conf/env.yml
 
 # Key variables to set:
 # - deployment_scenario: satellite-only, aap-only, or full-stack
@@ -75,7 +75,7 @@ ansible all -m ping
 ### Scenario: Satellite-Only
 
 ```bash
-# Set scenario in env.yml
+# Set scenario in your local ~/.ansible/conf/env.yml
 deployment_scenario: satellite-only
 
 # Deploy
@@ -85,7 +85,7 @@ ansible-playbook site.yml -t satellite
 ### Scenario: AAP-Only  
 
 ```bash
-# Set scenario in env.yml
+# Set scenario in your local ~/.ansible/conf/env.yml
 deployment_scenario: aap-only
 
 # Deploy
@@ -95,7 +95,7 @@ ansible-playbook site.yml -t aap
 ### Scenario: Full Stack
 
 ```bash
-# Set scenario in env.yml
+# Set scenario in your local ~/.ansible/conf/env.yml
 deployment_scenario: full-stack
 
 # Deploy all products
