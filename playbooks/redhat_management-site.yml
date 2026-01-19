@@ -1,0 +1,7 @@
+---
+# Wrapper playbook for Red Hat Management entrypoint
+# This file was created to satisfy tools/scripts that expect
+# `playbooks/redhat_management-site.yml` to exist. It imports the
+# primary `site.yml` playbook so behavior remains identical.
+
+- import_playbook: site.yml
