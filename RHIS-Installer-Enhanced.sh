@@ -95,6 +95,12 @@ init_environment() {
     echo "=========================================" >> "${LOG_FILE}"
 }
 
+# Source shared local env helpers if present
+if [[ -f "${PROJECT_ROOT}/scripts/lib/local_env.sh" ]]; then
+    # shellcheck disable=SC1090
+    source "${PROJECT_ROOT}/scripts/lib/local_env.sh"
+fi
+
 # Print styled header
 print_header() {
     clear
@@ -160,6 +166,63 @@ pause() {
 }
 
 # ============================================================================
+# LOCAL CONFIG HELPERS (on-demand only)
+# These helpers read values from a user-local config at ${CREDENTIALS_DIR}/env.yml
+# but DO NOT use them as automatic defaults. Values are read only when explicitly
+# requested by the user during interactive prompts.
+# ============================================================================
+
+# Read a YAML key from ${CREDENTIALS_DIR}/env.yml and print its value.
+# Usage: read_local_env_key "some.key.path"
+read_local_env_key() {
+    local key="$1"
+    local file="${CREDENTIALS_DIR}/env.yml"
+
+    if [[ ! -f "${file}" ]]; then
+        return 1
+    fi
+
+    # Use python to safely parse YAML and return the requested nested key
+    python3 - <<PY
+import sys, yaml
+f='''${file}'''
+k='''${key}'''
+try:
+    with open(f) as fh:
+        data = yaml.safe_load(fh) or {}
+    value = data
+    for part in k.split('.'):
+        if isinstance(value, dict) and part in value:
+            value = value[part]
+        else:
+            print('')
+            sys.exit(0)
+    if value is None:
+        print('')
+    else:
+        print(value)
+except Exception:
+    print('')
+    sys.exit(0)
+PY
+}
+
+# Mask a value for safe display (show only last 4 chars)
+mask_value() {
+    local val="$1"
+    if [[ -z "${val}" ]]; then
+        echo "(not set)"
+        return
+    fi
+    local len=${#val}
+    if [[ ${len} -le 8 ]]; then
+        echo "****${val: -4}"
+    else
+        echo "****${val: -4}"
+    fi
+}
+
+# ============================================================================
 # CREDENTIAL COLLECTION
 # ============================================================================
 
@@ -176,11 +239,41 @@ collect_red_hat_credentials() {
     # Check if credentials file exists
     if [[ -f "${CREDENTIALS_FILE}" ]]; then
         print_warning "Credentials file already exists at ${CREDENTIALS_FILE}"
-        read -p "Do you want to update credentials? (y/N): " -r UPDATE_CREDS
-        if [[ ! "${UPDATE_CREDS}" =~ ^[Yy]$ ]]; then
-            print_success "Using existing credentials"
-            return 0
-        fi
+        echo "Choose how to proceed with existing local credentials:"
+        echo "  [U]pdate - overwrite with new credentials"
+        echo "  [L]ookup - view values from local config and optionally use them for this run (no files changed)"
+        echo "  [S]kip  - do not use local config; enter new credentials now"
+        read -p "Choose [U/L/S] (default U): " -r CREDS_CHOICE
+        CREDS_CHOICE="${CREDS_CHOICE:-U}"
+
+        case "${CREDS_CHOICE^^}" in
+            L)
+                # Attempt to show masked values from local config and ask to use them
+                LOCAL_USER="$(read_local_env_key 'cdn_username' || true)"
+                LOCAL_OFFLINE_TOKEN="$(read_local_env_key 'offline_token' || true)"
+                echo "Local credentials preview:"
+                echo "  CDN Username: $(mask_value "${LOCAL_USER}")"
+                echo "  Offline Token: $(mask_value "${LOCAL_OFFLINE_TOKEN}")"
+                read -p "Use these local credentials for this run? (y/N): " -r USE_LOCAL
+                if [[ "${USE_LOCAL}" =~ ^[Yy]$ ]]; then
+                    export RHIS_CDN_USERNAME="${LOCAL_USER}"
+                    # Do not export full token if empty
+                    if [[ -n "${LOCAL_OFFLINE_TOKEN}" ]]; then
+                        export RHIS_OFFLINE_TOKEN="${LOCAL_OFFLINE_TOKEN}"
+                    fi
+                    print_success "Using local credentials for this session (not saved to repository)"
+                    return 0
+                else
+                    print_info "Proceeding to prompt for new credentials"
+                fi
+                ;;
+            S)
+                print_info "Skipping local config and prompting for credentials"
+                ;;
+            U|*)
+                # Fall through to prompt for new credentials which may later be vaulted by helper
+                ;;
+        esac
     fi
     
     # Collect credentials
@@ -238,8 +331,8 @@ select_scenario() {
     print_option "15" "FULL STACK (Default)" "Satellite + AAP + IdM + OpenShift"
     echo ""
     
-    read -p "Enter scenario number (default: 15): " -r SCENARIO_CHOICE
-    SCENARIO_CHOICE="${SCENARIO_CHOICE:-15}"
+    read -p "Enter scenario number (default: 11): " -r SCENARIO_CHOICE
+    SCENARIO_CHOICE="${SCENARIO_CHOICE:-11}"
     
     if [[ ! ${SCENARIO_CHOICE} =~ ^[0-9]+$ ]] || [[ ${SCENARIO_CHOICE} -lt 1 ]] || [[ ${SCENARIO_CHOICE} -gt 15 ]]; then
         print_error "Invalid scenario selection"
@@ -248,7 +341,7 @@ select_scenario() {
         return
     fi
     
-    DEPLOYMENT_SCENARIO="${SCENARIOS[${SCENARIO_CHOICE}]}"
+    DEPLOYMENT_SCENARIO="${SCENARIOS[${SCENARIO_CHOICE}] }"
     print_success "Selected scenario: ${DEPLOYMENT_SCENARIO}"
     log "INFO" "Deployment scenario selected: ${DEPLOYMENT_SCENARIO}"
 }
@@ -666,43 +759,39 @@ view_logs() {
 show_help() {
     print_header
     print_section "Help Information"
-    
-    cat <<EOF
-${CYAN}RHIS Installer Help${NC}
+        cat <<'HELP'
+RHIS Installer Help
 
-${YELLOW}Description:${NC}
-The RHIS Installer automates the deployment of Red Hat products including:
-- Red Hat Satellite 6.18
-- Ansible Automation Platform 2.6
-- Red Hat Identity Management 3.0
-- OpenShift 4.21
+Description:
+The RHIS Installer automates deployment of Red Hat products including:
+ - Red Hat Satellite 6.18
+ - Ansible Automation Platform 2.6
+ - Red Hat Identity Management 3.0
+ - OpenShift 4.21
 
-${YELLOW}Workflow:${NC}
-1. Credentials - Provide Red Hat CDN and token credentials
-2. Scenario - Select which products to deploy
-3. Platform - Choose deployment platform
-4. OS - Select operating system version
-5. Installation Method - Choose OEMDRV or TFTP
-6. Confirmation - Review and confirm configuration
-7. Deployment - Automated deployment begins
+Workflow:
+ 1. Credentials - provide Red Hat CDN and token credentials
+ 2. Scenario - select which products to deploy
+ 3. Platform - choose deployment platform
+ 4. OS - select operating system version
+ 5. Installation Method - choose OEMDRV or TFTP
+ 6. Confirmation - review and confirm configuration
+ 7. Deployment - automated deployment begins
 
-${YELLOW}Credentials Storage:${NC}
-Credentials are stored securely at:
-${BLUE}${CREDENTIALS_FILE}${NC}
-(Encrypted with Ansible Vault)
+Credentials Storage:
+    Credentials should be stored only in your local configuration directory
+    (e.g. ~/.ansible/conf) and should never be committed to this repository.
+    If you use a local env file, encrypt it with Ansible Vault.
 
-${YELLOW}Configuration Storage:${NC}
-Deployment configuration saved at:
-${BLUE}${CREDENTIALS_DIR}/deployment_config.yml${NC}
+Configuration Storage:
+    Deployment configuration (generated) will be saved in your local config
+    directory: ~/.ansible/conf/deployment_config.yml
 
-${YELLOW}Logs:${NC}
-All deployment logs saved to:
-${BLUE}${LOG_DIR}/${NC}
+Logs:
+    All deployment logs are saved to the project's logs directory.
 
-${YELLOW}For more information:${NC}
-See documentation at: ${DOCS_DIR}/deployment/README.md
-
-EOF
+For more information: see the documentation under docs/deployment/README.md
+HELP
 }
 
 # ============================================================================

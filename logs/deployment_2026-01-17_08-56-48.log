@@ -1,0 +1,5 @@
+RHIS Deployment Log - 2026-01-17_08-56-48
+=========================================
+[2026-01-18 07:12:38] [INFO] Credentials collected successfully
+[2026-01-18 07:13:55] [INFO] Deployment scenario selected: satellite_aap_idm
+[2026-01-18 07:14:09] [INFO] Deployment platform selected: libvirt

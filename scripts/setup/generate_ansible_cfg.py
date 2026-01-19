@@ -13,13 +13,13 @@ from jinja2 import Environment, FileSystemLoader
 
 # Default locations
 HOME = os.path.expanduser("~")
-ENV_YML_FILE = os.path.join(HOME, ".ansible", "conf", "env.yml")
+ENV_YML_FILE = None
 ENV_CONF_FILE = os.path.join(HOME, ".ansible", "conf", "env.conf")
 DEFAULT_PROJECT_ROOT = os.getcwd()
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Generate ansible.cfg from template and environment variables")
-    parser.add_argument("--env-yml", default=ENV_YML_FILE, help="Path to environment YAML file (default: ~/.ansible/conf/env.yml)")
+    parser.add_argument("--env-yml", default=ENV_YML_FILE, help="Path to environment YAML file (optional: only used if provided)")
     parser.add_argument("--env-conf", default=ENV_CONF_FILE, help="Path to environment conf file (KEY=VALUE; default: ~/.ansible/conf/env.conf)")
     parser.add_argument("--project-root", default=DEFAULT_PROJECT_ROOT, help="Project root directory")
     parser.add_argument("--template", default="templates/ansible.cfg.j2", help="Path to ansible.cfg.j2 template file")

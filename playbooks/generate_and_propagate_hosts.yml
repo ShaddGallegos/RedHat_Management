@@ -73,16 +73,9 @@
         label: "{{ item.name }}"
       when: reverse_dns_check | default(false) | bool
 
-    - name: Stat controller env.yml (user-level)
-      stat:
-        path: "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
-      register: controller_env_yml
-
-    - name: Load controller env.yml into `user_env` if present
-      include_vars:
-        file: "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
-        name: user_env
-      when: controller_env_yml.stat.exists
+    # NOTE: Do NOT automatically load a user-level ~/.ansible/conf/env.yml here.
+    # Values from a personal env.yml must be applied explicitly by the operator
+    # (e.g., by setting variables or invoking a helper). Proceed using prompted values.
 
     - name: Render /etc/hosts template to files/generated_hosts
       template:
@@ -116,9 +109,9 @@
         src: ../templates/env.conf.j2
         dest: ../files/env.conf
       vars:
-        github_user: "{{ github_user | default(user_env.github_user | default('')) }}"
-        github_repo: "{{ github_repo | default(user_env.github_repo | default('')) }}"
-        github_pat: "{{ github_pat | default(user_env.github_token | default(user_env.github_pat | default(''))) }}"
+        github_user: "{{ github_user | default('') }}"
+        github_repo: "{{ github_repo | default('') }}"
+        github_pat: "{{ github_pat | default('') }}"
 
 - name: Propagate hosts and inventory to all machines
   hosts: all

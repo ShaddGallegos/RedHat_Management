@@ -1,9 +1,16 @@
 ---
 # Entry point for satellite mail + stack bootstrap
 
-- name: Load vaulted/env variables
+- name: Stat satellite mail vaulted file (only when explicitly requested)
+  ansible.builtin.stat:
+    path: "{{ satellite_mail_vault_file }}"
+  register: satellite_mail_vault_stat
+  when: (satellite_mail_vault_file is defined and satellite_mail_vault_file != '') and (use_local_env | default(false) | bool)
+
+- name: Load vaulted/env variables (only when explicitly requested)
   ansible.builtin.include_vars:
-    file: "{{ satellite_mail_vault_file | default('~/.ansible/conf/env.yml') }}"
+    file: "{{ satellite_mail_vault_file }}"
+  when: (satellite_mail_vault_file is defined and satellite_mail_vault_file != '') and (use_local_env | default(false) | bool) and satellite_mail_vault_stat.stat.exists
   ignore_errors: false
   no_log: true
 
