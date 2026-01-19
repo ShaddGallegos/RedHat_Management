@@ -465,8 +465,6 @@
             3. Access AAP: https://aap-controller
             4. Access IdM: https://idm-host
             5. Access Ansible-CMDB: http://satellite-host:8081
-          
           For troubleshooting, see:
             - docs/troubleshooting/
             - logs/deployment_{{ deployment_timestamp }}.log
-      tags: ["always"]

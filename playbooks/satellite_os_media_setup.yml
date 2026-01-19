@@ -1,15 +1,10 @@
 ---
-# Satellite OS and Media Configuration Playbook
-# Creates Operating Systems and Installation Media for RHEL 9 & 10
+# Satellite OS & install media wrapper playbook
+# Delegates OS/media creation to the `satellite_os_configuration` role.
 
-- name: Configure Satellite Operating Systems and Installation Media
+- name: "Satellite OS and install media setup"
   hosts: satellite
   gather_facts: yes
-  
-  vars:
-    satellite_url: "https://{{ inventory_hostname }}"
-    satellite_username: "admin"
-    # satellite_password: use vault
 
   roles:
     - role: satellite_os_configuration
@@ -20,18 +15,4 @@
         create_kickstart_repo: false
         configure_sync_job: false
 
-  post_tasks:
-    - name: Display OS Configuration Summary
-      ansible.builtin.debug:
-        msg: |
-          ✅ Satellite Operating System Configuration Complete
-          
-          Configured Operating Systems:
-          - RHEL 9 (9.0, SHA512 password hash)
-          - RHEL 10 (10.0, SHA512 password hash)
-          
-          Configured Installation Media:
-          - RHEL 9 BaseOS: http://cdn.redhat.com/content/dist/rhel/rhel-9/...
-          - RHEL 10 BaseOS: http://cdn.redhat.com/content/dist/rhel/rhel-10/...
-          
-          Next: Configure provisioning templates and partition tables
+# End of playbook — role performs configuration and reporting
