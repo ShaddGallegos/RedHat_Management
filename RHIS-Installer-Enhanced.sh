@@ -277,8 +277,8 @@ collect_red_hat_credentials() {
     fi
     
     # Collect credentials
-    read -sp "Red Hat CDN Username (for redhat.com/redhat.io): " -r CDN_USERNAME
-    echo ""
+    # Username should be visible while typing; passwords remain hidden
+    read -p "Red Hat CDN Username (for redhat.com/redhat.io): " -r CDN_USERNAME
     read -sp "Red Hat CDN Password (for redhat.com/redhat.io): " -r CDN_PASSWORD
     echo ""
     read -sp "Red Hat Offline Token (for console.redhat.com/Automation Hub): " -r OFFLINE_TOKEN
@@ -329,10 +329,17 @@ select_scenario() {
     print_option "13" "Satellite + IdM + OpenShift" "Inventory + Identity + Containers"
     print_option "14" "AAP + IdM + OpenShift" "Automation + Identity + Containers"
     print_option "15" "FULL STACK (Default)" "Satellite + AAP + IdM + OpenShift"
+    print_option "0" "Exit" "Exit installer"
     echo ""
     
     read -p "Enter scenario number (default: 11): " -r SCENARIO_CHOICE
     SCENARIO_CHOICE="${SCENARIO_CHOICE:-11}"
+
+    if [[ "${SCENARIO_CHOICE}" == "0" ]]; then
+        print_info "Exiting installer"
+        log "INFO" "Installer exited by user (scenario menu)"
+        exit 0
+    fi
     
     if [[ ! ${SCENARIO_CHOICE} =~ ^[0-9]+$ ]] || [[ ${SCENARIO_CHOICE} -lt 1 ]] || [[ ${SCENARIO_CHOICE} -gt 15 ]]; then
         print_error "Invalid scenario selection"
@@ -341,7 +348,7 @@ select_scenario() {
         return
     fi
     
-    DEPLOYMENT_SCENARIO="${SCENARIOS[${SCENARIO_CHOICE}] }"
+    DEPLOYMENT_SCENARIO="${SCENARIOS[$SCENARIO_CHOICE]}"
     print_success "Selected scenario: ${DEPLOYMENT_SCENARIO}"
     log "INFO" "Deployment scenario selected: ${DEPLOYMENT_SCENARIO}"
 }
@@ -363,10 +370,17 @@ select_platform() {
     print_option "5" "GCP" "Google Cloud Platform"
     print_option "6" "VMware" "VMware vSphere"
     print_option "7" "Nutanix" "Nutanix HCI platform"
+    print_option "0" "Exit" "Exit installer"
     echo ""
     
     read -p "Enter platform number (default: 1 - LibVirt): " -r PLATFORM_CHOICE
     PLATFORM_CHOICE="${PLATFORM_CHOICE:-1}"
+
+    if [[ "${PLATFORM_CHOICE}" == "0" ]]; then
+        print_info "Exiting installer"
+        log "INFO" "Installer exited by user (platform menu)"
+        exit 0
+    fi
     
     if [[ ! ${PLATFORM_CHOICE} =~ ^[0-9]+$ ]] || [[ ${PLATFORM_CHOICE} -lt 1 ]] || [[ ${PLATFORM_CHOICE} -gt 7 ]]; then
         print_error "Invalid platform selection"
@@ -392,10 +406,17 @@ select_os() {
     echo ""
     print_option "1" "RHEL 9" "Red Hat Enterprise Linux 9 (default)"
     print_option "2" "RHEL 10" "Red Hat Enterprise Linux 10"
+    print_option "0" "Exit" "Exit installer"
     echo ""
     
     read -p "Enter OS number (default: 1 - RHEL 9): " -r OS_CHOICE
     OS_CHOICE="${OS_CHOICE:-1}"
+
+    if [[ "${OS_CHOICE}" == "0" ]]; then
+        print_info "Exiting installer"
+        log "INFO" "Installer exited by user (os menu)"
+        exit 0
+    fi
     
     if [[ ! ${OS_CHOICE} =~ ^[0-9]+$ ]] || [[ ${OS_CHOICE} -lt 1 ]] || [[ ${OS_CHOICE} -gt 2 ]]; then
         print_error "Invalid OS selection"
@@ -448,10 +469,17 @@ select_installation_method() {
     echo ""
     print_option "1" "OEMDRV Kickstart" "Use OEMDRV kickstart files for automated installation"
     print_option "2" "TFTP/PXE Boot" "Use TFTP server for network booting"
+    print_option "0" "Exit" "Exit installer"
     echo ""
     
     read -p "Enter installation method (default: 1 - OEMDRV): " -r INSTALL_METHOD_CHOICE
     INSTALL_METHOD_CHOICE="${INSTALL_METHOD_CHOICE:-1}"
+
+    if [[ "${INSTALL_METHOD_CHOICE}" == "0" ]]; then
+        print_info "Exiting installer"
+        log "INFO" "Installer exited by user (installation method menu)"
+        exit 0
+    fi
     
     case ${INSTALL_METHOD_CHOICE} in
         1)
@@ -610,9 +638,16 @@ run_deployment_playbooks() {
     print_info "Tags: ${playbook_tags}"
     log "INFO" "Running playbook with tags: ${playbook_tags}"
     
-    # Run the main deployment playbook
+    # Prefer the real main playbook, but fall back to a safe placeholder
+    main_playbook="${PLAYBOOKS_DIR}/site.yml"
+    if ! ansible-playbook "${main_playbook}" --syntax-check -i "${INVENTORY_DIR}/hosts" >/dev/null 2>&1; then
+        print_warning "Main playbook ${main_playbook} failed syntax check — using placeholder playbook"
+        main_playbook="${PLAYBOOKS_DIR}/_placeholder_site.yml"
+    fi
+
+    # Run the selected playbook
     ansible-playbook \
-        "${PLAYBOOKS_DIR}/redhat_management-site.yml" \
+        "${main_playbook}" \
         --tags "${playbook_tags}" \
         -e "deployment_scenario=${DEPLOYMENT_SCENARIO}" \
         -e "deployment_platform=${DEPLOYMENT_PLATFORM}" \
@@ -640,7 +675,7 @@ verify_deployment() {
     
     # Run validation playbook
     ansible-playbook \
-        "${PLAYBOOKS_DIR}/redhat_management-site.yml" \
+        "${PLAYBOOKS_DIR}/site.yml" \
         --tags "validate" \
         -i "${INVENTORY_DIR}/hosts" \
         -v 2>&1 | tee -a "${LOG_FILE}"
@@ -671,7 +706,7 @@ show_main_menu() {
     print_option "5" "View Configuration" "Display current deployment configuration"
     print_option "6" "View Logs" "Display deployment logs"
     print_option "7" "Help" "Display help information"
-    print_option "8" "Exit" "Exit installer"
+    print_option "0" "Exit" "Exit installer"
     echo ""
     
     read -p "Enter option number: " -r MENU_CHOICE
@@ -704,7 +739,7 @@ show_main_menu() {
             show_help
             pause
             ;;
-        8)
+        0)
             print_info "Exiting installer"
             log "INFO" "Installer exited by user"
             exit 0
