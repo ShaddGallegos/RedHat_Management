@@ -1,112 +1,27 @@
 ---
-# Complete Satellite Infrastructure Provisioning Playbook
-# Configures OS, Install Media, Kickstart Repository, and Network Infrastructure
-# For RHEL 9 & 10 BaseOS with 10.168.0.0/16 network
+# Satellite infrastructure wrapper playbook
+# Delegates work to existing roles; keep variables in group_vars.
 
-- name: Deploy Complete Satellite Infrastructure with Network Configuration
+- name: "Satellite infrastructure setup"
   hosts: satellite
   gather_facts: yes
   vars_files:
     - "group_vars/all.yml"
     - "group_vars/satellite.yml"
-  
-  vars:
-    # Satellite Connection
-    satellite_url: "https://{{ ansible_fqdn }}"
-    satellite_username: "admin"
-    # satellite_password defined in vault or group_vars
-    
-    # Feature flags
-    setup_os: true
-    setup_install_media: true
-    setup_kickstart_repo: true
-    setup_sync_jobs: true
-    setup_network: true
-
-  pre_tasks:
-    - name: Display deployment information
-      ansible.builtin.debug:
-        msg: |
-          ========================================
-          Satellite Infrastructure Deployment
-          ========================================
-          
-          Target: {{ ansible_fqdn }}
-          OS Setup: {{ setup_os }}
-          Install Media Setup: {{ setup_install_media }}
-          Kickstart Repository: {{ setup_kickstart_repo }}
-          Sync Jobs: {{ setup_sync_jobs }}
-          Network Infrastructure: {{ setup_network }}
-          
-          ========================================
 
   roles:
-    # Phase 1: Operating Systems and Install Media
     - role: satellite_os_configuration
-      when: setup_os or setup_install_media
+      when: (setup_os | default(true)) or (setup_install_media | default(true)) or (setup_kickstart_repo | default(false)) or (setup_sync_jobs | default(false))
       vars:
-        satellite_os_config_enabled: true
-        create_operatingsystems: "{{ setup_os }}"
-        create_install_media: "{{ setup_install_media }}"
-        create_kickstart_repo: "{{ setup_kickstart_repo }}"
-        configure_sync_job: "{{ setup_sync_jobs }}"
+        satellite_os_config_enabled: "{{ setup_os | default(true) }}"
+        create_operatingsystems: "{{ setup_os | default(true) }}"
+        create_install_media: "{{ setup_install_media | default(true) }}"
+        create_kickstart_repo: "{{ setup_kickstart_repo | default(false) }}"
+        configure_sync_job: "{{ setup_sync_jobs | default(false) }}"
 
-    # Phase 2: Network Infrastructure (10.168.0.0/16)
     - role: network_infrastructure_config
-      when: setup_network
+      when: (setup_network | default(false))
       vars:
-        network_config_enabled: true
+        network_config_enabled: "{{ setup_network | default(false) }}"
 
-  post_tasks:
-    - name: Display deployment summary
-      ansible.builtin.debug:
-        msg: |
-          ========================================
-          Deployment Complete
-          ========================================
-          
-          ✅ Operating Systems Configured
-          ✅ Install Media Available
-          ✅ Kickstart Repository Ready
-          ✅ Network Infrastructure Configured
-          
-          Next Steps:
-          1. Configure provisioning templates
-          2. Assign kickstart templates to OS
-          3. Link installation media
-          4. Configure PXE boot options
-          5. Begin automated provisioning
-          
-          ========================================
-
-    - name: Save deployment status
-      ansible.builtin.copy:
-        content: |
-          Satellite Infrastructure Deployment Summary
-          =============================================
-          
-          Deployment Date: {{ ansible_date_time.iso8601 }}
-          Target: {{ ansible_fqdn }}
-          
-          Completed:
-          - Operating Systems: RHEL 9, RHEL 10
-          - Install Media: BaseOS for both versions
-          - Kickstart Repository: Weekly sync enabled
-          - Network Subnet: 10.168.0.0/16
-          
-          RHEL 9 Configuration:
-          - Major: 9, Minor: 0
-          - Install Media: http://cdn.redhat.com/content/dist/rhel/rhel-9/...
-          
-          RHEL 10 Configuration:
-          - Major: 10, Minor: 0
-          - Install Media: http://cdn.redhat.com/content/dist/rhel/rhel-10/...
-          
-          Network Configuration:
-          - Primary Subnet: 10.168.0.0/16
-          - Gateway: 10.168.0.1
-          - Host Groups: 6 configured
-          - Static Hosts: 3 configured (Satellite, IdM, AAP)
-          
-          Status: Ready for provisioning
-        dest: "/tmp/satellite_deployment_{{ ansible_date_time.iso8601_basic_short }}.txt"
+# End of playbook — role implementations perform the real work
