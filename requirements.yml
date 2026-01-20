@@ -21,24 +21,25 @@ collections:
   - name: community.azure
   - name: community.google
   - name: community.hashi_vault
-  collections:
-    - name: ansible.posix
-    - name: ansible.netcommon
-    - name: community.crypto
-    - name: redhat.rhel_system_roles
-    - name: redhat.insights
-    - name: ansible.utils
-    - name: community.os_windows
-    - name: community.platform_vmware
-    - name: community.docker
-    - name: community.kubernetes
-    - name: kubernetes.core
-    - name: google.cloud
-    - name: amazon.aws
-    - name: azure.azcollection
-    - name: community.aws
-    - name: community.azure
-    - name: community.google
-    - name: community.hashi_vault
-    - name: ansible.os_windows
-    - name: community.general
+  - name: ansible.os_windows
+  - name: ansible.posix
+  - name: ansible.netcommon
+  - name: community.crypto
+  - name: redhat.rhel_system_roles
+  - name: redhat.insights
+  - name: ansible.utils
+  - name: community.os_windows
+  - name: community.platform_vmware
+  - name: community.docker
+  - name: community.kubernetes
+  - name: kubernetes.core
+  - name: google.cloud
+  - name: amazon.aws
+  - name: azure.azcollection
+  - name: community.aws
+  - name: community.azure
+  - name: community.google
+  - name: community.hashi_vault
+  - name: ansible.os_windows
+  - name: community.general
+  
