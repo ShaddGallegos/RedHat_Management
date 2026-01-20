@@ -1,6 +1,6 @@
 ---
-# Test: aap_credentials_config role
-- name: Test aap_credentials_config role
+# Test: aap_credentials role
+- name: Test aap_credentials role
   hosts: localhost
   gather_facts: false
   vars:

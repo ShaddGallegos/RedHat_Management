@@ -111,7 +111,7 @@ mandatory_os_config: []              # OS-specific config
   hosts: aap
   roles:
     - common_tasks  # Include common tasks as dependency
-    - aap_2_6_setup # Product-specific setup
+    - aap # Product-specific setup
 
   tasks:
     - name: Update system

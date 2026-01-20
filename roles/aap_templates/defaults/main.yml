@@ -1,5 +1,5 @@
 ---
-# Default variables for aap_templates_config role
+# Default variables for aap_templates role
 aap_templates_config_enabled: true
 aap_templates_config_version: "1.0"
 aap_templates_config_timeout: 600

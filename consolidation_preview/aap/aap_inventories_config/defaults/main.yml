@@ -1,5 +1,5 @@
 ---
-# Default variables for aap_inventories_config role
+# Default variables for aap_inventories role
 aap_inventories_config_enabled: true
 aap_inventories_config_version: "1.0"
 aap_inventories_config_timeout: 600

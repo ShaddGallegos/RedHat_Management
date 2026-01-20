@@ -116,7 +116,7 @@
 
             - name: Include AAP setup role
               ansible.builtin.include_role:
-                name: aap_2_6_setup
+                name: aap
               vars:
                 aap_bundle_path: "{{ base_dir | default('.') }}/files/ansible-automation-platform-containerized-setup-bundle-2.6-4-x86_64/"
                 aap_cluster_enabled: true

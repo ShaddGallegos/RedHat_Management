@@ -1,8 +1,8 @@
-# Role: aap_inventories_config
+# Role: aap_inventories
 
 ## Description
 
-The `aap_inventories_config` role configures inventories in Ansible Automation Platform (AAP). It manages static inventories, dynamic inventory sources, and inventory synchronization.
+The `aap_inventories` role configures inventories in Ansible Automation Platform (AAP). It manages static inventories, dynamic inventory sources, and inventory synchronization.
 
 **Key Responsibility**: Configure and manage AAP inventories.
 
@@ -78,7 +78,7 @@ inventory_sources:
 - name: Configure AAP Inventories
   hosts: localhost
   roles:
-    - role: aap_inventories_config
+    - role: aap_inventories
       vars:
         create_static_inventories: true
         create_dynamic_inventories: true

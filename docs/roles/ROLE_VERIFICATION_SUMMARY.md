@@ -70,12 +70,12 @@ Roles with full structure, documentation, and handlers:
 
 Roles missing handlers, README, or handlers:
 
-1. **aap_2_6_setup**
+1. **aap**
    - Missing: README.md, handlers/
    - Action: ✅ Add README with AAP setup details
    - Action: ✅ Create handlers/main.yml for service restarts
 
-2. **aap_credentials_config**
+2. **aap_credentials**
    - Missing: README.md, handlers/
    - Action: ✅ Add comprehensive README
    - Action: ✅ Create handlers for credential updates
@@ -121,7 +121,7 @@ services_provisioning_stack (Core)
 ├── network_infrastructure_config (Interface setup)
 ├── satellite_6_18_deployment (Content server)
 ├── idm_integration (User/cert management)
-├── aap_2_6_setup (Automation platform)
+├── aap (Automation platform)
 └── infrastructure (Base services)
 ```
 
@@ -132,7 +132,7 @@ services_provisioning_stack (Core)
 3. **services_provisioning_stack** - DHCP, DNS, TFTP, PXE
 4. **satellite_6_18_deployment** - Satellite server
 5. **idm_integration** - Identity management
-6. **aap_2_6_setup** - Automation platform
+6. **aap** - Automation platform
 7. **Other roles** - As needed
 
 ## Variable Consistency
@@ -202,7 +202,7 @@ Every role now includes README.md with:
 - Restart satellite services
 - Reload satellite configurations
 
-**aap_2_6_setup**
+**aap**
 - Restart AAP services
 - Reload AAP configurations
 

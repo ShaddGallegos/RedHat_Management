@@ -1,7 +1,7 @@
 ---
 # Product Installation Role - Installation tasks executor
 # This role handles product-specific installation tasks
-# Calls product-specific roles (e.g., aap_2_6_setup, satellite_base, idm_base)
+# Calls product-specific roles (e.g., aap, satellite_base, idm_base)
 # 
 # Usage:
 #   - name: Install AAP
@@ -11,7 +11,7 @@
 #         vars:
 #           product_name: aap
 #           product_roles:
-#             - aap_2_6_setup
+#             - aap
 
 - name: "Display installation information"
   ansible.builtin.debug:

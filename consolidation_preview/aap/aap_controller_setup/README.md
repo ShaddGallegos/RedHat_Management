@@ -1,4 +1,4 @@
-# rhis_aap_controller_setup
+# aap_controller
 
 Configure Ansible Automation Platform controller instance with manifest, authentication, and certificates.
 
@@ -37,7 +37,7 @@ aap_controller_validate_certs: false
 ```yaml
 - hosts: localhost
   roles:
-    - role: rhis_aap_controller_setup
+    - role: aap_controller
       vars:
         aap_controller_host: "aap-controller.prod.spg"
         aap_manifest_source_path: "/opt/manifests/aap.zip"

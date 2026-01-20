@@ -1,6 +1,6 @@
 ---
-# Test: aap_inventories_config role
-- name: Test aap_inventories_config role
+# Test: aap_inventories role
+- name: Test aap_inventories role
   hosts: localhost
   gather_facts: false
   vars:

@@ -6,7 +6,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ## Roles Created
 
-### 1. aap_credentials_config
+### 1. aap_credentials
 **Purpose**: Manage all credential types in AAP
 
 **Capabilities**:
@@ -40,7 +40,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ---
 
-### 2. aap_inventories_config
+### 2. aap_inventories
 **Purpose**: Configure static and dynamic inventories in AAP
 
 **Capabilities**:
@@ -74,7 +74,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ---
 
-### 3. aap_projects_config
+### 3. aap_projects
 **Purpose**: Configure projects (playbook repositories) in AAP
 
 **Capabilities**:
@@ -108,7 +108,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ---
 
-### 4. aap_templates_config
+### 4. aap_templates
 **Purpose**: Configure job and workflow templates in AAP
 
 **Capabilities**:
@@ -156,7 +156,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
   hosts: aap_controllers
   roles:
     # First configure credentials
-    - role: aap_credentials_config
+    - role: aap_credentials
       vars:
         aap_url: "https://aap.prod.example.com"
         aap_username: "admin"
@@ -167,7 +167,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
         create_satellite_credentials: true
 
     # Then configure inventories
-    - role: aap_inventories_config
+    - role: aap_inventories
       vars:
         aap_url: "https://aap.prod.example.com"
         create_static_inventories: true
@@ -175,7 +175,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
         create_inventory_sources: true
 
     # Then configure projects
-    - role: aap_projects_config
+    - role: aap_projects
       vars:
         aap_url: "https://aap.prod.example.com"
         create_git_projects: true
@@ -183,7 +183,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
         aap_projects_sync_on_create: true
 
     # Finally configure templates
-    - role: aap_templates_config
+    - role: aap_templates
       vars:
         aap_url: "https://aap.prod.example.com"
         create_job_templates: true
@@ -192,10 +192,10 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ### Execution Order
 
-1. **aap_credentials_config** - Create all credentials first
-2. **aap_inventories_config** - Create inventories
-3. **aap_projects_config** - Setup projects with repositories
-4. **aap_templates_config** - Create templates that reference above
+1. **aap_credentials** - Create all credentials first
+2. **aap_inventories** - Create inventories
+3. **aap_projects** - Setup projects with repositories
+4. **aap_templates** - Create templates that reference above
 
 This order ensures all dependencies are met before template creation.
 
@@ -320,7 +320,7 @@ Each role includes:
 
 **Role Dependencies**:
 - None (AAP must be pre-deployed)
-- aap_2_6_setup (recommended as prerequisite)
+- aap (recommended as prerequisite)
 
 ---
 

@@ -1,8 +1,8 @@
-# Role: aap_templates_config
+# Role: aap_templates
 
 ## Description
 
-The `aap_templates_config` role configures job templates and workflow templates in Ansible Automation Platform (AAP). Templates define how playbooks are executed with specific inventories, credentials, and configurations.
+The `aap_templates` role configures job templates and workflow templates in Ansible Automation Platform (AAP). Templates define how playbooks are executed with specific inventories, credentials, and configurations.
 
 **Key Responsibility**: Configure and manage AAP templates for RHIS deployments.
 
@@ -70,7 +70,7 @@ workflow_templates:
 - name: Configure AAP Templates
   hosts: localhost
   roles:
-    - role: aap_templates_config
+    - role: aap_templates
       vars:
         create_job_templates: true
         create_workflow_templates: true
@@ -78,7 +78,7 @@ workflow_templates:
 
 ### Configure with Prompts
 ```yaml
-- role: aap_templates_config
+- role: aap_templates
   vars:
     job_templates:
       - name: "RHIS_Deploy"
@@ -102,9 +102,9 @@ workflow_templates:
 
 ## Dependencies
 
-- aap_credentials_config (for credentials)
-- aap_inventories_config (for inventories)
-- aap_projects_config (for projects)
+- aap_credentials (for credentials)
+- aap_inventories (for inventories)
+- aap_projects (for projects)
 
 ## Author
 

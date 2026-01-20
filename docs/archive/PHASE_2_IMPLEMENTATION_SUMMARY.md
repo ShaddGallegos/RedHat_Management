@@ -200,13 +200,13 @@ satellite_rhis_environment: "production"
 20. ✅ redhat_products/insights
 21. ✅ integration
 22. ✅ support
-23. ✅ rhis_aap_deployment
+23. ✅ aap_deploy
 24. ✅ satellite_6_18_deployment
 25. ✅ openshift_4_21_deployment
-26. ✅ aap_2_6_setup
+26. ✅ aap
 27. ✅ rhis_host_provisioning
 28. ✅ rhis_inventory_integration
-29. ✅ rhis_aap_controller_setup
+29. ✅ aap_controller
 30. ✅ legacy
 31. ✅ product_lifecycle
 32. ✅ libvirt_vm_provisioner

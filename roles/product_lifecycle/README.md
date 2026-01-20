@@ -23,7 +23,7 @@ skip_validation: false
 - name: Install AAP
   hosts: aap
   roles:
-    - aap_2_6_setup              # Product-specific role
+    - aap              # Product-specific role
     - product_lifecycle/install  # Lifecycle orchestrator
 ```
 

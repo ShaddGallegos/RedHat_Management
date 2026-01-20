@@ -33,7 +33,7 @@ several high-impact improvement opportunities:
 
 **Example Missing**:
 ```
-aap_2_6_setup/
+aap/
 baremetal_provisioner/
 deployment_setup/
 infrastructure_manager/
@@ -65,7 +65,7 @@ support/
 - Missing quick reference
 - No variable dependency documentation
 
-**Examples Missing**: aap_2_6_setup, baremetal_provisioner, deployment_setup, infrastructure_manager, integration, os/, redhat_products/*, support/ (30+ roles)
+**Examples Missing**: aap, baremetal_provisioner, deployment_setup, infrastructure_manager, integration, os/, redhat_products/*, support/ (30+ roles)
 
 ---
 

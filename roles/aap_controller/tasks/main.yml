@@ -1,5 +1,5 @@
 ---
-# Role: rhis_aap_controller_setup
+# Role: aap_controller
 # Purpose: Configure AAP controller (manifest, auth, certificates)
 # This role sets up the AAP controller instance with licenses, authentication,
 # and service certificates before deployment.

@@ -11,14 +11,14 @@ High-level groups and proposed canonical targets (examples & mappings):
 1) Ansible Automation Platform (AAP)
 - Canonical: `roles/aap` (core installation/config) and supporting roles `roles/aap_controller`, `roles/aap_deploy`, `roles/aap_inventories`, `roles/aap_projects`, `roles/aap_templates`
 - Current candidates to merge:
-  - `aap_2_6_setup` -> `aap` (merge tasks into `roles/aap/install.yml` / `roles/aap/tasks`)
-  - `aap_controller_setup` -> `aap_controller`
-  - `aap_deployment` -> `aap_deploy`
-  - `aap_credentials_config` -> `aap/credentials` or `aap_credentials`
-  - `aap_inventories_config` -> `aap_inventories`
-  - `aap_projects_config` -> `aap_projects`
-  - `aap_templates_config` -> `aap_templates`
-  - `ansible_automation_platform` (composite) -> keep as `roles/aap` with imported task files (`install.yml`, `configure.yml`, `test.yml`, `backup.yml`, `restore.yml`)
+  - `aap` -> `aap` (merge tasks into `roles/aap/install.yml` / `roles/aap/tasks`)
+  - `aap_controller` -> `aap_controller`
+  - `aap_deploy` -> `aap_deploy`
+  - `aap_credentials` -> `aap/credentials` or `aap_credentials`
+  - `aap_inventories` -> `aap_inventories`
+  - `aap_projects` -> `aap_projects`
+  - `aap_templates` -> `aap_templates`
+  - `aap_composite` (composite) -> keep as `roles/aap` with imported task files (`install.yml`, `configure.yml`, `test.yml`, `backup.yml`, `restore.yml`)
 
 2) EDA (Event-Driven Ansible)
 - Canonical: `roles/eda` and `roles/eda_start`, `roles/eda_stop`, `roles/eda_config` as needed

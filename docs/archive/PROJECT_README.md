@@ -58,7 +58,7 @@ RedHat_Management/
 │   ├── services_provisioning_stack/  DHCP, DNS, TFTP, PXE
 │   ├── satellite_6_18_deployment/
 │   ├── satellite_content_config/
-│   ├── aap_2_6_setup/
+│   ├── aap/
 │   ├── idm_integration/
 │   ├── network_infrastructure_config/
 │   └── [20+ other roles]
@@ -188,11 +188,11 @@ RedHat_Management/
 - **satellite_kickstart_config** - Kickstart template setup
 
 ### AAP Services
-- **aap_2_6_setup** - Ansible Automation Platform deployment
-- **aap_credentials_config** - Credential management
-- **aap_inventories_config** - Inventory configuration
-- **aap_projects_config** - Project management
-- **aap_templates_config** - Job template configuration
+- **aap** - Ansible Automation Platform deployment
+- **aap_credentials** - Credential management
+- **aap_inventories** - Inventory configuration
+- **aap_projects** - Project management
+- **aap_templates** - Job template configuration
 
 ### Identity Management
 - **idm_integration** - Identity Management integration

@@ -1,6 +1,6 @@
 ---
-# Test: aap_templates_config role
-- name: Test aap_templates_config role
+# Test: aap_templates role
+- name: Test aap_templates role
   hosts: localhost
   gather_facts: false
   vars:

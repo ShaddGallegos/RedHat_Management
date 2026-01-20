@@ -1,8 +1,8 @@
-# Role: aap_credentials_config
+# Role: aap_credentials
 
 ## Description
 
-The `aap_credentials_config` role configures credentials in Ansible Automation Platform (AAP). It manages the creation and configuration of all credential types needed for RHIS deployments.
+The `aap_credentials` role configures credentials in Ansible Automation Platform (AAP). It manages the creation and configuration of all credential types needed for RHIS deployments.
 
 **Key Responsibility**: Configure and manage AAP credentials for automation.
 
@@ -96,7 +96,7 @@ satellite_credentials:
 - name: Configure AAP Credentials
   hosts: localhost
   roles:
-    - role: aap_credentials_config
+    - role: aap_credentials
       vars:
         aap_url: "https://aap.prod.example.com"
         aap_username: "admin"
@@ -108,7 +108,7 @@ satellite_credentials:
 
 ### Configure Specific Credential Type
 ```yaml
-- role: aap_credentials_config
+- role: aap_credentials
   vars:
     create_machine_credentials: true
     create_vault_credentials: false

@@ -1,5 +1,5 @@
 ---
-# Default variables for aap_2_6_setup role
+# Default variables for aap role
 aap_2_6_setup_enabled: false
 aap_2_6_setup_version: "1.0"
 

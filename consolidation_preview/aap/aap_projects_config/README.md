@@ -1,8 +1,8 @@
-# Role: aap_projects_config
+# Role: aap_projects
 
 ## Description
 
-The `aap_projects_config` role configures projects in Ansible Automation Platform (AAP). Projects contain playbooks and roles sourced from Git repositories or manually uploaded content.
+The `aap_projects` role configures projects in Ansible Automation Platform (AAP). Projects contain playbooks and roles sourced from Git repositories or manually uploaded content.
 
 **Key Responsibility**: Configure and manage AAP projects.
 
@@ -65,7 +65,7 @@ manual_projects:
 - name: Configure AAP Projects
   hosts: localhost
   roles:
-    - role: aap_projects_config
+    - role: aap_projects
       vars:
         create_git_projects: true
         create_manual_projects: true

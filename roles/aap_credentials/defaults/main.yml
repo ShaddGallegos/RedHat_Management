@@ -1,5 +1,5 @@
 ---
-# Default variables for aap_credentials_config role
+# Default variables for aap_credentials role
 aap_credentials_config_enabled: true
 aap_credentials_config_version: "1.0"
 aap_credentials_config_timeout: 600

@@ -1,4 +1,4 @@
-# rhis_aap_deployment
+# aap_deploy
 
 Deploy Ansible Automation Platform using the AAP installer.
 
@@ -39,7 +39,7 @@ builder_key_file: "~/.ssh/id_rsa"
 ```yaml
 - hosts: localhost
   roles:
-    - role: rhis_aap_deployment
+    - role: aap_deploy
       vars:
         aap_installer_bundle_dir: "/opt/aap-2.6"
         controllers:

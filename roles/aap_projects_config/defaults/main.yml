@@ -1,5 +1,5 @@
 ---
-# Default variables for aap_projects_config role
+# Default variables for aap_projects role
 aap_projects_config_enabled: true
 aap_projects_config_version: "1.0"
 aap_projects_config_timeout: 600

@@ -10,7 +10,7 @@ Inventory plugins and examples now live in `plugins/inventory/`.
 
 Role-to-inventory examples (under `roles/<role>/inventory/`):
 - satellite               -> satellite_inventory.yml (plugin: satellite_inventory)
-- ansible_automation_platform -> aap_inventory.yml (static/example)
+- aap_composite -> aap_inventory.yml (static/example)
 - openshift               -> openshift_inventory.yml (static/example)
 - nutanix                 -> nutanix_inventory.yml (plugin: nutanix_dynamic)
 - servicenow              -> servicenow_inventory.yml (plugin: servicenow_inventory)

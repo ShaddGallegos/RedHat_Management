@@ -1,5 +1,5 @@
 ---
-# Default variables for rhis_aap_deployment role
+# Default variables for aap_deploy role
 
 # AAP installer settings
 aap_installer_version: "2.6"

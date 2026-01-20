@@ -7,7 +7,7 @@ Complete documentation for all Red Hat products and components deployed through 
 ### [Ansible Automation Platform (AAP) 2.6](aap/AAP_2_6_GUIDE.md)
 Enterprise automation platform providing scalable automation execution, management, and governance.
 - **IP:** 10.168.0.26
-- **Roles:** `roles/aap_2_6_setup/`, `roles/rhis_aap_deployment/`, `roles/rhis_aap_controller_setup/`
+- **Roles:** `roles/aap/`, `roles/aap_deploy/`, `roles/aap_controller/`
 - **Quick Start:** [AAP_2_6_GUIDE.md](aap/AAP_2_6_GUIDE.md#quick-start)
 
 ### [Red Hat Satellite 6.18](satellite/SATELLITE_6_18_GUIDE.md)

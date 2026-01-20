@@ -52,7 +52,7 @@ These playbooks have been consolidated into roles:
 ### Component Roles
 1. **ansible_cmdb_setup** - Infrastructure visibility
 2. **satellite_6_18_deployment** - Content management
-3. **aap_2_6_setup** - Automation platform
+3. **aap** - Automation platform
 4. **idm_integration** - Identity management
 5. **openshift_4_21_deployment** - Container platform
 

@@ -1,5 +1,5 @@
 ---
-# Variables for rhis_aap_deployment role
+# Variables for aap_deploy role
 # These are set at runtime and should not be modified
 
 # This file is intentionally minimal - most configuration

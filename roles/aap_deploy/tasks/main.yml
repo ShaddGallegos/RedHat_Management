@@ -1,5 +1,5 @@
 ---
-# Role: rhis_aap_deployment
+# Role: aap_deploy
 # Purpose: Deploy and launch AAP installer
 # This role handles the complete AAP deployment workflow including
 # downloading content, extracting the installer, configuring it, and launching.

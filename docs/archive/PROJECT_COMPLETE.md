@@ -162,11 +162,11 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 ### 4. AAP Integration ✅
 
 **Roles** (4+):
-- aap_2_6_setup
-- aap_credentials_config
-- aap_inventories_config
-- aap_projects_config
-- aap_templates_config
+- aap
+- aap_credentials
+- aap_inventories
+- aap_projects
+- aap_templates
 
 **Features**:
 - Automation platform deployment

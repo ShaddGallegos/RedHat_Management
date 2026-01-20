@@ -1,6 +1,6 @@
 ---
-# Test: aap_projects_config role
-- name: Test aap_projects_config role
+# Test: aap_projects role
+- name: Test aap_projects role
   hosts: localhost
   gather_facts: false
   vars:

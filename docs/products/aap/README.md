@@ -113,7 +113,7 @@ aap_postgresql_user: "awx"
 # Deploy with specific role
 ansible-playbook -i inventory/hosts \
   -e "deployment_scenario=aap" \
-  roles/aap_2_6_setup/tasks/main.yml
+  roles/aap/tasks/main.yml
 
 # Or via main playbook
 ansible-playbook redhat_management-site.yml \
@@ -166,7 +166,7 @@ Create job templates that reference other RHIS roles:
 - name: Deploy via RHIS
   hosts: all
   roles:
-    - aap_2_6_setup
+    - aap
     - satellite_6_18_deployment
     - idm_integration
 ```
@@ -197,7 +197,7 @@ pip install -r requirements.txt
 # 3. Run upgrade playbook
 ansible-playbook -i inventory/hosts \
   -e "aap_upgrade=true" \
-  roles/aap_2_6_setup/tasks/upgrade.yml
+  roles/aap/tasks/upgrade.yml
 
 # 4. Verify upgrade
 ./scripts/python/verify_aap_version.py
@@ -244,7 +244,7 @@ Create a playbook for deployment:
       
     - name: Include AAP setup
       include_role:
-        name: aap_2_6_setup
+        name: aap
 ```
 
 ### Example 2: Credential Management
@@ -320,7 +320,7 @@ print(json.dumps(cred, indent=2))
     
     - name: Deploy AAP
       include_role:
-        name: aap_2_6_setup
+        name: aap
       vars:
         aap_version: "2.6"
     
@@ -372,7 +372,7 @@ case $choice in
     3) ansible-playbook playbooks/run_job.yml ;;
     4) podman logs -f awx-web-1 ;;
     5) ansible-playbook playbooks/backup_aap.yml ;;
-    6) ansible-playbook roles/aap_2_6_setup/tasks/upgrade.yml ;;
+    6) ansible-playbook roles/aap/tasks/upgrade.yml ;;
 esac
 ```
 

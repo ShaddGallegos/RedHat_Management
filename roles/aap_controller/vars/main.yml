@@ -1,5 +1,5 @@
 ---
-# Variables for rhis_aap_controller_setup role
+# Variables for aap_controller role
 # These are set at runtime and should not be modified
 
 # This file is intentionally minimal - most configuration

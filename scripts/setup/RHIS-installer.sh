@@ -1235,7 +1235,7 @@ test_default_scenario() {
     fi
     
     # Test 3: Verify required roles exist
-    local required_roles=("infrastructure_prep" "libvirt_vm_provisioner" "satellite_6_18_deployment" "aap_2_6_setup" "idm_3_0_setup")
+    local required_roles=("infrastructure_prep" "libvirt_vm_provisioner" "satellite_6_18_deployment" "aap" "idm_3_0_setup")
     for role in "${required_roles[@]}"; do
         if [ -d "${PROJECT_ROOT}/roles/${role}" ]; then
             echo "✓ PASS: Role '$role' exists"

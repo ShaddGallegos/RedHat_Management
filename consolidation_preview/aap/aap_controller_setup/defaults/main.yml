@@ -1,5 +1,5 @@
 ---
-# Default variables for rhis_aap_controller_setup role
+# Default variables for aap_controller role
 
 # Controller connection settings
 aap_controller_host: "{{ ansible_host | default('controller.example.com') }}"

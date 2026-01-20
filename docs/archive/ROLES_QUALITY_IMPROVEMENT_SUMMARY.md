@@ -46,7 +46,7 @@ dependencies: []
 
 **Files Created:**
 ```
-✅ aap_2_6_setup/meta/main.yml
+✅ aap/meta/main.yml
 ✅ ansible_cmdb_setup/meta/main.yml
 ✅ baremetal_provisioner/meta/main.yml
 ✅ cmdb/meta/main.yml
@@ -67,8 +67,8 @@ dependencies: []
 ✅ prompts/meta/main.yml
 ✅ provisioning/meta/main.yml
 ✅ redhat_products/meta/main.yml
-✅ rhis_aap_controller_setup/meta/main.yml
-✅ rhis_aap_deployment/meta/main.yml
+✅ aap_controller/meta/main.yml
+✅ aap_deploy/meta/main.yml
 ✅ rhis_host_provisioning/meta/main.yml
 ✅ rhis_inventory_integration/meta/main.yml
 ✅ satellite_6_18_deployment/meta/main.yml

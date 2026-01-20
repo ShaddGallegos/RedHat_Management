@@ -1,6 +1,6 @@
 ---
-# Test: rhis_aap_deployment role basic functionality
-- name: Test rhis_aap_deployment role
+# Test: aap_deploy role basic functionality
+- name: Test aap_deploy role
   hosts: localhost
   gather_facts: false
   vars:
