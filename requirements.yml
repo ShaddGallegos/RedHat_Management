@@ -1,22 +1,9 @@
 ---
-# Public Ansible Galaxy collections for local development and ansible-lint
+# Minimal public collections for local linting (avoid Automation Hub queries)
 collections:
   - name: ansible.posix
   - name: ansible.netcommon
-  - name: community.crypto
   - name: ansible.utils
-  - name: community.os_windows
-  - name: community.platform_vmware
-  - name: community.docker
-  - name: community.kubernetes
-  - name: kubernetes.core
-  - name: google.cloud
-  - name: amazon.aws
-  - name: azure.azcollection
-  - name: community.aws
-  - name: community.azure
-  - name: community.google
-  - name: community.hashi_vault
   - name: community.general
 
 roles: []
