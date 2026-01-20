@@ -169,8 +169,8 @@ The role provides:
 
 After successful execution:
 - `/var/log/deployment.log` - Deployment log
-- `/opt/rhis/reports/deployment_summary.html` - Deployment report
-- `/opt/rhis/inventory/hosts.generated` - Generated inventory
+- `/opt/reports/deployment_summary.html` - Deployment report
+- `/opt/inventory/hosts.generated` - Generated inventory
 
 ## Common Issues & Resolution
 
