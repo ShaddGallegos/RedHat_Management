@@ -1,5 +1,5 @@
 ---
-- name: Generate hosts and inventory from prompts
+- name: Generate hosts and inventory from ansible_dev_node_prompts
   hosts: localhost
   connection: local
   gather_facts: no
@@ -11,13 +11,13 @@
       prompt: "Enter installer host as hostname:ip (this node must be included) (e.g., installer.example.com:10.0.0.5)"
       private: no
     - name: host_list
-      prompt: "Enter hosts as hostname:ip:type separated by commas (e.g., sat.example.com:10.0.0.10:satellite,dhcp1:10.0.0.11:dhcp)"
+      prompt: "Enter hosts as hostname:ip:type separated by commas (e.g., sat.example.com:10.0.0.10:scenario_satellite,dhcp1:10.0.0.11:dhcp)"
       private: no
     - name: github_user
       prompt: "(optional) GitHub username for repo operations (leave blank if not needed)"
       private: no
     - name: github_repo
-      prompt: "(optional) GitHub repo name (owner/repo) for workflow integration (leave blank if not needed)"
+      prompt: "(optional) GitHub repo name (owner/repo) for workflow integration_generic (leave blank if not needed)"
       private: no
     - name: github_pat
       prompt: "(optional) GitHub Personal Access Token (PAT) with 'repo' and 'workflow' scopes (leave blank if not needed)"
@@ -92,10 +92,10 @@
         path: ../files/generated_hosts
         mode: '0644'
 
-    - name: Set installer and satellite nameserver variables (controller)
+    - name: Set installer and scenario_satellite nameserver variables (controller)
       set_fact:
         installer_ns: "{{ (hosts_entries | selectattr('type','equalto','installer') | map(attribute='ip') | list)[0] | default(installer_entry.ip) }}"
-        satellite_ns: "{{ (hosts_entries | selectattr('type','equalto','satellite') | map(attribute='ip') | list)[0] | default((hosts_entries | selectattr('ip','match','^10\\.168\\.') | map(attribute='ip') | list)[0] | default('')) }}"
+        satellite_ns: "{{ (hosts_entries | selectattr('type','equalto','scenario_satellite') | map(attribute='ip') | list)[0] | default((hosts_entries | selectattr('ip','match','^10\\.168\\.') | map(attribute='ip') | list)[0] | default('')) }}"
 
     - name: Render resolv.conf on controller for verification
       template:
@@ -148,10 +148,10 @@
       ignore_errors: yes
       when: propagate | default(true) | bool
 
-    - name: Set installer and satellite nameserver variables
+    - name: Set installer and scenario_satellite nameserver variables
       set_fact:
         installer_ns: "{{ (hosts_entries | selectattr('type','equalto','installer') | map(attribute='ip') | list)[0] | default(installer_entry.ip) }}"
-        satellite_ns: "{{ (hosts_entries | selectattr('type','equalto','satellite') | map(attribute='ip') | list)[0] | default((hosts_entries | selectattr('ip','match','^10\\.168\\.') | map(attribute='ip') | list)[0] | default('')) }}"
+        satellite_ns: "{{ (hosts_entries | selectattr('type','equalto','scenario_satellite') | map(attribute='ip') | list)[0] | default((hosts_entries | selectattr('ip','match','^10\\.168\\.') | map(attribute='ip') | list)[0] | default('')) }}"
 
     - name: Render resolv.conf with both nameservers and rotate option
       template:

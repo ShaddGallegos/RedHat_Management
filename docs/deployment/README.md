@@ -17,24 +17,24 @@
 ## Component Guides
 
 See subdirectories for component-specific documentation:
-- `satellite/` - Satellite 6.18 guides
+- `scenario_satellite/` - Satellite 6.18 guides
 - `aap/` - AAP 2.6 guides
 - `controller/` - Controller guides
 - `eda/` - Event-Driven Automation
 - `idm/` - Identity Management
-- `openshift/` - OpenShift 4.21
-- `openshift-virtualization/` - OpenShift Virtualization
+- `scenario_openshift/` - OpenShift 4.21
+- `scenario_openshift-virtualization/` - OpenShift Virtualization
 - `libvirt/` - Libvirt platform guide
 - `aws/` - AWS deployment guide
 - `azure/` - Azure deployment guide
 - `gcp/` - GCP deployment guide
-- `vmware/` - VMware deployment guide
-- `nutanix/` - Nutanix deployment guide
+- `platform_vmware/` - VMware deployment guide
+- `platform_nutanix/` - Nutanix deployment guide
 - `automation-hub/` - Automation Hub
 - `insights/` - Red Hat Insights
 - `receptor/` - Receptor networking
-- `servicenow/` - ServiceNow integration
-- `terraform/` - Terraform integration
+- `integration_servicenow/` - ServiceNow integration_generic
+- `terraform/` - Terraform integration_generic
 - `snmp/` - SNMP monitoring
 - `yang/` - YANG models
 

@@ -46,7 +46,7 @@ KVM/libvirt virtual machine utilities.
   - Start, stop, delete VMs
   - Clone, snapshot, resize operations
   
-- **libvirt_vm_provisioner.py** - Automated VM provisioning
+- **platform_libvirt_vm_provisioner.py** - Automated VM platform_provisioning
   
 - **create_libvirt_vm_from_iso.sh** - Create VMs from ISO images
 
@@ -108,7 +108,7 @@ Testing, validation, and helper utilities.
 
 | Task | Script |
 |------|--------|
-| Deploy infrastructure | `setup/RHIS-installer.sh` |
+| Deploy platform_infrastructure_core | `setup/RHIS-installer.sh` |
 | Manage containers | `containers/container_manager.sh` |
 | Manage VMs | `libvirt/libvirt_vm_helper.sh` |
 | Fix playbooks | `maintenance/fixup_playbooks.py` |
@@ -116,7 +116,7 @@ Testing, validation, and helper utilities.
 
 ## Help
 
-Most scripts support `--help` or `-h` flag for detailed usage information:
+Most scripts ansible_dev_node_support `--help` or `-h` flag for detailed usage information:
 
 ```bash
 ./setup/RHIS-installer.sh --help

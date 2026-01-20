@@ -1,0 +1,22 @@
+---
+# Satellite and IDM integration_generic
+# Configures Satellite authentication and user sync with IDM/FreeIPA
+
+- name: Configure Satellite IDM authentication
+  block:
+    - name: Install required IDM packages
+      ansible.builtin.package:
+        name:
+          - freeipa-client
+          - python3-ipalib
+        state: present
+
+    - name: Configure IDM authentication for Satellite
+      ansible.builtin.debug:
+        msg: "Configuring Satellite with IDM authentication"
+
+    - name: Setup user sync from IDM to Satellite
+      ansible.builtin.debug:
+        msg: "Configuring IDM user synchronization"
+
+  when: idm_realm is defined and satellite_fqdn is defined

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 
-# Simple helper to run prompts, prepare env/vault files, and optionally install collections.
+# Simple helper to run ansible_dev_node_prompts, prepare env/vault files, and optionally install collections.
 # Usage: scripts/run_setup.sh [--skip-collections] [--test] [--help]
 
 # Print help and exit
@@ -16,11 +16,11 @@ for arg in "$@"; do
       cat <<EOF
 Usage: run_setup.sh [--skip-collections] [--test] [--help]
 
-  --skip-collections   Skip installing Ansible collections after prompts
+  --skip-collections   Skip installing Ansible collections after ansible_dev_node_prompts
   --test               Run non-interactively using ~/.ansible/conf/test-env.yml
   --help               Show this help message and exit
 
-This script runs the standardized provisioning prompts (system_prompts.yml),
+This script runs the standardized platform_provisioning ansible_dev_node_prompts (system_prompts.yml),
 generates and vaults your environment file, and installs required collections.
 EOF
       exit 0
@@ -70,18 +70,18 @@ generated_env="${ROOT_DIR}/env.local.generated.yml"
 generated_env="${ROOT_DIR}/env.local.generated.yml"
 
 
-# 1) Run the standardized prompt suite to gather all provisioning variables
+# 1) Run the standardized prompt suite to gather all platform_provisioning variables
 if [[ "$TEST_MODE" == true ]]; then
-  echo "[INFO] Running in test mode: using ~/.ansible/conf/test-env.yml and skipping prompts."
+  echo "[INFO] Running in test mode: using ~/.ansible/conf/test-env.yml and skipping ansible_dev_node_prompts."
   ansible-playbook system_prompts.yml --extra-vars "@${HOME}/.ansible/conf/test-env.yml"
 else
-  echo "[INFO] Running standardized provisioning prompts (system_prompts.yml)…"
+  echo "[INFO] Running standardized platform_provisioning ansible_dev_node_prompts (system_prompts.yml)…"
   ansible-playbook system_prompts.yml
 fi
 
 generated_env="${ROOT_DIR}/env.local.generated.yml"
 if [[ ! -f "$generated_env" ]]; then
-  echo "[ERROR] Expected env.local.generated.yml not found after prompts." >&2
+  echo "[ERROR] Expected env.local.generated.yml not found after ansible_dev_node_prompts." >&2
   exit 1
 fi
 
@@ -123,8 +123,8 @@ if [[ "$SKIP_COLLECTIONS" == false ]]; then
   if [[ -f "${ROOT_DIR}/requirements_hub.yml" ]]; then
     echo "[INFO] Installing Automation Hub collections from requirements_hub.yml (with --force, requires token)"
     if ! ansible-galaxy collection install -r requirements_hub.yml --force; then
-      echo "[WARN] Automation Hub collection install failed. Attempting to install local redhat-satellite collection from files/."
-      local_collection_tar="${ROOT_DIR}/files/redhat-satellite-5.7.0.tar.gz"
+      echo "[WARN] Automation Hub collection install failed. Attempting to install local redhat-scenario_satellite collection from files/."
+      local_collection_tar="${ROOT_DIR}/files/redhat-scenario_satellite-5.7.0.tar.gz"
       if [[ -f "$local_collection_tar" ]]; then
         ansible-galaxy collection install "$local_collection_tar" --force
       else

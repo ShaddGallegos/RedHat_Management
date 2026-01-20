@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Validate role metadata files
 
-import os
+import os_generic
 import json
 import yaml
 from pathlib import Path

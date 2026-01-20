@@ -1,0 +1,11 @@
+- name: Load survey for Nutanix (if present)
+	include_role:
+  name: integration_survey_loader
+	run_once: true
+	delegate_to: localhost
+
+- import_tasks: install.yml
+- import_tasks: configure.yml
+- import_tasks: test.yml
+- import_tasks: backup.yml
+- import_tasks: restore.yml

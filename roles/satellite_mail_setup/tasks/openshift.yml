@@ -1,4 +1,0 @@
----
-- name: Placeholder OpenShift integration
-  ansible.builtin.debug:
-    msg: "Integrate with OpenShift (e.g., ocp cluster creds, routes) here."

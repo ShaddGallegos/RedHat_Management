@@ -107,7 +107,7 @@ aws ec2 run-instances \
   --block-device-mappings \
     DeviceName=/dev/xvda,Ebs={VolumeSize=500,VolumeType=gp3} \
   --tag-specifications \
-    "ResourceType=instance,Tags=[{Key=Name,Value=satellite}]"
+    "ResourceType=instance,Tags=[{Key=Name,Value=scenario_satellite}]"
 
 # Launch IdM instance
 aws ec2 run-instances \
@@ -341,7 +341,7 @@ aws route53 change-resource-record-sets \
     {
       "Action": "CREATE",
       "ResourceRecordSet": {
-        "Name": "satellite.example.com",
+        "Name": "scenario_satellite.example.com",
         "Type": "A",
         "TTL": 300,
         "ResourceRecords": [{"Value": "10.0.1.50"}]
@@ -383,7 +383,7 @@ aws cloudwatch put-dashboard \
   hosts: localhost
   gather_facts: no
   tasks:
-    - name: Create AWS infrastructure
+    - name: Create AWS platform_infrastructure_core
       terraform:
         project_path: './terraform'
         state: present

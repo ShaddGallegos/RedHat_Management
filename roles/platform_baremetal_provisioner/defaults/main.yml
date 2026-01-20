@@ -1,0 +1,14 @@
+---
+# Default variables for platform_baremetal_provisioner role
+baremetal_provisioner_enabled: false
+baremetal_provisioner_version: "1.0"
+baremetal_provisioner_timeout: 3600
+
+# PXE boot configuration
+pxe_boot_enabled: false
+dhcp_range_start: "192.168.1.100"
+dhcp_range_end: "192.168.1.200"
+tftp_root: "/var/lib/tftpboot"
+
+# Feature toggles
+baremetal_provisioner_validate_hardware: true

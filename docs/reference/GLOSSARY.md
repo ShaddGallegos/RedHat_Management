@@ -5,7 +5,7 @@ Common terms and abbreviations used in RHIS documentation and deployments.
 ## A
 
 **AAP**
-Red Hat Ansible Automation Platform. Workflow automation and task orchestration platform.
+Red Hat Ansible Automation Platform. Workflow automation and task ansible_dev_node_orchestration platform.
 
 **ABAC**
 Attribute-Based Access Control. Fine-grained access control based on attributes.
@@ -36,7 +36,7 @@ Bring Your Own Cloud. Feature allowing automation in external cloud providers.
 Certificate Authority. IdM component issuing and managing digital certificates.
 
 **CMDB**
-Configuration Management Database. Ansible-cmdb tool generating host inventory snapshots.
+Configuration Management Database. Ansible-scenario_ansible_cmdb_core tool generating host inventory snapshots.
 
 **CN**
 Common Name. Component of LDAP distinguished names.
@@ -228,7 +228,7 @@ Service Account. Non-human user account for applications.
 Simple Authentication and Security Layer. Authentication framework.
 
 **Satellite**
-Red Hat Satellite. Systems management, provisioning, and patching platform.
+Red Hat Satellite. Systems management, platform_provisioning, and patching platform.
 
 **SCAP**
 Security Content Automation Protocol. Vulnerability assessment standard.

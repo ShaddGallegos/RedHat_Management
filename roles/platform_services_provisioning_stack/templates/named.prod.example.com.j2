@@ -1,0 +1,43 @@
+$TTL 3600
+@   IN  SOA scenario_satellite.prod.spg.prod.example.com. hostmaster.prod.example.com. (
+            2026011601  ; Serial
+            3600        ; Refresh (1 hour)
+            1800        ; Retry (30 minutes)
+            604800      ; Expire (7 days)
+            86400 )     ; Minimum TTL (24 hours)
+
+    IN  NS  scenario_satellite.prod.spg.prod.example.com.
+    IN  A   10.168.0.10
+
+; Production Infrastructure Hosts (10.168.0.0/24)
+scenario_satellite               IN  A   10.168.0.10
+idm                     IN  A   10.168.0.20
+aap                     IN  A   10.168.0.30
+
+; Production Application Servers (10.168.1.0/24)
+app01                   IN  A   10.168.1.10
+app02                   IN  A   10.168.1.11
+app-vip                 IN  A   10.168.1.100
+
+; Production Container Hosts (10.168.2.0/24)
+ocp-master01            IN  A   10.168.2.10
+ocp-master02            IN  A   10.168.2.11
+ocp-master03            IN  A   10.168.2.12
+ocp-worker01            IN  A   10.168.2.20
+ocp-worker02            IN  A   10.168.2.21
+
+; Production Database Servers (10.168.3.0/24)
+db-primary              IN  A   10.168.3.10
+db-secondary            IN  A   10.168.3.11
+db-standby              IN  A   10.168.3.12
+
+; Service Records
+_ldap._tcp              IN  SRV 10 0 389  idm.prod.example.com.
+_kerberos._tcp          IN  SRV 10 0 88   idm.prod.example.com.
+_kerberos-adm._tcp      IN  SRV 10 0 749  idm.prod.example.com.
+
+; CNAME records
+ldap                    IN  CNAME   idm.prod.example.com.
+kerberos                IN  CNAME   idm.prod.example.com.
+platform_provisioning            IN  CNAME   scenario_satellite.prod.example.com.
+automation              IN  CNAME   aap.prod.example.com.

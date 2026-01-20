@@ -48,10 +48,10 @@ openshift_version: "4.21"
 
 ```yaml
 aap_hostname: "aap.example.com"
-satellite_hostname: "satellite.example.com"
+satellite_hostname: "scenario_satellite.example.com"
 idm_hostname: "idm.example.com"
 aap_url: "https://aap.example.com"
-satellite_url: "https://satellite.example.com"
+satellite_url: "https://scenario_satellite.example.com"
 ```
 
 ### 4. Ports
@@ -184,7 +184,7 @@ configure_aap_rbac: true
 ```yaml
 satellite_enabled: true
 satellite_version: "6.18"
-satellite_hostname: "satellite.example.com"
+satellite_hostname: "scenario_satellite.example.com"
 satellite_port: 443
 satellite_timeout: 7200
 satellite_max_retries: 5
@@ -307,7 +307,7 @@ Contains environment-specific overrides:
 ```yaml
 ---
 aap_hostname: "aap.prod.example.com"
-satellite_hostname: "satellite.prod.example.com"
+satellite_hostname: "scenario_satellite.prod.example.com"
 ```
 
 ## Migration Guide
@@ -351,7 +351,7 @@ All role `defaults/main.yml` files should conform to this convention. Validation
 
 ## Examples by Role
 
-### AAP Role (redhat_products/aap)
+### AAP Role (ansible_dev_node_redhat_products/aap)
 
 ```yaml
 defaults/main.yml:
@@ -383,7 +383,7 @@ aap_organizations: ["Default", "Production"]
 configure_aap_rbac: true
 ```
 
-### Satellite Role (redhat_products/satellite)
+### Satellite Role (ansible_dev_node_redhat_products/scenario_satellite)
 
 ```yaml
 defaults/main.yml:
@@ -393,7 +393,7 @@ satellite_enabled: true
 satellite_version: "6.18"
 
 # Connectivity
-satellite_hostname: "satellite.example.com"
+satellite_hostname: "scenario_satellite.example.com"
 satellite_port: 443
 satellite_url: "https://{{ satellite_hostname }}"
 
@@ -429,7 +429,7 @@ A: No, always use the full role name for consistency and clarity.
 **Q: What about third-party product variables?**  
 A: Prefix with the RHIS role that manages it. Example: `satellite_foreman_username`.
 
-**Q: Should integration variables use both product names?**  
+**Q: Should integration_generic variables use both product names?**  
 A: Yes: `configure_{{ product1 }}_{{ product2 }}_integration`. Order alphabetically when possible.
 
 ## Version History

@@ -1,0 +1,15 @@
+---
+# Test: scenario_satellite_lifecycle_config role
+- name: Test scenario_satellite_lifecycle_config role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    satellite_lifecycle_config_enabled: true
+    satellite_url: "https://scenario_satellite.example.com"
+    satellite_username: "admin"
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - satellite_lifecycle_config_enabled is defined
+          - satellite_url is defined

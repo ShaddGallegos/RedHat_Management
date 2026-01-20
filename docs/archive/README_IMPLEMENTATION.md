@@ -32,7 +32,7 @@ RHIS-Installer.sh             ← Original (backup)
 
 ### Orchestration Playbooks (26.4KB)
 ```
-playbooks/orchestration.yml        ← Main 7-phase orchestration (450+ lines)
+playbooks/ansible_dev_node_orchestration.yml        ← Main 7-phase ansible_dev_node_orchestration (450+ lines)
 playbooks/scenario_configs.yml    ← 15 scenarios + 7 platforms (400+ lines)
 ```
 
@@ -74,12 +74,12 @@ docs/examples/PLAYBOOK_ORGANIZATION_BEST_PRACTICES.md ← Organization patterns
 ```bash
 ./RHIS-Installer-Enhanced.sh                    # Interactive mode
 ./RHIS-Installer-Enhanced.sh --help             # Show help
-./RHIS-Installer-Enhanced.sh --scenario full_stack --platform libvirt --os rhel-9 --skip-prompts
+./RHIS-Installer-Enhanced.sh --scenario full_stack --platform libvirt --os_generic rhel-9 --skip-ansible_dev_node_prompts
 ```
 
-### 2. Orchestration Playbook (`playbooks/orchestration.yml`)
+### 2. Orchestration Playbook (`playbooks/ansible_dev_node_orchestration.yml`)
 
-**450+ lines of Ansible orchestration**
+**450+ lines of Ansible ansible_dev_node_orchestration**
 
 7-Phase Deployment:
 1. Initialize Ansible Developer Node
@@ -136,7 +136,7 @@ Each with:
 - Tag system explanation
 - Credential management guidelines
 - Repository enablement strategy
-- Ansible-CMDB integration
+- Ansible-CMDB integration_generic
 - Post-deployment checklist
 
 #### Quick Start Guide (350+ lines)
@@ -162,7 +162,7 @@ Each with:
 - 100+ Jinja2 variables organized by category
 - Environment lookups
 - Secure credential management examples
-- Vault integration patterns
+- Vault integration_generic patterns
 
 #### Status Report (500+ lines)
 - Implementation summary
@@ -180,9 +180,9 @@ Each with:
 ✅ Vault-encrypted credential storage (`~/.ansible/conf/env.yml`)  
 ✅ No hardcoded credentials anywhere in codebase  
 ✅ Environment variable lookups with safe defaults  
-✅ Secure credential collection via interactive prompts  
+✅ Secure credential collection via interactive ansible_dev_node_prompts  
 ✅ No_log flags for sensitive tasks  
-✅ SSH key management for provisioning  
+✅ SSH key management for platform_provisioning  
 ✅ Integration credentials separation  
 ✅ Role-based access control preparation  
 
@@ -202,7 +202,7 @@ User runs RHIS-Installer-Enhanced.sh
            ↓
     Create Deployment Config
            ↓
-    Execute orchestration.yml
+    Execute ansible_dev_node_orchestration.yml
            ↓
     [7-Phase Deployment]
     ├→ Phase 1: Initialize Installer Host
@@ -260,23 +260,23 @@ User runs RHIS-Installer-Enhanced.sh
 
 ```bash
 # Single scenario+platform
---tags "satellite,libvirt,rhel-9"
+--tags "scenario_satellite,libvirt,rhel-9"
 
 # Specific phases only  
 --tags "install,configure,integrate"
 
 # Skip specific products
---skip-tags "openshift"
+--skip-tags "scenario_openshift"
 
 # Only validation
 --tags "validate"
 ```
 
 **Tag Hierarchy:**
-- **Scenario:** satellite, aap, idm, openshift, full-stack
-- **Platform:** libvirt, aws, azure, gcp, vmware, nutanix
+- **Scenario:** scenario_satellite, aap, idm, scenario_openshift, full-stack
+- **Platform:** libvirt, aws, azure, gcp, platform_vmware, platform_nutanix
 - **Phase:** init, prepare, provision, install, configure, integrate, validate
-- **Product:** satellite, aap, idm, openshift
+- **Product:** scenario_satellite, aap, idm, scenario_openshift
 
 ---
 
@@ -289,20 +289,20 @@ RedHat_Management/
 ├── PROJECT_STATUS_JAN_16_2026.md     ← NEW: Status report
 │
 ├── playbooks/
-│   ├── orchestration.yml             ← NEW: Main orchestration (18KB)
+│   ├── ansible_dev_node_orchestration.yml             ← NEW: Main ansible_dev_node_orchestration (18KB)
 │   ├── scenario_configs.yml          ← NEW: Scenario definitions (8.4KB)
 │   └── [existing playbooks]
 │
 ├── roles/
 │   ├── installer_host/               ← For Ansible dev node
 │   ├── platform_prep/                ← For platform preparation
-│   ├── inventory_generator/          ← For inventory generation
-│   ├── libvirt_vm_provisioner/      ← For VM provisioning
-│   ├── infrastructure_manager/       ← For cloud/enterprise infra
-│   ├── redhat_products/              ← For product deployment
-│   ├── cmdb/                         ← For Ansible-CMDB
-│   ├── integration/                  ← For product integrations
-│   ├── support/                      ← For utilities
+│   ├── ansible_dev_node_inventory_generator/          ← For inventory generation
+│   ├── platform_libvirt_vm_provisioner/      ← For VM platform_provisioning
+│   ├── platform_infrastructure_manager/       ← For cloud/enterprise infra
+│   ├── ansible_dev_node_redhat_products/              ← For product deployment
+│   ├── scenario_ansible_cmdb_core/                         ← For Ansible-CMDB
+│   ├── integration_generic/                  ← For product integrations
+│   ├── ansible_dev_node_support/                      ← For utilities
 │   └── [existing roles]
 │
 ├── docs/
@@ -324,10 +324,10 @@ RedHat_Management/
 │
 ├── group_vars/
 │   ├── all.yml
-│   ├── satellite.yml
+│   ├── scenario_satellite.yml
 │   ├── aap.yml
 │   ├── idm.yml
-│   ├── openshift.yml
+│   ├── scenario_openshift.yml
 │   └── [platform-specific]
 │
 ├── inventory/
@@ -368,11 +368,11 @@ cd ~/Downloads/RedHat_Management
 
 ### 3. Access Deployed Products
 ```
-Satellite:     https://satellite-hostname/
+Satellite:     https://scenario_satellite-hostname/
 AAP:           https://aap-controller:443/
 IdM:           https://idm-hostname/ipa/ui/
-OpenShift:     https://console-openshift-console.apps.ocp/
-Ansible-CMDB:  http://satellite-hostname:8081/
+OpenShift:     https://console-scenario_openshift-console.apps.ocp/
+Ansible-CMDB:  http://scenario_satellite-hostname:8081/
 ```
 
 ---
@@ -467,13 +467,13 @@ Ansible-CMDB:  http://satellite-hostname:8081/
 ./RHIS-Installer-Enhanced.sh \
   --scenario full_stack \
   --platform libvirt \
-  --os rhel-9 \
-  --skip-prompts
+  --os_generic rhel-9 \
+  --skip-ansible_dev_node_prompts
 ```
 
 ### 5. **Direct Playbook Execution** (Advanced)
 ```bash
-ansible-playbook playbooks/orchestration.yml \
+ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
   -e "deployment_scenario=satellite_aap" \
   -e "deployment_platform=aws" \
   -e "deployment_os=rhel-9" \
@@ -569,13 +569,13 @@ COMPLETE
 ✅ Manages complex credential and configuration requirements  
 ✅ Provides interactive guided setup  
 ✅ Enables non-interactive automation  
-✅ Implements 7-phase orchestration  
+✅ Implements 7-phase ansible_dev_node_orchestration  
 ✅ Includes comprehensive documentation  
 ✅ Follows Ansible best practices  
 ✅ Maintains security standards  
 ✅ Ready for immediate use  
 
-**Ready to deploy the Red Hat infrastructure stack? Start with:**
+**Ready to deploy the Red Hat platform_infrastructure_core stack? Start with:**
 
 ```bash
 ./RHIS-Installer-Enhanced.sh

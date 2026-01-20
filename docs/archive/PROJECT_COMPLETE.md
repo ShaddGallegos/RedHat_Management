@@ -17,30 +17,30 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 - DNS Server (BIND 9 with 9 zones)
 - TFTP Server (network boot files)
 - PXE Boot System (10 boot options)
-- Integrated provisioning workflow
+- Integrated platform_provisioning workflow
 
 ✅ **Dual Network Architecture**
 - Primary Interface (eth0): External libvirt NAT with DHCP
 - Secondary Interface (eth1): Internal private network 10.168.0.0/16
 - Network isolation and security
-- Complete NetworkManager integration
+- Complete NetworkManager integration_generic
 
 ✅ **Complete Role Suite**
 - 41 well-organized Ansible roles
-- Satellite 6.18 integration (6+ roles)
-- AAP 2.6 integration (4+ roles)
-- IdM integration (1+ role)
-- Infrastructure and support roles (30+ roles)
+- Satellite 6.18 integration_generic (6+ roles)
+- AAP 2.6 integration_generic (4+ roles)
+- IdM integration_generic (1+ role)
+- Infrastructure and ansible_dev_node_support roles (30+ roles)
 
 ✅ **Comprehensive Documentation**
 - 12 active production guides
-- 19 archived legacy documents
+- 19 archived ansible_dev_node_legacy_archive documents
 - Quick reference materials
 - Complete configuration guides
 - Network troubleshooting guide
 
 ✅ **Deployment Infrastructure**
-- 10 playbooks for orchestration
+- 10 playbooks for ansible_dev_node_orchestration
 - 72 Jinja2 templates
 - Complete variable organization
 - Test suite and validation
@@ -52,11 +52,11 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 ```
 📊 PROJECT METRICS
 ├── 📦 Roles: 41
-│   ├── services_provisioning_stack: 1 (core)
+│   ├── platform_services_provisioning_stack: 1 (core)
 │   ├── satellite_* roles: 6
 │   ├── aap_* roles: 4
 │   ├── idm_integration: 1
-│   └── infrastructure roles: 29
+│   └── platform_infrastructure_core roles: 29
 │
 ├── 📜 Playbooks: 10
 │   ├── provisioning_services_setup.yml
@@ -72,7 +72,7 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 │   ├── TFTP: xinetd.tftp.j2
 │   ├── PXE: pxelinux.cfg.default.j2
 │   ├── Kickstart: 5+ templates
-│   └── 60+ infrastructure templates
+│   └── 60+ platform_infrastructure_core templates
 │
 ├── 📚 Documentation: 31 files
 │   ├── Active guides: 12
@@ -80,7 +80,7 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 │   ├── Configuration guides: 5
 │   ├── Reference materials: 2
 │   ├── Navigation guides: 1
-│   └── Archived: 19 (legacy/status)
+│   └── Archived: 19 (ansible_dev_node_legacy_archive/status)
 │
 ├── 🔧 Configuration: 2+ files
 │   ├── ansible.cfg
@@ -95,7 +95,7 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 
 ### 1. Provisioning Services Stack ✅
 
-**Location**: `/roles/services_provisioning_stack/`
+**Location**: `/roles/platform_services_provisioning_stack/`
 
 **Services**:
 - **DHCP** (dhcpd) - 10.168.0.2-10.168.254.254 (38,401 IPs)
@@ -112,7 +112,7 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 - Full test suite
 
 **Features**:
-- Dual network support (eth0 + eth1)
+- Dual network ansible_dev_node_support (eth0 + eth1)
 - Automatic interface configuration
 - Kickstart template delivery
 - Static host reservations
@@ -121,7 +121,7 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 
 ### 2. Network Infrastructure ✅
 
-**Location**: `/roles/network_infrastructure_config/`
+**Location**: `/roles/platform_network_infrastructure/`
 
 **Interfaces**:
 - **eth0** (Primary/External)
@@ -135,7 +135,7 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
   - 38,397 available IPs (10.168.0.2-254.254)
 
 **Configuration**:
-- NetworkManager integration
+- NetworkManager integration_generic
 - Persistent interface configuration
 - Autoconnect enabled
 - Firewall rules per interface
@@ -146,10 +146,10 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 **Roles** (6+):
 - satellite_6_18_deployment
 - satellite_content_config
-- satellite_lifecycle_config
-- satellite_activation_config
+- scenario_satellite_lifecycle_config
+- scenario_satellite_activation_config
 - satellite_kickstart_config
-- satellite_os_configuration
+- scenario_satellite_os_configuration
 
 **Features**:
 - RHEL 9 & 10 OS definitions
@@ -157,23 +157,23 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 - Installation media configuration
 - Content repository setup
 - Activation key management
-- System provisioning workflow
+- System platform_provisioning workflow
 
 ### 4. AAP Integration ✅
 
 **Roles** (4+):
-- aap_2_6_setup
-- aap_credentials_config
-- aap_inventories_config
-- aap_projects_config
-- aap_templates_config
+- scenario_aap_setup
+- scenario_aap_credentials
+- scenario_aap_inventories
+- scenario_aap_projects
+- scenario_aap_templates
 
 **Features**:
 - Automation platform deployment
 - Credential management
 - Inventory configuration
 - Project and template setup
-- Post-boot automation support
+- Post-boot automation ansible_dev_node_support
 
 ### 5. IdM Integration ✅
 
@@ -182,9 +182,9 @@ The Red Hat Infrastructure Setup (RHIS) project is **complete and ready for prod
 **Features**:
 - User authentication
 - Certificate management
-- DNS integration
+- DNS integration_generic
 - LDAP configuration
-- Kerberos support
+- Kerberos ansible_dev_node_support
 
 ---
 
@@ -215,7 +215,7 @@ PXE Menu (10 boot options)
     ↓
 DNS Resolution (10.168.0.1:53)
     ├─ Resolves Satellite hostname
-    └─ Resolves provisioning services
+    └─ Resolves platform_provisioning services
     ↓
 Anaconda Installer
     ├─ Downloads from Satellite
@@ -264,7 +264,7 @@ Production System Ready ✅
 # 1. Install dependencies
 make install
 
-# 2. Deploy provisioning services
+# 2. Deploy platform_provisioning services
 ansible-playbook playbooks/provisioning_services_setup.yml \
   -i inventory/hosts -b
 
@@ -311,7 +311,7 @@ ansible-playbook playbooks/provisioning_tftp_pxe_setup.yml -i inventory/hosts -b
 - [ ] Run syntax check: `make test`
 
 ### Deployment
-- [ ] Execute provisioning deployment
+- [ ] Execute platform_provisioning deployment
 - [ ] Monitor playbook output
 - [ ] Verify no errors in output
 
@@ -341,12 +341,12 @@ RedHat_Management/
 │   └── [7 more playbooks]
 │
 ├── roles/                         (41 roles)
-│   ├── services_provisioning_stack/ ✅ CORE
-│   ├── network_infrastructure_config/ ✅ COMPLETE
+│   ├── platform_services_provisioning_stack/ ✅ CORE
+│   ├── platform_network_infrastructure/ ✅ COMPLETE
 │   ├── satellite_* (6 roles) ✅ COMPLETE
 │   ├── aap_* (4 roles) ✅ COMPLETE
 │   ├── idm_integration/ ✅ COMPLETE
-│   └── [29 infrastructure roles] ✅ COMPLETE
+│   └── [29 platform_infrastructure_core roles] ✅ COMPLETE
 │
 ├── templates/                     (72 templates)
 │   ├── dhcpd.conf.j2
@@ -362,7 +362,7 @@ RedHat_Management/
 ├── group_vars/                    (Group variables)
 │   ├── all.yml
 │   ├── aap.yml
-│   ├── satellite.yml
+│   ├── scenario_satellite.yml
 │   └── [3 more files]
 │
 ├── docs/                          (31 documentation files)
@@ -372,7 +372,7 @@ RedHat_Management/
 │   ├── PROVISIONING_SERVICES_CONFIGURATION.md
 │   ├── NETWORK_INTERFACE_CONFIGURATION.md
 │   ├── [7 more active docs]
-│   └── archive/                   (19 legacy docs)
+│   └── archive/                   (19 ansible_dev_node_legacy_archive docs)
 │       ├── README.md
 │       └── [18 archived files]
 │
@@ -419,10 +419,10 @@ RedHat_Management/
 
 ### Post-Deployment
 1. Monitor service logs
-2. Test system provisioning via PXE
+2. Test system platform_provisioning via PXE
 3. Verify Satellite content synchronization
 4. Set up AAP automation
-5. Configure IdM integration
+5. Configure IdM integration_generic
 
 ---
 
@@ -467,12 +467,12 @@ make site              # Deploy complete site
 ## Success Criteria Met ✅
 
 ✅ All requested components implemented:
-- Complete provisioning services stack (DHCP, DNS, TFTP, PXE)
+- Complete platform_provisioning services stack (DHCP, DNS, TFTP, PXE)
 - Dual network configuration (eth0 external + eth1 private)
-- Satellite integration
-- AAP integration
-- IdM integration
-- Network infrastructure
+- Satellite integration_generic
+- AAP integration_generic
+- IdM integration_generic
+- Network platform_infrastructure_core
 - 41 well-organized roles
 
 ✅ All documentation requirements met:

@@ -2,16 +2,16 @@
 
 ## Synopsis
 
-Red Hat Identity Management (IdM) is an integrated solution for managing users, groups, services, and authentication across your infrastructure. Built on FreeIPA, IdM provides:
+Red Hat Identity Management (IdM) is an integrated solution for managing users, groups, services, and authentication across your platform_infrastructure_core. Built on FreeIPA, IdM provides:
 
 - **User & Group Management** - Centralized user and group directory
 - **Authentication** - LDAP, Kerberos, and certificate-based auth
-- **Authorization** - RBAC for infrastructure and applications
+- **Authorization** - RBAC for platform_infrastructure_core and applications
 - **Single Sign-On (SSO)** - Integrated Kerberos realm
-- **Certificate Management** - CA services for infrastructure
-- **DNS Management** - Integrated DNS for infrastructure naming
+- **Certificate Management** - CA services for platform_infrastructure_core
+- **DNS Management** - Integrated DNS for platform_infrastructure_core naming
 
-When deployed via RHIS, IdM serves as the identity backbone for all infrastructure management.
+When deployed via RHIS, IdM serves as the identity backbone for all platform_infrastructure_core management.
 
 ---
 
@@ -539,7 +539,7 @@ tail -f /var/log/named/query.log
 - [FreeIPA Project](https://www.freeipa.org/)
 - [Ansible FreeIPA Roles](https://github.com/freeipa/ansible-freeipa)
 - [RHIS Project Guide](../README.md)
-- [Related: Satellite Integration](../satellite/README.md)
+- [Related: Satellite Integration](../scenario_satellite/README.md)
 
 ---
 

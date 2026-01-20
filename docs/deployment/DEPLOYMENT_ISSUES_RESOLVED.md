@@ -10,7 +10,7 @@
 ```
 make: *** No rule to make target 'install'.  Stop.
 Error: site-RedHat_Management.yml not found
-ERROR! the role 'services_provisioning_stack' was not found
+ERROR! the role 'platform_services_provisioning_stack' was not found
 ```
 
 ---
@@ -56,7 +56,7 @@ make site         # ✅ Now works
 
 ### 3. Invalid Role Metadata ❌ → ✅
 
-**Problem**: services_provisioning_stack/meta/main.yml used invalid `namespace` field.
+**Problem**: platform_services_provisioning_stack/meta/main.yml used invalid `namespace` field.
 
 **Error was**:
 ```
@@ -130,8 +130,8 @@ ERROR! 'namespace' is not a valid attribute for a RoleMetadata
 | Makefile | Modified | Added install, bootstrap, site targets; fixed test target |
 | ansible.cfg | Created | New file with roles path configuration |
 | requirements.yml | Created | New file with collection dependencies |
-| roles/services_provisioning_stack/meta/main.yml | Modified | Fixed role metadata format |
-| roles/services_provisioning_stack/tasks/main.yml | Modified | Fixed task names, firewall rules |
+| roles/platform_services_provisioning_stack/meta/main.yml | Modified | Fixed role metadata format |
+| roles/platform_services_provisioning_stack/tasks/main.yml | Modified | Fixed task names, firewall rules |
 
 ---
 
@@ -162,7 +162,7 @@ The project is now fully functional and ready for production deployment.
 **Run any of these commands**:
 ```bash
 make site                                                          # Deploy everything
-ansible-playbook playbooks/provisioning_services_setup.yml -b     # Deploy provisioning only
+ansible-playbook playbooks/provisioning_services_setup.yml -b     # Deploy platform_provisioning only
 ```
 
 ---
@@ -174,4 +174,4 @@ ansible-playbook playbooks/provisioning_services_setup.yml -b     # Deploy provi
 **100% Test Pass Rate**  
 **✅ Ready for Production**
 
-All deployment errors have been resolved. Your RHIS infrastructure is ready for deployment.
+All deployment errors have been resolved. Your RHIS platform_infrastructure_core is ready for deployment.

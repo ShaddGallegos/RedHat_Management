@@ -6,7 +6,7 @@ Complete guide for deploying RHIS on LibVirt/KVM.
 
 LibVirt is an open-source virtualization management API and daemon providing:
 
-- KVM/QEMU hypervisor support
+- KVM/QEMU hypervisor ansible_dev_node_support
 - Virtual networking and storage
 - Virtual machine lifecycle management
 - Migration and clustering
@@ -83,8 +83,8 @@ virsh list --all
 ```bash
 # Quick management using helper script
 ./scripts/libvirt/libvirt_vm_helper.sh list
-./scripts/libvirt/libvirt_vm_helper.sh ip satellite
-./scripts/libvirt/libvirt_vm_helper.sh console satellite
+./scripts/libvirt/libvirt_vm_helper.sh ip scenario_satellite
+./scripts/libvirt/libvirt_vm_helper.sh console scenario_satellite
 ```
 
 ## Monitoring
@@ -111,4 +111,4 @@ virsh cputune <vm-name> --cpu-shares 1024
 
 ---
 
-See [Infrastructure](../infrastructure/) for other platform guides.
+See [Infrastructure](../platform_infrastructure_core/) for other platform guides.

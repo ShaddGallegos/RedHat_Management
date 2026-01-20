@@ -2,26 +2,26 @@
 
 ## Overview
 
-Complete setup for Satellite 6.18 infrastructure including OS definitions, install media, kickstart repositories with weekly sync, and network infrastructure for 10.168.0.0/16 subnet.
+Complete setup for Satellite 6.18 platform_infrastructure_core including OS definitions, install media, kickstart repositories with weekly sync, and network platform_infrastructure_core for 10.168.0.0/16 subnet.
 
 ## Components Created
 
 ### 1. Roles
 
-#### satellite_os_configuration
+#### scenario_satellite_os_configuration
 - Creates RHEL 9 and RHEL 10 Operating Systems in Satellite
 - Configures Installation Media for BaseOS
-- Sets up Kickstart Repository for provisioning files
+- Sets up Kickstart Repository for platform_provisioning files
 - Configures weekly synchronization job
 - Files: 5 (meta, defaults, tasks, tests, README)
 
-#### network_infrastructure_config
+#### platform_network_infrastructure
 - Defines 10.168.0.0/16 primary subnet
 - Configures 6 host group subnets for different service types
 - Sets up DHCP for automatic IP allocation
 - Configures DNS with primary/secondary resolvers
 - Defines firewall rules for network segmentation
-- Static host reservations for core infrastructure
+- Static host reservations for core platform_infrastructure_core
 - Files: 5 (meta, defaults, tasks, tests, README)
 
 ### 2. Playbooks
@@ -47,7 +47,7 @@ Major: 9
 Minor: 0
 Family: Redhat
 Password Hash: SHA512
-Install Media: http://cdn.redhat.com/content/dist/rhel/rhel-9/rhel-9-x86_64/baseos/os
+Install Media: http://cdn.redhat.com/content/dist/rhel/rhel-9/rhel-9-x86_64/baseos/os_generic
 ```
 
 ### RHEL 10
@@ -57,7 +57,7 @@ Major: 10
 Minor: 0
 Family: Redhat
 Password Hash: SHA512
-Install Media: http://cdn.redhat.com/content/dist/rhel/rhel-10/rhel-10-x86_64/baseos/os
+Install Media: http://cdn.redhat.com/content/dist/rhel/rhel-10/rhel-10-x86_64/baseos/os_generic
 ```
 
 ## Kickstart Repository Configuration
@@ -66,7 +66,7 @@ Install Media: http://cdn.redhat.com/content/dist/rhel/rhel-10/rhel-10-x86_64/ba
 - **Name**: Kickstart Files Repository
 - **Product**: RHIS Infrastructure
 - **Content Type**: File-based repository
-- **URL**: https://satellite.example.com/pub/kickstarts
+- **URL**: https://scenario_satellite.example.com/pub/kickstarts
 - **Download Policy**: Immediate
 
 ### Weekly Sync Job
@@ -109,11 +109,11 @@ Usable: 65,534
 ### Host Group Subnets
 
 #### 1. Infrastructure (10.168.0.0/24)
-- **Purpose**: Core infrastructure services
+- **Purpose**: Core platform_infrastructure_core services
 - **DHCP Range**: 10.168.0.50 - 10.168.0.254
 - **Services**: Satellite, IdM, AAP
 - **Capacity**: 205 IPs
-- **Tags**: infrastructure, core
+- **Tags**: platform_infrastructure_core, core
 
 #### 2. Application-Servers (10.168.1.0/24)
 - **Purpose**: Production application deployments
@@ -122,7 +122,7 @@ Usable: 65,534
 - **Tags**: application, production
 
 #### 3. Container-Hosts (10.168.2.0/24)
-- **Purpose**: Container and Kubernetes infrastructure
+- **Purpose**: Container and Kubernetes platform_infrastructure_core
 - **DHCP Range**: 10.168.2.50 - 10.168.2.254
 - **Capacity**: 205 IPs
 - **Tags**: containers, kubernetes
@@ -134,7 +134,7 @@ Usable: 65,534
 - **Tags**: database, data
 
 #### 5. Development (10.168.100.0/24)
-- **Purpose**: Development and testing infrastructure
+- **Purpose**: Development and testing platform_infrastructure_core
 - **DHCP Range**: 10.168.100.50 - 10.168.100.254
 - **Capacity**: 205 IPs
 - **Tags**: development, testing
@@ -149,7 +149,7 @@ Usable: 65,534
 
 ```
 Hostname                  IP Address      MAC Address        Subnet
-satellite.prod.example    10.168.0.10     52:54:00:00:00:10  Infrastructure
+scenario_satellite.prod.example    10.168.0.10     52:54:00:00:00:10  Infrastructure
 idm.prod.example          10.168.0.20     52:54:00:00:00:20  Infrastructure
 aap.prod.example          10.168.0.30     52:54:00:00:00:30  Infrastructure
 ```
@@ -207,7 +207,7 @@ ansible-playbook playbooks/satellite_infrastructure_setup.yml \
   -i inventory/hosts \
   -e "setup_os=true setup_install_media=false setup_kickstart_repo=false setup_sync_jobs=false setup_network=false"
 
-# Deploy only network infrastructure
+# Deploy only network platform_infrastructure_core
 ansible-playbook playbooks/satellite_infrastructure_setup.yml \
   -i inventory/hosts \
   -e "setup_os=false setup_install_media=false setup_kickstart_repo=false setup_sync_jobs=false setup_network=true"
@@ -225,24 +225,24 @@ ansible-playbook playbooks/satellite_infrastructure_setup.yml \
    └─ Enables RHEL repositories
    └─ Creates organizations/locations
 
-3. satellite_lifecycle_config
+3. scenario_satellite_lifecycle_config
    └─ Creates environments (Dev → Staging → Prod)
    └─ Creates content views
 
-4. satellite_activation_config
+4. scenario_satellite_activation_config
    └─ Creates activation keys
    └─ Manages subscriptions
 
 5. satellite_kickstart_config
    └─ Creates kickstart templates
 
-6. satellite_os_configuration [NEW]
+6. scenario_satellite_os_configuration [NEW]
    ├─ Defines Operating Systems (RHEL 9, 10)
    ├─ Configures Installation Media
    ├─ Creates Kickstart Repository
    └─ Enables weekly sync
 
-7. network_infrastructure_config [NEW]
+7. platform_network_infrastructure [NEW]
    ├─ Configures 10.168.0.0/16 subnet
    ├─ Sets up DHCP and DNS
    ├─ Defines host groups
@@ -263,7 +263,7 @@ ansible-playbook playbooks/satellite_infrastructure_setup.yml \
 The kickstart repository can be:
 1. Added to content views via file repositories
 2. Promoted through lifecycle environments
-3. Available in provisioning templates
+3. Available in platform_provisioning templates
 4. Referenced in PXE configuration
 
 ### Weekly Sync Process
@@ -277,7 +277,7 @@ Satellite fetches latest kickstarts
     ↓
 Updates repository content
     ↓
-Available in provisioning immediately
+Available in platform_provisioning immediately
     ↓
 Can be published to environments
     ↓
@@ -291,7 +291,7 @@ Promoted to other environments
 ```bash
 # SSH to Satellite and check
 curl -k -u admin:password \
-  https://satellite.example.com/api/v2/operatingsystems/ \
+  https://scenario_satellite.example.com/api/v2/operatingsystems/ \
   | jq '.results[] | {id, name, major, minor}'
 ```
 
@@ -299,7 +299,7 @@ curl -k -u admin:password \
 
 ```bash
 curl -k -u admin:password \
-  https://satellite.example.com/api/v2/media/ \
+  https://scenario_satellite.example.com/api/v2/media/ \
   | jq '.results[] | {id, name, path}'
 ```
 
@@ -307,7 +307,7 @@ curl -k -u admin:password \
 
 ```bash
 curl -k -u admin:password \
-  https://satellite.example.com/api/v2/repositories/ \
+  https://scenario_satellite.example.com/api/v2/repositories/ \
   | jq '.results[] | select(.name=="Kickstart Files Repository")'
 ```
 
@@ -316,15 +316,15 @@ curl -k -u admin:password \
 ```bash
 # From any system in 10.168.0.0/16
 ping 10.168.0.1          # Test gateway
-nslookup satellite.prod.example.com 10.168.0.53  # Test DNS
+nslookup scenario_satellite.prod.example.com 10.168.0.53  # Test DNS
 dhclient -v eth0         # Test DHCP
 ```
 
 ## Files Created
 
 ### Roles
-- `roles/satellite_os_configuration/` (5 files, 400+ lines)
-- `roles/network_infrastructure_config/` (5 files, 500+ lines)
+- `roles/scenario_satellite_os_configuration/` (5 files, 400+ lines)
+- `roles/platform_network_infrastructure/` (5 files, 500+ lines)
 
 ### Playbooks
 - `playbooks/satellite_infrastructure_setup.yml` (100+ lines)
@@ -339,8 +339,8 @@ dhclient -v eth0         # Test DHCP
 
 1. **Review Role Configurations**
    ```bash
-   cat roles/satellite_os_configuration/defaults/main.yml
-   cat roles/network_infrastructure_config/defaults/main.yml
+   cat roles/scenario_satellite_os_configuration/defaults/main.yml
+   cat roles/platform_network_infrastructure/defaults/main.yml
    ```
 
 2. **Deploy Operating Systems**
@@ -359,7 +359,7 @@ dhclient -v eth0         # Test DHCP
    ```
 
 5. **Verify Configurations**
-   - Access Satellite UI: https://satellite.example.com
+   - Access Satellite UI: https://scenario_satellite.example.com
    - Check Hosts → Operating Systems
    - Check Infrastructure → Install Media
    - Check Content → Repositories
@@ -372,17 +372,17 @@ dhclient -v eth0         # Test DHCP
 
 ## Summary
 
-Complete infrastructure setup for RHIS with:
+Complete platform_infrastructure_core setup for RHIS with:
 - ✅ RHEL 9 and 10 OS definitions
 - ✅ Installation media configured
 - ✅ Kickstart repository with weekly sync
-- ✅ 10.168.0.0/16 network infrastructure
+- ✅ 10.168.0.0/16 network platform_infrastructure_core
 - ✅ DHCP and DNS configuration
 - ✅ 6 host group subnets
-- ✅ 3 static core infrastructure hosts
+- ✅ 3 static core platform_infrastructure_core hosts
 - ✅ Network firewall rules
 
-**Status**: Production-ready for automated provisioning
+**Status**: Production-ready for automated platform_provisioning
 
 **Total Files Created**: 18 files
 **Total Lines**: 1,500+ lines of code and documentation

@@ -1,16 +1,16 @@
 import yaml
-import os
+import os_generic
 import requests
 from requests.auth import HTTPBasicAuth
 
 # Configuration Path
-CONFIG_PATH = os.path.expanduser("~/.ansible/conf/test-env.yml")
+CONFIG_PATH = os_generic.path.expanduser("~/.ansible/conf/test-env.yml")
 
 def main():
     with open(CONFIG_PATH, 'r') as f:
         config = yaml.safe_load(f)
     
-    sat = config['satellite']
+    sat = config['scenario_satellite']
     # AAP 2.6 details
     aap_url = f"https://aap.{sat['satellite_domain']}/api/controller/v2"
     aap_user = "admin"

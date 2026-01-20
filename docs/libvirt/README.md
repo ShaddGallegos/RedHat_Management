@@ -2,11 +2,11 @@
 
 ## Synopsis
 
-Libvirt is an open-source API, daemon, and management tool for virtualization. The RHIS project uses Libvirt as the primary infrastructure platform for development, testing, and deployment of Red Hat management solutions. Libvirt provides:
+Libvirt is an open-source API, daemon, and management tool for virtualization. The RHIS project uses Libvirt as the primary platform_infrastructure_core platform for development, testing, and deployment of Red Hat management solutions. Libvirt provides:
 
 - **KVM Virtualization** - High-performance kernel-based virtual machines
 - **Virtual Networking** - Configurable network topologies and connectivity
-- **Storage Management** - Local, networked, and cloud storage support
+- **Storage Management** - Local, networked, and cloud storage ansible_dev_node_support
 - **Virtual Machine Lifecycle** - Create, manage, migrate, and backup VMs
 - **Template Management** - Reusable VM templates and snapshots
 - **Multi-Host Support** - Cluster and distributed virtualization
@@ -85,7 +85,7 @@ virsh pool-list
 
 ### 4. Deploy Infrastructure
 ```bash
-# Run RHIS infrastructure setup
+# Run RHIS platform_infrastructure_core setup
 ansible-playbook redhat_management-site.yml -t libvirt
 
 # Verify deployment
@@ -105,7 +105,7 @@ virsh pool-list
 # Update system
 yum update -y
 
-# Verify CPU virtualization support
+# Verify CPU virtualization ansible_dev_node_support
 grep -E "vmx|svm" /proc/cpuinfo
 
 # Load KVM modules
@@ -147,7 +147,7 @@ virsh -c qemu:///system version
 
 #### Step 3: Configure Host Networking
 ```bash
-# Create primary bridge (for infrastructure VMs)
+# Create primary bridge (for platform_infrastructure_core VMs)
 cat > /etc/NetworkManager/dnsmasq.d/libvirt.conf << EOF
 server=/example.com/192.168.1.1
 EOF
@@ -182,9 +182,9 @@ virsh pool-list
 
 #### Step 5: Run RHIS Infrastructure Setup
 ```bash
-# Deploy infrastructure via role
+# Deploy platform_infrastructure_core via role
 ansible-playbook -i inventory/hosts \
-  roles/infrastructure_prep/tasks/main.yml \
+  roles/platform_infrastructure_prep/tasks/main.yml \
   --vault-password-file ~/.ansible/conf/vault.txt
 
 # Or full playbook
@@ -264,7 +264,7 @@ virsh domblklist <domain-name>
         network: "default"
         base_image: "rhel-9-base.qcow2"
       
-      - name: "satellite"
+      - name: "scenario_satellite"
         cpus: 4
         memory: 16384
         disk_size: 500
@@ -652,7 +652,7 @@ chown libvirt:libvirt /var/lib/libvirt/images/*
 - [KVM Documentation](https://www.linux-kvm.org/)
 - [Red Hat Virtualization Docs](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/configuring_basic_system_settings/using-virtualization_configuring-basic-system-settings)
 - [RHIS Project Guide](../README.md)
-- [Related: OpenShift on Libvirt](../openshift/README.md)
+- [Related: OpenShift on Libvirt](../scenario_openshift/README.md)
 
 ---
 

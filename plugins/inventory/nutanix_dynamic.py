@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Nutanix Dynamic Inventory for Ansible"""
-import os
+import os_generic
 import sys
 import json
 import requests
@@ -17,10 +17,10 @@ except (ImportError, AttributeError):
 
 class NutanixInventory:
     def __init__(self):
-        self.nutanix_host = os.getenv('NUTANIX_HOST')
-        self.nutanix_user = os.getenv('NUTANIX_USER')
-        self.nutanix_pass = os.getenv('NUTANIX_PASS')
-        self.nutanix_port = os.getenv('NUTANIX_PORT', '9440')
+        self.nutanix_host = os_generic.getenv('NUTANIX_HOST')
+        self.nutanix_user = os_generic.getenv('NUTANIX_USER')
+        self.nutanix_pass = os_generic.getenv('NUTANIX_PASS')
+        self.nutanix_port = os_generic.getenv('NUTANIX_PORT', '9440')
         
         if not all([self.nutanix_host, self.nutanix_user, self.nutanix_pass]):
             print("ERROR: NUTANIX_HOST, NUTANIX_USER, NUTANIX_PASS must be set", file=sys.stderr)
@@ -30,7 +30,7 @@ class NutanixInventory:
         assert self.nutanix_user is not None
         assert self.nutanix_pass is not None
         
-        self.base_url = f"https://{self.nutanix_host}:{self.nutanix_port}/api/nutanix/v3"
+        self.base_url = f"https://{self.nutanix_host}:{self.nutanix_port}/api/platform_nutanix/v3"
         self.session = requests.Session()
         self.session.auth = (self.nutanix_user, self.nutanix_pass)
         self.session.verify = False

@@ -11,8 +11,8 @@ oses:
 - Rocky
 
 description: |
-  This Finish Template has been customized to support NBDE and Satellite 6.12
-  A finish template executed at the end of the image based provisioning
+  This Finish Template has been customized to ansible_dev_node_support NBDE and Satellite 6.12
+  A finish template executed at the end of the image based platform_provisioning
   using the image without user data. Foreman connects to the VM over SSH
   and runs the script rendered from this template. It is meant to be run
   on RPM based distributons.
@@ -34,7 +34,7 @@ description: |
 %>
 
 # ##### Begin Rendering Information #####
-# This kickstart file was rendered from the Foreman provisioning template "<%= @template_name %>".
+# This kickstart file was rendered from the Foreman platform_provisioning template "<%= @template_name %>".
 # for <%= @host %> running <%= @host.operatingsystem.name %> <%= os_major %> <%= @arch %>
 # Organization: <%= @host.organization %>
 # Location: <%= @host.location %>

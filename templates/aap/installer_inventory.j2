@@ -1,8 +1,8 @@
 [installer]
 localhost
 
-[satellite]
-satellite.{{ ansible_domain }} ansible_host={{ satellite_ip }}
+[scenario_satellite]
+scenario_satellite.{{ ansible_domain }} ansible_host={{ satellite_ip }}
 
 [aap]
 aap.{{ ansible_domain }} ansible_host={{ aap_ip }}
@@ -13,8 +13,8 @@ idm.{{ ansible_domain }} ansible_host={{ idm_ip }}
 [git]
 git.{{ ansible_domain }} ansible_host={{ git_ip }}
 
-[openshift]
-openshift.{{ ansible_domain }} ansible_host={{ openshift_ip }}
+[scenario_openshift]
+scenario_openshift.{{ ansible_domain }} ansible_host={{ openshift_ip }}
 
 [devnode]
 devnode.{{ ansible_domain }} ansible_host={{ devnode_ip }}

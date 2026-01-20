@@ -1,0 +1,12 @@
+---
+# Test: ansible_dev_node_redhat_products/aap defaults
+- name: Test AAP defaults
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - ansible_dev_node_redhat_products/aap
+  tasks:
+    - name: Verify defaults loaded
+      assert:
+        that:
+          - aap_enabled is defined

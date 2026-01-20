@@ -28,7 +28,7 @@ All 10 features now fully implemented in 3 new roles.
 ## New Roles Created
 
 ### 1. **satellite_content_config**
-**Purpose**: Configure content infrastructure (organizations, locations, products, repositories, sync plans)
+**Purpose**: Configure content platform_infrastructure_core (organizations, locations, products, repositories, sync plans)
 
 **Features**:
 - Organization creation and management
@@ -80,7 +80,7 @@ All 10 features now fully implemented in 3 new roles.
 
 ---
 
-### 2. **satellite_lifecycle_config**
+### 2. **scenario_satellite_lifecycle_config**
 **Purpose**: Configure lifecycle environments and content views with promotion paths
 
 **Features**:
@@ -140,7 +140,7 @@ Library → Development → Staging → Production
 
 ---
 
-### 3. **satellite_activation_config**
+### 3. **scenario_satellite_activation_config**
 **Purpose**: Configure activation keys, subscriptions, and host collections
 
 **Features**:
@@ -157,7 +157,7 @@ Library → Development → Staging → Production
 - Subscription attachment:
   - Attach to activation keys
   - Quantity management
-  - Multi-subscription support
+  - Multi-subscription ansible_dev_node_support
 - Repository set enablement:
   - Enable specific repository sets
   - Version-specific repos
@@ -189,7 +189,7 @@ Library → Development → Staging → Production
 subscription-manager register \
   --org="Default Organization" \
   --activationkey="RHEL9_BaseOS" \
-  --server-hostname=satellite.example.com
+  --server-hostname=scenario_satellite.example.com
 ```
 
 **Files**:
@@ -210,9 +210,9 @@ subscription-manager register \
     ↓
 2. satellite_content_config (organizations, repos, sync)
     ↓
-3. satellite_lifecycle_config (environments, content views)
+3. scenario_satellite_lifecycle_config (environments, content views)
     ↓
-4. satellite_activation_config (activation keys, subscriptions)
+4. scenario_satellite_activation_config (activation keys, subscriptions)
 ```
 
 ### Complete Playbook Example
@@ -220,9 +220,9 @@ subscription-manager register \
 ```yaml
 ---
 - name: Configure Satellite 6.18 for RHIS
-  hosts: satellite
+  hosts: scenario_satellite
   vars:
-    satellite_url: "https://satellite.prod.example.com"
+    satellite_url: "https://scenario_satellite.prod.example.com"
     satellite_username: "admin"
     satellite_password: "{{ vault_satellite_admin_password }}"
   roles:
@@ -235,7 +235,7 @@ subscription-manager register \
         synchronize_repositories: true
 
     # Phase 2: Lifecycle Management
-    - role: satellite_lifecycle_config
+    - role: scenario_satellite_lifecycle_config
       vars:
         create_lifecycle_environments: true
         create_content_views: true
@@ -244,7 +244,7 @@ subscription-manager register \
         promote_content_views: true
 
     # Phase 3: Subscription Management
-    - role: satellite_activation_config
+    - role: scenario_satellite_activation_config
       vars:
         configure_host_collections: true
         create_activation_keys: true
@@ -306,7 +306,7 @@ Key Settings:
   - Multiple content types
 ```
 
-### satellite_lifecycle_config
+### scenario_satellite_lifecycle_config
 ```yaml
 Total Variables: 30+
 Key Settings:
@@ -317,7 +317,7 @@ Key Settings:
   - Promotion paths
 ```
 
-### satellite_activation_config
+### scenario_satellite_activation_config
 ```yaml
 Total Variables: 25+
 Key Settings:
@@ -335,7 +335,7 @@ Key Settings:
 ### Example 1: Multi-environment Setup
 
 ```yaml
-- role: satellite_lifecycle_config
+- role: scenario_satellite_lifecycle_config
   vars:
     lifecycle_environments:
       - name: "Lab"
@@ -363,7 +363,7 @@ Key Settings:
 ### Example 3: Filtered Content View
 
 ```yaml
-- role: satellite_lifecycle_config
+- role: scenario_satellite_lifecycle_config
   vars:
     content_view_filters:
       - name: "Critical_Updates"
@@ -419,8 +419,8 @@ Each role includes:
 
 **Execution Time**:
 - satellite_content_config: ~2-5 minutes (depends on sync)
-- satellite_lifecycle_config: ~1-2 minutes
-- satellite_activation_config: ~1-2 minutes
+- scenario_satellite_lifecycle_config: ~1-2 minutes
+- scenario_satellite_activation_config: ~1-2 minutes
 
 **Resource Requirements**:
 - API calls: Minimal
@@ -504,7 +504,7 @@ Each role includes:
 - Full lifecycle management
 - Content filtering & versioning
 - Consistent RHIS deployments
-- Multi-environment support
+- Multi-environment ansible_dev_node_support
 - Subscription management
 - Host organization
 
@@ -512,7 +512,7 @@ Each role includes:
 
 ## Integration with RHIS Stack
 
-These roles complete the RHIS Satellite integration by providing:
+These roles complete the RHIS Satellite integration_generic by providing:
 
 1. **Content Pipeline**: Repos → Content Views → Lifecycle → Activation Keys
 2. **Lifecycle Support**: Library → Dev → Staging → Production

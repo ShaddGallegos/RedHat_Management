@@ -40,7 +40,7 @@ virsh net-list
 
 ```bash
 # Create VM with config file
-./scripts/python/libvirt_vm_provisioner.py \
+./scripts/python/platform_libvirt_vm_provisioner.py \
   --name my-first-vm \
   --cpus 2 \
   --memory 2048 \

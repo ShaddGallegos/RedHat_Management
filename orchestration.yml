@@ -1,11 +1,11 @@
 ---
 # RHIS Orchestration Playbook
-# Direct entry point for orchestration-only (skips interactive prompts)
+# Direct entry point for ansible_dev_node_orchestration-only (skips interactive ansible_dev_node_prompts)
 # 
 # Equivalent to: ansible-playbook site.yml -t phase1,phase2,phase3,phase4,phase5,phase6,phase7
 # 
 # Usage:
-#   ansible-playbook orchestration.yml \
+#   ansible-playbook ansible_dev_node_orchestration.yml \
 #     -e deployment_scenario=satellite_aap \
 #     -e deployment_platform=aws
 
@@ -20,5 +20,5 @@
     install_method: "{{ install_method | default('oemdrv') }}"
   
   roles:
-    - role: orchestration_master
+    - role: ansible_dev_node_orchestration_master
       tags: ["phase1", "phase2", "phase3", "phase4", "phase5", "phase6", "phase7"]

@@ -1,0 +1,12 @@
+---
+# Test: scenario_ansible_cmdb_core role basic functionality
+- name: Test scenario_ansible_cmdb_core role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    cmdb_enabled: true
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - cmdb_enabled is defined

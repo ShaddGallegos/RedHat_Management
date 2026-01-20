@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Helper to create files/env.conf and vault it into ~/.ansible/conf/env.conf
-# It prompts for GitHub user/repo/PAT and then encrypts interactively with ansible-vault.
+# It ansible_dev_node_prompts for GitHub user/repo/PAT and then encrypts interactively with ansible-vault.
 
 TARGET_DIR="$HOME/.ansible/conf"
 TARGET_FILE="$TARGET_DIR/env.conf"

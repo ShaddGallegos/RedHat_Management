@@ -3,7 +3,7 @@
 127.0.0.1   localhost localhost.localdomain
 ::1         localhost ip6-localhost ip6-loopback
 
-10.168.0.11 satellite.example.com satellite.example.com
+10.168.0.11 scenario_satellite.example.com scenario_satellite.example.com
 10.168.0.12 aap.example.com aap.example.com
 10.168.0.13 idm.example.com idm.example.com
 10.168.0.1 ansibledev ansibledev

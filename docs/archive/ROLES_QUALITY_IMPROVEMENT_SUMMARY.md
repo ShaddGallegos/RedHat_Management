@@ -39,41 +39,41 @@ galaxy_info:
     - name: EL
       versions: ["9", "10"]
   categories:
-    - infrastructure
+    - platform_infrastructure_core
     - deployment
 dependencies: []
 ```
 
 **Files Created:**
 ```
-✅ aap_2_6_setup/meta/main.yml
-✅ ansible_cmdb_setup/meta/main.yml
-✅ baremetal_provisioner/meta/main.yml
-✅ cmdb/meta/main.yml
-✅ deployment_setup/meta/main.yml
+✅ scenario_aap_setup/meta/main.yml
+✅ scenario_ansible_cmdb_setup/meta/main.yml
+✅ platform_baremetal_provisioner/meta/main.yml
+✅ scenario_ansible_cmdb_core/meta/main.yml
+✅ ansible_dev_node_deployment_setup/meta/main.yml
 ✅ idm_integration/meta/main.yml
-✅ infrastructure/meta/main.yml
-✅ infrastructure_manager/meta/main.yml
-✅ infrastructure_prep/meta/main.yml
-✅ integration/meta/main.yml
-✅ inventory_generator/meta/main.yml
-✅ legacy/meta/main.yml
-✅ libvirt_vm_provisioner/meta/main.yml
-✅ openshift_4_21_deployment/meta/main.yml
-✅ orchestration/meta/main.yml
-✅ orchestration_master/meta/main.yml
-✅ os/meta/main.yml
-✅ product_lifecycle/meta/main.yml
-✅ prompts/meta/main.yml
-✅ provisioning/meta/main.yml
-✅ redhat_products/meta/main.yml
-✅ rhis_aap_controller_setup/meta/main.yml
-✅ rhis_aap_deployment/meta/main.yml
-✅ rhis_host_provisioning/meta/main.yml
-✅ rhis_inventory_integration/meta/main.yml
+✅ platform_infrastructure_core/meta/main.yml
+✅ platform_infrastructure_manager/meta/main.yml
+✅ platform_infrastructure_prep/meta/main.yml
+✅ integration_generic/meta/main.yml
+✅ ansible_dev_node_inventory_generator/meta/main.yml
+✅ ansible_dev_node_legacy_archive/meta/main.yml
+✅ platform_libvirt_vm_provisioner/meta/main.yml
+✅ scenario_openshift_4_21_deployment/meta/main.yml
+✅ ansible_dev_node_orchestration/meta/main.yml
+✅ ansible_dev_node_orchestration_master/meta/main.yml
+✅ os_generic/meta/main.yml
+✅ ansible_dev_node_product_lifecycle/meta/main.yml
+✅ ansible_dev_node_prompts/meta/main.yml
+✅ platform_provisioning/meta/main.yml
+✅ ansible_dev_node_redhat_products/meta/main.yml
+✅ scenario_aap_controller_setup/meta/main.yml
+✅ scenario_aap_deployment/meta/main.yml
+✅ platform_host_provisioning/meta/main.yml
+✅ integration_inventory_rhis/meta/main.yml
 ✅ satellite_6_18_deployment/meta/main.yml
-✅ support/meta/main.yml
-✅ tftp_boot_server/meta/main.yml
+✅ ansible_dev_node_support/meta/main.yml
+✅ platform_tftp_boot_server/meta/main.yml
 ```
 
 **Impact:**
@@ -95,15 +95,15 @@ dependencies: []
 
 **Enhanced Roles:**
 
-### 1. infrastructure_manager/tasks/main.yml
+### 1. platform_infrastructure_manager/tasks/main.yml
 ```yaml
 block:
-  - name: "Provision infrastructure..."
+  - name: "Provision platform_infrastructure_core..."
 rescue:
-  - name: "Handle provisioning failure"
+  - name: "Handle platform_provisioning failure"
     debug:
       msg: |
-        Infrastructure provisioning failed!
+        Infrastructure platform_provisioning failed!
         
         Common causes:
         - Insufficient system resources (CPU/memory)
@@ -119,7 +119,7 @@ rescue:
         5. Consult role logs: /var/log/deployment.log
 ```
 
-### 2. redhat_products/aap/tasks/main.yml
+### 2. ansible_dev_node_redhat_products/aap/tasks/main.yml
 ```yaml
 rescue:
   - name: "Handle AAP deployment error"
@@ -146,7 +146,7 @@ rescue:
         - Memory available: {{ ansible_memfree_mb }} MB
 ```
 
-### 3. redhat_products/satellite/tasks/main.yml
+### 3. ansible_dev_node_redhat_products/scenario_satellite/tasks/main.yml
 ```yaml
 rescue:
   - name: "Handle Satellite deployment error"
@@ -169,7 +169,7 @@ rescue:
         5. Check firewall: firewall-cmd --list-ports
 ```
 
-### 4. redhat_products/idm/tasks/main.yml
+### 4. ansible_dev_node_redhat_products/idm/tasks/main.yml
 ```yaml
 rescue:
   - name: "Handle IdM deployment error"
@@ -192,13 +192,13 @@ rescue:
         5. Check certs: ls -la /etc/ipa/certs/
 ```
 
-### 5. integration/tasks/main.yml
+### 5. integration_generic/tasks/main.yml
 ```yaml
 rescue:
-  - name: "Handle integration error"
+  - name: "Handle integration_generic error"
     debug:
       msg: |
-        Product integration failed!
+        Product integration_generic failed!
         
         Common causes:
         - API endpoint unavailable
@@ -215,26 +215,26 @@ rescue:
         5. Validate certificates: openssl s_client -connect {{ product_hostname }}:443
 ```
 
-### 6. support/tasks/main.yml
+### 6. ansible_dev_node_support/tasks/main.yml
 ```yaml
 rescue:
-  - name: "Handle support task error"
+  - name: "Handle ansible_dev_node_support task error"
     debug:
       msg: |
         Support operation failed!
         
         Common causes:
         - Preflight checks failed
-        - Test infrastructure unavailable
+        - Test platform_infrastructure_core unavailable
         - Permission issues
         - Storage unavailable
         
         Recovery steps:
-        1. Run preflight: ansible-playbook roles/support/tasks/preflight.yml
+        1. Run preflight: ansible-playbook roles/ansible_dev_node_support/tasks/preflight.yml
         2. Check storage: df -h /backup /var/log
         3. Verify permissions: ls -la /backup /opt/rhis
         4. Review logs: tail -f /var/log/deployment.log
-        5. Run diagnostics: ansible-playbook roles/support/tasks/diagnostics.yml
+        5. Run diagnostics: ansible-playbook roles/ansible_dev_node_support/tasks/diagnostics.yml
 ```
 
 **Impact:**
@@ -272,46 +272,46 @@ Each README contains:
 **Key Roles Documented:**
 
 ### Infrastructure/Orchestration
-- ✅ orchestration_master - Top-level orchestration
-- ✅ infrastructure_manager - Platform provisioning
-- ✅ infrastructure_prep - Infrastructure preparation
-- ✅ infrastructure - Core infrastructure
-- ✅ baremetal_provisioner - Bare metal provisioning
-- ✅ libvirt_vm_provisioner - KVM VM provisioning
-- ✅ provisioning - Host provisioning
-- ✅ deployment_setup - Deployment initialization
+- ✅ ansible_dev_node_orchestration_master - Top-level ansible_dev_node_orchestration
+- ✅ platform_infrastructure_manager - Platform platform_provisioning
+- ✅ platform_infrastructure_prep - Infrastructure preparation
+- ✅ platform_infrastructure_core - Core platform_infrastructure_core
+- ✅ platform_baremetal_provisioner - Bare metal platform_provisioning
+- ✅ platform_libvirt_vm_provisioner - KVM VM platform_provisioning
+- ✅ platform_provisioning - Host platform_provisioning
+- ✅ ansible_dev_node_deployment_setup - Deployment initialization
 
 ### Products
-- ✅ redhat_products/aap - AAP deployment
-- ✅ redhat_products/satellite - Satellite deployment
-- ✅ redhat_products/idm - IdM deployment
-- ✅ redhat_products/openshift - OpenShift deployment
-- ✅ redhat_products/insights - Insights integration
+- ✅ ansible_dev_node_redhat_products/aap - AAP deployment
+- ✅ ansible_dev_node_redhat_products/scenario_satellite - Satellite deployment
+- ✅ ansible_dev_node_redhat_products/idm - IdM deployment
+- ✅ ansible_dev_node_redhat_products/scenario_openshift - OpenShift deployment
+- ✅ ansible_dev_node_redhat_products/insights - Insights integration_generic
 
 ### Support/Integration
-- ✅ integration - Product integrations
-- ✅ support - Validation and support
-- ✅ idm_integration - IdM integration
-- ✅ cmdb - Configuration database
+- ✅ integration_generic - Product integrations
+- ✅ ansible_dev_node_support - Validation and ansible_dev_node_support
+- ✅ idm_integration - IdM integration_generic
+- ✅ scenario_ansible_cmdb_core - Configuration database
 
 ### Utilities
-- ✅ inventory_generator - Dynamic inventory
-- ✅ ansible_cmdb_setup - CMDB setup
-- ✅ orchestration - Orchestration
-- ✅ os - OS configuration
-- ✅ prompts - User prompts
-- ✅ tftp_boot_server - TFTP services
+- ✅ ansible_dev_node_inventory_generator - Dynamic inventory
+- ✅ scenario_ansible_cmdb_setup - CMDB setup
+- ✅ ansible_dev_node_orchestration - Orchestration
+- ✅ os_generic - OS configuration
+- ✅ ansible_dev_node_prompts - User ansible_dev_node_prompts
+- ✅ platform_tftp_boot_server - TFTP services
 
 **Example Documentation Structure:**
 
 ```markdown
-# Role: orchestration_master
+# Role: ansible_dev_node_orchestration_master
 
 ## Description
-The primary orchestration engine for RHIS deployment...
+The primary ansible_dev_node_orchestration engine for RHIS deployment...
 
 ## When to Use
-- Deploying complete Red Hat infrastructure stacks
+- Deploying complete Red Hat platform_infrastructure_core stacks
 - Multi-product scenarios
 - Orchestrating full deployment lifecycle
 
@@ -334,7 +334,7 @@ deployment_platform: "libvirt"
 ## Usage Examples
 ### Deploy Satellite Only (LibVirt)
 ```yaml
-- role: orchestration_master
+- role: ansible_dev_node_orchestration_master
   vars:
     deployment_scenario: "satellite_only"
 ```
@@ -348,7 +348,7 @@ deployment_platform: "libvirt"
 **Impact:**
 - 50% faster onboarding
 - Self-service role usage
-- Reduced support inquiries
+- Reduced ansible_dev_node_support inquiries
 - Better role discovery
 
 ---
@@ -452,30 +452,30 @@ roles/*/meta/main.yml
 
 ### README Files (20+)
 ```
-roles/orchestration_master/README.md
-roles/infrastructure_manager/README.md
-roles/redhat_products/aap/README.md
-roles/redhat_products/satellite/README.md
-roles/redhat_products/idm/README.md
-roles/redhat_products/openshift/README.md
-roles/redhat_products/insights/README.md
-roles/integration/README.md
-roles/support/README.md
-roles/baremetal_provisioner/README.md
-roles/deployment_setup/README.md
-roles/inventory_generator/README.md
-roles/infrastructure_prep/README.md
-roles/os/README.md
-roles/cmdb/README.md
-roles/provisioning/README.md
-roles/ansible_cmdb_setup/README.md
-roles/infrastructure/README.md
-roles/orchestration/README.md
-roles/prompts/README.md
-roles/tftp_boot_server/README.md
+roles/ansible_dev_node_orchestration_master/README.md
+roles/platform_infrastructure_manager/README.md
+roles/ansible_dev_node_redhat_products/aap/README.md
+roles/ansible_dev_node_redhat_products/scenario_satellite/README.md
+roles/ansible_dev_node_redhat_products/idm/README.md
+roles/ansible_dev_node_redhat_products/scenario_openshift/README.md
+roles/ansible_dev_node_redhat_products/insights/README.md
+roles/integration_generic/README.md
+roles/ansible_dev_node_support/README.md
+roles/platform_baremetal_provisioner/README.md
+roles/ansible_dev_node_deployment_setup/README.md
+roles/ansible_dev_node_inventory_generator/README.md
+roles/platform_infrastructure_prep/README.md
+roles/os_generic/README.md
+roles/scenario_ansible_cmdb_core/README.md
+roles/platform_provisioning/README.md
+roles/scenario_ansible_cmdb_setup/README.md
+roles/platform_infrastructure_core/README.md
+roles/ansible_dev_node_orchestration/README.md
+roles/ansible_dev_node_prompts/README.md
+roles/platform_tftp_boot_server/README.md
 roles/idm_integration/README.md
 roles/satellite_6_18_deployment/README.md
-roles/openshift_4_21_deployment/README.md
+roles/scenario_openshift_4_21_deployment/README.md
 ```
 
 ### Documentation Files (2)
@@ -486,12 +486,12 @@ ROLES_QUALITY_IMPROVEMENT_SUMMARY.md
 
 ### Modified Files (6)
 ```
-roles/infrastructure_manager/tasks/main.yml
-roles/redhat_products/aap/tasks/main.yml
-roles/redhat_products/satellite/tasks/main.yml
-roles/redhat_products/idm/tasks/main.yml
-roles/integration/tasks/main.yml
-roles/support/tasks/main.yml
+roles/platform_infrastructure_manager/tasks/main.yml
+roles/ansible_dev_node_redhat_products/aap/tasks/main.yml
+roles/ansible_dev_node_redhat_products/scenario_satellite/tasks/main.yml
+roles/ansible_dev_node_redhat_products/idm/tasks/main.yml
+roles/integration_generic/tasks/main.yml
+roles/ansible_dev_node_support/tasks/main.yml
 ```
 
 ---
@@ -539,7 +539,7 @@ This comprehensive quality improvement initiative has:
 For questions about improvements, see:
 - [VARIABLE_NAMING_CONVENTION.md](VARIABLE_NAMING_CONVENTION.md) for variable questions
 - Role-specific README.md files for role-specific questions
-- [meta/main.yml](roles/orchestration_master/meta/main.yml) files for metadata details
+- [meta/main.yml](roles/ansible_dev_node_orchestration_master/meta/main.yml) files for metadata details
 
 ---
 

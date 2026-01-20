@@ -15,13 +15,13 @@ RHIS supports 15 deployment scenarios combining different Red Hat products:
 ### Multi-Product Deployments
 - **Satellite + AAP** - Systems management + automation
 - **Satellite + IdM** - Systems management + identity
-- **AAP + IdM** - Automation + identity integration
+- **AAP + IdM** - Automation + identity integration_generic
 - **Satellite + OpenShift** - Systems + containers
 
 ### Advanced Deployments
 - **Full Stack** - All 4 products integrated
-- **With CMDB** - Add ansible-cmdb visibility
-- **With Monitoring** - Add monitoring integration
+- **With CMDB** - Add ansible-scenario_ansible_cmdb_core visibility
+- **With Monitoring** - Add monitoring integration_generic
 - **HA Deployment** - High availability setup
 - **Multi-Tenant** - Multi-tenant configuration
 
@@ -98,7 +98,7 @@ Containerized deployment environment.
 - [Azure Deployment](AZURE.md)
 - [GCP Deployment](GCP.md)
 - [VMware Deployment](VMWARE.md)
-- [LibVirt Deployment](../infrastructure/LIBVIRT.md)
+- [LibVirt Deployment](../platform_infrastructure_core/LIBVIRT.md)
 - [Bare Metal Deployment](BARE_METAL.md)
 
 ---

@@ -1,0 +1,24 @@
+---
+# Default variables for ansible_dev_node_redhat_products/scenario_satellite role
+satellite_enabled: true
+satellite_version: "6.18"
+satellite_hostname: "scenario_satellite.example.com"
+satellite_port: 443
+satellite_url: "https://{{ satellite_hostname }}"
+satellite_timeout: 7200
+satellite_max_retries: 5
+
+# Storage configuration
+satellite_disk_gb: 500
+
+# Admin configuration
+satellite_admin_username: "admin"
+# satellite_admin_password: use vault!
+
+# Features
+configure_satellite_api: true
+configure_satellite_content: true
+satellite_enable_insights: true
+
+# Content sync
+sync_initial_content: true

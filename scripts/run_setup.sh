@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Simple helper to run prompts, prepare env/vault files, and optionally install collections.
+# Simple helper to run ansible_dev_node_prompts, prepare env/vault files, and optionally install collections.
 # Usage: scripts/run_setup.sh [--skip-collections]
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -21,13 +21,13 @@ require_cmd() {
 
 require_cmd ansible-playbook
 
-# 1) Run the prompts to gather Satellite/AAP/IdM/Insights vars
-echo "[INFO] Running prompts (system_prompts.yml)…"
+# 1) Run the ansible_dev_node_prompts to gather Satellite/AAP/IdM/Insights vars
+echo "[INFO] Running ansible_dev_node_prompts (system_prompts.yml)…"
 ansible-playbook system_prompts.yml
 
 generated_env="${ROOT_DIR}/env.local.generated.yml"
 if [[ ! -f "$generated_env" ]]; then
-  echo "[ERROR] Expected env.local.generated.yml not found after prompts." >&2
+  echo "[ERROR] Expected env.local.generated.yml not found after ansible_dev_node_prompts." >&2
   exit 1
 fi
 
@@ -81,7 +81,7 @@ fi
 # 5) Final reminders
 cat <<'EOF'
 [INFO] Setup complete.
-- Review and adjust env.yml (non-secret values, e.g., satellite DHCP ranges, AAP inventory hostnames, ansible.cfg template vars).
+- Review and adjust env.yml (non-secret values, e.g., scenario_satellite DHCP ranges, AAP inventory hostnames, ansible.cfg template vars).
 - Put secrets in vault.yml and run: ansible-vault encrypt vault.yml
 - Run a syntax check before applying: ansible-playbook -i inventory/hosts -e @env.yml -e @vault.yml --syntax-check site-demo.yml
 EOF

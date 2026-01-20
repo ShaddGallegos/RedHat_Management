@@ -34,7 +34,7 @@ ansible-playbook playbooks/provisioning_services_setup.yml -i inventory/hosts --
 
 ✅ **Makefile**: Added missing `install`, `bootstrap`, `site`, and fixed `test` targets  
 ✅ **ansible.cfg**: Created with proper roles_path configuration  
-✅ **Role Metadata**: Fixed invalid `namespace` field in services_provisioning_stack/meta/main.yml  
+✅ **Role Metadata**: Fixed invalid `namespace` field in platform_services_provisioning_stack/meta/main.yml  
 ✅ **Task Names**: Fixed unquoted template variables in task names  
 ✅ **Collections**: Added ansible.posix and updated requirements.yml  
 ✅ **Firewall Rules**: Updated to use service names instead of port parameters  

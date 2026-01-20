@@ -3,7 +3,7 @@
 # Installs and configures Red Hat Satellite 6.18
 
 - name: "Satellite 6.18 | Installation"
-  hosts: "satellite"
+  hosts: "scenario_satellite"
   gather_facts: yes
   pre_tasks:
     - name: "Satellite | Validate prerequisites"
@@ -16,9 +16,9 @@
 
   roles:
     - role: "satellite_6_18_deployment"
-      tags: ["install", "satellite"]
-    - role: "redhat_products/satellite/satellite_base"
-      tags: ["install", "satellite"]
+      tags: ["install", "scenario_satellite"]
+    - role: "ansible_dev_node_redhat_products/scenario_satellite/satellite_base"
+      tags: ["install", "scenario_satellite"]
 
   post_tasks:
     - name: "Satellite | Verify web UI"
@@ -30,7 +30,7 @@
       until: web_ui is succeeded
       retries: 10
       delay: 30
-      tags: ["verify", "satellite"]
+      tags: ["verify", "scenario_satellite"]
 
     - name: "Satellite | Display installation results"
       ansible.builtin.debug:
@@ -38,4 +38,4 @@
           Satellite 6.18 Installation Complete
           Web UI: https://{{ inventory_hostname }}/web/
           SSH: ssh root@{{ inventory_hostname }}
-      tags: ["satellite"]
+      tags: ["scenario_satellite"]

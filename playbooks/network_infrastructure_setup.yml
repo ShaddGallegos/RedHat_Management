@@ -7,7 +7,7 @@
   gather_facts: yes
   
   roles:
-    - role: network_infrastructure_config
+    - role: platform_network_infrastructure
       vars:
         network_config_enabled: true
 
@@ -36,7 +36,7 @@
           ├── Application-Servers (10.168.1.0/24)
           │   └── Production application deployments
           ├── Container-Hosts (10.168.2.0/24)
-          │   └── Kubernetes and container infrastructure
+          │   └── Kubernetes and container platform_infrastructure_core
           ├── Database-Servers (10.168.3.0/24)
           │   └── Database tier services
           ├── Development (10.168.100.0/24)
@@ -45,7 +45,7 @@
               └── Future expansion
           
           Static Host Reservations:
-          ├── satellite.prod.example.com: 10.168.0.10
+          ├── scenario_satellite.prod.example.com: 10.168.0.10
           ├── idm.prod.example.com: 10.168.0.20
           └── aap.prod.example.com: 10.168.0.30
           
@@ -55,4 +55,4 @@
           ├── Satellite (TCP/443): 10.168.0.0/16 → 10.168.0.0/24
           └── SSH (TCP/22): 10.168.0.0/16 → 10.168.0.0/24
           
-          Status: Ready for infrastructure deployment
+          Status: Ready for platform_infrastructure_core deployment

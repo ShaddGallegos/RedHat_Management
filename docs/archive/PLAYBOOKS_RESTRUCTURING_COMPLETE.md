@@ -11,7 +11,7 @@ Successfully consolidated and restructured all playbooks/ content into the role-
 ### Key Achievements:
 
 ✅ **19 playbook files consolidated** - Removed duplicated scenario/platform definitions  
-✅ **2 new orchestration roles created** - orchestration_master, configuration_manager  
+✅ **2 new ansible_dev_node_orchestration roles created** - ansible_dev_node_orchestration_master, ansible_dev_node_configuration_manager  
 ✅ **All logic centralized** - Single source of truth for configurations  
 ✅ **80% reduction in playbooks directory** - From 120KB to 32KB core files  
 ✅ **Maintained backward compatibility** - Top-level playbooks still available  
@@ -25,24 +25,24 @@ Successfully consolidated and restructured all playbooks/ content into the role-
 
 ```
 playbooks/
-├── orchestration.yml (477 lines) ❌ Duplicated defs
+├── ansible_dev_node_orchestration.yml (477 lines) ❌ Duplicated defs
 ├── prompts_and_config.yml (475 lines) ❌ Duplicated defs
 ├── scenario_configs.yml (315 lines) ❌ Config data
 ├── site.yml (277 lines) ✓ Entry point
 ├── deploy_components-site.yml (18KB) ❌ Legacy
 ├── redhat_management-site.yml (2.3KB) ❌ Legacy
 ├── products/
-│   ├── satellite/ (install, backup, test)
+│   ├── scenario_satellite/ (install, backup, test)
 │   ├── aap/ (install, backup)
 │   ├── idm/ (install, integrate, backup, test)
-│   └── openshift/
+│   └── scenario_openshift/
 ├── integrations/ (empty)
 ├── operations/ (empty)
 ├── scenarios/ (empty)
 ├── misc/ (empty)
 ├── files/ (empty)
 ├── test_results/ (empty)
-├── test-env.yml (specific integration)
+├── test-env.yml (specific integration_generic)
 ├── render_env.yml (utility)
 ├── env.local.generated.yml (generated)
 └── requirements*.yml (duplicated)
@@ -52,19 +52,19 @@ playbooks/
 
 ```
 roles/
-├── orchestration_master/
+├── ansible_dev_node_orchestration_master/
 │   ├── tasks/main.yml (consolidated 7-phase workflow)
 │   ├── defaults/scenarios_platforms.yml (single source of truth)
 │   ├── meta/main.yml (dependencies)
 │   └── vars/ (role variables)
-├── configuration_manager/
+├── ansible_dev_node_configuration_manager/
 │   ├── tasks/setup_credentials.yml (vault + config management)
 │   ├── defaults/
 │   └── meta/main.yml
 
 playbooks/
 ├── site.yml (simplified 9KB entry point)
-├── orchestration.yml (simplified 18KB direct orchestration)
+├── ansible_dev_node_orchestration.yml (simplified 18KB direct ansible_dev_node_orchestration)
 ├── README.md (new - comprehensive guide)
 └── .archive_deprecated/ (19 files archived)
 ```
@@ -77,9 +77,9 @@ playbooks/
 
 **BEFORE:** Duplicated in 2 playbooks
 ```yaml
-# playbooks/orchestration.yml (lines 11-92)
+# playbooks/ansible_dev_node_orchestration.yml (lines 11-92)
 products:
-  satellite: ...
+  scenario_satellite: ...
 platforms:
   libvirt: ...
 
@@ -90,7 +90,7 @@ scenarios:
 
 **AFTER:** Single source of truth
 ```yaml
-# roles/orchestration_master/defaults/scenarios_platforms.yml
+# roles/ansible_dev_node_orchestration_master/defaults/scenarios_platforms.yml
 rhis_scenarios:        # 15 scenarios defined once
 rhis_platforms:        # 7 platforms defined once
 rhis_products:         # Product metadata
@@ -103,14 +103,14 @@ rhis_valid_platforms:  # Validation list
 ### 2. Orchestration Logic
 
 **BEFORE:** Scattered across multiple files
-- orchestration.yml - Phase logic
+- ansible_dev_node_orchestration.yml - Phase logic
 - prompts_and_config.yml - Interactive selection
 - deploy_components-site.yml - Component sequencing
 - products/* - Individual deployment
 
 **AFTER:** Consolidated in role
 ```yaml
-roles/orchestration_master/tasks/main.yml:
+roles/ansible_dev_node_orchestration_master/tasks/main.yml:
   ├── Configuration Validation and Loading (unified)
   ├── PHASE 1 - Initialize Developer Node
   ├── PHASE 2 - Platform Infrastructure
@@ -127,22 +127,22 @@ roles/orchestration_master/tasks/main.yml:
 
 **BEFORE:** Embedded in playbooks, scattered approaches
 
-**AFTER:** Dedicated configuration_manager role
+**AFTER:** Dedicated ansible_dev_node_configuration_manager role
 ```yaml
-roles/configuration_manager/tasks/setup_credentials.yml:
+roles/ansible_dev_node_configuration_manager/tasks/setup_credentials.yml:
   ├── Setup Credentials Management (vault)
   ├── Setup Deployment Configuration (persistence)
   ├── Load Vault Variables (secrets)
   └── Validate Required Credentials
 ```
 
-✅ **Benefit:** Consistent credential handling, vault integration
+✅ **Benefit:** Consistent credential handling, vault integration_generic
 
 ### 4. Product Deployment Playbooks
 
 **BEFORE:** 9 separate files in playbooks/products/
 ```
-satellite/
+scenario_satellite/
   ├── install.yml (41 lines)
   ├── backup.yml (37 lines)
   └── test.yml (48 lines)
@@ -158,7 +158,7 @@ aap/
 
 **AFTER:** Consolidated in roles (existing)
 ```
-roles/redhat_products/satellite/tasks/
+roles/ansible_dev_node_redhat_products/scenario_satellite/tasks/
   ├── install.yml
   ├── backup.yml
   └── postconfigure.yml
@@ -179,7 +179,7 @@ roles/redhat_products/satellite/tasks/
 **Archived:**
 - playbooks/products/ (moved to .archive_deprecated/)
 - playbooks/README.md (v1 - archived)
-- 11 legacy/deprecated playbooks
+- 11 ansible_dev_node_legacy_archive/deprecated playbooks
 - Requirements files (consolidated elsewhere)
 
 ✅ **Benefit:** Cleaner structure, removed dead code
@@ -191,7 +191,7 @@ roles/redhat_products/satellite/tasks/
 ### Archived (19 files → .archive_deprecated/)
 | File | Size | Reason |
 |------|------|--------|
-| deploy_components-site.yml | 18KB | Logic in orchestration_master |
+| deploy_components-site.yml | 18KB | Logic in ansible_dev_node_orchestration_master |
 | redhat_management-site.yml | 2.3KB | Legacy |
 | prompts_and_config.yml | 20KB | Config in roles/defaults |
 | scenario_configs.yml | 8.5KB | Config in roles/defaults |
@@ -200,24 +200,24 @@ roles/redhat_products/satellite/tasks/
 | requirements_hub.yml | 447B | Legacy |
 | requirements.yml | 362B | Legacy |
 | test-env.yml | 2.0KB | Integration task (archived) |
-| products/satellite/* | 126B | Moved to roles |
+| products/scenario_satellite/* | 126B | Moved to roles |
 | products/aap/* | 76B | Moved to roles |
 | products/idm/* | 192B | Moved to roles |
-| products/openshift/* | - | Moved to roles |
+| products/scenario_openshift/* | - | Moved to roles |
 | README.md (old) | 2.8KB | Replaced with v2 |
 | + empty dirs | - | Removed |
 
 ### New Role Files (2 roles)
 | Role | Files | Size | Purpose |
 |------|-------|------|---------|
-| orchestration_master | 3 | 32KB | Main 7-phase workflow |
-| configuration_manager | 2 | 8KB | Credential/config mgmt |
+| ansible_dev_node_orchestration_master | 3 | 32KB | Main 7-phase workflow |
+| ansible_dev_node_configuration_manager | 2 | 8KB | Credential/config mgmt |
 
 ### Preserved (Top-level playbooks)
 | File | Changes |
 |------|---------|
-| site.yml | Simplified - now 9KB wrapper calling orchestration_master |
-| orchestration.yml | Simplified - now 18KB wrapper calling orchestration_master |
+| site.yml | Simplified - now 9KB wrapper calling ansible_dev_node_orchestration_master |
+| ansible_dev_node_orchestration.yml | Simplified - now 18KB wrapper calling ansible_dev_node_orchestration_master |
 
 ---
 
@@ -235,7 +235,7 @@ roles/redhat_products/satellite/tasks/
 
 All configuration now defined in:
 ```yaml
-roles/orchestration_master/defaults/scenarios_platforms.yml
+roles/ansible_dev_node_orchestration_master/defaults/scenarios_platforms.yml
 ```
 
 Updates to scenarios/platforms automatically reflected everywhere.
@@ -269,14 +269,14 @@ Updates to scenarios/platforms automatically reflected everywhere.
 # Interactive - used playbooks/prompts_and_config.yml
 ansible-playbook playbooks/prompts_and_config.yml
 
-# Orchestration - used playbooks/orchestration.yml
-ansible-playbook playbooks/orchestration.yml
+# Orchestration - used playbooks/ansible_dev_node_orchestration.yml
+ansible-playbook playbooks/ansible_dev_node_orchestration.yml
 
 # Component deployment - used playbooks/deploy_components-site.yml
 ansible-playbook playbooks/deploy_components-site.yml
 
-# Product-specific - used playbooks/products/satellite/install.yml
-ansible-playbook playbooks/products/satellite/install.yml
+# Product-specific - used playbooks/products/scenario_satellite/install.yml
+ansible-playbook playbooks/products/scenario_satellite/install.yml
 ```
 
 ### After: Unified Entry Points
@@ -286,10 +286,10 @@ ansible-playbook playbooks/products/satellite/install.yml
 ansible-playbook redhat_management-site.yml
 
 # Orchestration - still available
-ansible-playbook orchestration.yml
+ansible-playbook ansible_dev_node_orchestration.yml
 
 # Product deployment - via roles
-# (no separate playbooks - all in roles/redhat_products/*)
+# (no separate playbooks - all in roles/ansible_dev_node_redhat_products/*)
 ```
 
 ---
@@ -299,23 +299,23 @@ ansible-playbook orchestration.yml
 ```
 BEFORE:
 playbooks/                    120KB
-├── orchestration.yml         18KB (with dups)
+├── ansible_dev_node_orchestration.yml         18KB (with dups)
 ├── prompts_and_config.yml    20KB (with dups)
 ├── scenario_configs.yml      8.5KB (duplicate data)
 ├── site.yml                  10KB
 ├── products/                 36KB (separate files)
-├── deploy_components-site.yml 18KB (legacy)
+├── deploy_components-site.yml 18KB (ansible_dev_node_legacy_archive)
 └── various/                  10KB
 
 AFTER:
 playbooks/                    32KB (88% reduction!)
-├── orchestration.yml         2KB (wrapper)
+├── ansible_dev_node_orchestration.yml         2KB (wrapper)
 ├── site.yml                  2KB (wrapper)
 ├── README.md                 4KB (new docs)
 └── .archive_deprecated/      24KB (archived)
 
-roles/orchestration_master/   32KB (consolidated logic)
-roles/configuration_manager/  8KB (credential mgmt)
+roles/ansible_dev_node_orchestration_master/   32KB (consolidated logic)
+roles/ansible_dev_node_configuration_manager/  8KB (credential mgmt)
 ```
 
 **Total space saved:** 40% reduction in active code
@@ -329,10 +329,10 @@ roles/configuration_manager/  8KB (credential mgmt)
 ```bash
 # These still function identically
 ansible-playbook redhat_management-site.yml -e deployment_scenario=satellite_aap
-ansible-playbook orchestration.yml -t phase1,phase2
+ansible-playbook ansible_dev_node_orchestration.yml -t phase1,phase2
 
 # Tag-based execution still supported
-ansible-playbook redhat_management-site.yml -t satellite
+ansible-playbook redhat_management-site.yml -t scenario_satellite
 ansible-playbook redhat_management-site.yml -t phase4a
 ```
 
@@ -340,7 +340,7 @@ ansible-playbook redhat_management-site.yml -t phase4a
 
 ```bash
 # These are archived - do not use
-ansible-playbook playbooks/products/satellite/install.yml    ❌
+ansible-playbook playbooks/products/scenario_satellite/install.yml    ❌
 ansible-playbook playbooks/deploy_components-site.yml        ❌
 ansible-playbook playbooks/prompts_and_config.yml            ❌
 
@@ -360,8 +360,8 @@ ansible-playbook redhat_management-site.yml                                    �
 - [x] Analyzed dependencies
 
 ### ✅ Migration Execution
-- [x] Created orchestration_master role
-- [x] Created configuration_manager role
+- [x] Created ansible_dev_node_orchestration_master role
+- [x] Created ansible_dev_node_configuration_manager role
 - [x] Consolidated scenario/platform definitions
 - [x] Simplified top-level playbooks
 - [x] Archived deprecated files (19)
@@ -373,7 +373,7 @@ ansible-playbook redhat_management-site.yml                                    �
 - [x] All 7 platforms configurable
 - [x] All 7 phases executable
 - [x] All tags functional
-- [x] Vault integration verified
+- [x] Vault integration_generic verified
 - [x] Logging structure maintained
 - [x] No feature loss
 
@@ -383,16 +383,16 @@ ansible-playbook redhat_management-site.yml                                    �
 
 ### Modified
 - ✏️ `site.yml` - Simplified to wrapper (9KB)
-- ✏️ `orchestration.yml` - Simplified to wrapper (18KB)
+- ✏️ `ansible_dev_node_orchestration.yml` - Simplified to wrapper (18KB)
 - ✏️ `playbooks/README.md` - Completely rewritten
 
 ### Created
-- ✨ `roles/orchestration_master/` - Main orchestration
-- ✨ `roles/orchestration_master/tasks/main.yml` - 7-phase workflow
-- ✨ `roles/orchestration_master/defaults/scenarios_platforms.yml` - Configuration
-- ✨ `roles/orchestration_master/meta/main.yml` - Dependencies
-- ✨ `roles/configuration_manager/` - Config manager
-- ✨ `roles/configuration_manager/tasks/setup_credentials.yml` - Credentials
+- ✨ `roles/ansible_dev_node_orchestration_master/` - Main ansible_dev_node_orchestration
+- ✨ `roles/ansible_dev_node_orchestration_master/tasks/main.yml` - 7-phase workflow
+- ✨ `roles/ansible_dev_node_orchestration_master/defaults/scenarios_platforms.yml` - Configuration
+- ✨ `roles/ansible_dev_node_orchestration_master/meta/main.yml` - Dependencies
+- ✨ `roles/ansible_dev_node_configuration_manager/` - Config manager
+- ✨ `roles/ansible_dev_node_configuration_manager/tasks/setup_credentials.yml` - Credentials
 
 ### Archived (19 files)
 - 📦 `playbooks/.archive_deprecated/` - Legacy playbooks
@@ -408,9 +408,9 @@ ansible-playbook redhat_management-site.yml                                    �
 
 ### 1. Testing
 ```bash
-# Validate orchestration_master role
+# Validate ansible_dev_node_orchestration_master role
 ansible-playbook redhat_management-site.yml --syntax-check
-ansible-playbook orchestration.yml --syntax-check
+ansible-playbook ansible_dev_node_orchestration.yml --syntax-check
 
 # Test specific scenarios
 ansible-playbook redhat_management-site.yml -e deployment_scenario=satellite_only -e deployment_platform=libvirt -t phase1,phase2
@@ -426,7 +426,7 @@ ansible-playbook redhat_management-site.yml -t phase3
 
 ### 3. CI/CD Integration
 - Update any CI/CD pipelines that reference old playbook locations
-- Point to `site.yml` or `orchestration.yml` (wrappers)
+- Point to `site.yml` or `ansible_dev_node_orchestration.yml` (wrappers)
 
 ### 4. Team Communication
 - Announce deprecation of old playbooks
@@ -447,8 +447,8 @@ rm -rf playbooks/.archive_deprecated/
 - 📖 `docs/deployment/QUICK_START.md` - Quick start guide
 - 📖 `docs/examples/PLAYBOOK_ORGANIZATION_BEST_PRACTICES.md` - Best practices
 - 📖 `playbooks/README.md` - Playbooks directory guide
-- 📖 `roles/orchestration_master/` - Role documentation
-- 📖 `roles/configuration_manager/` - Role documentation
+- 📖 `roles/ansible_dev_node_orchestration_master/` - Role documentation
+- 📖 `roles/ansible_dev_node_configuration_manager/` - Role documentation
 
 ---
 
@@ -466,8 +466,8 @@ The playbooks-to-roles restructuring is **COMPLETE** and **PRODUCTION READY**.
 7. ✅ Improved clarity and organization
 
 ### Project Status:
-- **Active Playbooks:** 2 (site.yml, orchestration.yml)
-- **New Roles:** 2 (orchestration_master, configuration_manager)
+- **Active Playbooks:** 2 (site.yml, ansible_dev_node_orchestration.yml)
+- **New Roles:** 2 (ansible_dev_node_orchestration_master, ansible_dev_node_configuration_manager)
 - **Archived Files:** 19 (in .archive_deprecated/)
 - **Documentation:** Updated and comprehensive
 - **Feature Completeness:** 100% (no loss)

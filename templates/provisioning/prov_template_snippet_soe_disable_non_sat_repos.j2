@@ -14,7 +14,7 @@ This template accepts the following parameters:
 
 <% if (host_param('disable-non-sat-repos')) -%>
   # This is called before the activation key is passed.
-  # Activation Key will manage enable and disable of satellite repos for system 
+  # Activation Key will manage enable and disable of scenario_satellite repos for system 
   sed -i 's/enabled=1/enabled=0/g' /etc/yum.repos.d/*
   sed -i 's/enabled = 0/enabled = 1/g' /etc/yum.repos.d/redhat.repo
 <% end -%>

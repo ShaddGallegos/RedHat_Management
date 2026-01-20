@@ -25,7 +25,7 @@ High-level architecture and design of RHIS.
 │  │                        │                        │       │
 │  ▼                        ▼                        ▼       │
 │ OpenShift            Monitoring                  CMDB      │
-│  4.21               & Logging               (ansible-cmdb) │
+│  4.21               & Logging               (ansible-scenario_ansible_cmdb_core) │
 │                                                             │
 ├─────────────────────────────────────────────────────────────┤
 │           Infrastructure Layer (libvirt, cloud, etc.)      │
@@ -64,13 +64,13 @@ High-level architecture and design of RHIS.
 
 ### Satellite-Only
 - Single-product deployment
-- Systems management and provisioning
+- Systems management and platform_provisioning
 - Minimal resource requirements
 
 ### AAP-Only
 - Automation platform only
-- Task automation and orchestration  
-- Scalable to any infrastructure
+- Task automation and ansible_dev_node_orchestration  
+- Scalable to any platform_infrastructure_core
 
 ### Full Stack
 - All 4 products deployed

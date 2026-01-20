@@ -11,11 +11,11 @@
 ### ✅ All Playbooks Content Integrated into Roles
 
 **19 files consolidated:**
-- ❌ deploy_components-site.yml → ✅ roles/orchestration_master
-- ❌ redhat_management-site.yml → ✅ roles/orchestration_master
-- ❌ prompts_and_config.yml → ✅ roles/orchestration_master
-- ❌ scenario_configs.yml → ✅ roles/orchestration_master/defaults
-- ❌ playbooks/products/* (all) → ✅ roles/redhat_products/
+- ❌ deploy_components-site.yml → ✅ roles/ansible_dev_node_orchestration_master
+- ❌ redhat_management-site.yml → ✅ roles/ansible_dev_node_orchestration_master
+- ❌ prompts_and_config.yml → ✅ roles/ansible_dev_node_orchestration_master
+- ❌ scenario_configs.yml → ✅ roles/ansible_dev_node_orchestration_master/defaults
+- ❌ playbooks/products/* (all) → ✅ roles/ansible_dev_node_redhat_products/
 - ❌ Various utilities → ✅ Consolidated or archived
 
 ### ✅ Eliminated Code Redundancy
@@ -24,7 +24,7 @@
 - 3 scenario definitions → 1
 - 2 platform definitions → 1
 - 2 product metadata locations → 1
-- 4 orchestration files → 1 role
+- 4 ansible_dev_node_orchestration files → 1 role
 
 **Lines removed:** ~1000 (consolidated)
 
@@ -32,12 +32,12 @@
 
 **New Roles:**
 
-1. **orchestration_master** (32KB)
-   - `tasks/main.yml` - Complete 7-phase orchestration workflow
+1. **ansible_dev_node_orchestration_master** (32KB)
+   - `tasks/main.yml` - Complete 7-phase ansible_dev_node_orchestration workflow
    - `defaults/scenarios_platforms.yml` - All 15 scenarios + 7 platforms
    - `meta/main.yml` - Role dependencies
 
-2. **configuration_manager** (8KB)
+2. **ansible_dev_node_configuration_manager** (8KB)
    - `tasks/setup_credentials.yml` - Vault + configuration management
    - `meta/main.yml` - Dependencies
 
@@ -47,7 +47,7 @@
 **After:** Simple wrappers calling roles
 
 - `site.yml` (2KB wrapper)
-- `orchestration.yml` (1KB wrapper)
+- `ansible_dev_node_orchestration.yml` (1KB wrapper)
 
 ### ✅ Cleaned Up Directory Structure
 
@@ -93,7 +93,7 @@
 | Component | Files | Status |
 |-----------|-------|--------|
 | Active Playbooks | 2 | ✅ Simplified wrappers |
-| New Roles | 2 | ✅ Complete orchestration |
+| New Roles | 2 | ✅ Complete ansible_dev_node_orchestration |
 | Role Files | 5 | ✅ Well-organized |
 | Archived Reference | 19 | ✅ Available for reference |
 | Removed Empty Dirs | 6 | ✅ Cleaned up |
@@ -126,12 +126,12 @@ ansible-playbook redhat_management-site.yml -t phase1,phase2,phase3
 
 ### Execute by Product
 ```bash
-ansible-playbook redhat_management-site.yml -t satellite,aap
+ansible-playbook redhat_management-site.yml -t scenario_satellite,aap
 ```
 
 ### Direct Orchestration (Non-Interactive)
 ```bash
-ansible-playbook orchestration.yml \
+ansible-playbook ansible_dev_node_orchestration.yml \
   -e deployment_scenario=full_stack \
   -e deployment_platform=aws
 ```
@@ -156,16 +156,16 @@ ansible-playbook orchestration.yml \
 ### ✅ All Existing Commands Work
 ```bash
 ansible-playbook redhat_management-site.yml                              # ✅ Works
-ansible-playbook orchestration.yml                     # ✅ Works
+ansible-playbook ansible_dev_node_orchestration.yml                     # ✅ Works
 ansible-playbook redhat_management-site.yml -t phase1                    # ✅ Works
 ansible-playbook redhat_management-site.yml -e deployment_scenario=...  # ✅ Works
-ansible-playbook redhat_management-site.yml -t satellite,aap             # ✅ Works
+ansible-playbook redhat_management-site.yml -t scenario_satellite,aap             # ✅ Works
 ```
 
 ### ⚠️ Deprecated (Do Not Use)
 ```bash
 ansible-playbook playbooks/deploy_components-site.yml         # ❌ Archived
-ansible-playbook playbooks/products/satellite/install.yml     # ❌ Archived
+ansible-playbook playbooks/products/scenario_satellite/install.yml     # ❌ Archived
 ansible-playbook playbooks/prompts_and_config.yml             # ❌ Archived
 ```
 
@@ -175,12 +175,12 @@ ansible-playbook playbooks/prompts_and_config.yml             # ❌ Archived
 
 ✅ Site.yml simplified and functional  
 ✅ Orchestration.yml simplified and functional  
-✅ orchestration_master role created and complete  
-✅ configuration_manager role created and complete  
+✅ ansible_dev_node_orchestration_master role created and complete  
+✅ ansible_dev_node_configuration_manager role created and complete  
 ✅ All 15 scenarios defined once  
 ✅ All 7 platforms configured once  
 ✅ All phase logic consolidated  
-✅ Vault integration configured  
+✅ Vault integration_generic configured  
 ✅ Product roles reference updated  
 ✅ Empty directories removed  
 ✅ Deprecated files archived  
@@ -207,7 +207,7 @@ rm -rf playbooks/.archive_deprecated/
 ```bash
 # Verify structure
 ansible-playbook redhat_management-site.yml --syntax-check
-ansible-playbook orchestration.yml --syntax-check
+ansible-playbook ansible_dev_node_orchestration.yml --syntax-check
 
 # Test specific scenario
 ansible-playbook redhat_management-site.yml -e deployment_scenario=satellite_only --check -t phase1
@@ -218,18 +218,18 @@ ansible-playbook redhat_management-site.yml -e deployment_scenario=satellite_onl
 ## Files Changed Summary
 
 ### Created (6 items)
-- ✨ roles/orchestration_master/
-- ✨ roles/orchestration_master/tasks/main.yml (600+ lines)
-- ✨ roles/orchestration_master/defaults/scenarios_platforms.yml (450+ lines)
-- ✨ roles/orchestration_master/meta/main.yml
-- ✨ roles/configuration_manager/
-- ✨ roles/configuration_manager/tasks/setup_credentials.yml (100+ lines)
-- ✨ roles/configuration_manager/meta/main.yml
+- ✨ roles/ansible_dev_node_orchestration_master/
+- ✨ roles/ansible_dev_node_orchestration_master/tasks/main.yml (600+ lines)
+- ✨ roles/ansible_dev_node_orchestration_master/defaults/scenarios_platforms.yml (450+ lines)
+- ✨ roles/ansible_dev_node_orchestration_master/meta/main.yml
+- ✨ roles/ansible_dev_node_configuration_manager/
+- ✨ roles/ansible_dev_node_configuration_manager/tasks/setup_credentials.yml (100+ lines)
+- ✨ roles/ansible_dev_node_configuration_manager/meta/main.yml
 - ✨ docs/PLAYBOOKS_RESTRUCTURING_COMPLETE.md (comprehensive report)
 
 ### Modified (3 items)
 - ✏️ site.yml (simplified to 2KB wrapper)
-- ✏️ orchestration.yml (simplified to 1KB wrapper)
+- ✏️ ansible_dev_node_orchestration.yml (simplified to 1KB wrapper)
 - ✏️ playbooks/README.md (completely rewritten, 4.5KB)
 
 ### Archived (19 items)
@@ -244,10 +244,10 @@ ansible-playbook redhat_management-site.yml -e deployment_scenario=satellite_onl
   - requirements.yml
   - test-env.yml
   - test-env.yml (old)
-  - products/satellite/* (3 files)
+  - products/scenario_satellite/* (3 files)
   - products/aap/* (2 files)
   - products/idm/* (4 files)
-  - products/openshift/*
+  - products/scenario_openshift/*
   - Various others
 
 ### Removed (6 directories)

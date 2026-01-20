@@ -28,7 +28,7 @@
 | **[PROJECT_COMPLETE.md](PROJECT_COMPLETE.md)** | Implementation details & completion status | 15 min |
 | **[docs/README.md](docs/README.md)** | Documentation guide and navigation | 5 min |
 | **[docs/DOCS_INDEX.md](docs/DOCS_INDEX.md)** | Complete documentation index | 5 min |
-| **[docs/PROVISIONING_QUICK_REFERENCE.md](docs/PROVISIONING_QUICK_REFERENCE.md)** | Quick start for provisioning | 5 min |
+| **[docs/PROVISIONING_QUICK_REFERENCE.md](docs/PROVISIONING_QUICK_REFERENCE.md)** | Quick start for platform_provisioning | 5 min |
 | **[docs/SATELLITE_CONFIG_QUICK_REFERENCE.md](docs/SATELLITE_CONFIG_QUICK_REFERENCE.md)** | Satellite quick reference | 5 min |
 
 ---
@@ -57,7 +57,7 @@ dig @10.168.0.1 example.com
 ```
 
 ### 5. Test Network Boot
-Boot a system via PXE to verify complete provisioning workflow
+Boot a system via PXE to verify complete platform_provisioning workflow
 
 ---
 
@@ -110,7 +110,7 @@ RedHat_Management/
 │   ├── PROVISIONING_QUICK_REFERENCE.md
 │   ├── PROVISIONING_SERVICES_CONFIGURATION.md
 │   ├── NETWORK_INTERFACE_CONFIGURATION.md
-│   └── archive/                   ← 19 legacy docs
+│   └── archive/                   ← 19 ansible_dev_node_legacy_archive docs
 │
 ├── playbooks/                     (10 playbooks)
 ├── roles/                         (41 roles)
@@ -131,7 +131,7 @@ RedHat_Management/
 - [ ] Run `make test` (syntax check)
 
 ### Deployment
-- [ ] Run provisioning deployment playbook
+- [ ] Run platform_provisioning deployment playbook
 - [ ] Monitor for errors
 - [ ] Check service status
 
@@ -140,7 +140,7 @@ RedHat_Management/
 - [ ] Test network interfaces
 - [ ] Test DNS resolution
 - [ ] Boot system via PXE
-- [ ] Verify auto-provisioning
+- [ ] Verify auto-platform_provisioning
 
 ---
 

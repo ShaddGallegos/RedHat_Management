@@ -26,14 +26,14 @@
     scenarios:
       satellite_only:
         name: "Satellite Only"
-        description: "Systems management and provisioning"
-        components: ["satellite"]
-        tags: ["satellite", "single-product"]
+        description: "Systems management and platform_provisioning"
+        components: ["scenario_satellite"]
+        tags: ["scenario_satellite", "single-product"]
         min_resources: { cpu: 8, memory: 32, disk: 500 }
       
       aap_only:
         name: "AAP Only"
-        description: "Automation platform and orchestration"
+        description: "Automation platform and ansible_dev_node_orchestration"
         components: ["aap"]
         tags: ["aap", "single-product"]
         min_resources: { cpu: 8, memory: 16, disk: 100 }
@@ -48,29 +48,29 @@
       satellite_aap:
         name: "Satellite + AAP"
         description: "Inventory management + Automation"
-        components: ["satellite", "aap"]
-        tags: ["satellite", "aap", "integration", "multi-product"]
+        components: ["scenario_satellite", "aap"]
+        tags: ["scenario_satellite", "aap", "integration_generic", "multi-product"]
         min_resources: { cpu: 16, memory: 48, disk: 600 }
       
       satellite_idm:
         name: "Satellite + IdM"
         description: "Inventory management + Authentication"
-        components: ["satellite", "idm"]
-        tags: ["satellite", "idm", "integration", "multi-product"]
+        components: ["scenario_satellite", "idm"]
+        tags: ["scenario_satellite", "idm", "integration_generic", "multi-product"]
         min_resources: { cpu: 12, memory: 40, disk: 550 }
       
       aap_idm:
         name: "AAP + IdM"
         description: "Automation + Authentication"
         components: ["aap", "idm"]
-        tags: ["aap", "idm", "integration", "multi-product"]
+        tags: ["aap", "idm", "integration_generic", "multi-product"]
         min_resources: { cpu: 12, memory: 24, disk: 150 }
       
       full_stack:
         name: "Full Stack (Satellite + AAP + IdM + OpenShift)"
         description: "Complete Red Hat management platform"
-        components: ["satellite", "aap", "idm", "openshift"]
-        tags: ["satellite", "aap", "idm", "openshift", "integration", "full-stack"]
+        components: ["scenario_satellite", "aap", "idm", "scenario_openshift"]
+        tags: ["scenario_satellite", "aap", "idm", "scenario_openshift", "integration_generic", "full-stack"]
         min_resources: { cpu: 32, memory: 128, disk: 1000 }
     
     # Platform definitions - use tags for selective execution
@@ -110,18 +110,18 @@
         requires: ["gcloud", "google-cloud-sdk"]
         default: false
       
-      vmware:
+      platform_vmware:
         name: "VMware vSphere"
-        description: "Deployment on VMware infrastructure"
-        tags: ["vmware", "on-premises", "virtualized"]
+        description: "Deployment on VMware platform_infrastructure_core"
+        tags: ["platform_vmware", "on-premises", "virtualized"]
         requires: ["pyvmomi"]
         default: false
       
-      nutanix:
+      platform_nutanix:
         name: "Nutanix AHV"
-        description: "Deployment on Nutanix infrastructure"
-        tags: ["nutanix", "on-premises", "virtualized"]
-        requires: ["nutanix-sdk"]
+        description: "Deployment on Nutanix platform_infrastructure_core"
+        tags: ["platform_nutanix", "on-premises", "virtualized"]
+        requires: ["platform_nutanix-sdk"]
         default: false
     
     # Operating system selections
@@ -214,11 +214,11 @@
               "5": "satellite_idm"
               "6": "aap_idm"
               "7": "full_stack"
-              "satellite only": "satellite_only"
+              "scenario_satellite only": "satellite_only"
               "aap only": "aap_only"
               "idm only": "idm_only"
-              "satellite + aap": "satellite_aap"
-              "satellite + idm": "satellite_idm"
+              "scenario_satellite + aap": "satellite_aap"
+              "scenario_satellite + idm": "satellite_idm"
               "aap + idm": "aap_idm"
               "full stack": "full_stack"
           tags: ["prompt", "scenario"]
@@ -266,8 +266,8 @@
               [3] AWS - Amazon Web Services
               [4] Azure - Microsoft Azure
               [5] GCP - Google Cloud Platform
-              [6] VMware - vSphere infrastructure
-              [7] Nutanix - AHV infrastructure
+              [6] VMware - vSphere platform_infrastructure_core
+              [7] Nutanix - AHV platform_infrastructure_core
           register: platform_selection
           tags: ["prompt", "platform"]
         
@@ -282,15 +282,15 @@
               "3": "aws"
               "4": "azure"
               "5": "gcp"
-              "6": "vmware"
-              "7": "nutanix"
+              "6": "platform_vmware"
+              "7": "platform_nutanix"
               "libvirt": "libvirt"
               "baremetal": "baremetal"
               "aws": "aws"
               "azure": "azure"
               "gcp": "gcp"
-              "vmware": "vmware"
-              "nutanix": "nutanix"
+              "platform_vmware": "platform_vmware"
+              "platform_nutanix": "platform_nutanix"
           tags: ["prompt", "platform"]
         
         - name: "Validate platform selection"
@@ -322,7 +322,7 @@
               [1] RHEL 9 (Recommended)
               [2] RHEL 10
           register: os_selection
-          tags: ["prompt", "os"]
+          tags: ["prompt", "os_generic"]
         
         - name: "Set deployment OS"
           ansible.builtin.set_fact:
@@ -334,7 +334,7 @@
               "2": "rhel_10"
               "rhel 9": "rhel_9"
               "rhel 10": "rhel_10"
-          tags: ["prompt", "os"]
+          tags: ["prompt", "os_generic"]
         
         - name: "Display OS confirmation"
           ansible.builtin.debug:
@@ -342,7 +342,7 @@
               
               ✓ OS selected: {{ os_details.name }} ({{ os_details.version }})
       
-      tags: ["step3", "os", "prompt"]
+      tags: ["step3", "os_generic", "prompt"]
     
     # STEP 4: Deployment Summary and Confirmation
     - name: "STEP 4 - Review Deployment Configuration"

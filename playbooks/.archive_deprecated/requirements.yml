@@ -8,11 +8,11 @@ collections:
 - ansible.utils
 - azure.azcollection
 - community.general
-- community.vmware
+- community.platform_vmware
 - community.aws
 - containers.podman
 - redhat.rhel_idm
 - redhat.rhel_system_roles
-- redhat.satellite
+- redhat.scenario_satellite
 - redhat.satellite_operations
 - redhat.redhat_csp_download

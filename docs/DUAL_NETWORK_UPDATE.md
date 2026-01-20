@@ -5,21 +5,21 @@
 
 ## Overview
 
-Updated the provisioning services infrastructure to support dual network interfaces with proper isolation between external and internal networks.
+Updated the platform_provisioning services platform_infrastructure_core to ansible_dev_node_support dual network interfaces with proper isolation between external and internal networks.
 
 ## Configuration Summary
 
 ### Network Architecture
 
 ```
-satellite.prod.spg (KVM VM)
+scenario_satellite.prod.spg (KVM VM)
 ├─ eth0: External Network (libvirt NAT)
 │  └─ DHCP auto-assigned IP from libvirt
 │  └─ Purpose: Package management, system updates, external connectivity
 │
 └─ eth1: Private Network (10.168.0.0/16)
    └─ Static IP: 10.168.0.1/16
-   └─ Purpose: DHCP, DNS, TFTP, PXE provisioning services
+   └─ Purpose: DHCP, DNS, TFTP, PXE platform_provisioning services
 ```
 
 ## Changes Made
@@ -100,7 +100,7 @@ provisioning_secondary_description: "Private Network (10.168.0.0/16 Provisioning
 
 ### Network Isolation
 - **External traffic**: eth0 only (package updates, system management)
-- **Internal provisioning**: eth1 only (DHCP, DNS, TFTP, PXE)
+- **Internal platform_provisioning**: eth1 only (DHCP, DNS, TFTP, PXE)
 - **No interference** between traffic types
 
 ### Improved Security
@@ -120,18 +120,18 @@ provisioning_secondary_description: "Private Network (10.168.0.0/16 Provisioning
 
 ## Files Modified
 
-1. **roles/services_provisioning_stack/defaults/main.yml**
+1. **roles/platform_services_provisioning_stack/defaults/main.yml**
    - Added primary interface variables
    - Enhanced secondary interface variables
    - Added autoconnect and description fields
 
-2. **roles/services_provisioning_stack/tasks/main.yml**
+2. **roles/platform_services_provisioning_stack/tasks/main.yml**
    - Added primary interface configuration (eth0)
    - Enhanced secondary interface configuration (eth1)
    - Added display blocks for both interfaces
    - Improved validation output
 
-3. **roles/services_provisioning_stack/README.md**
+3. **roles/platform_services_provisioning_stack/README.md**
    - Updated title and overview
    - Added network architecture section
    - Enhanced features list
@@ -287,7 +287,7 @@ ansible-playbook playbooks/provisioning_services_setup.yml \
 4. **Check DNS Service**
    ```bash
    systemctl status named
-   dig @10.168.0.1 satellite.prod.spg.example.com
+   dig @10.168.0.1 scenario_satellite.prod.spg.example.com
    ```
 
 5. **Check TFTP Service**
@@ -305,7 +305,7 @@ ansible-playbook playbooks/provisioning_services_setup.yml \
 
 ✅ Dual network configuration implemented  
 ✅ External network (eth0) for system management  
-✅ Internal network (eth1) for provisioning  
+✅ Internal network (eth1) for platform_provisioning  
 ✅ Complete isolation between networks  
 ✅ Automatic configuration and startup  
 ✅ Full documentation provided  
@@ -313,6 +313,6 @@ ansible-playbook playbooks/provisioning_services_setup.yml \
 
 Both networks now operate independently and securely:
 - **eth0**: Handles external traffic (updates, downloads)
-- **eth1**: Handles internal provisioning (DHCP, DNS, TFTP, PXE)
+- **eth1**: Handles internal platform_provisioning (DHCP, DNS, TFTP, PXE)
 
 **Status**: ✅ Production Ready

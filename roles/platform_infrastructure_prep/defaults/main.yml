@@ -1,0 +1,12 @@
+---
+# Default variables for platform_infrastructure_prep role
+infrastructure_prep_enabled: true
+infrastructure_prep_version: "1.0"
+infrastructure_prep_timeout: 1800
+
+# Network configuration
+configure_firewall: true
+enable_selinux: true
+
+# Feature toggles
+infrastructure_prep_validate_network: true

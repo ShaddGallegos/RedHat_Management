@@ -3,7 +3,7 @@
 # Validates Satellite installation and functionality
 
 - name: "Satellite 6.18 | Testing"
-  hosts: "satellite"
+  hosts: "scenario_satellite"
   gather_facts: yes
 
   tasks:

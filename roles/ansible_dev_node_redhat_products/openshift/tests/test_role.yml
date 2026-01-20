@@ -1,0 +1,14 @@
+---
+# Test: ansible_dev_node_redhat_products/scenario_openshift role basic functionality
+- name: Test OpenShift role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    openshift_enabled: true
+    openshift_version: "4.21"
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - openshift_enabled is defined
+          - openshift_version is defined

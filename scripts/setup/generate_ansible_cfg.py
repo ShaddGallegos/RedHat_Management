@@ -4,7 +4,7 @@ Ansible Configuration Generator
 This script generates ansible.cfg files from templates, using credentials from env.yml/env.conf
 """
 
-import os
+import os_generic
 import sys
 import yaml
 import argparse
@@ -12,10 +12,10 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 # Default locations
-HOME = os.path.expanduser("~")
+HOME = os_generic.path.expanduser("~")
 ENV_YML_FILE = None
-ENV_CONF_FILE = os.path.join(HOME, ".ansible", "conf", "env.conf")
-DEFAULT_PROJECT_ROOT = os.getcwd()
+ENV_CONF_FILE = os_generic.path.join(HOME, ".ansible", "conf", "env.conf")
+DEFAULT_PROJECT_ROOT = os_generic.getcwd()
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Generate ansible.cfg from template and environment variables")
@@ -28,7 +28,7 @@ def parse_args():
 
 def load_env_yml(path):
     try:
-        if os.path.exists(path):
+        if os_generic.path.exists(path):
             with open(path, 'r') as f:
                 return yaml.safe_load(f) or {}
     except Exception as e:
@@ -41,7 +41,7 @@ def load_env_conf(path):
     Ignores blank lines and comments starting with '#'.
     """
     env = {}
-    if not os.path.exists(path):
+    if not os_generic.path.exists(path):
         return env
     try:
         with open(path, 'r') as f:
@@ -65,9 +65,9 @@ def load_env_conf(path):
 
 def ensure_dirs(*paths):
     for p in paths:
-        d = os.path.dirname(p)
-        if d and not os.path.exists(d):
-            os.makedirs(d, mode=0o700)
+        d = os_generic.path.dirname(p)
+        if d and not os_generic.path.exists(d):
+            os_generic.makedirs(d, mode=0o700)
 
 def merge_env(env_conf, env_yml):
     """
@@ -122,7 +122,7 @@ def save_env_yml(path, env_vars):
     try:
         with open(path, 'w') as f:
             yaml.dump(env_vars, f, default_flow_style=False)
-        os.chmod(path, 0o600)
+        os_generic.chmod(path, 0o600)
         print(f"Updated environment YAML at {path}")
     except Exception as e:
         print(f"Warning: failed to write YAML env file {path}: {e}")
@@ -139,15 +139,15 @@ def save_env_conf(path, env_vars):
             f.write("# Managed by generate_ansible_cfg.py\n")
             for line in lines:
                 f.write(line + "\n")
-        os.chmod(path, 0o600)
+        os_generic.chmod(path, 0o600)
         print(f"Updated environment conf at {path}")
     except Exception as e:
         print(f"Warning: failed to write conf env file {path}: {e}")
 
 def render_cfg(template_path, output_path, env_vars):
     try:
-        template_dir = os.path.dirname(template_path) or "."
-        template_file = os.path.basename(template_path)
+        template_dir = os_generic.path.dirname(template_path) or "."
+        template_file = os_generic.path.basename(template_path)
         env = Environment(loader=FileSystemLoader(template_dir))
         template = env.get_template(template_file)
 
@@ -159,9 +159,9 @@ def render_cfg(template_path, output_path, env_vars):
 
         output = template.render(**context)
 
-        out_dir = os.path.dirname(output_path)
-        if out_dir and not os.path.exists(out_dir):
-            os.makedirs(out_dir, mode=0o755)
+        out_dir = os_generic.path.dirname(output_path)
+        if out_dir and not os_generic.path.exists(out_dir):
+            os_generic.makedirs(out_dir, mode=0o755)
         with open(output_path, 'w') as f:
             f.write(output)
         print(f"Generated ansible.cfg at {output_path}")
@@ -171,7 +171,7 @@ def render_cfg(template_path, output_path, env_vars):
         return False
 
 def update_gitignore(project_root):
-    gitignore_path = os.path.join(project_root, '.gitignore')
+    gitignore_path = os_generic.path.join(project_root, '.gitignore')
     ignore_entries = [
         "# Ansible generated files",
         "ansible.cfg",
@@ -191,7 +191,7 @@ def update_gitignore(project_root):
         "*.py[cod]",
     ]
     existing = set()
-    if os.path.exists(gitignore_path):
+    if os_generic.path.exists(gitignore_path):
         with open(gitignore_path, 'r') as f:
             existing = set(line.strip() for line in f.readlines())
     with open(gitignore_path, 'a+') as f:
@@ -207,15 +207,15 @@ def update_gitignore(project_root):
 def main():
     args = parse_args()
 
-    project_root = os.path.abspath(args.project_root)
+    project_root = os_generic.path.abspath(args.project_root)
     # Default env.yml to ~/.ansible/conf/env.yml when not provided
     if args.env_yml:
-        env_yml_path = os.path.abspath(args.env_yml)
+        env_yml_path = os_generic.path.abspath(args.env_yml)
     else:
-        env_yml_path = os.path.join(HOME, ".ansible", "conf", "env.yml")
-    env_conf_path = os.path.abspath(args.env_conf)
-    template_path = os.path.join(project_root, args.template)
-    output_path = os.path.join(project_root, args.output)
+        env_yml_path = os_generic.path.join(HOME, ".ansible", "conf", "env.yml")
+    env_conf_path = os_generic.path.abspath(args.env_conf)
+    template_path = os_generic.path.join(project_root, args.template)
+    output_path = os_generic.path.join(project_root, args.output)
 
     print(f"Project root: {project_root}")
     print(f"Environment YAML: {env_yml_path}")
@@ -223,7 +223,7 @@ def main():
     print(f"Template path: {template_path}")
     print(f"Output path: {output_path}")
 
-    if not os.path.exists(template_path):
+    if not os_generic.path.exists(template_path):
         print(f"Error: Template file not found at {template_path}")
         return 1
 

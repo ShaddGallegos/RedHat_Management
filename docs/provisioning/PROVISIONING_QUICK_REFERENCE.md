@@ -3,7 +3,7 @@
 ## Architecture at a Glance
 
 ```
-satellite.prod.spg (eth1: 10.168.0.1)
+scenario_satellite.prod.spg (eth1: 10.168.0.1)
 │
 ├─ DHCP   (port 67/UDP)  → 10.168.50.0 - 10.168.200.255
 ├─ DNS    (port 53)      → example.com, prod.example.com
@@ -65,7 +65,7 @@ cat /etc/resolv.conf
 ### Test Services
 ```bash
 # DNS
-dig @10.168.0.1 satellite.prod.spg.example.com
+dig @10.168.0.1 scenario_satellite.prod.spg.example.com
 
 # DHCP (from another host)
 dhclient -v eth0
@@ -154,7 +154,7 @@ PXE        4011/UDP
 
 | Host | IP | MAC |
 |------|----|----|
-| satellite.prod.spg | 10.168.0.10 | 52:54:00:00:00:10 |
+| scenario_satellite.prod.spg | 10.168.0.10 | 52:54:00:00:00:10 |
 | idm.prod.spg | 10.168.0.20 | 52:54:00:00:00:20 |
 | aap.prod.spg | 10.168.0.30 | 52:54:00:00:00:30 |
 
@@ -184,7 +184,7 @@ systemctl status named
 named-checkconf /etc/named.conf
 
 # Test directly
-dig @10.168.0.1 satellite.prod.spg.example.com
+dig @10.168.0.1 scenario_satellite.prod.spg.example.com
 
 # View logs
 journalctl -u named -n 50
@@ -241,7 +241,7 @@ nslookup google.com 10.168.0.1
 ### Documentation
 - `docs/PROVISIONING_SERVICES_CONFIGURATION.md` - Full documentation
 - `docs/PROVISIONING_SERVICES_SUMMARY.md` - Implementation summary
-- `roles/services_provisioning_stack/README.md` - Role documentation
+- `roles/platform_services_provisioning_stack/README.md` - Role documentation
 
 ### Playbooks
 - `playbooks/provisioning_services_setup.yml` - Complete stack
@@ -287,7 +287,7 @@ ansible-playbook playbooks/provisioning_services_setup.yml -i inventory/hosts -b
 systemctl status dhcpd named xinetd
 
 # 3. Test DNS
-dig @10.168.0.1 satellite.prod.spg.example.com
+dig @10.168.0.1 scenario_satellite.prod.spg.example.com
 
 # 4. Boot a system from network (PXE)
 # Select RHEL 9 or 10 from menu

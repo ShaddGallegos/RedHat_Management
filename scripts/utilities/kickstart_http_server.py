@@ -2,15 +2,15 @@
 """
 HTTP Server Helper for Libvirt VM Provisioner
 
-Standalone utility to serve kickstart files for VM provisioning.
-Used by the libvirt_vm_provisioner role.
+Standalone utility to serve kickstart files for VM platform_provisioning.
+Used by the platform_libvirt_vm_provisioner role.
 
 Usage:
     python3 kickstart_http_server.py --port 8888 --directory /tmp/kickstart
 """
 
 import argparse
-import os
+import os_generic
 import signal
 import sys
 from http.server import HTTPServer, SimpleHTTPRequestHandler
@@ -38,11 +38,11 @@ class KickstartHTTPServer:
     def start(self):
         """Start the HTTP server"""
         # Create directory if needed
-        os.makedirs(self.directory, exist_ok=True)
+        os_generic.makedirs(self.directory, exist_ok=True)
         
         # Change to directory
-        original_cwd = os.getcwd()
-        os.chdir(self.directory)
+        original_cwd = os_generic.getcwd()
+        os_generic.chdir(self.directory)
         
         # Create server
         self.server = HTTPServer(('0.0.0.0', self.port), QuietHTTPRequestHandler)
@@ -52,11 +52,11 @@ class KickstartHTTPServer:
         self.thread.start()
         
         # Change back
-        os.chdir(original_cwd)
+        os_generic.chdir(original_cwd)
         
         print(f"HTTP Server started on port {self.port}")
         print(f"Serving from: {self.directory}")
-        print(f"PID: {os.getpid()}")
+        print(f"PID: {os_generic.getpid()}")
     
     def stop(self):
         """Stop the HTTP server"""

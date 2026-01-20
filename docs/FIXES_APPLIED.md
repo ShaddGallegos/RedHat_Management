@@ -53,7 +53,7 @@ All deployment errors have been identified and fixed. The project is now fully f
 
 **Error**: `ERROR! 'namespace' is not a valid attribute for a RoleMetadata`
 
-**Root Cause**: The services_provisioning_stack role metadata used an invalid `namespace` field instead of the proper Ansible Galaxy format.
+**Root Cause**: The platform_services_provisioning_stack role metadata used an invalid `namespace` field instead of the proper Ansible Galaxy format.
 
 **Solution**:
 - Restructured `meta/main.yml` to use proper `galaxy_info` format
@@ -63,7 +63,7 @@ All deployment errors have been identified and fixed. The project is now fully f
   - `dependencies: []` section
   - Tags moved under galaxy_info.tags
 
-**Files Modified**: `roles/services_provisioning_stack/meta/main.yml`
+**Files Modified**: `roles/platform_services_provisioning_stack/meta/main.yml`
 
 ---
 
@@ -78,7 +78,7 @@ All deployment errors have been identified and fixed. The project is now fully f
 - Changed: `- name: Configure interface ({{ var }})`
 - To: `- name: "Configure interface ({{ var }})"`
 
-**Files Modified**: `roles/services_provisioning_stack/tasks/main.yml`
+**Files Modified**: `roles/platform_services_provisioning_stack/tasks/main.yml`
 
 ---
 
@@ -114,7 +114,7 @@ All deployment errors have been identified and fixed. The project is now fully f
 - Changed TFTP firewall rule from port `69/udp` to service `tftp`
 - Updated PXE rule to use `rich_rule` for custom port configuration
 
-**Files Modified**: `roles/services_provisioning_stack/tasks/main.yml`
+**Files Modified**: `roles/platform_services_provisioning_stack/tasks/main.yml`
 
 ---
 
@@ -140,8 +140,8 @@ All deployment errors have been identified and fixed. The project is now fully f
 ```
 Files Modified: 3
 - Makefile (targets added/fixed)
-- roles/services_provisioning_stack/meta/main.yml (metadata format)
-- roles/services_provisioning_stack/tasks/main.yml (task names, firewall rules)
+- roles/platform_services_provisioning_stack/meta/main.yml (metadata format)
+- roles/platform_services_provisioning_stack/tasks/main.yml (task names, firewall rules)
 
 Files Created: 2
 - ansible.cfg (Ansible configuration)

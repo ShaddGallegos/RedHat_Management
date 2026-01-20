@@ -12,12 +12,12 @@ PROJECT STRUCTURE VERIFICATION
    - Top-level files: 23
 
 ✅ Role Hierarchy Structure
-   - OS-Level (roles/os/): 5 roles
-   - Infrastructure (roles/infrastructure/): 6 groups
-   - Products (roles/redhat_products/): 18 roles
-   - Integration (roles/integration/): 4 roles
-   - Support (roles/support/): 3 roles
-   - Legacy archive (roles/legacy/): Preserved
+   - OS-Level (roles/os_generic/): 5 roles
+   - Infrastructure (roles/platform_infrastructure_core/): 6 groups
+   - Products (roles/ansible_dev_node_redhat_products/): 18 roles
+   - Integration (roles/integration_generic/): 4 roles
+   - Support (roles/ansible_dev_node_support/): 3 roles
+   - Legacy archive (roles/ansible_dev_node_legacy_archive/): Preserved
    - Total: 38 roles organized
 
 ✅ Collections & Dependencies
@@ -28,7 +28,7 @@ PROJECT STRUCTURE VERIFICATION
 ✅ Playbooks & Orchestration
    - Main playbook: redhat_management-site.yml (updated)
    - Archived playbooks: 20+ in playbooks/archived/
-   - Legacy playbooks: 10+ in playbooks/legacy/
+   - Legacy playbooks: 10+ in playbooks/ansible_dev_node_legacy_archive/
 
 ✅ Documentation Suite
    - ROLES_INDEX.md: ✅ Created
@@ -80,39 +80,39 @@ ROLE IMPLEMENTATION STATUS
 --------------------------
 
 ✅ Fully Implemented (11 roles)
-   1. roles/os/rhel_base/ - 5 task files
-   2. roles/os/rhel_updates/ - 5 task files
-   3. roles/os/ssh_hardening/ - 1 task file
-   4. roles/os/firewall_base/ - 1 task file
-   5. roles/infrastructure/libvirt/ - 10 task files
-   6. roles/redhat_products/satellite/satellite_base/ - Active
-   7. roles/redhat_products/satellite/satellite_api/ - Active
-   8. roles/redhat_products/aap/aap_base/ - Active
-   9. roles/redhat_products/aap/aap_callbacks/ - Active
-   10. roles/support/preflight_tests/ - 9 task files
-   11. roles/support/ansible_cmdb_setup/ - 2 task files
+   1. roles/os_generic/rhel_base/ - 5 task files
+   2. roles/os_generic/rhel_updates/ - 5 task files
+   3. roles/os_generic/ssh_hardening/ - 1 task file
+   4. roles/os_generic/firewall_base/ - 1 task file
+   5. roles/platform_infrastructure_core/libvirt/ - 10 task files
+   6. roles/ansible_dev_node_redhat_products/scenario_satellite/satellite_base/ - Active
+   7. roles/ansible_dev_node_redhat_products/scenario_satellite/satellite_api/ - Active
+   8. roles/ansible_dev_node_redhat_products/aap/aap_base/ - Active
+   9. roles/ansible_dev_node_redhat_products/aap/aap_callbacks/ - Active
+   10. roles/ansible_dev_node_support/preflight_tests/ - 9 task files
+   11. roles/ansible_dev_node_support/scenario_ansible_cmdb_setup/ - 2 task files
 
-🆕 Recently Implemented (4 integration roles)
-   1. roles/integration/satellite_aap/ - NOW: Connectivity + AAP config
-   2. roles/integration/satellite_idm/ - NOW: IDM authentication
-   3. roles/integration/satellite_insights/ - NOW: Insights registration
-   4. roles/support/backup_restore/ - NOW: Backup/restore procedures
+🆕 Recently Implemented (4 integration_generic roles)
+   1. roles/integration_generic/satellite_aap/ - NOW: Connectivity + AAP config
+   2. roles/integration_generic/satellite_idm/ - NOW: IDM authentication
+   3. roles/integration_generic/satellite_insights/ - NOW: Insights registration
+   4. roles/ansible_dev_node_support/backup_restore/ - NOW: Backup/restore procedures
 
 ⚙️ Skeleton Roles Ready for Implementation (14 roles)
-   - roles/os/selinux_config/
-   - roles/redhat_products/satellite/satellite_content/
-   - roles/redhat_products/satellite/satellite_hosts/
-   - roles/redhat_products/satellite/satellite_reporting/
-   - roles/redhat_products/aap/aap_rbac/
-   - roles/redhat_products/aap/aap_eda/
-   - roles/redhat_products/idm/idm_base/
-   - roles/redhat_products/idm/idm_integration/
-   - roles/redhat_products/insights/insights_base/
-   - roles/redhat_products/insights/insights_rhc/
-   - roles/redhat_products/insights/insights_remediation/
-   - roles/infrastructure/cloud/aws/
-   - roles/infrastructure/cloud/azure/
-   - roles/integration/servicenow/
+   - roles/os_generic/selinux_config/
+   - roles/ansible_dev_node_redhat_products/scenario_satellite/satellite_content/
+   - roles/ansible_dev_node_redhat_products/scenario_satellite/satellite_hosts/
+   - roles/ansible_dev_node_redhat_products/scenario_satellite/satellite_reporting/
+   - roles/ansible_dev_node_redhat_products/aap/aap_rbac/
+   - roles/ansible_dev_node_redhat_products/aap/aap_eda/
+   - roles/ansible_dev_node_redhat_products/idm/idm_base/
+   - roles/ansible_dev_node_redhat_products/idm/idm_integration/
+   - roles/ansible_dev_node_redhat_products/insights/insights_base/
+   - roles/ansible_dev_node_redhat_products/insights/insights_rhc/
+   - roles/ansible_dev_node_redhat_products/insights/insights_remediation/
+   - roles/platform_infrastructure_core/cloud/aws/
+   - roles/platform_infrastructure_core/cloud/azure/
+   - roles/integration_generic/integration_servicenow/
 
 BACKUP & SAFETY VERIFICATION
 -----------------------------
@@ -199,7 +199,7 @@ NEXT STEPS (Recommended Priority Order)
 ---------------------------------------
 
 HIGH:
-1. Implement remaining ServiceNow integration
+1. Implement remaining ServiceNow integration_generic
 2. Complete 7 product sub-role skeletons
 3. Run validation: ansible-lint + playbook check
 
@@ -210,7 +210,7 @@ MEDIUM:
 
 LOW:
 7. Review contrib/upstreams consolidation
-8. Document legacy role archive
+8. Document ansible_dev_node_legacy_archive role archive
 9. Performance tuning
 
 ================================================================================

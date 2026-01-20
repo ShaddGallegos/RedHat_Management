@@ -6,7 +6,7 @@
 
 ## Overview
 
-Complete infrastructure for DHCP, DNS, PXE, and TFTP services on `satellite.prod.spg` secondary ethernet device (`eth1`) for the `10.168.0.0/16` network.
+Complete platform_infrastructure_core for DHCP, DNS, PXE, and TFTP services on `scenario_satellite.prod.spg` secondary ethernet device (`eth1`) for the `10.168.0.0/16` network.
 
 ## Key Features
 
@@ -21,7 +21,7 @@ Complete infrastructure for DHCP, DNS, PXE, and TFTP services on `satellite.prod
 - **Range**: 10.168.50.0 - 10.168.200.255 (38,401 IPs)
 - **Lease Time**: 24 hours
 - **Nameservers**: 10.168.0.1, 10.168.1.53, 8.8.8.8
-- **Static Hosts**: satellite (10.168.0.10), idm (10.168.0.20), aap (10.168.0.30)
+- **Static Hosts**: scenario_satellite (10.168.0.10), idm (10.168.0.20), aap (10.168.0.30)
 
 ### DNS Server
 - **Service**: BIND (named)
@@ -72,9 +72,9 @@ options rotate timeout:2 attempts:3
 
 ## Files Created
 
-### Role: services_provisioning_stack
+### Role: platform_services_provisioning_stack
 ```
-roles/services_provisioning_stack/
+roles/platform_services_provisioning_stack/
 ├── meta/main.yml                            # Role metadata
 ├── defaults/main.yml                        # Configuration defaults (100+ lines)
 ├── tasks/main.yml                           # Main tasks (250+ lines)
@@ -185,8 +185,8 @@ cat /etc/resolv.conf
 
 ### Test DNS
 ```bash
-dig @10.168.0.1 satellite.prod.spg.example.com
-nslookup satellite.prod.spg.example.com 10.168.0.1
+dig @10.168.0.1 scenario_satellite.prod.spg.example.com
+nslookup scenario_satellite.prod.spg.example.com 10.168.0.1
 ```
 
 ### Test DHCP
@@ -206,10 +206,10 @@ Boot system from network and observe menu
 
 ## Integration with RHIS Stack
 
-This provisioning services layer integrates with:
+This platform_provisioning services layer integrates with:
 
 1. **Satellite 6.18**
-   - System provisioning
+   - System platform_provisioning
    - Content management
    - Lifecycle management
 
@@ -220,13 +220,13 @@ This provisioning services layer integrates with:
 
 3. **IdM (Identity Management)**
    - User authentication
-   - DNS integration
+   - DNS integration_generic
    - Certificate management
 
 4. **Network Infrastructure**
    - 10.168.0.0/16 subnet
    - DHCP + DNS services
-   - PXE provisioning
+   - PXE platform_provisioning
 
 ## Security Considerations
 
@@ -259,14 +259,14 @@ For production HA setup:
 - [ ] Secondary DNS for failover
 - [ ] DHCP failover pair configuration
 - [ ] TFTP load balancing
-- [ ] IPv6 support for dual-stack
+- [ ] IPv6 ansible_dev_node_support for dual-stack
 - [ ] IPMI boot options in PXE menu
 - [ ] Custom kickstart generation
-- [ ] Real-time provisioning dashboard
+- [ ] Real-time platform_provisioning dashboard
 
 ## Summary
 
-Complete production-ready provisioning infrastructure with:
+Complete production-ready platform_provisioning platform_infrastructure_core with:
 
 ✅ 4 core services (DHCP, DNS, TFTP, PXE)  
 ✅ Resolv.conf with nameserver 10.168.0.1 and rotate option  
@@ -275,6 +275,6 @@ Complete production-ready provisioning infrastructure with:
 ✅ Service validation and health checks  
 ✅ Security hardened configuration  
 ✅ Comprehensive documentation  
-✅ Ready for automated system provisioning  
+✅ Ready for automated system platform_provisioning  
 
 **Status: Production Ready** ✅

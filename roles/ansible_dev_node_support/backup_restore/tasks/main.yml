@@ -1,0 +1,43 @@
+---
+# Backup and Restore procedures for Satellite, AAP, and IDM
+# Handles database backups, configuration backups, and recovery
+
+- name: Backup Satellite database
+  block:
+    - name: Create backup directory
+      ansible.builtin.file:
+        path: /var/backups/scenario_satellite-backups
+        state: directory
+        mode: '0700'
+
+    - name: Backup Satellite PostgreSQL database
+      ansible.builtin.command: >
+        pg_dump -h localhost -U foreman foreman
+        | gzip > /var/backups/scenario_satellite-backups/foreman-$(date +%Y%m%d-%H%M%S).sql.gz
+      changed_when: true
+      when: backup_satellite_db is defined and backup_satellite_db | bool
+
+  when: backup_satellite_db is defined
+
+- name: Backup AAP database
+  block:
+    - name: Backup AAP PostgreSQL database
+      ansible.builtin.command: >
+        pg_dump -h localhost -U awx awx
+        | gzip > /var/backups/aap-backups/awx-$(date +%Y%m%d-%H%M%S).sql.gz
+      changed_when: true
+      when: backup_aap_db is defined and backup_aap_db | bool
+
+  when: backup_aap_db is defined
+
+- name: Restore from backup
+  block:
+    - name: Restore Satellite database from backup
+      ansible.builtin.shell: |
+        gunzip < {{ backup_file }} | psql -h localhost -U foreman foreman
+      changed_when: true
+      when:
+        - restore_satellite_db is defined and restore_satellite_db | bool
+        - backup_file is defined
+
+  when: restore_satellite_db is defined

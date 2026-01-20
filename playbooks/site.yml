@@ -14,6 +14,6 @@
       ansible.builtin.include_tasks: "{{ playbook_dir }}/generate_inventory.yml"
       tags: ["inventory"]
 
-    - name: Include orchestration
-      ansible.builtin.include_tasks: "{{ playbook_dir }}/orchestration.yml"
-      tags: ["orchestration"]
+    - name: Include ansible_dev_node_orchestration
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/ansible_dev_node_orchestration.yml"
+      tags: ["ansible_dev_node_orchestration"]

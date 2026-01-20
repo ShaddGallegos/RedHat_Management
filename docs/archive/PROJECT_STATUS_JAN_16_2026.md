@@ -27,7 +27,7 @@ Features:
 
 ### ✅ 2. Orchestration Playbook
 
-**File:** `playbooks/orchestration.yml`
+**File:** `playbooks/ansible_dev_node_orchestration.yml`
 
 Features:
 - 7-phase deployment workflow
@@ -73,7 +73,7 @@ Contains:
 - Credential management guidelines
 - Installation method options
 - Repository enablement strategy
-- Ansible-CMDB integration details
+- Ansible-CMDB integration_generic details
 - Post-deployment checklist
 
 **Status:** COMPLETE
@@ -168,20 +168,20 @@ Complete
 
 | # | Scenario | Products | Tags | Use Case |
 |---|----------|----------|------|----------|
-| 1 | Satellite Only | Sat | satellite | Systems management |
+| 1 | Satellite Only | Sat | scenario_satellite | Systems management |
 | 2 | AAP Only | AAP | aap | Automation only |
 | 3 | IdM Only | IdM | idm | Identity only |
-| 4 | OpenShift Only | OCP | openshift | Container only |
-| 5 | Satellite + AAP | Sat, AAP | satellite, aap | Inventory + Automation |
-| 6 | Satellite + IdM | Sat, IdM | satellite, idm | Inventory + Identity |
-| 7 | Satellite + OpenShift | Sat, OCP | satellite, openshift | Inventory + Containers |
+| 4 | OpenShift Only | OCP | scenario_openshift | Container only |
+| 5 | Satellite + AAP | Sat, AAP | scenario_satellite, aap | Inventory + Automation |
+| 6 | Satellite + IdM | Sat, IdM | scenario_satellite, idm | Inventory + Identity |
+| 7 | Satellite + OpenShift | Sat, OCP | scenario_satellite, scenario_openshift | Inventory + Containers |
 | 8 | AAP + IdM | AAP, IdM | aap, idm | Automation + Identity |
-| 9 | AAP + OpenShift | AAP, OCP | aap, openshift | Automation + Containers |
-| 10 | IdM + OpenShift | IdM, OCP | idm, openshift | Identity + Containers |
-| 11 | Sat + AAP + IdM | Sat, AAP, IdM | satellite, aap, idm | Complete Management Stack |
-| 12 | Sat + AAP + OCP | Sat, AAP, OCP | satellite, aap, openshift | Inv + Auto + Containers |
-| 13 | Sat + IdM + OCP | Sat, IdM, OCP | satellite, idm, openshift | Inv + Id + Containers |
-| 14 | AAP + IdM + OCP | AAP, IdM, OCP | aap, idm, openshift | Auto + Id + Containers |
+| 9 | AAP + OpenShift | AAP, OCP | aap, scenario_openshift | Automation + Containers |
+| 10 | IdM + OpenShift | IdM, OCP | idm, scenario_openshift | Identity + Containers |
+| 11 | Sat + AAP + IdM | Sat, AAP, IdM | scenario_satellite, aap, idm | Complete Management Stack |
+| 12 | Sat + AAP + OCP | Sat, AAP, OCP | scenario_satellite, aap, scenario_openshift | Inv + Auto + Containers |
+| 13 | Sat + IdM + OCP | Sat, IdM, OCP | scenario_satellite, idm, scenario_openshift | Inv + Id + Containers |
+| 14 | AAP + IdM + OCP | AAP, IdM, OCP | aap, idm, scenario_openshift | Auto + Id + Containers |
 | 15 | Full Stack | ALL | full-stack | Complete Unified Platform |
 
 ## Platforms (7 Options)
@@ -220,8 +220,8 @@ Additional credentials (as needed):
 
 ### Tag Hierarchy
 ```
-Scenario Tags: satellite, aap, idm, openshift, full-stack
-Platform Tags: libvirt, baremetal, aws, azure, gcp, vmware, nutanix
+Scenario Tags: scenario_satellite, aap, idm, scenario_openshift, full-stack
+Platform Tags: libvirt, baremetal, aws, azure, gcp, platform_vmware, platform_nutanix
 Phase Tags: init, prepare, install, configure, integrate, validate
 ```
 
@@ -231,13 +231,13 @@ Phase Tags: init, prepare, install, configure, integrate, validate
 --tags "full-stack,aws,rhel-9,install,configure,integrate"
 
 # Satellite only on LibVirt  
---tags "satellite,libvirt,rhel-9,install,configure"
+--tags "scenario_satellite,libvirt,rhel-9,install,configure"
 
 # Validate only
 --tags "validate"
 
 # Skip OpenShift
---skip-tags "openshift"
+--skip-tags "scenario_openshift"
 ```
 
 ## Files Created/Modified
@@ -247,7 +247,7 @@ Phase Tags: init, prepare, install, configure, integrate, validate
 | File | Purpose | Status |
 |------|---------|--------|
 | RHIS-Installer-Enhanced.sh | Main installer script | ✅ COMPLETE |
-| playbooks/orchestration.yml | Main orchestration | ✅ COMPLETE |
+| playbooks/ansible_dev_node_orchestration.yml | Main ansible_dev_node_orchestration | ✅ COMPLETE |
 | playbooks/scenario_configs.yml | Scenario definitions | ✅ COMPLETE |
 | docs/deployment/RHIS_DEPLOYMENT_ARCHITECTURE.md | Architecture docs | ✅ COMPLETE |
 | docs/deployment/QUICK_START.md | Quick start guide | ✅ COMPLETE |
@@ -270,7 +270,7 @@ RedHat_Management/
 ├── RHIS-Installer-Enhanced.sh       ← NEW: Enhanced installer
 ├── RHIS-Installer.sh                ← Copied to base for easy access
 ├── playbooks/
-│   ├── orchestration.yml            ← NEW: Main orchestration
+│   ├── ansible_dev_node_orchestration.yml            ← NEW: Main ansible_dev_node_orchestration
 │   ├── scenario_configs.yml         ← NEW: Scenario definitions
 │   └── [existing playbooks]
 ├── roles/
@@ -319,7 +319,7 @@ RedHat_Management/
    - Credential collection
    - Scenario/platform/OS selection
    - Configuration management
-   - Deployment orchestration
+   - Deployment ansible_dev_node_orchestration
 
 2. **Orchestration Playbook** (450+ lines)
    - 7-phase deployment workflow
@@ -347,8 +347,8 @@ RedHat_Management/
 1. **Create Core Roles** (if needed)
    - installer_host role
    - platform_prep role
-   - inventory_generator role
-   - cmdb configuration
+   - ansible_dev_node_inventory_generator role
+   - scenario_ansible_cmdb_core configuration
 
 2. **OEMDRV/Kickstart Files**
    - Satellite kickstart template
@@ -387,7 +387,7 @@ RedHat_Management/
 
 ### Direct Playbook Execution
 ```bash
-ansible-playbook playbooks/orchestration.yml \
+ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
   -e "deployment_scenario=full_stack" \
   -e "deployment_platform=libvirt" \
   -e "deployment_os=rhel-9" \
@@ -408,7 +408,7 @@ ansible-playbook playbooks/orchestration.yml \
 ✅ No hardcoded credentials anywhere
 ✅ 7-phase deployment workflow
 ✅ Post-deployment validation
-✅ Ansible-CMDB integration planned
+✅ Ansible-CMDB integration_generic planned
 ✅ Quick start guide provided
 
 ## Next Steps
@@ -425,7 +425,7 @@ ansible-playbook playbooks/orchestration.yml \
 ## File Locations
 
 - **Installer:** `/home/sgallego/Downloads/RedHat_Management/RHIS-Installer-Enhanced.sh`
-- **Orchestration:** `/home/sgallego/Downloads/RedHat_Management/playbooks/orchestration.yml`
+- **Orchestration:** `/home/sgallego/Downloads/RedHat_Management/playbooks/ansible_dev_node_orchestration.yml`
 - **Configs:** `/home/sgallego/Downloads/RedHat_Management/playbooks/scenario_configs.yml`
 - **Docs:** `/home/sgallego/Downloads/RedHat_Management/docs/deployment/`
 - **Credentials:** `~/.ansible/conf/env.yml` (created at first run)

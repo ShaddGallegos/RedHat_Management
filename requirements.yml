@@ -6,7 +6,7 @@ collections:
   - name: ansible.netcommon
   - name: community.crypto
   - name: redhat.rhel_system_roles
-  - name: redhat.satellite
+  - name: redhat.scenario_satellite
   - name: redhat.insights
   # redhat.libvirt removed due to hub dependency resolution issues
   # redhat.virtualization removed due to hub dependency resolution issues
@@ -23,8 +23,8 @@ collections:
   # redhat.workloads removed due to hub dependency resolution issues
   - name: ansible.utils
   # ansible.builtin removed from requirements (builtin collection)
-  - name: community.windows
-  - name: community.vmware
+  - name: community.os_windows
+  - name: community.platform_vmware
   - name: community.docker
   - name: community.kubernetes
   - name: kubernetes.core
@@ -36,11 +36,11 @@ collections:
   - name: community.google
   - name: community.hashi_vault
   # hashivault.hashivault removed due to dependency resolution issues
-  # ansible.legacy removed (builtin/compat collection)
-  - name: ansible.windows
+  # ansible.ansible_dev_node_legacy_archive removed (builtin/compat collection)
+  - name: ansible.os_windows
   # ansible.cloud removed from requirements
   # ansible.kubernetes removed from requirements
-  # ansible.vmware removed from requirements
+  # ansible.platform_vmware removed from requirements
   # ansible.docker removed from requirements
   # ansible.hashivault removed from requirements
   - name: community.general
@@ -48,7 +48,7 @@ collections:
   - name: ansible.posix
   - name: ansible.netcommon
   - name: redhat.rhel_system_roles
-  - name: redhat.satellite
+  - name: redhat.scenario_satellite
   - name: redhat.insights
   # redhat.libvirt removed due to hub dependency resolution issues
   # redhat.virtualization removed due to hub dependency resolution issues
@@ -65,8 +65,8 @@ collections:
   # redhat.workloads removed due to hub dependency resolution issues
   - name: ansible.utils
   # ansible.builtin removed from requirements (builtin collection)
-  - name: community.windows
-  - name: community.vmware
+  - name: community.os_windows
+  - name: community.platform_vmware
   - name: community.docker
   - name: community.kubernetes
   - name: kubernetes.core
@@ -78,11 +78,11 @@ collections:
   - name: community.google
   - name: community.hashi_vault
   # hashivault.hashivault removed due to dependency resolution issues
-  # ansible.legacy removed (builtin/compat collection)
-  - name: ansible.windows
+  # ansible.ansible_dev_node_legacy_archive removed (builtin/compat collection)
+  - name: ansible.os_windows
   # ansible.cloud removed from requirements
   # ansible.kubernetes removed from requirements
-  # ansible.vmware removed from requirements
+  # ansible.platform_vmware removed from requirements
   # ansible.docker removed from requirements
   # ansible.hashivault removed from requirements
   - name: community.general
@@ -90,7 +90,7 @@ collections:
   - name: ansible.posix
   - name: ansible.netcommon
   - name: redhat.rhel_system_roles
-  - name: redhat.satellite
+  - name: redhat.scenario_satellite
   - name: redhat.insights
   # redhat.libvirt removed due to hub dependency resolution issues
   # redhat.virtualization removed due to hub dependency resolution issues
@@ -107,8 +107,8 @@ collections:
   # redhat.workloads removed due to hub dependency resolution issues
   - name: ansible.utils
   # ansible.builtin removed from requirements (builtin collection)
-  - name: community.windows
-  - name: community.vmware
+  - name: community.os_windows
+  - name: community.platform_vmware
   - name: community.docker
   - name: community.kubernetes
   - name: kubernetes.core
@@ -120,11 +120,11 @@ collections:
   - name: community.google
   - name: community.hashi_vault
   # hashivault.hashivault removed due to dependency resolution issues
-  # ansible.legacy removed (builtin/compat collection)
-  - name: ansible.windows
+  # ansible.ansible_dev_node_legacy_archive removed (builtin/compat collection)
+  - name: ansible.os_windows
   # ansible.cloud removed from requirements
   # ansible.kubernetes removed from requirements
-  # ansible.vmware removed from requirements
+  # ansible.platform_vmware removed from requirements
   # ansible.docker removed from requirements
   # ansible.hashivault removed from requirements
 roles: []

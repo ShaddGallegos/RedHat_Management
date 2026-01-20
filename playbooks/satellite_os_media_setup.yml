@@ -1,13 +1,13 @@
 ---
 # Satellite OS & install media wrapper playbook
-# Delegates OS/media creation to the `satellite_os_configuration` role.
+# Delegates OS/media creation to the `scenario_satellite_os_configuration` role.
 
 - name: "Satellite OS and install media setup"
-  hosts: satellite
+  hosts: scenario_satellite
   gather_facts: yes
 
   roles:
-    - role: satellite_os_configuration
+    - role: scenario_satellite_os_configuration
       vars:
         satellite_os_config_enabled: true
         create_operatingsystems: true

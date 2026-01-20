@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Validate documentation coverage
 
-import os
+import os_generic
 from pathlib import Path
 
 def validate_documentation():

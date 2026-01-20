@@ -6,12 +6,12 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ## Roles Created
 
-### 1. aap_credentials_config
+### 1. scenario_aap_credentials
 **Purpose**: Manage all credential types in AAP
 
 **Capabilities**:
 - Machine Credentials (SSH keys, sudo configuration)
-- Vault Credentials (Ansible vault integration)
+- Vault Credentials (Ansible vault integration_generic)
 - Registry Credentials (Container registry access)
 - Satellite Credentials (Satellite API access)
 - Cloud Credentials (AWS, Azure, GCP)
@@ -20,7 +20,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 **Key Features**:
 - Automatic credential creation and validation
 - SSH key file reading and injection
-- Vault password integration
+- Vault password integration_generic
 - Connection testing
 - Detailed summary reporting
 
@@ -40,7 +40,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ---
 
-### 2. aap_inventories_config
+### 2. scenario_aap_inventories
 **Purpose**: Configure static and dynamic inventories in AAP
 
 **Capabilities**:
@@ -52,13 +52,13 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 **Key Features**:
 - Multiple inventory creation
-- Dynamic source integration
+- Dynamic source integration_generic
 - Variable inheritance
 - Inventory import/sync
 - Coverage reporting
 
 **Default Inventories Configured**:
-- `RHIS_Infrastructure` - Main infrastructure inventory
+- `RHIS_Infrastructure` - Main platform_infrastructure_core inventory
 - `Satellite_Hosts` - Satellite server inventory
 - `AAP_Controllers` - AAP controller nodes
 - `Satellite_Sync` - Dynamic Satellite inventory
@@ -74,7 +74,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ---
 
-### 3. aap_projects_config
+### 3. scenario_aap_projects
 **Purpose**: Configure projects (playbook repositories) in AAP
 
 **Capabilities**:
@@ -88,7 +88,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 - Repository authentication
 - Automatic project sync
 - Branch tracking
-- Multiple git project support
+- Multiple git project ansible_dev_node_support
 - Sync status monitoring
 
 **Default Projects Configured**:
@@ -96,7 +96,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 - `Satellite_Playbooks` - Satellite management playbooks
 - `IdM_Playbooks` - Identity Management automation
 - `AAP_Playbooks` - AAP deployment and configuration
-- `Infrastructure_Playbooks` - Infrastructure provisioning
+- `Infrastructure_Playbooks` - Infrastructure platform_provisioning
 - `RHIS_Local` - Manual/local playbooks
 
 **Files**:
@@ -108,12 +108,12 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ---
 
-### 4. aap_templates_config
+### 4. scenario_aap_templates
 **Purpose**: Configure job and workflow templates in AAP
 
 **Capabilities**:
 - Job Templates (single playbook execution)
-- Workflow Templates (multi-step orchestration)
+- Workflow Templates (multi-step ansible_dev_node_orchestration)
 - Workflow Nodes (workflow step definitions)
 - Execution Parameters (verbosity, limits, tags)
 - Prompt Options (ask on launch)
@@ -121,7 +121,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 **Key Features**:
 - Complete job template configuration
-- Workflow orchestration setup
+- Workflow ansible_dev_node_orchestration setup
 - Credential/inventory/project linking
 - Execution customization
 - Template validation
@@ -131,7 +131,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 - `RHIS_Configure_Satellite` - Satellite configuration
 - `RHIS_Setup_AAP` - AAP setup
 - `RHIS_Configure_IdM` - Identity Management configuration
-- `RHIS_Provision_Infrastructure` - Infrastructure provisioning
+- `RHIS_Provision_Infrastructure` - Infrastructure platform_provisioning
 
 **Default Workflow Templates Configured**:
 - `RHIS_Complete_Deployment` - Full deployment workflow
@@ -156,7 +156,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
   hosts: aap_controllers
   roles:
     # First configure credentials
-    - role: aap_credentials_config
+    - role: scenario_aap_credentials
       vars:
         aap_url: "https://aap.prod.example.com"
         aap_username: "admin"
@@ -167,7 +167,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
         create_satellite_credentials: true
 
     # Then configure inventories
-    - role: aap_inventories_config
+    - role: scenario_aap_inventories
       vars:
         aap_url: "https://aap.prod.example.com"
         create_static_inventories: true
@@ -175,7 +175,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
         create_inventory_sources: true
 
     # Then configure projects
-    - role: aap_projects_config
+    - role: scenario_aap_projects
       vars:
         aap_url: "https://aap.prod.example.com"
         create_git_projects: true
@@ -183,7 +183,7 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
         aap_projects_sync_on_create: true
 
     # Finally configure templates
-    - role: aap_templates_config
+    - role: scenario_aap_templates
       vars:
         aap_url: "https://aap.prod.example.com"
         create_job_templates: true
@@ -192,10 +192,10 @@ Created 4 comprehensive roles for Ansible Automation Platform (AAP) configuratio
 
 ### Execution Order
 
-1. **aap_credentials_config** - Create all credentials first
-2. **aap_inventories_config** - Create inventories
-3. **aap_projects_config** - Setup projects with repositories
-4. **aap_templates_config** - Create templates that reference above
+1. **scenario_aap_credentials** - Create all credentials first
+2. **scenario_aap_inventories** - Create inventories
+3. **scenario_aap_projects** - Setup projects with repositories
+4. **scenario_aap_templates** - Create templates that reference above
 
 This order ensures all dependencies are met before template creation.
 
@@ -237,7 +237,7 @@ registry_credentials:
 ```yaml
 static_inventories:
   - name: "RHIS_Infrastructure"
-    description: "RHIS infrastructure hosts"
+    description: "RHIS platform_infrastructure_core hosts"
     variables:
       ansible_connection: "ssh"
       ansible_user: "ansible"
@@ -247,9 +247,9 @@ static_inventories:
 ```yaml
 dynamic_inventories:
   - name: "Satellite_Sync"
-    source: "satellite"
+    source: "scenario_satellite"
     source_vars:
-      satellite_host: "satellite.example.com"
+      satellite_host: "scenario_satellite.example.com"
 ```
 
 ### Project Configuration
@@ -291,7 +291,7 @@ job_templates:
    - Template permissions enforced
 
 3. **Vault Integration**
-   - Vault credential support for all templates
+   - Vault credential ansible_dev_node_support for all templates
    - Encrypted variable passing
    - Password protection for sensitive data
 
@@ -305,7 +305,7 @@ Each role includes:
 - **Organization lookup** - Verify target organization
 - **Resource creation** - API calls for resource creation
 - **Summary reporting** - List all created resources
-- **Test validation** - Test files for CI/CD integration
+- **Test validation** - Test files for CI/CD integration_generic
 
 ---
 
@@ -320,7 +320,7 @@ Each role includes:
 
 **Role Dependencies**:
 - None (AAP must be pre-deployed)
-- aap_2_6_setup (recommended as prerequisite)
+- scenario_aap_setup (recommended as prerequisite)
 
 ---
 
@@ -370,7 +370,7 @@ Each role provides:
 
 These roles complete the RHIS automation stack by enabling:
 
-1. **Full Lifecycle Management** - From infrastructure to application
+1. **Full Lifecycle Management** - From platform_infrastructure_core to application
 2. **Multi-Product Support** - Satellite, AAP, IdM, OpenShift
 3. **Automated Provisioning** - Complete deployment automation
 4. **Configuration Management** - All product configurations

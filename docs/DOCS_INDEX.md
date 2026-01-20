@@ -18,7 +18,7 @@
 
 ## Provisioning Services Stack
 
-Complete documentation for DHCP, DNS, TFTP, PXE, and network infrastructure.
+Complete documentation for DHCP, DNS, TFTP, PXE, and network platform_infrastructure_core.
 
 ### Main Guides
 - [Provisioning Services Configuration](PROVISIONING_SERVICES_CONFIGURATION.md) - Complete technical reference (600+ lines)
@@ -114,13 +114,13 @@ docs/
 
 ### I want to...
 
-**Deploy provisioning services**
+**Deploy platform_provisioning services**
 → [Provisioning Services Configuration](PROVISIONING_SERVICES_CONFIGURATION.md)
 
 **Set up network interfaces**
 → [Network Interface Configuration](NETWORK_INTERFACE_CONFIGURATION.md)
 
-**Quick lookup for provisioning**
+**Quick lookup for platform_provisioning**
 → [Provisioning Quick Reference](PROVISIONING_QUICK_REFERENCE.md)
 
 **Configure Satellite**
@@ -135,7 +135,7 @@ docs/
 
 - ✅ Dual network configuration (eth0 external, eth1 private)
 - ✅ DHCP, DNS, TFTP, PXE services
-- ✅ Satellite 6.18 integration
+- ✅ Satellite 6.18 integration_generic
 - ✅ Resolv.conf configuration
 - ✅ Firewall rules
 - ✅ Network isolation and security

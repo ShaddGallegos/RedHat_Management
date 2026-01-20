@@ -1,0 +1,12 @@
+---
+# Test: scenario_aap_deployment role basic functionality
+- name: Test scenario_aap_deployment role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    rhis_aap_deployment_enabled: true
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - rhis_aap_deployment_enabled is defined

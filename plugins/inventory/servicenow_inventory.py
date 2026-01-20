@@ -3,7 +3,7 @@ Ansible dynamic inventory plugin for ServiceNow (Table API).
 
 Usage:
 - Place this file under infra-automation/plugins/inventory/
-- Use inventory/servicenow.yml (example) or create your own config pointing to this plugin.
+- Use inventory/integration_servicenow.yml (example) or create your own config pointing to this plugin.
 - Ensure 'requests' is installed in the Python env Ansible uses.
 
 This plugin queries a ServiceNow table and builds hosts + optional groups/hostvars.
@@ -123,7 +123,7 @@ options:
   plugin:
     description: token to ensure the config file is for this plugin
     required: true
-    choices: ['servicenow']
+    choices: ['integration_servicenow']
   url:
     description: Base URL for the ServiceNow instance (https://instance.service-now.com)
     required: true
@@ -161,7 +161,7 @@ options:
 """
 
 EXAMPLES = r"""
-plugin: servicenow
+plugin: integration_servicenow
 url: https://dev12345.service-now.com
 token: "{{ lookup('env','SNOW_API_TOKEN') }}"
 table: cmdb_ci
@@ -176,7 +176,7 @@ fields:
 """
 
 class InventoryModule(BaseInventoryPlugin):
-    NAME = 'servicenow'
+    NAME = 'integration_servicenow'
 
     def verify_file(self, path):
         """
@@ -217,7 +217,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         url = config.get('url')
         if not url:
-            raise AnsibleParserError("servicenow plugin: 'url' is required")
+            raise AnsibleParserError("integration_servicenow plugin: 'url' is required")
 
         table = config.get('table', 'cmdb_ci')
         query = config.get('query', '')
@@ -245,16 +245,16 @@ class InventoryModule(BaseInventoryPlugin):
         try:
             resp = requests.get(api, params=params, headers=headers, auth=auth, verify=verify_ssl, timeout=30)
         except Exception as e:
-            raise AnsibleParserError(f"servicenow plugin: HTTP request failed: {e}")
+            raise AnsibleParserError(f"integration_servicenow plugin: HTTP request failed: {e}")
 
         if resp.status_code >= 400:
-            raise AnsibleParserError(f"servicenow plugin: ServiceNow API error {resp.status_code}: {resp.text}")
+            raise AnsibleParserError(f"integration_servicenow plugin: ServiceNow API error {resp.status_code}: {resp.text}")
 
         try:
             data = resp.json()
             results = data.get('result', [])
         except Exception as e:
-            raise AnsibleParserError(f"servicenow plugin: Failed to parse JSON response: {e}")
+            raise AnsibleParserError(f"integration_servicenow plugin: Failed to parse JSON response: {e}")
 
         for item in results:
             host = item.get(host_field) or item.get('sys_id')

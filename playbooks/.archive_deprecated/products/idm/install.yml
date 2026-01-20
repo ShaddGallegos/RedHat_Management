@@ -14,7 +14,7 @@
         fail_msg: "IdM requires RHEL 8+"
 
   roles:
-    - role: "redhat_products/idm/idm_base"
+    - role: "ansible_dev_node_redhat_products/idm/idm_base"
       tags: ["install", "idm"]
 
   post_tasks:

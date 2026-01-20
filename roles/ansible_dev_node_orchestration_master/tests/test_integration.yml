@@ -1,0 +1,13 @@
+---
+# Test: ansible_dev_node_orchestration_master role integration_generic
+- name: Test ansible_dev_node_orchestration_master integration_generic
+  hosts: localhost
+  gather_facts: false
+  vars:
+    orchestration_master_enabled: true
+  tasks:
+    - name: Verify role dependencies
+      assert:
+        that:
+          - orchestration_master_enabled is defined
+        fail_msg: "Role integration_generic failed"

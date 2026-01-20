@@ -52,11 +52,11 @@ Deployment Complete
 ## Deployment Scenarios (15 Options)
 
 ### Single Products
-1. **Satellite Only** - Systems management & provisioning
+1. **Satellite Only** - Systems management & platform_provisioning
    - Products: Satellite 6.18
    - Use cases: Standalone inventory management
 
-2. **AAP Only** - Automation & orchestration
+2. **AAP Only** - Automation & ansible_dev_node_orchestration
    - Products: AAP 2.6
    - Use cases: Standalone automation
 
@@ -64,7 +64,7 @@ Deployment Complete
    - Products: IdM 3.0
    - Use cases: Standalone authentication
 
-4. **OpenShift Only** - Container orchestration
+4. **OpenShift Only** - Container ansible_dev_node_orchestration
    - Products: OpenShift 4.21+
    - Use cases: Container platform
 
@@ -75,11 +75,11 @@ Deployment Complete
 
 6. **Satellite + IdM** - Inventory + Identity
    - Products: Satellite 6.18, IdM 3.0
-   - Integration: SSSD integration, unified authentication
+   - Integration: SSSD integration_generic, unified authentication
 
 7. **Satellite + OpenShift** - Inventory + Containers
    - Products: Satellite 6.18, OpenShift 4.21+
-   - Integration: Image management, OS provisioning
+   - Integration: Image management, OS platform_provisioning
 
 8. **AAP + IdM** - Automation + Identity
    - Products: AAP 2.6, IdM 3.0
@@ -114,7 +114,7 @@ Deployment Complete
 15. **FULL STACK** - All products integrated
     - Products: Satellite 6.18, AAP 2.6, IdM 3.0, OpenShift 4.21+
     - Integration: Complete unified platform
-    - **Use Case**: Production-grade infrastructure
+    - **Use Case**: Production-grade platform_infrastructure_core
 
 ## Platforms (7 Options)
 
@@ -133,7 +133,7 @@ RedHat_Management/
 ├── RHIS-Installer-Enhanced.sh         # Main installer entry point
 ├── RHIS-Installer.sh                  # Original installer (kept for compatibility)
 ├── playbooks/
-│   ├── redhat_management-site.yml     # Main orchestration playbook
+│   ├── redhat_management-site.yml     # Main ansible_dev_node_orchestration playbook
 │   ├── init_installer_host.yml        # Initialize ansible developer node
 │   ├── prepare_platform.yml           # Platform-specific preparation
 │   ├── build_inventory.yml            # Dynamic inventory generation
@@ -147,47 +147,47 @@ RedHat_Management/
 ├── roles/
 │   ├── installer_host/                # Ansible developer node setup
 │   ├── platform_prep/                 # Platform preparation
-│   ├── inventory_generator/           # Inventory generation
-│   ├── libvirt_vm_provisioner/       # LibVirt VM provisioning
-│   ├── infrastructure_manager/        # Platform management (AWS, Azure, GCP, VMware, Nutanix)
-│   ├── redhat_products/              # Product deployment roles
-│   │   ├── satellite/
+│   ├── ansible_dev_node_inventory_generator/           # Inventory generation
+│   ├── platform_libvirt_vm_provisioner/       # LibVirt VM platform_provisioning
+│   ├── platform_infrastructure_manager/        # Platform management (AWS, Azure, GCP, VMware, Nutanix)
+│   ├── ansible_dev_node_redhat_products/              # Product deployment roles
+│   │   ├── scenario_satellite/
 │   │   ├── aap/
 │   │   ├── idm/
-│   │   └── openshift/
-│   ├── cmdb/                          # Ansible-CMDB role
-│   ├── integration/                   # Integration roles
-│   └── support/                       # Support utilities
+│   │   └── scenario_openshift/
+│   ├── scenario_ansible_cmdb_core/                          # Ansible-CMDB role
+│   ├── integration_generic/                   # Integration roles
+│   └── ansible_dev_node_support/                       # Support utilities
 ├── group_vars/
 │   ├── all.yml                        # Global variables
-│   ├── satellite.yml                  # Satellite-specific
+│   ├── scenario_satellite.yml                  # Satellite-specific
 │   ├── aap.yml                        # AAP-specific
 │   ├── idm.yml                        # IdM-specific
-│   ├── openshift.yml                  # OpenShift-specific
+│   ├── scenario_openshift.yml                  # OpenShift-specific
 │   ├── libvirt.yml                    # LibVirt-specific
 │   ├── aws.yml                        # AWS-specific
 │   ├── azure.yml                      # Azure-specific
 │   ├── gcp.yml                        # GCP-specific
-│   ├── vmware.yml                     # VMware-specific
-│   └── nutanix.yml                    # Nutanix-specific
+│   ├── platform_vmware.yml                     # VMware-specific
+│   └── platform_nutanix.yml                    # Nutanix-specific
 ├── templates/
 │   ├── ansible.cfg.j2                 # Ansible config template
 │   ├── oemdrv/                        # OEMDRV kickstart templates
-│   │   ├── satellite-ks.cfg.j2
+│   │   ├── scenario_satellite-ks.cfg.j2
 │   │   ├── aap-ks.cfg.j2
 │   │   ├── idm-ks.cfg.j2
-│   │   └── openshift-ks.cfg.j2
+│   │   └── scenario_openshift-ks.cfg.j2
 │   └── repo-enable/                   # Repo enablement per scenario
-│       ├── satellite-repos.sh.j2
+│       ├── scenario_satellite-repos.sh.j2
 │       ├── aap-repos.sh.j2
 │       ├── idm-repos.sh.j2
-│       └── openshift-repos.sh.j2
+│       └── scenario_openshift-repos.sh.j2
 ├── files/
 │   ├── OEMDRV/                        # OEMDRV files per product
-│   │   ├── satellite-ks.cfg
+│   │   ├── scenario_satellite-ks.cfg
 │   │   ├── aap-ks.cfg
 │   │   ├── idm-ks.cfg
-│   │   └── openshift-ks.cfg
+│   │   └── scenario_openshift-ks.cfg
 │   ├── rhel-iso/                      # RHEL ISO location
 │   ├── rpms/                          # Required RPMs not in repos
 │   └── tftp/                          # TFTP boot files
@@ -218,14 +218,14 @@ RedHat_Management/
 
 ```
 Scenario Tags:
-  satellite, aap, idm, openshift           # Individual products
+  scenario_satellite, aap, idm, scenario_openshift           # Individual products
   multi-product                             # Multiple products
   full-stack                                # All products
 
 Platform Tags:
   libvirt, baremetal                        # Local platforms
   aws, azure, gcp                           # Cloud platforms
-  vmware, nutanix                           # Enterprise platforms
+  platform_vmware, platform_nutanix                           # Enterprise platforms
   cloud, enterprise, local                  # Platform categories
 
 Phase Tags:
@@ -234,8 +234,8 @@ Phase Tags:
   integrate, validate                       # Integration phases
 
 Component Tags:
-  satellite, aap, idm, openshift           # Product-specific
-  infrastructure, networking, storage       # Infrastructure-specific
+  scenario_satellite, aap, idm, scenario_openshift           # Product-specific
+  platform_infrastructure_core, networking, storage       # Infrastructure-specific
   monitoring, backup, logging               # Cross-cutting concerns
 
 ## Example Tag Combinations
@@ -243,7 +243,7 @@ Component Tags:
 ```bash
 # Install Satellite on LibVirt
 ansible-playbook redhat_management-site.yml \
-  --tags "satellite,libvirt,rhel-9,install,configure"
+  --tags "scenario_satellite,libvirt,rhel-9,install,configure"
 
 # Full stack on AWS
 ansible-playbook redhat_management-site.yml \
@@ -255,7 +255,7 @@ ansible-playbook redhat_management-site.yml \
 
 # Multi-product (Sat+AAP+IdM) on Azure
 ansible-playbook playbooks/redhat_management-site.yml \
-  --tags "satellite,aap,idm,multi-product,azure,rhel-9"
+  --tags "scenario_satellite,aap,idm,multi-product,azure,rhel-9"
 ```
 
 ## Credential Management
@@ -268,7 +268,7 @@ ansible-playbook playbooks/redhat_management-site.yml \
 ├── Product admin passwords
 ├── Database credentials
 ├── Integration credentials
-└── SSH keys for provisioning
+└── SSH keys for platform_provisioning
 ```
 
 ### Never Hard-Coded
@@ -297,10 +297,10 @@ ansible-playbook playbooks/redhat_management-site.yml \
 Per-scenario repo enablement scripts:
 ```
 templates/repo-enable/
-├── satellite-repos.sh.j2          # Satellite-specific repos
+├── scenario_satellite-repos.sh.j2          # Satellite-specific repos
 ├── aap-repos.sh.j2                # AAP-specific repos
 ├── idm-repos.sh.j2                # IdM-specific repos
-└── openshift-repos.sh.j2          # OpenShift-specific repos
+└── scenario_openshift-repos.sh.j2          # OpenShift-specific repos
 ```
 
 Each script enables:
@@ -315,7 +315,7 @@ Each script enables:
 - Service: Systemd managed
 - Data Source: Satellite inventory + ansible facts
 - Dashboard: HTML fancy split view
-- Updates: After each product integration
+- Updates: After each product integration_generic
 
 ## Post-Deployment Checklist
 
