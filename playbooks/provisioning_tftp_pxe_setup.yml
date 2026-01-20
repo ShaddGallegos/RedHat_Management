@@ -28,12 +28,12 @@
           register: tftp_status
 
         - name: Verify TFTP root directory
-          stat:
+          ansible.builtin.stat:
             path: /var/lib/tftpboot
           register: tftp_root
 
         - name: Verify PXE menu file
-          stat:
+          ansible.builtin.stat:
             path: /var/lib/tftpboot/pxelinux.cfg/default
           register: pxe_menu
 

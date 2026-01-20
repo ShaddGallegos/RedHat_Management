@@ -21,14 +21,14 @@
       failed_when: false
 
     - name: "Verify TFTP boot files"
-      stat:
+      ansible.builtin.stat:
         path: "/var/lib/tftpboot/pxelinux.0"
       register: tftp_bootfile
       changed_when: false
       failed_when: false
 
     - name: "Assert TFTP is configured"
-      assert:
+      ansible.builtin.assert:
         that:
           - "tftp_status.rc == 0"
           - "tftp_bootfile.stat.exists or 'TFTP boot files will be configured' is not defined"

@@ -7,7 +7,7 @@
     - ansible_dev_node_orchestration_master
   tasks:
     - name: Verify defaults loaded
-      assert:
+      ansible.builtin.assert:
         that:
           - orchestration_master_enabled is defined
         fail_msg: "Defaults not loaded"

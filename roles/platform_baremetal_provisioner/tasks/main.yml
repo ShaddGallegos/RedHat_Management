@@ -21,7 +21,7 @@
   tags: ["baremetal", "platform_provisioning"]
 
 - name: "Validate baremetal platform configuration"
-  assert:
+  ansible.builtin.assert:
     that:
       - deployment_platform is defined
       - deployment_platform == "baremetal"

@@ -9,7 +9,7 @@
     - ansible_distribution_major_version|int not in [7, 8, 9, 10]
 
 - name: Set OS and package manager facts
-  set_fact:
+  ansible.builtin.set_fact:
     update_rhel_os_info:
       distribution: "{{ ansible_distribution }}"
       major_version: "{{ ansible_distribution_major_version|int }}"
@@ -113,7 +113,7 @@
   ignore_errors: "{{ update_rhel_ignore_errors | default(false) }}"
 
 - name: Set update result variable
-  set_fact:
+  ansible.builtin.set_fact:
     package_update_result: "{{ yum_update_result if ansible_distribution_major_version|int == 7 else dnf_update_result }}"
 
 - name: Display update results
@@ -146,7 +146,7 @@
   register: packages_list_post_update
 
 - name: Determine latest installed kernel version
-  set_fact:
+  ansible.builtin.set_fact:
     latest_kernel_version: "{{ packages_list_post_update.ansible_facts.packages.kernel[-1].version }}-{{ packages_list_post_update.ansible_facts.packages.kernel[-1].release }}.{{ packages_list_post_update.ansible_facts.packages.kernel[-1].arch }}"
   when: packages_list_post_update.ansible_facts.packages.kernel is defined
 
@@ -163,17 +163,17 @@
     - latest_kernel_version is defined
 
 - name: Check if reboot is needed for kernel update
-  set_fact:
+  ansible.builtin.set_fact:
     system_reboot_needed: "{{ latest_kernel_version is defined and ansible_kernel != latest_kernel_version }}"
 
 - name: Check for other reboot indicators (RHEL 8+)
-  stat:
+  ansible.builtin.stat:
     path: /var/run/reboot-required
   register: reboot_required_file
   when: ansible_distribution_major_version|int >= 8
 
 - name: Set reboot needed for other reasons
-  set_fact:
+  ansible.builtin.set_fact:
     system_reboot_needed: "{{ system_reboot_needed or (reboot_required_file.stat.exists | default(false)) }}"
 
 - name: Display reboot requirement
@@ -209,7 +209,7 @@
         filter: ansible_distribution*
 
     - name: Set post-reboot OS information
-      set_fact:
+      ansible.builtin.set_fact:
         os_info_post_update:
           distribution: "{{ ansible_distribution }}"
           distribution_major_version: "{{ ansible_distribution_major_version }}"

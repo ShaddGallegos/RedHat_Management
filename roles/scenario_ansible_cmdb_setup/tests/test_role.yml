@@ -7,6 +7,6 @@
     ansible_cmdb_setup_enabled: true
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - ansible_cmdb_setup_enabled is defined

@@ -7,6 +7,6 @@
     - integration_generic
   tasks:
     - name: Verify defaults loaded
-      assert:
+      ansible.builtin.assert:
         that:
           - integration_enabled is defined

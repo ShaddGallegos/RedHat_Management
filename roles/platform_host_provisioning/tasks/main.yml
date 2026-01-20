@@ -4,12 +4,12 @@
 # This role handles host creation from Satellite hostgroups and inventory management
 
 - name: Check for persistent marker for platform_host_provisioning
-  stat:
+  ansible.builtin.stat:
     path: /var/lib/rhm/platform_host_provisioning_done
   register: phm_marker_stat
 
 - name: Set platform_host_provisioning_done fact
-  set_fact:
+  ansible.builtin.set_fact:
     platform_host_provisioning_done: "{{ phm_marker_stat.stat.exists | default(false) }}"
 
 - block:

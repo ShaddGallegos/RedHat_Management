@@ -26,7 +26,7 @@
       failed_when: false
 
     - name: "Assert AWS is configured"
-      assert:
+      ansible.builtin.assert:
         that:
           - "aws_cli_check.rc == 0"
           - "aws_creds_check.rc == 0"

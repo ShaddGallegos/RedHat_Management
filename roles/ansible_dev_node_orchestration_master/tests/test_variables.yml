@@ -9,7 +9,7 @@
     deployment_platform: "libvirt"
   tasks:
     - name: Validate variable types
-      assert:
+      ansible.builtin.assert:
         that:
           - orchestration_master_enabled is boolean
           - deployment_scenario is string

@@ -14,7 +14,7 @@
   tags: ["os_generic", "config"]
 
 - name: "Validate OS selection"
-  assert:
+  ansible.builtin.assert:
     that:
       - deployment_os is defined
       - deployment_os in ["rhel-9", "rhel-10"]

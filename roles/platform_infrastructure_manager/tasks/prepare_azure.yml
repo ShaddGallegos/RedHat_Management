@@ -26,7 +26,7 @@
       failed_when: false
 
     - name: "Assert Azure is configured"
-      assert:
+      ansible.builtin.assert:
         that:
           - "az_cli_check.rc == 0"
           - "az_auth_check.rc == 0"

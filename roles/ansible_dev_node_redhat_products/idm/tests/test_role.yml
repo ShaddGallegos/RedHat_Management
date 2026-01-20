@@ -8,7 +8,7 @@
     idm_version: "3.0"
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - idm_enabled is defined
           - idm_version is defined

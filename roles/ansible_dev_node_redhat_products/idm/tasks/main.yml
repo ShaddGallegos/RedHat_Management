@@ -14,7 +14,7 @@
   tags: ["idm", "products"]
 
 - name: "Validate IdM configuration"
-  assert:
+  ansible.builtin.assert:
     that:
       - deployment_scenario is defined
       - scenario_config.products is defined

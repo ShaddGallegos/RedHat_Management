@@ -14,7 +14,7 @@
   tags: ["scenario_satellite", "products"]
 
 - name: "Validate Satellite configuration"
-  assert:
+  ansible.builtin.assert:
     that:
       - deployment_scenario is defined
       - scenario_config.products is defined

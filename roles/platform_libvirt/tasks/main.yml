@@ -1,6 +1,6 @@
 ---
 - name: Stat user env overrides file
-  stat:
+  ansible.builtin.stat:
     path: "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
   register: user_env_file
 

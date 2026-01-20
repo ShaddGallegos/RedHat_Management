@@ -8,7 +8,7 @@
     deployment_platform: "libvirt"
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - infrastructure_manager_enabled is defined
           - deployment_platform is defined

@@ -8,7 +8,7 @@
     openshift_version: "4.21"
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - openshift_enabled is defined
           - openshift_version is defined

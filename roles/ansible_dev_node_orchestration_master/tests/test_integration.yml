@@ -7,7 +7,7 @@
     orchestration_master_enabled: true
   tasks:
     - name: Verify role dependencies
-      assert:
+      ansible.builtin.assert:
         that:
           - orchestration_master_enabled is defined
         fail_msg: "Role integration_generic failed"

@@ -26,7 +26,7 @@
       failed_when: false
 
     - name: "Assert Bare Metal services are configured"
-      assert:
+      ansible.builtin.assert:
         that:
           - "dhcp_status.rc == 0 or 'DHCP server required' is not defined"
           - "tftp_status.rc == 0 or 'TFTP server required' is not defined"

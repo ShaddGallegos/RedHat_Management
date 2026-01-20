@@ -7,6 +7,6 @@
     - ansible_dev_node_support
   tasks:
     - name: Verify defaults loaded
-      assert:
+      ansible.builtin.assert:
         that:
           - support_enabled is defined

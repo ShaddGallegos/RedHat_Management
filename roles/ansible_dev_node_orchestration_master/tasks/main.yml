@@ -26,7 +26,7 @@
 - name: "Block: Configuration Validation and Loading"
   block:
     - name: "Validate deployment scenario"
-      assert:
+      ansible.builtin.assert:
         that:
           - deployment_scenario is defined
           - deployment_scenario in rhis_valid_scenarios
@@ -34,7 +34,7 @@
       tags: ["always", "validate"]
 
     - name: "Validate deployment platform"
-      assert:
+      ansible.builtin.assert:
         that:
           - deployment_platform is defined
           - deployment_platform in rhis_valid_platforms
@@ -42,7 +42,7 @@
       tags: ["always", "validate"]
 
     - name: "Validate OS selection"
-      assert:
+      ansible.builtin.assert:
         that:
           - deployment_os is defined
           - deployment_os in ["rhel-9", "rhel-10"]
@@ -58,7 +58,7 @@
       tags: ["config", "load"]
 
     - name: "Set scenario configuration"
-      set_fact:
+      ansible.builtin.set_fact:
         scenario_config: "{{ rhis_scenarios[deployment_scenario] }}"
         platform_config: "{{ rhis_platforms[deployment_platform] }}"
       tags: ["config", "setup"]

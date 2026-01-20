@@ -18,7 +18,7 @@
         msg: "Validating vCenter credentials and connectivity"
 
     - name: "Verify VMware environment variables"
-      assert:
+      ansible.builtin.assert:
         that:
           - "vcenter_hostname is defined or lookup('env', 'VCENTER_HOSTNAME') != ''"
           - "vcenter_username is defined or lookup('env', 'VCENTER_USERNAME') != ''"

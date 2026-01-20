@@ -7,6 +7,6 @@
     - platform_infrastructure_manager
   tasks:
     - name: Verify defaults loaded
-      assert:
+      ansible.builtin.assert:
         that:
           - infrastructure_manager_enabled is defined

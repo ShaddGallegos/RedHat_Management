@@ -9,7 +9,7 @@
     satellite_username: "admin"
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - satellite_lifecycle_config_enabled is defined
           - satellite_url is defined

@@ -18,7 +18,7 @@
         msg: "Validating Nutanix Prism credentials and connectivity"
 
     - name: "Verify Nutanix environment configuration"
-      assert:
+      ansible.builtin.assert:
         that:
           - "nutanix_prism_host is defined or lookup('env', 'NUTANIX_PRISM_HOST') != ''"
           - "nutanix_prism_username is defined or lookup('env', 'NUTANIX_USERNAME') != ''"

@@ -7,6 +7,6 @@
     insights_enabled: true
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - insights_enabled is defined

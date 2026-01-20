@@ -7,6 +7,6 @@
     inventory_generator_enabled: true
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - inventory_generator_enabled is defined

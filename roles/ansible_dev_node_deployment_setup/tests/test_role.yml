@@ -7,6 +7,6 @@
     deployment_setup_enabled: true
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - deployment_setup_enabled is defined

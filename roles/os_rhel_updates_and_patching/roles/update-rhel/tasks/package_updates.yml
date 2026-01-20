@@ -34,7 +34,7 @@
   ignore_errors: "{{ update_rhel_ignore_errors | default(false) }}"
 
 - name: Set package update result
-  set_fact:
+  ansible.builtin.set_fact:
     update_rhel_package_result: "{{ update_rhel_yum_result if update_rhel_os_info.major_version == 7 else update_rhel_dnf_result }}"
 
 - name: Display update results
@@ -73,7 +73,7 @@
   when: update_rhel_os_info.major_version >= 8
 
 - name: Set remaining updates count
-  set_fact:
+  ansible.builtin.set_fact:
     update_rhel_remaining_count: "{{ update_rhel_remaining_updates.results | length }}"
 
 - name: Display remaining updates

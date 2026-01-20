@@ -7,6 +7,6 @@
     satellite_6_18_deployment_enabled: true
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - satellite_6_18_deployment_enabled is defined

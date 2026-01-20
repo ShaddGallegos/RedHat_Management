@@ -24,7 +24,7 @@
           PXE Enabled: {{ pxe_enabled }}
 
     - name: Test required variables exist
-      assert:
+      ansible.builtin.assert:
         that:
           - provisioning_host is defined
           - provisioning_secondary_interface is defined

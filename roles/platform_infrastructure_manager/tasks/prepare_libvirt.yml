@@ -25,7 +25,7 @@
       register: package_facts
 
     - name: "Assert LibVirt is installed and running"
-      assert:
+      ansible.builtin.assert:
         that:
           - "'libvirt-daemon' in package_facts.ansible_facts.packages or libvirt_status.rc == 0"
         fail_msg: "LibVirt daemon is not installed or running. Install libvirt-daemon and start the service."

@@ -9,7 +9,7 @@
     aap_username: "admin"
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - aap_templates_config_enabled is defined
           - aap_url is defined

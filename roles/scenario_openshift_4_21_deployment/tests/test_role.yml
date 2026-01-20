@@ -7,6 +7,6 @@
     openshift_4_21_deployment_enabled: true
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - openshift_4_21_deployment_enabled is defined

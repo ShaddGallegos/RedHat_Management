@@ -1,6 +1,6 @@
 ---
 - name: Determine OS family and set package list
-  set_fact:
+  ansible.builtin.set_fact:
     libvirt_packages: "{{ (['libvirt*','qemu*','virt-manager','kvm*','python3-libvirt','cloud-utils'] if ansible_facts['os_family'] == 'RedHat' else (['libvirt-daemon-system','libvirt-clients','qemu-kvm','virt-manager','python3-libvirt','cloud-utils'] if ansible_facts['os_family'] == 'Debian' else ['libvirt*','qemu*','virt-manager','kvm*','python3-libvirt','cloud-utils'])) }}"
   when: ansible_facts is defined
 
@@ -11,12 +11,12 @@
   ignore_errors: yes
 
 - name: Check if bridge 'virbr0' already exists on host
-  stat:
+  ansible.builtin.stat:
     path: /sys/class/net/virbr0
   register: virbr0_stat
 
 - name: Set external bridge name (use alternate if virbr0 exists)
-  set_fact:
+  ansible.builtin.set_fact:
     libvirt_external_bridge: "{{ 'external_nat' if (virbr0_stat.stat is not defined) or (not virbr0_stat.stat.exists) else 'external_nat_alt' }}"
   when: virbr0_stat is defined
 
@@ -72,17 +72,17 @@
   ignore_errors: true
 
 - name: Check for persistent setup marker file
-  stat:
+  ansible.builtin.stat:
     path: /var/lib/rhm/platform_libvirt_setup_done
   register: rhm_marker_stat
 
 - name: Set persistent marker fact
-  set_fact:
+  ansible.builtin.set_fact:
     platform_libvirt_setup_done: "{{ rhm_marker_stat.stat.exists | default(false) }}"
 
 - block:
   - name: Determine OS family and set package list
-    set_fact:
+    ansible.builtin.set_fact:
       libvirt_packages: "{{ (['libvirt*','qemu*','virt-manager','kvm*','python3-libvirt','cloud-utils'] if ansible_facts['os_family'] == 'RedHat' else ([
   'libvirt-daemon-system','libvirt-clients','qemu-kvm','virt-manager','python3-libvirt','cloud-utils'] if ansible_facts['os_family'] == 'Debian' else ['libvirt*','qemu*','virt-manager','kvm*','python3-libvirt','cloud-utils'])) }}"
     when: ansible_facts is defined
@@ -94,12 +94,12 @@
     ignore_errors: yes
 
   - name: Check if bridge 'virbr0' already exists on host
-    stat:
+    ansible.builtin.stat:
       path: /sys/class/net/virbr0
     register: virbr0_stat
 
   - name: Set external bridge name (use alternate if virbr0 exists)
-    set_fact:
+    ansible.builtin.set_fact:
       libvirt_external_bridge: "{{ 'external_nat' if (virbr0_stat.stat is not defined) or (not virbr0_stat.stat.exists) else 'external_nat_alt' }}"
     when: virbr0_stat is defined
 

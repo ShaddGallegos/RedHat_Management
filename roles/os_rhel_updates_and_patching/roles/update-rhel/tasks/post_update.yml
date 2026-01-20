@@ -6,22 +6,22 @@
   register: update_rhel_packages_post
 
 - name: Store post-update package count
-  set_fact:
+  ansible.builtin.set_fact:
     update_rhel_post_package_count: "{{ update_rhel_packages_post.ansible_facts.packages.keys() | length }}"
 
 - name: Determine latest installed kernel version
-  set_fact:
+  ansible.builtin.set_fact:
     update_rhel_latest_kernel: "{{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].version }}-{{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].release }}.{{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].arch }}"
   when:
     - update_rhel_packages_post.ansible_facts.packages.kernel is defined
     - update_rhel_packages_post.ansible_facts.packages.kernel | length > 0
 
 - name: Check if kernel update requires reboot
-  set_fact:
+  ansible.builtin.set_fact:
     update_rhel_kernel_reboot_needed: "{{ update_rhel_latest_kernel is defined and update_rhel_os_info.kernel != update_rhel_latest_kernel }}"
 
 - name: Check for system reboot indicators (RHEL 8+)
-  stat:
+  ansible.builtin.stat:
     path: /var/run/reboot-required
   register: update_rhel_reboot_file
   when: update_rhel_os_info.major_version >= 8
@@ -33,7 +33,7 @@
   changed_when: false
 
 - name: Determine overall reboot requirement
-  set_fact:
+  ansible.builtin.set_fact:
     update_rhel_reboot_needed: >-
       {{
         update_rhel_kernel_reboot_needed | default(false) or

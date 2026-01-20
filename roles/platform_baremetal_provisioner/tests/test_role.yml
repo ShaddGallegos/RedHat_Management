@@ -7,6 +7,6 @@
     baremetal_provisioner_enabled: true
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - baremetal_provisioner_enabled is defined

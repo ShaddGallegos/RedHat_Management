@@ -15,7 +15,7 @@
   no_log: true
 
 - name: Determine install targets from defaults or overrides
-  set_fact:
+  ansible.builtin.set_fact:
     sms_selected_targets: "{{ satellite_mail_targets | default(['scenario_satellite','aap','scenario_openshift']) }}"
 
 - name: Validate required secrets are provided

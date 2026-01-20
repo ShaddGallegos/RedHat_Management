@@ -6,7 +6,7 @@
   register: update_rhel_packages_pre
 
 - name: Store pre-update package count
-  set_fact:
+  ansible.builtin.set_fact:
     update_rhel_pre_package_count: "{{ update_rhel_packages_pre.ansible_facts.packages.keys() | length }}"
 
 - name: Display pre-update package summary
@@ -46,7 +46,7 @@
   when: update_rhel_os_info.major_version >= 8
 
 - name: Set available updates count
-  set_fact:
+  ansible.builtin.set_fact:
     update_rhel_updates_available: "{{ update_rhel_available_updates.results | length }}"
 
 - name: Display available updates summary

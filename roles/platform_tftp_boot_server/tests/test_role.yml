@@ -7,6 +7,6 @@
     tftp_boot_server_enabled: true
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - tftp_boot_server_enabled is defined

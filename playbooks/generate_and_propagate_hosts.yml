@@ -24,17 +24,17 @@
       private: yes
   tasks:
     - name: Parse installer into parts
-      set_fact:
+      ansible.builtin.set_fact:
         installer_parts: "{{ installer.split(':') }}"
 
     - name: Build installer_entry
-      set_fact:
+      ansible.builtin.set_fact:
         installer_entry: "{{ {'name': (installer_parts[0])|trim, 'ip': (installer_parts[1])|trim, 'type': 'installer'} }}"
 
     - name: Build hosts_entries list
       vars:
         parts: "{{ item.split(':') }}"
-      set_fact:
+      ansible.builtin.set_fact:
         hosts_entries: "{{ hosts_entries | default([]) + [ {'name': (parts[0])|trim, 'ip': (parts[1])|trim, 'type': (parts|length > 2) | ternary((parts[2])|trim, 'unknown') } ] }}"
       loop: "{{ host_list.split(',') }}"
 
@@ -43,12 +43,12 @@
         var: hosts_entries
 
     - name: Ensure installer is included in hosts_entries
-      set_fact:
+      ansible.builtin.set_fact:
         hosts_entries: "{{ (hosts_entries | default([])) + [ installer_entry ] }}"
       when: "(hosts_entries | default([]) | selectattr('name','equalto', installer_entry.name) | list | length) == 0"
 
     - name: Validate no duplicate hostnames or IPs
-      assert:
+      ansible.builtin.assert:
         that:
           - "(hosts_entries | map(attribute='name') | list | length) == (hosts_entries | map(attribute='name') | list | unique | length)"
           - "(hosts_entries | map(attribute='ip') | list | length) == (hosts_entries | map(attribute='ip') | list | unique | length)"
@@ -57,7 +57,7 @@
     - name: Validate IPv4 format for all hosts
       vars:
         ipv4_regex: '^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])){3}$'
-      assert:
+      ansible.builtin.assert:
         that:
           - "item.ip is match(ipv4_regex)"
         fail_msg: "Invalid IPv4 address '{{ item.ip }}' for host '{{ item.name }}'"
@@ -93,7 +93,7 @@
         mode: '0644'
 
     - name: Set installer and scenario_satellite nameserver variables (controller)
-      set_fact:
+      ansible.builtin.set_fact:
         installer_ns: "{{ (hosts_entries | selectattr('type','equalto','installer') | map(attribute='ip') | list)[0] | default(installer_entry.ip) }}"
         satellite_ns: "{{ (hosts_entries | selectattr('type','equalto','scenario_satellite') | map(attribute='ip') | list)[0] | default((hosts_entries | selectattr('ip','match','^10\\.168\\.') | map(attribute='ip') | list)[0] | default('')) }}"
 
@@ -149,7 +149,7 @@
       when: propagate | default(true) | bool
 
     - name: Set installer and scenario_satellite nameserver variables
-      set_fact:
+      ansible.builtin.set_fact:
         installer_ns: "{{ (hosts_entries | selectattr('type','equalto','installer') | map(attribute='ip') | list)[0] | default(installer_entry.ip) }}"
         satellite_ns: "{{ (hosts_entries | selectattr('type','equalto','scenario_satellite') | map(attribute='ip') | list)[0] | default((hosts_entries | selectattr('ip','match','^10\\.168\\.') | map(attribute='ip') | list)[0] | default('')) }}"
 

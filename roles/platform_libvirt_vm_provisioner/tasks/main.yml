@@ -2,16 +2,16 @@
 - name: Build vm list in role
   # Check for a locally-written survey file and load it if present (runs on controller)
 - name: Check for persistent marker for libvirt VM provisioner
-  stat:
+  ansible.builtin.stat:
     path: /var/lib/rhm/platform_libvirt_vm_provisioner_done
   register: vmprov_marker_stat
 
 - name: Set platform_libvirt_vm_provisioner_done fact
-  set_fact:
+  ansible.builtin.set_fact:
     platform_libvirt_vm_provisioner_done: "{{ vmprov_marker_stat.stat.exists | default(false) }}"
 
 - name: Check for survey file on controller
-  stat:
+  ansible.builtin.stat:
     path: files/cache/survey.yml
   delegate_to: localhost
   run_once: true
@@ -26,13 +26,13 @@
   run_once: true
 
 - name: Use surveyed vm_list when available
-  set_fact:
+  ansible.builtin.set_fact:
     vm_list: "{{ hostvars['localhost']['survey']['vm_list'] }}"
   when: survey_file.stat.exists
 
 # Fallback: build vm_list from existing node_* variables when no survey file
 - name: Build vm list in role
-  set_fact:
+  ansible.builtin.set_fact:
     vm_list:
       - name: "{{ node_ansibledev_fqdn }}"
         memory: 8192
@@ -57,7 +57,7 @@
   when: not survey_file.stat.exists
 
 - name: Assign deterministic MAC addresses to VMs when not provided
-  set_fact:
+  ansible.builtin.set_fact:
     vm_list: "{{ (vm_list_updated | default([])) + [ item | combine({'mac': (item.mac | default('52:54:00:' + (item.name | hash('sha1'))[0:2] + ':' + (item.name | hash('sha1'))[2:4] + ':' + (item.name | hash('sha1'))[4:6])) }) ] }}"
   loop: "{{ vm_list }}"
   loop_control:

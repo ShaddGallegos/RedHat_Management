@@ -7,6 +7,6 @@
     - ansible_dev_node_redhat_products/aap
   tasks:
     - name: Verify defaults loaded
-      assert:
+      ansible.builtin.assert:
         that:
           - aap_enabled is defined

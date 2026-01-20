@@ -8,7 +8,7 @@
     satellite_version: "6.18"
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - satellite_enabled is defined
           - satellite_version is defined

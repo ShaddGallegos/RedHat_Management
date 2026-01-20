@@ -13,7 +13,7 @@
   tags: ["platform_infrastructure_core", "always"]
 
 - name: "Validate platform_infrastructure_core configuration"
-  assert:
+  ansible.builtin.assert:
     that:
       - deployment_platform is defined
     fail_msg: "Infrastructure management requires deployment_platform to be defined"

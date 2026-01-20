@@ -15,12 +15,12 @@
 - name: "Validate OEM driver installation setup"
   block:
     - name: "Check OEM driver availability"
-      stat:
+      ansible.builtin.stat:
         path: "/boot/oemdrv"
       register: oemdrv_check
 
     - name: "Assert OEM drivers are available"
-      assert:
+      ansible.builtin.assert:
         that:
           - "oemdrv_check.stat.exists or 'OEMDRV media will be provided' is not defined"
         fail_msg: "OEM driver media not found. Ensure /boot/oemdrv is available or provide media."

@@ -7,6 +7,6 @@
     integration_enabled: true
   tasks:
     - name: Verify role variables
-      assert:
+      ansible.builtin.assert:
         that:
           - integration_enabled is defined
