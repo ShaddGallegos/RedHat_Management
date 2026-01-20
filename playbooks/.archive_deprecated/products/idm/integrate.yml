@@ -7,21 +7,21 @@
   gather_facts: yes
 
   tasks:
-    - name: "IdM | Configure AAP integration"
+    - name: "IdM | Configure AAP integration_generic"
       ansible.builtin.include_tasks: "integrate_aap.yml"
       when: "'aap' in groups"
-      tags: ["integration", "aap"]
+      tags: ["integration_generic", "aap"]
 
-    - name: "IdM | Configure Satellite integration"
+    - name: "IdM | Configure Satellite integration_generic"
       ansible.builtin.include_tasks: "integrate_satellite.yml"
-      when: "'satellite' in groups"
-      tags: ["integration", "satellite"]
+      when: "'scenario_satellite' in groups"
+      tags: ["integration_generic", "scenario_satellite"]
 
-    - name: "IdM | Configure OpenShift integration"
+    - name: "IdM | Configure OpenShift integration_generic"
       ansible.builtin.include_tasks: "integrate_openshift.yml"
-      when: "'openshift' in groups"
-      tags: ["integration", "openshift"]
+      when: "'scenario_openshift' in groups"
+      tags: ["integration_generic", "scenario_openshift"]
 
     - name: "IdM | Integration complete"
       ansible.builtin.debug:
-        msg: "IdM integration tasks completed"
+        msg: "IdM integration_generic tasks completed"

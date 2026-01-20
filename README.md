@@ -1,6 +1,6 @@
 # Host & Inventory Generator
 
-This repository includes an Ansible playbook that prompts for scenario-specific hosts, generates `/etc/hosts` and an Ansible inventory, and (optionally) propagates those files to target hosts.
+This repository includes an Ansible playbook that ansible_dev_node_prompts for scenario-specific hosts, generates `/etc/hosts` and an Ansible inventory, and (optionally) propagates those files to target hosts.
 
 Quick paths:
 - Playbook: playbooks/generate_and_propagate_hosts.yml
@@ -18,7 +18,7 @@ Vaulting GitHub credentials
 ansible-vault encrypt files/env.conf --output ~/.ansible/conf/env.conf --ask-vault-pass
 ```
 
-Or use the included helper script which prompts and runs the encrypt step interactively:
+Or use the included helper script which ansible_dev_node_prompts and runs the encrypt step interactively:
 
 ```bash
 ./scripts/vault_env_conf.sh
@@ -64,7 +64,7 @@ This directory contains all helper scripts for the Red Hat Infrastructure Setup 
 scripts/
 ├── 🚀 setup/              [6 scripts]   Initialization & setup
 ├── ⚙️  configuration/      [3 scripts]   Configuration management
-├── 🏗️  infrastructure/     [2 scripts]   VM provisioning
+├── 🏗️  platform_infrastructure_core/     [2 scripts]   VM platform_provisioning
 ├── 🔧 maintenance/        [3 scripts]   System updates
 ├── ✅ validation/         [1 script]    Testing & validation
 ├── 🛠️  utilities/          [5 scripts]   Helper utilities
@@ -101,7 +101,7 @@ Configuration generation and management.
 - `update_ansible_token.py` - Update Ansible tokens
 
 ### 🏗️  Infrastructure (2 scripts)
-VM provisioning and infrastructure management.
+VM platform_provisioning and platform_infrastructure_core management.
 
 - `create_libvirt_vm_from_iso.sh` - Create VMs from ISO
 - `libvirt_vm_helper.sh` - Libvirt VM utilities
@@ -140,7 +140,7 @@ Helper and fixup scripts.
 **Utility Modules:**
 - `convert_rhis_templates.py` - Template conversion
 - `kickstart_http_server.py` - HTTP server for kickstart
-- `libvirt_vm_provisioner.py` - Libvirt VM provisioning
+- `platform_libvirt_vm_provisioner.py` - Libvirt VM platform_provisioning
 
 ---
 
@@ -161,7 +161,7 @@ Helper and fixup scripts.
 ```bash
 ./scripts/setup/run_all_setup.sh
 ./scripts/configuration/generate_ansible_cfg.py
-./scripts/infrastructure/create_libvirt_vm_from_iso.sh rhel.iso vm-name
+./scripts/platform_infrastructure_core/create_libvirt_vm_from_iso.sh rhel.iso vm-name
 ./scripts/maintenance/update.sh
 ./scripts/validation/validate-reorganization.sh
 ```

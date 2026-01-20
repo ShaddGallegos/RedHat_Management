@@ -1,0 +1,6 @@
+# Default URLs for preflight API checks
+satellite_url: "http://scenario_satellite.prod.spg"
+aap_url: "http://aap.prod.spg"
+idm_url: "http://idm.prod.spg"
+insights_url: "https://console.redhat.com/api/insights"
+rhc_url: "https://console.redhat.com/api/rhc"

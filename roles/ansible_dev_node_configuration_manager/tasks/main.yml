@@ -1,0 +1,26 @@
+---
+# Configuration Manager Role - Wrapper
+# Orchestrates credential and configuration management tasks
+# Routes to appropriate configuration subroles
+
+- name: "CONFIGURATION MANAGEMENT - Initialize"
+  debug:
+    msg: |
+      Configuration Management
+      ==========================
+      Scenario: {{ deployment_scenario | default('undefined') }}
+      Managing credentials and environment setup
+  tags: ["configuration", "always"]
+
+- name: "Execute credential setup and management"
+  include_role:
+    name: "ansible_dev_node_configuration_manager"
+    tasks_from: "setup_credentials"
+    apply:
+      tags: ["configuration", "credentials"]
+  tags: ["configuration"]
+
+- name: "Configuration management completed"
+  debug:
+    msg: "Credentials and configuration setup complete."
+  tags: ["configuration", "info"]

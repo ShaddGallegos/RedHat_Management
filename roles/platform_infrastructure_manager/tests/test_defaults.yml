@@ -1,0 +1,12 @@
+---
+# Test: platform_infrastructure_manager defaults
+- name: Test platform_infrastructure_manager defaults
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - platform_infrastructure_manager
+  tasks:
+    - name: Verify defaults loaded
+      assert:
+        that:
+          - infrastructure_manager_enabled is defined

@@ -106,7 +106,7 @@ docs/
     ├── Audit reports (5 files)
     ├── Quality analysis (2 files)
     ├── Legacy docs (3 files)
-    └── [Other legacy documentation]
+    └── [Other ansible_dev_node_legacy_archive documentation]
 ```
 
 ---
@@ -135,7 +135,7 @@ docs/
 1. Check: Relevant Quick Reference
 2. Review: Configuration guide troubleshooting section
 3. Search: `grep -r "error message" docs/`
-4. Archive: Check legacy docs if needed: `grep -r "topic" docs/archive/`
+4. Archive: Check ansible_dev_node_legacy_archive docs if needed: `grep -r "topic" docs/archive/`
 
 ---
 
@@ -174,7 +174,7 @@ grep -n "DHCP" docs/PROVISIONING_SERVICES_CONFIGURATION.md
 grep -B2 -A2 "error" docs/*.md
 
 # Search in archive
-grep -r "legacy topic" docs/archive/
+grep -r "ansible_dev_node_legacy_archive topic" docs/archive/
 ```
 
 ---
@@ -223,7 +223,7 @@ grep -r "legacy topic" docs/archive/
 4. Update FILE_INDEX.md if needed
 
 **Archiving Documents**
-1. Move to `archive/` when superseded or legacy
+1. Move to `archive/` when superseded or ansible_dev_node_legacy_archive
 2. Update ARCHIVE_INDEX.md
 3. Remove from main DOCS_INDEX.md
 4. Notify team of archive status

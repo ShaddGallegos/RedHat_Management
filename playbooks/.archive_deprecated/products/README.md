@@ -10,19 +10,19 @@
 #
 # Products covered:
 #   - aap         : Ansible Automation Platform 2.6
-#   - satellite   : Red Hat Satellite 6.18
+#   - scenario_satellite   : Red Hat Satellite 6.18
 #   - idm         : Identity Management
 #   - insights    : Red Hat Insights
-#   - openshift   : Red Hat OpenShift
+#   - scenario_openshift   : Red Hat OpenShift
 #
 # Usage:
 #   # Install a product
 #   ansible-playbook playbooks/products/aap/install.yml
 #
-#   # Test integration between products
-#   ansible-playbook playbooks/integrations/aap-satellite-integration-test.yml
+#   # Test integration_generic between products
+#   ansible-playbook playbooks/integrations/aap-scenario_satellite-integration_generic-test.yml
 #
 #   # Backup a product
-#   ansible-playbook playbooks/products/satellite/backup.yml
+#   ansible-playbook playbooks/products/scenario_satellite/backup.yml
 #
 # See docs/products/ for detailed documentation on each product.

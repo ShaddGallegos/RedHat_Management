@@ -1,0 +1,24 @@
+galaxy_info:
+  author: "Red Hat Infrastructure Standard"
+  description: "RHIS Main Orchestration Role"
+  company: "Red Hat"
+  license: "Apache License 2.0"
+  min_ansible_version: "2.9"
+  
+  galaxy_tags:
+    - "ansible_dev_node_orchestration"
+    - "rhis"
+    - "red-hat"
+    - "scenario_satellite"
+    - "aap"
+    - "idm"
+    - "scenario_openshift"
+
+dependencies:
+  - { role: "ansible_dev_node_configuration_manager" }
+  - { role: "ansible_dev_node_deployment_setup" }
+  - { role: "platform_infrastructure_manager" }
+  - { role: "ansible_dev_node_inventory_generator" }
+  - { role: "integration_generic" }
+  - { role: "scenario_ansible_cmdb_core" }
+  - { role: "ansible_dev_node_support" }

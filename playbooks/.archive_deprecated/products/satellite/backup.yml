@@ -3,10 +3,10 @@
 # Creates backup of Satellite configuration, content, and database
 
 - name: "Satellite 6.18 | Backup"
-  hosts: "satellite"
+  hosts: "scenario_satellite"
   gather_facts: yes
   vars:
-    backup_dir: "/var/backups/satellite"
+    backup_dir: "/var/backups/scenario_satellite"
     backup_retention_days: 7
 
   tasks:
@@ -17,16 +17,16 @@
         mode: "0700"
       tags: ["backup"]
 
-    - name: "Satellite | Check satellite-backup exists"
-      ansible.builtin.command: "which satellite-backup"
+    - name: "Satellite | Check scenario_satellite-backup exists"
+      ansible.builtin.command: "which scenario_satellite-backup"
       register: satellite_backup_cmd
       ignore_errors: yes
       tags: ["backup"]
 
-    - name: "Satellite | Run satellite-backup"
+    - name: "Satellite | Run scenario_satellite-backup"
       ansible.builtin.command: |
-        satellite-backup --disable-counts
-        {{ backup_dir }}/satellite-backup_{{ ansible_date_time.date }}
+        scenario_satellite-backup --disable-counts
+        {{ backup_dir }}/scenario_satellite-backup_{{ ansible_date_time.date }}
       async: 3600
       poll: 30
       when: satellite_backup_cmd is succeeded

@@ -1,0 +1,12 @@
+---
+# Test: ansible_dev_node_redhat_products/scenario_satellite defaults
+- name: Test Satellite defaults
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - ansible_dev_node_redhat_products/scenario_satellite
+  tasks:
+    - name: Verify defaults loaded
+      assert:
+        that:
+          - satellite_enabled is defined

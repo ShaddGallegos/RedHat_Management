@@ -1,0 +1,32 @@
+---
+# VMware VM Provisioning Role Defaults
+
+# Enable/disable VM platform_provisioning
+vmware_vm_provisioning_enabled: true
+
+# vSphere configuration (inherited from vmware_setup)
+vmware_hostname: "{{ vmware_hostname | default('vcenter.example.com') }}"
+vmware_username: "{{ vmware_username | default('administrator@vsphere.local') }}"
+vmware_password: "{{ vmware_password | default('') }}"
+vmware_validate_certs: false
+
+# VM platform_provisioning defaults
+vmware_vm_name: "rhel-vm"
+vmware_vm_cpu: 4
+vmware_vm_memory_mb: 8192
+vmware_vm_disk_size_gb: 50
+vmware_vm_disk_type: thin
+
+# VM template
+vmware_template: "RHEL-9-Template"
+vmware_template_folder: "/Templates"
+
+# Network configuration
+vmware_vm_network: "VM Network"
+vmware_vm_dns_servers:
+  - 8.8.8.8
+  - 8.8.4.4
+
+# Customization
+vmware_vm_wait_for_ip: true
+vmware_vm_wait_timeout: 600

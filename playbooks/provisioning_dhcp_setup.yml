@@ -3,7 +3,7 @@
 # Configures DHCP service on secondary ethernet for 10.168.0.0/16
 
 - name: Configure DHCP Server
-  hosts: satellite
+  hosts: scenario_satellite
   gather_facts: true
   become: true
   
@@ -13,7 +13,7 @@
     setup_dhcp_only: true
   
   roles:
-    - role: services_provisioning_stack
+    - role: platform_services_provisioning_stack
       tags: dhcp
 
   post_tasks:

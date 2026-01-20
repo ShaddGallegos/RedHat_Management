@@ -1,6 +1,6 @@
 # Troubleshooting - Support and Escalation
 
-Guide for getting support and escalating issues in RHIS deployments.
+Guide for getting ansible_dev_node_support and escalating issues in RHIS deployments.
 
 ## Support Resources
 
@@ -9,7 +9,7 @@ Guide for getting support and escalating issues in RHIS deployments.
 **Access:** https://access.redhat.com/
 
 Features:
-- Open support tickets
+- Open ansible_dev_node_support tickets
 - Search knowledgebase
 - Download patches and errata
 - View system status
@@ -31,7 +31,7 @@ Features:
 **Forums:**
 - [Red Hat Community](https://www.redhat.com/en/open-source/communities)
 - [Ansible Community](https://www.ansible.com/community)
-- Stack Overflow (tag: ansible, satellite, etc.)
+- Stack Overflow (tag: ansible, scenario_satellite, etc.)
 
 **Chat:**
 - IRC: Freenode #ansible
@@ -191,7 +191,7 @@ Severity 4 (Low)
 
 ### Open Ticket via Portal
 
-1. Navigate to https://access.redhat.com/support/cases/
+1. Navigate to https://access.redhat.com/ansible_dev_node_support/cases/
 2. Click "Create a Case"
 3. Fill in:
    - Product: Select appropriate product
@@ -237,7 +237,7 @@ KCS#1556677: IdM replication conflict
            └─> Try suggested solutions
 
 2. Support Portal
-   └─> Create support case
+   └─> Create ansible_dev_node_support case
        └─> Initial response (24 hours)
            └─> Troubleshooting (48 hours)
                 └─> Engineering engagement
@@ -253,7 +253,7 @@ KCS#1556677: IdM replication conflict
 
 **Standard Support:**
 - Support Portal: cases.redhat.com
-- Email: support@redhat.com
+- Email: ansible_dev_node_support@redhat.com
 - Phone: 1-888-733-8423
 
 **Premium Support:**
@@ -281,30 +281,30 @@ sudo yum install -y insights-client
 # Register system
 sudo insights-client --register
 
-# Enable remote support
+# Enable remote ansible_dev_node_support
 sudo insights-client --collector
 
-# Authorize Red Hat support
+# Authorize Red Hat ansible_dev_node_support
 # Via: https://access.redhat.com/insights/
 ```
 
 ### VPN/SSH Access
 
-If remote support needed:
+If remote ansible_dev_node_support needed:
 
 ```bash
-# Create support user
-sudo useradd -m -s /bin/bash redhat-support
-sudo usermod -aG wheel redhat-support
+# Create ansible_dev_node_support user
+sudo useradd -m -s /bin/bash redhat-ansible_dev_node_support
+sudo usermod -aG wheel redhat-ansible_dev_node_support
 
 # Generate key
-ssh-keygen -t rsa -b 4096 -f /home/redhat-support/.ssh/id_rsa
+ssh-keygen -t rsa -b 4096 -f /home/redhat-ansible_dev_node_support/.ssh/id_rsa
 
 # Configure sudo for specific commands only
-# /etc/sudoers.d/redhat-support
-# redhat-support ALL=(ALL) NOPASSWD: /usr/bin/tail, /usr/bin/less, etc.
+# /etc/sudoers.d/redhat-ansible_dev_node_support
+# redhat-ansible_dev_node_support ALL=(ALL) NOPASSWD: /usr/bin/tail, /usr/bin/less, etc.
 
-# Red Hat support team connects and performs diagnostics
+# Red Hat ansible_dev_node_support team connects and performs diagnostics
 ```
 
 ## Common Escalation Triggers
@@ -313,7 +313,7 @@ ssh-keygen -t rsa -b 4096 -f /home/redhat-support/.ssh/id_rsa
 
 ```
 - Issue not resolved within SLA
-- Multiple support tickets on same issue
+- Multiple ansible_dev_node_support tickets on same issue
 - Workaround impacts operations
 - Issue blocks critical business process
 - Security implications identified
@@ -384,13 +384,13 @@ Prevention: [how to avoid in future]
 **Benefits:**
 - Faster issue resolution
 - Deeper product knowledge
-- Reduced support ticket frequency
+- Reduced ansible_dev_node_support ticket frequency
 
 ### Advanced Support Features
 
 With certification/training:
 - Access to advanced training materials
-- Priority queue in support portal
+- Priority queue in ansible_dev_node_support portal
 - Advanced troubleshooting guides
 - Early access to product releases
 

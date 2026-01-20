@@ -30,8 +30,8 @@ EXECUTABLE COMPONENTS
 ORCHESTRATION COMPONENTS
 ════════════════════════════════════════════════════════════════════════════
 
-✅ playbooks/orchestration.yml (18KB, 450+ lines)
-   - Main 7-phase orchestration playbook
+✅ playbooks/ansible_dev_node_orchestration.yml (18KB, 450+ lines)
+   - Main 7-phase ansible_dev_node_orchestration playbook
    - Supports all 15 scenarios
    - Supports all 7 platforms
    - Tag-based selective execution
@@ -80,7 +80,7 @@ DOCUMENTATION (4000+ LINES)
    - 100+ Jinja2 variables
    - 8 variable categories
    - Environment lookups
-   - Vault integration patterns
+   - Vault integration_generic patterns
    - Security best practices
 
 ✅ PROJECT_STATUS_JAN_16_2026.md (14KB, 500+ lines)
@@ -165,7 +165,7 @@ SECURITY FEATURES
    - Environment lookups with safe defaults
 
 ✅ Secure Credential Collection
-   - Interactive prompts (no echo)
+   - Interactive ansible_dev_node_prompts (no echo)
    - CDN username, password, offline token
 
 ✅ Integration Credential Management
@@ -197,9 +197,9 @@ DEPLOYMENT PHASES (7)
    - OpenShift 4.21+ (if selected)
 
 ✅ Phase 5: Configure Integrations
-   - Satellite ↔ AAP integration
-   - Satellite ↔ IdM integration
-   - AAP ↔ IdM integration
+   - Satellite ↔ AAP integration_generic
+   - Satellite ↔ IdM integration_generic
+   - AAP ↔ IdM integration_generic
    - Multi-product integrations
 
 ✅ Phase 6: Setup Ansible-CMDB
@@ -217,21 +217,21 @@ TAG SYSTEM
 ════════════════════════════════════════════════════════════════════════════
 
 ✅ Scenario Tags
-   - satellite, aap, idm, openshift, full-stack
+   - scenario_satellite, aap, idm, scenario_openshift, full-stack
 
 ✅ Platform Tags
-   - libvirt, baremetal, aws, azure, gcp, vmware, nutanix
+   - libvirt, baremetal, aws, azure, gcp, platform_vmware, platform_nutanix
 
 ✅ Phase Tags
    - init, prepare, provision, install, configure, integrate, validate
 
 ✅ Component Tags
-   - satellite, aap, idm, openshift, infrastructure, networking
+   - scenario_satellite, aap, idm, scenario_openshift, platform_infrastructure_core, networking
 
 ✅ Selective Execution Examples
-   - --tags "satellite,libvirt,rhel-9"
+   - --tags "scenario_satellite,libvirt,rhel-9"
    - --tags "install,configure"
-   - --skip-tags "openshift"
+   - --skip-tags "scenario_openshift"
    - --tags "validate"
 
 ════════════════════════════════════════════════════════════════════════════
@@ -245,14 +245,14 @@ DIRECTORY STRUCTURE
    - PROJECT_STATUS_JAN_16_2026.md
 
 ✅ Playbooks Directory
-   - orchestration.yml (Main orchestration)
+   - ansible_dev_node_orchestration.yml (Main ansible_dev_node_orchestration)
    - scenario_configs.yml (Scenario definitions)
    - [existing playbooks]
 
 ✅ Roles Directory
    - installer_host/ (Setup Ansible dev node)
    - platform_prep/ (Platform preparation)
-   - inventory_generator/ (Inventory generation)
+   - ansible_dev_node_inventory_generator/ (Inventory generation)
    - [existing roles]
 
 ✅ Documentation Directory
@@ -272,16 +272,16 @@ USAGE EXAMPLES
 
 ✅ Interactive Mode
    $ ./RHIS-Installer-Enhanced.sh
-   (Follow menu prompts)
+   (Follow menu ansible_dev_node_prompts)
 
 ✅ Help
    $ ./RHIS-Installer-Enhanced.sh --help
 
 ✅ Command-Line Arguments
-   $ ./RHIS-Installer-Enhanced.sh --scenario full_stack --platform libvirt --os rhel-9 --skip-prompts
+   $ ./RHIS-Installer-Enhanced.sh --scenario full_stack --platform libvirt --os_generic rhel-9 --skip-ansible_dev_node_prompts
 
 ✅ Direct Playbook Execution
-   $ ansible-playbook playbooks/orchestration.yml \
+   $ ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
      -e "deployment_scenario=satellite_aap" \
      -e "deployment_platform=aws" \
      -e "deployment_os=rhel-9" \
@@ -294,7 +294,7 @@ VALIDATION RESULTS
 ✅ File Verification
    - RHIS-Installer-Enhanced.sh exists and executable
    - RHIS-Installer.sh exists
-   - playbooks/orchestration.yml exists
+   - playbooks/ansible_dev_node_orchestration.yml exists
    - playbooks/scenario_configs.yml exists
    - All documentation files present
 

@@ -2,7 +2,7 @@
 # Collections that require Red Hat Automation Hub access (subscription token)
 # Install with: ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN=<token> ansible-galaxy collection install -r requirements_hub.yml
 collections:
-  - name: redhat.satellite
+  - name: redhat.scenario_satellite
     version: ">=4.8.0"
   - name: redhat.satellite_operations
     version: ">=1.3.0"

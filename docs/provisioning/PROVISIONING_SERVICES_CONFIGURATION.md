@@ -2,7 +2,7 @@
 
 ## Overview
 
-Complete setup for DHCP, DNS, PXE, and TFTP services running on the secondary ethernet device (`eth1`) of `satellite.prod.spg` for the `10.168.0.0/16` network.
+Complete setup for DHCP, DNS, PXE, and TFTP services running on the secondary ethernet device (`eth1`) of `scenario_satellite.prod.spg` for the `10.168.0.0/16` network.
 
 ## Architecture
 
@@ -71,7 +71,7 @@ option ntp-servers 10.168.0.1, 8.8.8.8;
 
 ### Static Host Reservations
 ```
-Host: satellite.prod.spg
+Host: scenario_satellite.prod.spg
 ├─ IP: 10.168.0.10
 ├─ MAC: 52:54:00:00:00:10
 └─ Domain: prod.example.com
@@ -105,16 +105,16 @@ filename "pxelinux.0";
 
 #### Forward Zones
 1. **example.com**
-   - Records: satellite, idm, aap, app servers
-   - SOA: satellite.prod.spg.example.com
+   - Records: scenario_satellite, idm, aap, app servers
+   - SOA: scenario_satellite.prod.spg.example.com
 
 2. **prod.example.com**
-   - Records: Production infrastructure hosts
-   - SOA: satellite.prod.spg.prod.example.com
+   - Records: Production platform_infrastructure_core hosts
+   - SOA: scenario_satellite.prod.spg.prod.example.com
 
 3. **lab.example.com**
    - Records: Development/testing hosts
-   - SOA: satellite.prod.spg.lab.example.com
+   - SOA: scenario_satellite.prod.spg.lab.example.com
 
 #### Reverse Zones
 - `0.168.10.in-addr.arpa` (10.168.0.0/24)
@@ -134,7 +134,7 @@ filename "pxelinux.0";
 ```
 _ldap._tcp          IN  SRV  10 0 389  idm.prod.example.com
 _kerberos._tcp      IN  SRV  10 0 88   idm.prod.example.com
-_xmpp-server._tcp   IN  SRV  10 0 5269 satellite.prod.example.com
+_xmpp-server._tcp   IN  SRV  10 0 5269 scenario_satellite.prod.example.com
 ```
 
 ## Resolv.conf Configuration
@@ -373,8 +373,8 @@ cat /etc/resolv.conf
 
 ### Test DNS Resolution
 ```bash
-dig @10.168.0.1 satellite.prod.spg.example.com
-nslookup satellite.prod.spg.example.com 10.168.0.1
+dig @10.168.0.1 scenario_satellite.prod.spg.example.com
+nslookup scenario_satellite.prod.spg.example.com 10.168.0.1
 ```
 
 ### Test DHCP
@@ -490,7 +490,7 @@ tcpdump -i eth1 -n 'udp port 67 or udp port 69'
 
 ### Role Structure
 ```
-roles/services_provisioning_stack/
+roles/platform_services_provisioning_stack/
 ├── meta/main.yml
 ├── defaults/main.yml
 ├── tasks/main.yml
@@ -530,7 +530,7 @@ docs/
 - High availability design
 - Security hardened
 - Complete documentation
-- Ready for automated provisioning
+- Ready for automated platform_provisioning
 
 ## Next Steps
 
@@ -542,7 +542,7 @@ docs/
 2. **Verify Connectivity**
    ```bash
    ping 10.168.0.1
-   dig @10.168.0.1 satellite.prod.spg.example.com
+   dig @10.168.0.1 scenario_satellite.prod.spg.example.com
    ```
 
 3. **Boot Test System**

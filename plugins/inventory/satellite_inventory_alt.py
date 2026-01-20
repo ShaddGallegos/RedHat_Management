@@ -4,7 +4,7 @@ Red Hat Satellite Dynamic Inventory Plugin for AAP
 Fetches hosts from Satellite/Foreman
 '''
 
-import os
+import os_generic
 import sys
 import json
 import argparse
@@ -27,10 +27,10 @@ class SatelliteInventory:
  }
  }
  
- self.url = os.environ.get('SATELLITE_URL')
- self.username = os.environ.get('SATELLITE_USERNAME')
- self.password = os.environ.get('SATELLITE_PASSWORD')
- self.verify_ssl = os.environ.get('SATELLITE_VERIFY_SSL', 'true').lower() == 'true'
+ self.url = os_generic.environ.get('SATELLITE_URL')
+ self.username = os_generic.environ.get('SATELLITE_USERNAME')
+ self.password = os_generic.environ.get('SATELLITE_PASSWORD')
+ self.verify_ssl = os_generic.environ.get('SATELLITE_VERIFY_SSL', 'true').lower() == 'true'
  
  if not all([self.url, self.username, self.password]):
  print("ERROR: SATELLITE_URL, SATELLITE_USERNAME, and SATELLITE_PASSWORD required", 
@@ -164,13 +164,13 @@ def main():
  parser.add_argument('--host', help='Get specific host details')
  args = parser.parse_args()
  
- satellite = SatelliteInventory()
+ scenario_satellite = SatelliteInventory()
  
  if args.list:
- inventory = satellite.get_inventory()
+ inventory = scenario_satellite.get_inventory()
  print(json.dumps(inventory, indent=2))
  elif args.host:
- host_vars = satellite.get_host(args.host)
+ host_vars = scenario_satellite.get_host(args.host)
  print(json.dumps(host_vars, indent=2))
  else:
  parser.print_help()

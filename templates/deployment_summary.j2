@@ -6,19 +6,19 @@
 
 ## Deployment Overview
 
-This deployment was executed using the role-based Satellite automation framework, running all components in the proper sequence to ensure complete integration.
+This deployment was executed using the role-based Satellite automation framework, running all components in the proper sequence to ensure complete integration_generic.
 
 ## Roles Executed
 
 ### Phase 1: Core Installation
-- **Role:** `satellite_build`
+- **Role:** `scenario_satellite_build`
 - **Status:** {{ 'Completed' if satellite_build_enabled | default(true) else 'Skipped' }}
 - **Purpose:** Red Hat Satellite 6.17 server installation and base configuration
 
 ### Phase 2: PXE Services
-- **Role:** `satellite_pxe_services`  
+- **Role:** `scenario_satellite_pxe_services`  
 - **Status:** {{ 'Completed' if satellite_pxe_enabled | default(true) else 'Skipped' }}
-- **Purpose:** TFTP, DHCP, LibVirt integration for automated provisioning
+- **Purpose:** TFTP, DHCP, LibVirt integration_generic for automated platform_provisioning
 
 ### Phase 3: Content Management
 - **Role:** `satellite_content`
@@ -28,7 +28,7 @@ This deployment was executed using the role-based Satellite automation framework
 ### Phase 4: Provisioning Workflows
 - **Role:** `satellite_provisioning`
 - **Status:** {{ 'Completed' if satellite_provisioning_enabled | default(true) else 'Skipped' }}
-- **Purpose:** Automated node provisioning and management workflows
+- **Purpose:** Automated node platform_provisioning and management workflows
 
 ## System Information
 
@@ -64,7 +64,7 @@ The following services should be running after successful deployment:
 
 1. **Access the Web UI** using the credentials above
 2. **Verify repository synchronization** in Content > Products
-3. **Test PXE boot** by provisioning a test node
+3. **Test PXE boot** by platform_provisioning a test node
 4. **Configure additional settings** as needed for your environment
 5. **Review audit logs** for any issues during deployment
 

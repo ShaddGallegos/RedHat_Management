@@ -1,0 +1,91 @@
+---
+# Integration Role - Wrapper
+# Orchestrates product integrations (Satellite+AAP, Satellite+IdM, etc.)
+# Routes to appropriate integration_generic subroles based on scenario
+
+- name: "PRODUCT INTEGRATION - Initialize"
+  debug:
+    msg: |
+      Product Integration Configuration
+      ===================================
+      Scenario: {{ deployment_scenario | default('undefined') }}
+      Products: {{ scenario_config.products | default([]) | join(', ') }}
+      Integrations: {{ scenario_config.integrations | default([]) | join(', ') or 'None' }}
+  tags: ["integration_generic", "always"]
+
+- name: "Execute Satellite + AAP integration_generic (if applicable)"
+  include_role:
+    name: "integration_generic"
+    tasks_from: "satellite_aap/main.yml"
+    apply:
+      tags: ["integration_generic", "satellite_aap"]
+  when: 
+    - scenario_config.integrations is defined
+    - "'satellite_aap' in scenario_config.integrations"
+  tags: ["integration_generic"]
+
+- name: "Execute Satellite + IdM integration_generic (if applicable)"
+  include_role:
+    name: "integration_generic"
+    tasks_from: "satellite_idm/main.yml"
+    apply:
+      tags: ["integration_generic", "satellite_idm"]
+  when:
+    - scenario_config.integrations is defined
+    - "'satellite_idm' in scenario_config.integrations"
+  tags: ["integration_generic"]
+
+- name: "Execute Satellite + Insights integration_generic (if applicable)"
+  include_role:
+    name: "integration_generic"
+    tasks_from: "satellite_insights/main.yml"
+    apply:
+      tags: ["integration_generic", "satellite_insights"]
+  when:
+    - scenario_config.integrations is defined
+    - "'satellite_insights' in scenario_config.integrations"
+  tags: ["integration_generic"]
+
+- name: "Execute ServiceNow integration_generic (if applicable)"
+  include_role:
+    name: "integration_generic"
+    tasks_from: "integration_servicenow/main.yml"
+    apply:
+      tags: ["integration_generic", "integration_servicenow"]
+  when:
+    - scenario_config.integrations is defined
+    - "'integration_servicenow' in scenario_config.integrations"
+  tags: ["integration_generic"]
+
+- name: "Integration configuration completed"
+  block:
+    - name: "Validate all integrations successful"
+      debug:
+        msg: "Product integrations configured successfully."
+      tags: ["integration_generic", "info"]
+
+  rescue:
+    - name: "Integration configuration failed - detailed error"
+      fail:
+        msg: |
+          ❌ INTEGRATION CONFIGURATION FAILED
+          
+          Common causes:
+          1. Missing integration_generic prerequisites
+          2. Product connectivity issues
+          3. Authentication/credential problems
+          4. API endpoint unavailable
+          5. Firewall or network restrictions
+          
+          Enabled integrations:
+          {{ scenario_config.integrations | default([]) | join(', ') or 'None' }}
+          
+          Recovery steps:
+          1. Verify all products are running
+          2. Check network connectivity between products
+          3. Validate credentials and API tokens
+          4. Confirm API endpoints are accessible
+          5. Review firewall policies
+          
+          Check logs above for detailed error information.
+  tags: ["integration_generic"]

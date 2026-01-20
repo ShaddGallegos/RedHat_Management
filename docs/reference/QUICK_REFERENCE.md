@@ -20,7 +20,7 @@ ansible-playbook redhat_management-site.yml -i inventory/hosts --check
 ansible-playbook redhat_management-site.yml --tags deploy_aap
 
 # Run specific host
-ansible-playbook redhat_management-site.yml -i inventory/hosts -l satellite.prod.spg
+ansible-playbook redhat_management-site.yml -i inventory/hosts -l scenario_satellite.prod.spg
 
 # Vault operations
 ansible-vault create vault.yml
@@ -150,7 +150,7 @@ virsh destroy <vm-name>  # Force power off
 
 ```
 /opt/
-├── satellite-installer/        # Installer directory
+├── scenario_satellite-installer/        # Installer directory
 ├── foreman/                    # Foreman application
 └── rh-postgresql-12/           # Database
 
@@ -204,9 +204,9 @@ Configuration:
 | Component | URL |
 |-----------|-----|
 | AAP Controller | https://aap.example.com |
-| Satellite | https://satellite.example.com |
+| Satellite | https://scenario_satellite.example.com |
 | IdM | https://idm.example.com |
-| Foreman API | https://satellite.example.com/api/v2 |
+| Foreman API | https://scenario_satellite.example.com/api/v2 |
 | AAP API | https://aap.example.com/api/v2 |
 | IdM API | https://idm.example.com/ipa/json |
 | Grafana | https://aap.example.com:3000 |
@@ -228,7 +228,7 @@ vault_db_admin_password: DBPassword123!
 ```
 rhel8-key              # RHEL 8 systems
 rhel9-key              # RHEL 9 systems
-satellite-key          # Satellite systems
+scenario_satellite-key          # Satellite systems
 aap-key               # AAP systems
 ```
 
@@ -238,7 +238,7 @@ aap-key               # AAP systems
 
 ```bash
 # 1. Download CA certificate
-wget https://satellite.example.com/pub/katello-ca-consumer-latest.noarch.rpm
+wget https://scenario_satellite.example.com/pub/katello-ca-consumer-latest.noarch.rpm
 sudo rpm -Uvh katello-ca-consumer-latest.noarch.rpm
 
 # 2. Register with activation key

@@ -4,15 +4,15 @@
 
 Red Hat OpenShift Container Platform is a comprehensive enterprise Kubernetes platform built on open source technologies. OpenShift 4.21 provides:
 
-- **Kubernetes Orchestration** - Production-grade container orchestration
+- **Kubernetes Orchestration** - Production-grade container ansible_dev_node_orchestration
 - **Developer Experience** - Built-in developer tools and CI/CD
 - **Container Registry** - Integrated image registry and management
-- **Service Mesh** - Istio integration for service communication
+- **Service Mesh** - Istio integration_generic for service communication
 - **Monitoring & Logging** - Integrated Prometheus and ELK stack
 - **Security** - RBAC, network policies, pod security standards
 - **Multi-tenancy** - Project-based resource isolation
 
-Deployed via RHIS, OpenShift provides the platform for containerized applications across your infrastructure.
+Deployed via RHIS, OpenShift provides the platform for containerized applications across your platform_infrastructure_core.
 
 ---
 
@@ -26,7 +26,7 @@ Deployed via RHIS, OpenShift provides the platform for containerized application
 - Network connectivity to Red Hat registries
 
 ### 1. Configure Inventory
-Update `inventory/openshift.yml`:
+Update `inventory/scenario_openshift.yml`:
 ```yaml
 [ocp_masters]
 ocp-master1.example.com
@@ -49,7 +49,7 @@ ocp_version=4.21
 ```
 
 ### 2. Configure Settings
-Edit `group_vars/openshift.yml`:
+Edit `group_vars/scenario_openshift.yml`:
 ```yaml
 ocp_version: "4.21"
 ocp_cluster_name: "production"
@@ -60,11 +60,11 @@ ocp_ingress_vip: "192.168.1.101"
 
 ### 3. Deploy OpenShift
 ```bash
-ansible-playbook redhat_management-site.yml -t openshift
+ansible-playbook redhat_management-site.yml -t scenario_openshift
 ```
 
 ### 4. Access OpenShift
-- **Console**: https://console-openshift-console.apps.production.example.com
+- **Console**: https://console-scenario_openshift-console.apps.production.example.com
 - **API**: https://api.production.example.com:6443
 - **Default Admin**: kubeadmin (password in deployment logs)
 
@@ -124,15 +124,15 @@ sysctl --system
 #### Step 2: Pre-Installation Configuration
 ```bash
 # Create installation directory
-mkdir -p /opt/openshift-install
-cd /opt/openshift-install
+mkdir -p /opt/scenario_openshift-install
+cd /opt/scenario_openshift-install
 
 # Download installer
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.21/openshift-install-linux.tar.gz
-tar xzf openshift-install-linux.tar.gz
+wget https://mirror.scenario_openshift.com/pub/scenario_openshift-v4/x86_64/clients/ocp/4.21/scenario_openshift-install-linux.tar.gz
+tar xzf scenario_openshift-install-linux.tar.gz
 
 # Download kubectl
-wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/4.21/kubectl-linux.tar.gz
+wget https://mirror.scenario_openshift.com/pub/scenario_openshift-v4/x86_64/clients/ocp/4.21/kubectl-linux.tar.gz
 tar xzf kubectl-linux.tar.gz
 cp kubectl /usr/local/bin/
 
@@ -171,7 +171,7 @@ platform:
   libvirt:
     network:
       if: br0
-pullSecret: '{"auths":{"cloud.openshift.com":{...}}}'
+pullSecret: '{"auths":{"cloud.scenario_openshift.com":{...}}}'
 sshKey: 'ssh-rsa AAAAB3...'
 EOF
 ```
@@ -179,21 +179,21 @@ EOF
 #### Step 3: Run Installation Role
 ```bash
 # Deploy OpenShift via role
-ansible-playbook -i inventory/openshift.yml \
-  roles/openshift_4_21_deployment/tasks/main.yml \
+ansible-playbook -i inventory/scenario_openshift.yml \
+  roles/scenario_openshift_4_21_deployment/tasks/main.yml \
   --vault-password-file ~/.ansible/conf/vault.txt
 
 # Or full playbook
 ansible-playbook redhat_management-site.yml \
-  -e "deployment_scenario=openshift" \
-  --tags openshift
+  -e "deployment_scenario=scenario_openshift" \
+  --tags scenario_openshift
 ```
 
 #### Step 4: Create Installation Manifests
 ```bash
-cd /opt/openshift-install
+cd /opt/scenario_openshift-install
 
-./openshift-install create manifests --dir=cluster
+./scenario_openshift-install create manifests --dir=cluster
 
 # Modify manifests if needed
 sed -i 's/mastersSchedulable: true/mastersSchedulable: false/' cluster/manifests/cluster-scheduler-02-config.yml
@@ -201,9 +201,9 @@ sed -i 's/mastersSchedulable: true/mastersSchedulable: false/' cluster/manifests
 
 #### Step 5: Create Ignition Configs
 ```bash
-cd /opt/openshift-install
+cd /opt/scenario_openshift-install
 
-./openshift-install create ignition-configs --dir=cluster
+./scenario_openshift-install create ignition-configs --dir=cluster
 
 # Verify configs
 ls -la cluster/*.ign
@@ -217,7 +217,7 @@ for i in 1 2 3; do
 done
 
 # Monitor bootstrap
-./openshift-install wait-for bootstrap-complete --dir=cluster --log-level=info
+./scenario_openshift-install wait-for bootstrap-complete --dir=cluster --log-level=info
 
 # Start worker nodes
 for i in 1 2 3; do
@@ -225,13 +225,13 @@ for i in 1 2 3; do
 done
 
 # Wait for installation complete
-./openshift-install wait-for install-complete --dir=cluster --log-level=info
+./scenario_openshift-install wait-for install-complete --dir=cluster --log-level=info
 ```
 
 #### Step 7: Verification
 ```bash
 # Get kubeconfig
-export KUBECONFIG=/opt/openshift-install/cluster/auth/kubeconfig
+export KUBECONFIG=/opt/scenario_openshift-install/cluster/auth/kubeconfig
 
 # Check cluster status
 kubectl get nodes
@@ -251,7 +251,7 @@ kubectl cluster-info
 ```yaml
 # group_vars/vault.yml
 vault_ocp_pull_secret: |
-  {"auths":{"cloud.openshift.com":{...}}}
+  {"auths":{"cloud.scenario_openshift.com":{...}}}
 vault_ocp_ssh_key: |
   -----BEGIN OPENSSH PRIVATE KEY-----
   ...
@@ -266,7 +266,7 @@ vault_ocp_ssh_key: |
   hosts: localhost
   
   vars:
-    kubeconfig: /opt/openshift-install/cluster/auth/kubeconfig
+    kubeconfig: /opt/scenario_openshift-install/cluster/auth/kubeconfig
   
   tasks:
     - name: Add HTPasswd identity provider
@@ -274,7 +274,7 @@ vault_ocp_ssh_key: |
         kubeconfig: "{{ kubeconfig }}"
         state: present
         definition:
-          apiVersion: config.openshift.io/v1
+          apiVersion: config.scenario_openshift.io/v1
           kind: OAuth
           metadata:
             name: cluster
@@ -318,7 +318,7 @@ vault_ocp_ssh_key: |
       kubernetes.core.k8s:
         state: present
         definition:
-          apiVersion: project.openshift.io/v1
+          apiVersion: project.scenario_openshift.io/v1
           kind: Project
           metadata:
             name: production
@@ -354,7 +354,7 @@ kubectl get all -A -o yaml > cluster_backup_$(date +%Y%m%d).yaml
 kubectl get clusterversion
 
 # 3. Review upgrade documentation
-./openshift-install explain clusterversion
+./scenario_openshift-install explain clusterversion
 ```
 
 ### Upgrade Process
@@ -447,7 +447,7 @@ kubectl get pods -A | grep -E "ERROR|Pending"
       kubernetes.core.k8s:
         state: present
         definition:
-          apiVersion: route.openshift.io/v1
+          apiVersion: route.scenario_openshift.io/v1
           kind: Route
           metadata:
             name: web-server-route
@@ -565,7 +565,7 @@ kubectl get pods -A | grep -E "ERROR|Pending"
 #!/bin/bash
 # scripts/bash/configure_ocp_rbac.sh
 
-KUBECONFIG=/opt/openshift-install/cluster/auth/kubeconfig
+KUBECONFIG=/opt/scenario_openshift-install/cluster/auth/kubeconfig
 
 # Create developer role
 kubectl create role developer \
@@ -668,7 +668,7 @@ kubectl get pv
 
 ## Additional Resources
 
-- [OpenShift Documentation](https://docs.openshift.com/container-platform/4.21/)
+- [OpenShift Documentation](https://docs.scenario_openshift.com/container-platform/4.21/)
 - [Red Hat Learning](https://learning.redhat.com/)
 - [Kubernetes Documentation](https://kubernetes.io/docs/)
 - [RHIS Project Guide](../README.md)

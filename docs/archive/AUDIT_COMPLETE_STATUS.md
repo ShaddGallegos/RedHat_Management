@@ -20,20 +20,20 @@
 - **Result**: Wrapper main.yml pattern selected for subrole-based roles
 
 ### Continuation Task 2: Resolve Baremetal Provisioner ✓
-- Created: roles/baremetal_provisioner/tasks/main.yml
-- Status: Fully integrated into orchestration_master
+- Created: roles/platform_baremetal_provisioner/tasks/main.yml
+- Status: Fully integrated into ansible_dev_node_orchestration_master
 - Platforms: Bare metal deployments now fully supported
 - **Result**: Missing role issue RESOLVED
 
 ### Continuation Task 3: Create Wrapper Main.yml Files ✓
 - Created 6 wrapper main.yml files for subrole-based roles
-- Files: cmdb, configuration_manager, infrastructure_manager, integration, os, support
+- Files: scenario_ansible_cmdb_core, ansible_dev_node_configuration_manager, platform_infrastructure_manager, integration_generic, os_generic, ansible_dev_node_support
 - Total lines added: 266
 - **Result**: All subrole-based roles now have proper entry points
 
 ### Continuation Task 4: Create Product Role Main.yml Files ✓
-- Created 3 comprehensive product deployment orchestration files
-- Files: redhat_products/aap, satellite, idm
+- Created 3 comprehensive product deployment ansible_dev_node_orchestration files
+- Files: ansible_dev_node_redhat_products/aap, scenario_satellite, idm
 - Total lines added: 236
 - Subroles orchestrated: 18 total subroles
 - **Result**: All product deployments now have unified entry points
@@ -54,10 +54,10 @@
 
 ### Continuation Task 7: End-to-End Verification ✓
 - Ran syntax checks on site.yml ✓
-- Ran syntax checks on orchestration.yml ✓
+- Ran syntax checks on ansible_dev_node_orchestration.yml ✓
 - Verified all include_role calls resolve
 - Verified all dynamic references work
-- **Result**: Complete orchestration chain validated
+- **Result**: Complete ansible_dev_node_orchestration chain validated
 
 ---
 
@@ -65,44 +65,44 @@
 
 ### Category 1: Baremetal Provisioner (1 file)
 ```
-roles/baremetal_provisioner/tasks/main.yml                           41 lines
+roles/platform_baremetal_provisioner/tasks/main.yml                           41 lines
 ```
 
 ### Category 2: Wrapper Main.yml Files (6 files)
 ```
-roles/cmdb/tasks/main.yml                                            26 lines
-roles/configuration_manager/tasks/main.yml                           26 lines
-roles/infrastructure_manager/tasks/main.yml                          39 lines
-roles/integration/tasks/main.yml                                     63 lines
-roles/os/tasks/main.yml                                              58 lines
-roles/support/tasks/main.yml                                         54 lines
+roles/scenario_ansible_cmdb_core/tasks/main.yml                                            26 lines
+roles/ansible_dev_node_configuration_manager/tasks/main.yml                           26 lines
+roles/platform_infrastructure_manager/tasks/main.yml                          39 lines
+roles/integration_generic/tasks/main.yml                                     63 lines
+roles/os_generic/tasks/main.yml                                              58 lines
+roles/ansible_dev_node_support/tasks/main.yml                                         54 lines
 Subtotal: 266 lines
 ```
 
 ### Category 3: Product Role Main.yml Files (3 files)
 ```
-roles/redhat_products/aap/tasks/main.yml                             73 lines
-roles/redhat_products/satellite/tasks/main.yml                       99 lines
-roles/redhat_products/idm/tasks/main.yml                             64 lines
+roles/ansible_dev_node_redhat_products/aap/tasks/main.yml                             73 lines
+roles/ansible_dev_node_redhat_products/scenario_satellite/tasks/main.yml                       99 lines
+roles/ansible_dev_node_redhat_products/idm/tasks/main.yml                             64 lines
 Subtotal: 236 lines
 ```
 
 ### Category 4: Platform Preparation Tasks (7 files)
 ```
-roles/infrastructure_manager/tasks/prepare_libvirt.yml               29 lines
-roles/infrastructure_manager/tasks/prepare_baremetal.yml             34 lines
-roles/infrastructure_manager/tasks/prepare_aws.yml                   30 lines
-roles/infrastructure_manager/tasks/prepare_azure.yml                 33 lines
-roles/infrastructure_manager/tasks/prepare_gcp.yml                   33 lines
-roles/infrastructure_manager/tasks/prepare_vmware.yml                30 lines
-roles/infrastructure_manager/tasks/prepare_nutanix.yml               30 lines
+roles/platform_infrastructure_manager/tasks/prepare_libvirt.yml               29 lines
+roles/platform_infrastructure_manager/tasks/prepare_baremetal.yml             34 lines
+roles/platform_infrastructure_manager/tasks/prepare_aws.yml                   30 lines
+roles/platform_infrastructure_manager/tasks/prepare_azure.yml                 33 lines
+roles/platform_infrastructure_manager/tasks/prepare_gcp.yml                   33 lines
+roles/platform_infrastructure_manager/tasks/prepare_vmware.yml                30 lines
+roles/platform_infrastructure_manager/tasks/prepare_nutanix.yml               30 lines
 Subtotal: 229 lines
 ```
 
 ### Category 5: Installation Method Tasks (2 files)
 ```
-roles/infrastructure_manager/tasks/install_method_oemdrv.yml         32 lines
-roles/infrastructure_manager/tasks/install_method_tftp.yml           34 lines
+roles/platform_infrastructure_manager/tasks/install_method_oemdrv.yml         32 lines
+roles/platform_infrastructure_manager/tasks/install_method_tftp.yml           34 lines
 Subtotal: 66 lines
 ```
 
@@ -119,25 +119,25 @@ FILES_CREATED_AUDIT.md                                               150+ lines
 
 ## ISSUES RESOLVED: DETAILED BREAKDOWN
 
-### Issue 1: Missing baremetal_provisioner Role
+### Issue 1: Missing platform_baremetal_provisioner Role
 - **Type**: Missing role
 - **Severity**: CRITICAL
 - **Status**: ✓ RESOLVED
-- **Solution**: Created roles/baremetal_provisioner/tasks/main.yml
+- **Solution**: Created roles/platform_baremetal_provisioner/tasks/main.yml
 - **Impact**: Baremetal platform deployments now functional
-- **Testing**: Syntax checked and integrated into orchestration_master
+- **Testing**: Syntax checked and integrated into ansible_dev_node_orchestration_master
 
 ### Issue 2: Missing Main Task Files (6 roles)
 - **Type**: Missing entry points
 - **Severity**: CRITICAL
-- **Roles Affected**: cmdb, configuration_manager, infrastructure_manager, integration, os, support
+- **Roles Affected**: scenario_ansible_cmdb_core, ansible_dev_node_configuration_manager, platform_infrastructure_manager, integration_generic, os_generic, ansible_dev_node_support
 - **Status**: ✓ RESOLVED
 - **Solution**: Created wrapper main.yml files for each role
 - **Impact**: All supporting roles now callable via include_role
 - **Testing**: All syntax checked and verified
 
 ### Issue 3: Missing Product Role Main.yml (3 roles)
-- **Type**: Missing orchestration layer
+- **Type**: Missing ansible_dev_node_orchestration layer
 - **Severity**: CRITICAL
 - **Products Affected**: AAP, Satellite, IdM
 - **Status**: ✓ RESOLVED
@@ -149,10 +149,10 @@ FILES_CREATED_AUDIT.md                                               150+ lines
 ### Issue 4: Missing Platform Preparation Tasks (7 tasks)
 - **Type**: Missing dynamic task files
 - **Severity**: HIGH
-- **Platforms Affected**: libvirt, baremetal, aws, azure, gcp, vmware, nutanix
+- **Platforms Affected**: libvirt, baremetal, aws, azure, gcp, platform_vmware, platform_nutanix
 - **Status**: ✓ RESOLVED
 - **Solution**: Created prepare_{{ platform }}.yml files
-- **Impact**: All platform-specific provisioning tasks now available
+- **Impact**: All platform-specific platform_provisioning tasks now available
 - **Testing**: Files created with proper validation logic
 
 ### Issue 5: Missing Installation Method Tasks (2 tasks)
@@ -169,7 +169,7 @@ FILES_CREATED_AUDIT.md                                               150+ lines
 - **Severity**: CRITICAL
 - **Status**: ✓ RESOLVED
 - **Solution**: Wrapper pattern implemented consistently across all subrole-based roles
-- **Impact**: Unified orchestration approach throughout codebase
+- **Impact**: Unified ansible_dev_node_orchestration approach throughout codebase
 
 ### Issue 7: Reference Resolution
 - **Type**: Broken variable references
@@ -184,12 +184,12 @@ FILES_CREATED_AUDIT.md                                               150+ lines
 
 ### Syntax Validation
 - ✓ site.yml - VALID
-- ✓ orchestration.yml - VALID
+- ✓ ansible_dev_node_orchestration.yml - VALID
 - ✓ All new role task files - VALID
 - ✓ All dynamic task files - VALID
 
 ### Reference Validation
-- ✓ orchestration_master → includes 15+ roles - ALL RESOLVE
+- ✓ ansible_dev_node_orchestration_master → includes 15+ roles - ALL RESOLVE
 - ✓ {{ deployment_platform }} → 7 platforms defined - ALL RESOLVE
 - ✓ {{ install_method }} → 2 methods defined - ALL RESOLVE
 - ✓ Product roles → 3 roles callable - ALL RESOLVE
@@ -205,7 +205,7 @@ FILES_CREATED_AUDIT.md                                               150+ lines
 
 ### Architecture Validation
 - ✓ Orchestration layer consistent
-- ✓ Platform provisioning layer complete
+- ✓ Platform platform_provisioning layer complete
 - ✓ Product deployment layer complete
 - ✓ Support services layer complete
 - ✓ Integration layer complete
@@ -222,16 +222,16 @@ FILES_CREATED_AUDIT.md                                               150+ lines
 2. ✓ aap_only - Ansible Automation Platform only
 3. ✓ idm_only - Red Hat Identity Management only
 4. ✓ openshift_only - OpenShift Container Platform only
-5. ✓ satellite_aap - Satellite + AAP integration
-6. ✓ satellite_idm - Satellite + IdM integration
-7. ✓ satellite_openshift - Satellite + OpenShift integration
-8. ✓ aap_idm - AAP + IdM integration
-9. ✓ aap_openshift - AAP + OpenShift integration
-10. ✓ idm_openshift - IdM + OpenShift integration
-11. ✓ satellite_aap_idm - 3-product integration
-12. ✓ satellite_aap_openshift - 3-product integration
-13. ✓ satellite_idm_openshift - 3-product integration
-14. ✓ aap_idm_openshift - 3-product integration
+5. ✓ satellite_aap - Satellite + AAP integration_generic
+6. ✓ satellite_idm - Satellite + IdM integration_generic
+7. ✓ satellite_openshift - Satellite + OpenShift integration_generic
+8. ✓ aap_idm - AAP + IdM integration_generic
+9. ✓ aap_openshift - AAP + OpenShift integration_generic
+10. ✓ idm_openshift - IdM + OpenShift integration_generic
+11. ✓ satellite_aap_idm - 3-product integration_generic
+12. ✓ satellite_aap_openshift - 3-product integration_generic
+13. ✓ satellite_idm_openshift - 3-product integration_generic
+14. ✓ aap_idm_openshift - 3-product integration_generic
 15. ✓ satellite_aap_idm_openshift - Complete stack
 
 ### Platforms (7 total)
@@ -240,8 +240,8 @@ FILES_CREATED_AUDIT.md                                               150+ lines
 3. ✓ aws - Amazon Web Services EC2
 4. ✓ azure - Microsoft Azure VMs
 5. ✓ gcp - Google Cloud Platform
-6. ✓ vmware - VMware vCenter environments
-7. ✓ nutanix - Nutanix HCI environments
+6. ✓ platform_vmware - VMware vCenter environments
+7. ✓ platform_nutanix - Nutanix HCI environments
 
 ### Products (4 total)
 1. ✓ Satellite 6.18 - Systems management
@@ -261,7 +261,7 @@ FILES_CREATED_AUDIT.md                                               150+ lines
 - **Files Created**: 18
 - **Lines of Code**: 828
 - **Average File Size**: 46 lines
-- **Largest File**: 99 lines (satellite main.yml)
+- **Largest File**: 99 lines (scenario_satellite main.yml)
 - **Documentation Lines**: 550+
 
 ### Coverage
@@ -298,9 +298,9 @@ FILES_CREATED_AUDIT.md                                               150+ lines
 
 ### Immediate (Ready to Execute)
 1. **Integration Testing**
-   - Execute orchestration_master with test scenario
+   - Execute ansible_dev_node_orchestration_master with test scenario
    - Validate scenario selection and routing
-   - Verify platform provisioning flow
+   - Verify platform platform_provisioning flow
 
 2. **Single Scenario Testing**
    - Test satellite_only deployment
@@ -308,7 +308,7 @@ FILES_CREATED_AUDIT.md                                               150+ lines
    - Test one multi-product scenario
 
 3. **Platform Testing**
-   - Verify libvirt provisioning flow
+   - Verify libvirt platform_provisioning flow
    - Verify platform-specific task execution
    - Test one cloud platform
 

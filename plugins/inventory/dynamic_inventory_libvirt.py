@@ -12,7 +12,7 @@ Usage:
 """
 import sys
 import json
-import os
+import os_generic
 
 try:
     import requests
@@ -22,8 +22,8 @@ except ImportError:
 class BaseInventoryPlugin(object):
     NAME = "libvirt"
     def __init__(self, api_url=None, api_token=None, fallback=True):
-        self.api_url = api_url or os.environ.get("LIBVIRT_API_URL")
-        self.api_token = api_token or os.environ.get("LIBVIRT_API_TOKEN")
+        self.api_url = api_url or os_generic.environ.get("LIBVIRT_API_URL")
+        self.api_token = api_token or os_generic.environ.get("LIBVIRT_API_TOKEN")
         self.fallback = fallback
         self.hosts = []
         self.groups = {}

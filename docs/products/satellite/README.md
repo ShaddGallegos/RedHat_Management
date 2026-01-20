@@ -2,16 +2,16 @@
 
 ## Synopsis
 
-Red Hat Satellite is a systems management platform that provides visibility and control over your Red Hat infrastructure. Satellite 6.18 enables:
+Red Hat Satellite is a systems management platform that provides visibility and control over your Red Hat platform_infrastructure_core. Satellite 6.18 enables:
 
 - **Patch Management** - Automated updates and patch deployment
 - **Content Management** - Synchronized content repositories
-- **Provisioning** - Automated system provisioning (PXE, image-based)
+- **Provisioning** - Automated system platform_provisioning (PXE, image-based)
 - **Compliance** - Configuration and security compliance monitoring
 - **Remote Execution** - Job execution across managed systems
 - **Subscription Management** - License and subscription tracking
 
-Deployed via RHIS, Satellite acts as the content and lifecycle management hub for all Red Hat products in your infrastructure.
+Deployed via RHIS, Satellite acts as the content and lifecycle management hub for all Red Hat products in your platform_infrastructure_core.
 
 ---
 
@@ -26,18 +26,18 @@ Deployed via RHIS, Satellite acts as the content and lifecycle management hub fo
 ### 1. Configure Inventory
 Update `inventory/hosts`:
 ```ini
-[satellite]
-satellite.example.com
+[scenario_satellite]
+scenario_satellite.example.com
 
-[satellite:vars]
+[scenario_satellite:vars]
 satellite_admin_user=admin
 satellite_admin_password=SecurePass123
-satellite_hostname=satellite.example.com
+satellite_hostname=scenario_satellite.example.com
 satellite_domain=example.com
 ```
 
 ### 2. Configure Settings
-Edit `group_vars/satellite.yml`:
+Edit `group_vars/scenario_satellite.yml`:
 ```yaml
 satellite_version: "6.18"
 satellite_org: "Default Organization"
@@ -47,11 +47,11 @@ satellite_admin_email: "admin@example.com"
 
 ### 3. Deploy Satellite
 ```bash
-ansible-playbook redhat_management-site.yml -t satellite
+ansible-playbook redhat_management-site.yml -t scenario_satellite
 ```
 
 ### 4. Access Satellite
-- **URL**: https://satellite.example.com
+- **URL**: https://scenario_satellite.example.com
 - **Username**: admin
 - **Password**: (from group_vars)
 
@@ -67,28 +67,28 @@ ansible-playbook redhat_management-site.yml -t satellite
 yum update -y
 
 # Install required packages
-yum install -y satellite-server satellite-cli
+yum install -y scenario_satellite-server scenario_satellite-cli
 
 # Configure firewall
-firewall-cmd --permanent --add-service=satellite-server
+firewall-cmd --permanent --add-service=scenario_satellite-server
 firewall-cmd --permanent --add-port=5646/tcp
 firewall-cmd --permanent --add-port=5647/tcp
 firewall-cmd --reload
 
 # Prepare storage
-lvcreate -L 500G -n satellite /dev/vg_name
-mkfs.xfs /dev/vg_name/satellite
-mkdir -p /var/lib/satellite
-mount /dev/vg_name/satellite /var/lib/satellite
+lvcreate -L 500G -n scenario_satellite /dev/vg_name
+mkfs.xfs /dev/vg_name/scenario_satellite
+mkdir -p /var/lib/scenario_satellite
+mount /dev/vg_name/scenario_satellite /var/lib/scenario_satellite
 ```
 
 #### Step 2: Pre-Installation Configuration
-Create `/usr/lib/python3/site-packages/satellite/settings.yaml`:
+Create `/usr/lib/python3/site-packages/scenario_satellite/settings.yaml`:
 ```yaml
 ---
-satellite:
+scenario_satellite:
   server:
-    hostname: satellite.example.com
+    hostname: scenario_satellite.example.com
     domain: example.com
     
   database:
@@ -99,7 +99,7 @@ satellite:
     username: foreman
     
   storage:
-    path: /var/lib/satellite
+    path: /var/lib/scenario_satellite
     size_gb: 500
     
   admin:
@@ -117,25 +117,25 @@ ansible-playbook -i inventory/hosts \
 
 # Or full playbook
 ansible-playbook redhat_management-site.yml \
-  -e "deployment_scenario=satellite" \
-  --tags satellite
+  -e "deployment_scenario=scenario_satellite" \
+  --tags scenario_satellite
 ```
 
 #### Step 4: Post-Installation Configuration
 ```bash
 # Initialize Satellite
-satellite-installer --scenario satellite \
+scenario_satellite-installer --scenario scenario_satellite \
   --foreman-initial-admin-username admin \
   --foreman-initial-admin-password "SecurePass123" \
   --foreman-initial-organization "Default Organization" \
   --foreman-initial-location "Default Location"
 
 # Configure subscriptions
-satellite-manage-repos --enable rhel-*-satellite-6.18-*
+scenario_satellite-manage-repos --enable rhel-*-scenario_satellite-6.18-*
 yum update -y
 
 # Sync content
-satellite-sync --all
+scenario_satellite-sync --all
 ```
 
 #### Step 5: Verification
@@ -149,7 +149,7 @@ systemctl status postgresql
 sudo -u postgres psql -l | grep foreman
 
 # Test API
-curl -k https://satellite.example.com/api/v2/status \
+curl -k https://scenario_satellite.example.com/api/v2/status \
   -u admin:password
 ```
 
@@ -177,7 +177,7 @@ vault_satellite_ssh_key: |
 - name: Sync Satellite Inventory to Ansible
   hosts: localhost
   vars:
-    satellite_url: "https://satellite.example.com"
+    satellite_url: "https://scenario_satellite.example.com"
     satellite_user: "admin"
     satellite_password: "{{ vault_satellite_admin_password }}"
   
@@ -199,7 +199,7 @@ vault_satellite_ssh_key: |
 
 ### 3. Content Management
 ```yaml
-# group_vars/satellite.yml
+# group_vars/scenario_satellite.yml
 satellite_repositories:
   - name: "rhel-9-for-x86_64-baseos-rpms"
     organization: "Default Organization"
@@ -209,7 +209,7 @@ satellite_repositories:
     organization: "Default Organization"
     enabled: true
   
-  - name: "satellite-tools-6.18-for-rhel-9-x86_64-rpms"
+  - name: "scenario_satellite-tools-6.18-for-rhel-9-x86_64-rpms"
     organization: "Default Organization"
     enabled: true
 
@@ -223,7 +223,7 @@ satellite_sync_schedule: "0 2 * * *"  # 2 AM daily
 - name: Provision Host via Satellite
   hosts: localhost
   vars:
-    satellite_url: "https://satellite.example.com"
+    satellite_url: "https://scenario_satellite.example.com"
     host_group: "Production/Linux"
     compute_resource: "libvirt"
   
@@ -257,28 +257,28 @@ tar -czf /backup/satellite_config_$(date +%Y%m%d).tar.gz \
   /etc/foreman/ /var/lib/pulp/
 
 # 3. Check upgrade path
-satellite-installer --version
+scenario_satellite-installer --version
 ```
 
 ### Upgrade Process
 ```bash
 # Update packages
-yum update -y satellite-*
+yum update -y scenario_satellite-*
 
 # Run installer to apply changes
-satellite-installer --scenario satellite
+scenario_satellite-installer --scenario scenario_satellite
 
 # Verify upgrade
-satellite-installer --list-tuning
+scenario_satellite-installer --list-tuning
 
 # Check status
-satellite-admin status
+scenario_satellite-admin status
 ```
 
 ### Verify After Upgrade
 ```bash
 # Test API
-curl -k https://satellite.example.com/api/v2/status
+curl -k https://scenario_satellite.example.com/api/v2/status
 
 # Check database integrity
 psql foreman -c "SELECT * FROM users LIMIT 1;"
@@ -296,7 +296,7 @@ systemctl status httpd
 ```yaml
 ---
 - name: Add RHEL 9 AppStream Repository
-  hosts: satellite
+  hosts: scenario_satellite
   
   tasks:
     - name: Create Product
@@ -324,7 +324,7 @@ systemctl status httpd
 #!/bin/bash
 # scripts/bash/create_satellite_activation_key.sh
 
-SATELLITE_URL="https://satellite.example.com"
+SATELLITE_URL="https://scenario_satellite.example.com"
 ORG="Default Organization"
 LIFETIME_DAYS=365
 
@@ -344,7 +344,7 @@ hammer activation-key add-subscription \
 ```yaml
 ---
 - name: Provision Host via Satellite PXE
-  hosts: satellite
+  hosts: scenario_satellite
   
   vars:
     new_hostname: "webserver-prod-01"
@@ -371,7 +371,7 @@ hammer activation-key add-subscription \
       pause:
         minutes: 5
       
-    - name: Verify host provisioning
+    - name: Verify host platform_provisioning
       shell: >
         hammer host info --name {{ new_hostname }}
         --organization "Default Organization"
@@ -420,7 +420,7 @@ class SatelliteSync:
 
 # Usage
 sync = SatelliteSync(
-    "https://satellite.example.com",
+    "https://scenario_satellite.example.com",
     "admin",
     "password"
 )
@@ -446,7 +446,7 @@ sync.sync_all()
         inputs:
           - name: command
             input_type: String
-        server_url: "https://satellite.example.com"
+        server_url: "https://scenario_satellite.example.com"
         username: admin
         password: "{{ vault_satellite_admin_password }}"
     
@@ -472,7 +472,7 @@ journalctl -u foreman
 psql -U foreman foreman -c "SELECT 1"
 
 # Check disk space
-df -h /var/lib/satellite
+df -h /var/lib/scenario_satellite
 ```
 
 ### Issue: Content Sync Fails

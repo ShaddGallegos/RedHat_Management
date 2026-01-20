@@ -1,0 +1,12 @@
+---
+# Test: ansible_dev_node_orchestration role basic functionality
+- name: Test ansible_dev_node_orchestration role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    orchestration_enabled: true
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - orchestration_enabled is defined

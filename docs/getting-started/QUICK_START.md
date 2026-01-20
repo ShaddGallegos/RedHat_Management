@@ -27,7 +27,7 @@ mkdir -p ~/.ansible/conf && cp env.yml.example ~/.ansible/conf/env.yml
 vi ~/.ansible/conf/env.yml
 
 # Key variables to set:
-# - deployment_scenario: satellite-only, aap-only, or full-stack
+# - deployment_scenario: scenario_satellite-only, aap-only, or full-stack
 # - infrastructure_platform: libvirt, aws, azure, gcp
 # - network configuration: IP ranges, DNS, etc.
 ```
@@ -66,7 +66,7 @@ ansible all -m ping
 
 # Access deployed systems
 # AAP: https://aap-host
-# Satellite: https://satellite-host
+# Satellite: https://scenario_satellite-host
 # IdM: https://idm-host
 ```
 
@@ -76,10 +76,10 @@ ansible all -m ping
 
 ```bash
 # Set scenario in your local ~/.ansible/conf/env.yml
-deployment_scenario: satellite-only
+deployment_scenario: scenario_satellite-only
 
 # Deploy
-ansible-playbook redhat_management-site.yml -t satellite
+ansible-playbook redhat_management-site.yml -t scenario_satellite
 ```
 
 ### Scenario: AAP-Only  

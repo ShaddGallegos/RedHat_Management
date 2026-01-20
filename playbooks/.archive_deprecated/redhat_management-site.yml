@@ -1,7 +1,7 @@
 ---
 # Red Hat Management Framework - Interactive Deployment
 # This is the single entry point for all deployments using consolidated roles
-# All playbooks have been consolidated into this orchestration structure
+# All playbooks have been consolidated into this ansible_dev_node_orchestration structure
 
 - name: Red Hat Management Framework - Setup & Deployment
   hosts: localhost
@@ -28,17 +28,17 @@
   tasks:
     - name: Step 1 - Interactive Configuration Setup
       ansible.builtin.include_role:
-        name: deployment_setup
+        name: ansible_dev_node_deployment_setup
       vars:
         setup_mode: interactive
     
     - name: Step 2 - Generate Deployment Inventory
       ansible.builtin.include_role:
-        name: inventory_generator
+        name: ansible_dev_node_inventory_generator
     
     - name: Step 3 - Prepare Infrastructure
       ansible.builtin.include_role:
-        name: infrastructure_prep
+        name: platform_infrastructure_prep
       when: deployment_platform == "libvirt"
     
     - name: Step 4 - Deploy Components
@@ -47,10 +47,10 @@
       loop: "{{ deployment_components }}"
       vars:
         component_version:
-          satellite: 6_18
+          scenario_satellite: 6_18
           aap: 2_6
           idm: latest
-          openshift: 4_21
+          scenario_openshift: 4_21
   
   post_tasks:
     - name: Display completion summary
@@ -60,8 +60,8 @@
           Deployment Complete
 
           Access Points:
-          - ansible-cmdb:  http://localhost:8081
-          - Satellite:     https://satellite.example.com
+          - ansible-scenario_ansible_cmdb_core:  http://localhost:8081
+          - Satellite:     https://scenario_satellite.example.com
           - AAP:           https://controller.example.com
           - IdM:           https://idm.example.com
           - OpenShift:     https://console.apps.example.com

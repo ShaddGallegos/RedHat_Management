@@ -103,7 +103,7 @@ gcloud compute instances create aap-controller \
   --metadata=enable-oslogin=TRUE
 
 # Create Satellite instance
-gcloud compute instances create satellite \
+gcloud compute instances create scenario_satellite \
   --zone=us-central1-a \
   --machine-type=n2-standard-16 \
   --network-interface=network=rhis-network,subnet=rhis-management \
@@ -149,14 +149,14 @@ IdM:
 
 ```bash
 # Create disk for Satellite repos
-gcloud compute disks create satellite-repos \
+gcloud compute disks create scenario_satellite-repos \
   --size=1000GB \
   --zone=us-central1-a \
   --type=pd-ssd
 
 # Attach to Satellite instance
-gcloud compute instances attach-disk satellite \
-  --disk=satellite-repos \
+gcloud compute instances attach-disk scenario_satellite \
+  --disk=scenario_satellite-repos \
   --zone=us-central1-a
 
 # Create disk for AAP data
@@ -328,7 +328,7 @@ gcloud dns record-sets create aap.example.com. \
   --zone=rhis-zone
 
 # Create A record for Satellite
-gcloud dns record-sets create satellite.example.com. \
+gcloud dns record-sets create scenario_satellite.example.com. \
   --rrdatas=10.0.1.20 \
   --ttl=300 \
   --type=A \

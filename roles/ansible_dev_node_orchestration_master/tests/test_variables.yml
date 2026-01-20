@@ -1,0 +1,17 @@
+---
+# Test: ansible_dev_node_orchestration_master role variables validation
+- name: Test ansible_dev_node_orchestration_master variable validation
+  hosts: localhost
+  gather_facts: false
+  vars:
+    orchestration_master_enabled: true
+    deployment_scenario: "satellite_aap"
+    deployment_platform: "libvirt"
+  tasks:
+    - name: Validate variable types
+      assert:
+        that:
+          - orchestration_master_enabled is boolean
+          - deployment_scenario is string
+          - deployment_platform is string
+        fail_msg: "Variable types invalid"

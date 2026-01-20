@@ -23,10 +23,10 @@ sudo subscription-manager register
 sudo subscription-manager attach --pool=<pool-id>
 
 # Enable Satellite repositories
-sudo subscription-manager repos --enable=rhel-*-satellite-6.18-*-rpms
+sudo subscription-manager repos --enable=rhel-*-scenario_satellite-6.18-*-rpms
 
 # Install Satellite packages
-sudo yum install -y satellite satellite-cli
+sudo yum install -y scenario_satellite scenario_satellite-cli
 ```
 
 ### 2. Firewall Configuration
@@ -62,11 +62,11 @@ sudo systemctl start postgresql
 
 ```bash
 # Start installer
-sudo satellite-installer
+sudo scenario_satellite-installer
 
 # Or with options
-sudo satellite-installer \
-  --scenario satellite \
+sudo scenario_satellite-installer \
+  --scenario scenario_satellite \
   --foreman-initial-admin-username admin \
   --foreman-initial-admin-password SecurePassword123! \
   --foreman-admin-email admin@example.com \
@@ -81,7 +81,7 @@ Installation takes 30-60 minutes:
 
 ```bash
 # Watch installer progress
-sudo tail -f /var/log/foreman-installer/satellite.log
+sudo tail -f /var/log/foreman-installer/scenario_satellite.log
 
 # Check services
 sudo systemctl status tomcat foreman postgresql foreman-proxy
@@ -91,7 +91,7 @@ sudo systemctl status tomcat foreman postgresql foreman-proxy
 
 ### 1. Access Satellite
 
-- URL: `https://satellite.example.com`
+- URL: `https://scenario_satellite.example.com`
 - Username: `admin`
 - Password: Set during installation
 
@@ -100,18 +100,18 @@ sudo systemctl status tomcat foreman postgresql foreman-proxy
 #### Configure Organizations & Locations
 
 ```bash
-satellite-cli \
+scenario_satellite-cli \
   --username admin \
   --password <password> \
   organization create \
   --name "Default Organization" \
-  --url https://satellite.example.com
+  --url https://scenario_satellite.example.com
 ```
 
 #### Create Activation Keys
 
 ```bash
-satellite-cli \
+scenario_satellite-cli \
   --username admin \
   activation-key create \
   --name "rhel8-key" \
@@ -191,7 +191,7 @@ On managed systems:
 
 ```bash
 # Download activation key
-wget https://satellite.example.com/pub/katello-ca-consumer-latest.noarch.rpm
+wget https://scenario_satellite.example.com/pub/katello-ca-consumer-latest.noarch.rpm
 sudo rpm -Uvh katello-ca-consumer-latest.noarch.rpm
 
 # Register
@@ -239,7 +239,7 @@ In AAP Controller:
 
 1. **Inventories** → **Create Inventory**
 2. **Source**: Red Hat Satellite 6
-3. **Host**: satellite.example.com
+3. **Host**: scenario_satellite.example.com
 4. **Organization**: Default
 5. **Update on Launch**: Yes
 
@@ -276,7 +276,7 @@ Edit `/etc/foreman/settings.yaml`:
 
 ```yaml
 # Increase RAM for Java
-:foreman_url: https://satellite.example.com
+:foreman_url: https://scenario_satellite.example.com
 :facts_cache_enabled: true
 :search_duration: 3600
 ```
@@ -293,17 +293,17 @@ Edit `/etc/foreman/settings.yaml`:
 
 ```bash
 # Full backup
-sudo satellite-backup --verbose /mnt/backup/
+sudo scenario_satellite-backup --verbose /mnt/backup/
 
 # Incremental backup
-sudo satellite-backup --incremental /mnt/backup/
+sudo scenario_satellite-backup --incremental /mnt/backup/
 ```
 
 ### Restore
 
 ```bash
 # Restore from backup
-sudo satellite-restore --verbose /mnt/backup/satellite-backup-*.tar.gz
+sudo scenario_satellite-restore --verbose /mnt/backup/scenario_satellite-backup-*.tar.gz
 ```
 
 ## Satellite Integration with IdM
@@ -326,13 +326,13 @@ ldap_group_base: cn=groups,cn=accounts,dc=example,dc=com
 
 ```bash
 # Check for updates
-sudo yum check-update satellite
+sudo yum check-update scenario_satellite
 
 # Apply updates
-sudo yum update -y satellite
+sudo yum update -y scenario_satellite
 
 # Run installer again
-sudo satellite-installer
+sudo scenario_satellite-installer
 ```
 
 ### Clean Up Old Packages

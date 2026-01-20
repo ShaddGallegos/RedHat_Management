@@ -6,7 +6,7 @@
 
 ## Completed Components
 
-### ✅ Role: services_provisioning_stack
+### ✅ Role: platform_services_provisioning_stack
 - [x] Meta configuration (`meta/main.yml`)
 - [x] Defaults with 100+ configuration variables (`defaults/main.yml`)
 - [x] Main tasks for service deployment (`tasks/main.yml`)
@@ -43,8 +43,8 @@
 - [x] Nameserver options configured
 - [x] NTP server options configured
 - [x] NetBIOS nameserver options configured
-- [x] Static host reservations (satellite, idm, aap)
-- [x] PXE boot integration (next-server, filename)
+- [x] Static host reservations (scenario_satellite, idm, aap)
+- [x] PXE boot integration_generic (next-server, filename)
 - [x] Lease time configuration (24 hours)
 - [x] DHCP leases file initialization
 - [x] Service start on boot
@@ -67,7 +67,7 @@
 - [x] Zone file creation
 - [x] SOA records configured
 - [x] NS records configured
-- [x] A records for hosts (satellite, idm, aap)
+- [x] A records for hosts (scenario_satellite, idm, aap)
 - [x] CNAME records
 - [x] SRV records (_ldap, _kerberos)
 - [x] Query logging enabled
@@ -112,7 +112,7 @@
 - [x] System Reboot option
 - [x] System Power Off option
 - [x] Kernel parameters (net.ifnames, biosdevname)
-- [x] Kickstart URL integration
+- [x] Kickstart URL integration_generic
 - [x] Console options (tty0, ttyS0,115200n8)
 
 ### ✅ Secondary Network Interface
@@ -218,11 +218,11 @@
 ### ✅ Satellite Integration
 - [x] Provisioning service roles defined
 - [x] Playbooks compatible with site.yml
-- [x] Host inventory integration ready
+- [x] Host inventory integration_generic ready
 - [x] Group variables applicable
 
 ### ✅ Network Infrastructure Integration
-- [x] 10.168.0.0/16 subnet provisioning
+- [x] 10.168.0.0/16 subnet platform_provisioning
 - [x] DNS resolution for network hosts
 - [x] DHCP for automatic IP allocation
 - [x] PXE boot for system deployment
@@ -230,15 +230,15 @@
 ### ✅ RHIS Stack Integration
 - [x] Compatible with satellite_6_18_deployment
 - [x] Compatible with satellite_content_config
-- [x] Compatible with satellite_lifecycle_config
-- [x] Compatible with satellite_activation_config
+- [x] Compatible with scenario_satellite_lifecycle_config
+- [x] Compatible with scenario_satellite_activation_config
 - [x] Ready for post-boot AAP automation
 
 ## File Summary
 
 ### Role Files: 15 total
 ```
-roles/services_provisioning_stack/
+roles/platform_services_provisioning_stack/
 ├── meta/main.yml                        (30 lines)
 ├── defaults/main.yml                   (130+ lines)
 ├── tasks/main.yml                      (250+ lines)
@@ -283,7 +283,7 @@ docs/
 
 ### Phase 1: Preparation
 - [x] Review configuration defaults
-- [x] Update inventory with satellite host
+- [x] Update inventory with scenario_satellite host
 - [x] Configure secondary interface (eth1)
 
 ### Phase 2: Deployment
@@ -299,7 +299,7 @@ docs/
 
 ### Phase 4: Integration
 - [x] Integrate with Satellite
-- [x] Configure provisioning templates
+- [x] Configure platform_provisioning templates
 - [x] Set up kickstart synchronization
 
 ### Phase 5: Production
@@ -319,7 +319,7 @@ ansible-playbook playbooks/provisioning_services_setup.yml \
 # Verify deployment
 systemctl status dhcpd named xinetd
 cat /etc/resolv.conf
-dig @10.168.0.1 satellite.prod.spg.example.com
+dig @10.168.0.1 scenario_satellite.prod.spg.example.com
 ```
 
 ## Verification Checklist
@@ -330,7 +330,7 @@ dig @10.168.0.1 satellite.prod.spg.example.com
 - [x] TFTP service running and listening on 69/UDP
 - [x] Resolv.conf contains nameserver 10.168.0.1
 - [x] Resolv.conf contains options rotate
-- [x] Firewall rules allow all provisioning services
+- [x] Firewall rules allow all platform_provisioning services
 - [x] DHCP clients get IPs from correct range
 - [x] DNS queries resolve correctly
 - [x] TFTP bootloader downloads correctly
@@ -346,10 +346,10 @@ None identified. All services operational and tested.
 - [ ] Add secondary DNS server failover
 - [ ] Implement DHCP failover pair
 - [ ] Add TFTP load balancing
-- [ ] IPv6 dual-stack support
+- [ ] IPv6 dual-stack ansible_dev_node_support
 - [ ] IPMI boot options in PXE
 - [ ] Custom kickstart generation
-- [ ] Real-time provisioning dashboard
+- [ ] Real-time platform_provisioning dashboard
 - [ ] Automated backup scheduling
 
 ## Sign-Off
@@ -361,4 +361,4 @@ None identified. All services operational and tested.
 **Documentation**: Complete  
 **Integration**: Ready  
 
-All provisioning services (DHCP, DNS, PXE, TFTP) are fully configured, documented, and ready for automated system provisioning on the 10.168.0.0/16 network.
+All platform_provisioning services (DHCP, DNS, PXE, TFTP) are fully configured, documented, and ready for automated system platform_provisioning on the 10.168.0.0/16 network.

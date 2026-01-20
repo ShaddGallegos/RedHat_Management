@@ -9,19 +9,19 @@ Inventory plugins and examples now live in `plugins/inventory/`.
 - libvirt_inventory.yml (example)
 
 Role-to-inventory examples (under `roles/<role>/inventory/`):
-- satellite               -> satellite_inventory.yml (plugin: satellite_inventory)
-- ansible_automation_platform -> aap_inventory.yml (static/example)
-- openshift               -> openshift_inventory.yml (static/example)
-- nutanix                 -> nutanix_inventory.yml (plugin: nutanix_dynamic)
-- servicenow              -> servicenow_inventory.yml (plugin: servicenow_inventory)
-- vmware                  -> vmware_inventory.yml (plugin: vmware_inventory)
+- scenario_satellite               -> satellite_inventory.yml (plugin: satellite_inventory)
+- scenario_aap_platform -> aap_inventory.yml (static/example)
+- scenario_openshift               -> openshift_inventory.yml (static/example)
+- platform_nutanix                 -> nutanix_inventory.yml (plugin: nutanix_dynamic)
+- integration_servicenow              -> servicenow_inventory.yml (plugin: servicenow_inventory)
+- platform_vmware                  -> vmware_inventory.yml (plugin: vmware_inventory)
 - libvirt                 -> libvirt_inventory.yml (plugin: dynamic_inventory_libvirt)
 - aws                     -> aws_inventory.yml (plugin: amazon.aws.aws_ec2)
 - azure                   -> azure_inventory.yml (plugin: azure.azcollection.azure_rm)
-- windows                 -> windows_inventory.yml (static/example)
+- os_windows                 -> windows_inventory.yml (static/example)
 - rhel                    -> rhel_inventory.yml (static/example)
-- linux_other             -> linux_other_inventory.yml (static/example)
-- updates_and_patching    -> updates_and_patching_inventory.yml (static/example)
+- os_rhel_other             -> linux_other_inventory.yml (static/example)
+- os_rhel_updates_and_patching    -> updates_and_patching_inventory.yml (static/example)
 
 If you add new dynamic inventory scripts per product, place them here and reference from ansible.cfg.
 ansible.cfg is configured with:

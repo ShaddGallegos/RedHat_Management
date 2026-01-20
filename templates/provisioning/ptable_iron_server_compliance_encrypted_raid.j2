@@ -14,7 +14,7 @@ clearpart --all
 # The system will reencrypt the drive with a secret key on reboot
 ## This was written for ceph storage nodes containing 24 disks.
 
-<% if @host.provider.downcase == 'vmware' %>
+<% if @host.provider.downcase == 'platform_vmware' %>
 
 ignoredisk --only-use=sda,sdb
 ## partitions for /boot

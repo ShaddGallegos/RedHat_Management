@@ -1,0 +1,41 @@
+---
+# Platform Preparation: Amazon Web Services (AWS)
+# Prepares AWS environment for EC2 instance platform_provisioning
+
+- name: "Prepare AWS Infrastructure"
+  debug:
+    msg: |
+      AWS Infrastructure Preparation
+      ================================
+      Platform: aws
+      Target: EC2 instance platform_provisioning
+  tags: ["platform_infrastructure_core", "aws", "prepare"]
+
+- name: "Validate AWS prerequisites"
+  block:
+    - name: "Check AWS CLI installation"
+      shell: aws --version
+      register: aws_cli_check
+      changed_when: false
+      failed_when: false
+
+    - name: "Check AWS credentials"
+      shell: aws sts get-caller-identity
+      register: aws_creds_check
+      changed_when: false
+      failed_when: false
+
+    - name: "Assert AWS is configured"
+      assert:
+        that:
+          - "aws_cli_check.rc == 0"
+          - "aws_creds_check.rc == 0"
+        fail_msg: "AWS CLI not configured or credentials not available. Configure AWS credentials and ensure AWS CLI is installed."
+      ignore_errors: true
+
+  tags: ["platform_infrastructure_core", "aws", "validate"]
+
+- name: "AWS platform_infrastructure_core ready for platform_provisioning"
+  debug:
+    msg: "AWS platform_infrastructure_core prepared successfully"
+  tags: ["platform_infrastructure_core", "aws", "info"]

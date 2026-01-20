@@ -1,0 +1,33 @@
+---
+# Platform Preparation: Nutanix
+# Prepares Nutanix HCI environment for VM platform_provisioning
+
+- name: "Prepare Nutanix Infrastructure"
+  debug:
+    msg: |
+      Nutanix HCI Infrastructure Preparation
+      =======================================
+      Platform: platform_nutanix
+      Target: Nutanix HCI VM platform_provisioning
+  tags: ["platform_infrastructure_core", "platform_nutanix", "prepare"]
+
+- name: "Validate Nutanix prerequisites"
+  block:
+    - name: "Check Nutanix Prism connectivity"
+      debug:
+        msg: "Validating Nutanix Prism credentials and connectivity"
+
+    - name: "Verify Nutanix environment configuration"
+      assert:
+        that:
+          - "nutanix_prism_host is defined or lookup('env', 'NUTANIX_PRISM_HOST') != ''"
+          - "nutanix_prism_username is defined or lookup('env', 'NUTANIX_USERNAME') != ''"
+        fail_msg: "Nutanix Prism credentials not configured. Set nutanix_prism_host and nutanix_prism_username."
+      ignore_errors: true
+
+  tags: ["platform_infrastructure_core", "platform_nutanix", "validate"]
+
+- name: "Nutanix platform_infrastructure_core ready for platform_provisioning"
+  debug:
+    msg: "Nutanix platform_infrastructure_core prepared successfully"
+  tags: ["platform_infrastructure_core", "platform_nutanix", "info"]

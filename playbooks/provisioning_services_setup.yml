@@ -1,21 +1,21 @@
 ---
 # Provisioning Services Complete Setup Playbook
-# Deploys DHCP, DNS, PXE, and TFTP services on satellite.prod.spg
+# Deploys DHCP, DNS, PXE, and TFTP services on scenario_satellite.prod.spg
 # Secondary ethernet interface: eth1
 # Network: 10.168.0.0/16
 
 - name: Deploy Provisioning Services Stack
-  hosts: satellite
+  hosts: scenario_satellite
   gather_facts: true
   become: true
   
   vars:
-    provisioning_host: "satellite.prod.spg"
+    provisioning_host: "scenario_satellite.prod.spg"
     provisioning_secondary_interface: "eth1"
     provisioning_interface_ip: "10.168.0.1"
   
   roles:
-    - role: services_provisioning_stack
+    - role: platform_services_provisioning_stack
       tags:
         - provisioning_services
         - dhcp
@@ -24,7 +24,7 @@
         - pxe
 
   post_tasks:
-    - name: Display provisioning services summary
+    - name: Display platform_provisioning services summary
       debug:
         msg: |
           
@@ -64,6 +64,6 @@
           ║    • DHCP (67/UDP), DNS (53), TFTP (69/UDP)                    ║
           ║    • PXE (4011/UDP)                                             ║
           ║                                                                    ║
-          ║  Ready for automated system provisioning!                        ║
+          ║  Ready for automated system platform_provisioning!                        ║
           ║                                                                    ║
           ╚════════════════════════════════════════════════════════════════════╝

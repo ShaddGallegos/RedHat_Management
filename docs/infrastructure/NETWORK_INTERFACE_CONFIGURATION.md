@@ -1,12 +1,12 @@
 # Network Interface Configuration
 
-## Dual Network Configuration for satellite.prod.spg
+## Dual Network Configuration for scenario_satellite.prod.spg
 
 ### Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│          satellite.prod.spg (KVM Virtual Machine)       │
+│          scenario_satellite.prod.spg (KVM Virtual Machine)       │
 ├─────────────────────────────────────────────────────────┤
 │                                                         │
 │  ┌──────────────────────────────────────────────────┐  │
@@ -27,7 +27,7 @@
 │  │ • IP Address: 10.168.0.1/16                       │  │
 │  │ • Netmask: 255.255.0.0                            │  │
 │  │ • Gateway: 10.168.0.1 (local)                     │  │
-│  │ • Purpose: DHCP, DNS, TFTP, PXE provisioning     │  │
+│  │ • Purpose: DHCP, DNS, TFTP, PXE platform_provisioning     │  │
 │  │ • Status: Autoconnect enabled                     │  │
 │  │ • Services: DHCP, DNS, TFTP/PXE running here     │  │
 │  └──────────────────────────────────────────────────┘  │
@@ -77,7 +77,7 @@ nmcli connection add type ethernet \
 
 ### Secondary Interface: eth1 (Private - Provisioning Network)
 
-**Purpose**: Internal provisioning services network (10.168.0.0/16)
+**Purpose**: Internal platform_provisioning services network (10.168.0.0/16)
 
 **Configuration**:
 ```yaml
@@ -158,7 +158,7 @@ Client (10.168.x.x)
     ↓ (TFTP port 69)
     → Boot files
     ↓ (HTTP/Kickstart)
-    → Satellite provisioning
+    → Satellite platform_provisioning
 ```
 
 ## Interface Priority and Routing
@@ -169,8 +169,8 @@ Client (10.168.x.x)
 - **Primary**: eth0 route table
 
 ### Static Routes
-- **10.168.0.0/16**: Via eth1 (local provisioning only)
-- **Scope**: Internal provisioning network only
+- **10.168.0.0/16**: Via eth1 (local platform_provisioning only)
+- **Scope**: Internal platform_provisioning network only
 - **Primary**: eth1 route table
 
 ## Network Configuration Files
@@ -277,20 +277,20 @@ ping 10.168.0.1
 cat /etc/resolv.conf
 
 # Test DNS via eth1
-dig @10.168.0.1 satellite.prod.spg.example.com
+dig @10.168.0.1 scenario_satellite.prod.spg.example.com
 ```
 
 ## Dual Network Advantages
 
 1. **Network Isolation**
-   - External traffic separate from internal provisioning
+   - External traffic separate from internal platform_provisioning
    - Security boundary between networks
    - Reduced attack surface
 
 2. **Performance**
    - Provisioning traffic isolated from external traffic
    - No contention for bandwidth
-   - Optimized for provisioning workloads
+   - Optimized for platform_provisioning workloads
 
 3. **Scalability**
    - Independent network management per interface
@@ -298,14 +298,14 @@ dig @10.168.0.1 satellite.prod.spg.example.com
    - Each network can scale independently
 
 4. **Flexibility**
-   - Easy to add more provisioning networks
+   - Easy to add more platform_provisioning networks
    - Can modify eth0 without affecting eth1
    - Independent troubleshooting
 
 5. **Reliability**
    - Provisioning services remain available even if external network issues
-   - No single point of failure for internal provisioning
-   - Can test provisioning independently
+   - No single point of failure for internal platform_provisioning
+   - Can test platform_provisioning independently
 
 ## Configuration Management
 
@@ -384,9 +384,9 @@ ping -I eth1 10.168.0.1     # Internal
 - External resource access
 - System updates and downloads
 
-**eth1**: Internal provisioning network (10.168.0.0/16)
+**eth1**: Internal platform_provisioning network (10.168.0.0/16)
 - Static IP: 10.168.0.1
 - DHCP/DNS/TFTP/PXE services
-- System provisioning via PXE boot
+- System platform_provisioning via PXE boot
 
-Both interfaces autoconnect and operate independently, providing complete isolation between external and provisioning networks.
+Both interfaces autoconnect and operate independently, providing complete isolation between external and platform_provisioning networks.

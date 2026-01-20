@@ -138,7 +138,7 @@ In AAP Controller, create inventory using Satellite plugin:
 
 - **Name**: Satellite Inventory
 - **Plugin**: Red Hat Satellite 6
-- **Server**: satellite.example.com
+- **Server**: scenario_satellite.example.com
 - **Organization**: Default
 - **Verify SSL**: false (for self-signed certs)
 

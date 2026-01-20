@@ -2,7 +2,7 @@
 
 ## Overview
 
-Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseOS installations through Satellite 6.18 provisioning infrastructure.
+Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseOS installations through Satellite 6.18 platform_provisioning platform_infrastructure_core.
 
 ## New Role Created
 
@@ -10,7 +10,7 @@ Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseO
 
 **Location**: `/roles/satellite_kickstart_config/`
 
-**Purpose**: Configure Satellite provisioning templates and kickstart files for RHEL 9/10 deployments
+**Purpose**: Configure Satellite platform_provisioning templates and kickstart files for RHEL 9/10 deployments
 
 ## What's Included
 
@@ -19,8 +19,8 @@ Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseO
 1. **RHEL 9 BaseOS Minimal** (`rhel9-baseos-minimal.ks`)
    - Minimal core packages only
    - LVM disk partitioning
-   - Satellite subscription manager integration
-   - Insights client support
+   - Satellite subscription manager integration_generic
+   - Insights client ansible_dev_node_support
    - Cloud-init enabled
    - Use Case: Minimal server deployments
 
@@ -40,7 +40,7 @@ Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseO
 4. **RHEL 10 Full Stack** (`rhel10-fullstack.ks`)
    - RHEL 10 full stack equivalent
    - Modern Podman v4+ runtime
-   - Use Case: Production servers, container infrastructure
+   - Use Case: Production servers, container platform_infrastructure_core
 
 ## Kickstart Features
 
@@ -82,7 +82,7 @@ Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseO
 **Integration**:
 - ✅ Satellite subscription-manager
 - ✅ Red Hat Insights client
-- ✅ Cloud-init for provisioning
+- ✅ Cloud-init for platform_provisioning
 - ✅ Ansible core compatibility
 
 ## Files Created
@@ -106,11 +106,11 @@ roles/satellite_kickstart_config/
 
 ```yaml
 - name: Configure Satellite Kickstarts
-  hosts: satellite
+  hosts: scenario_satellite
   roles:
     - role: satellite_kickstart_config
       vars:
-        satellite_url: "https://satellite.prod.example.com"
+        satellite_url: "https://scenario_satellite.prod.example.com"
         satellite_username: "admin"
         satellite_password: "{{ vault_satellite_admin_password }}"
         create_provisioning_templates: true
@@ -132,7 +132,7 @@ roles/satellite_kickstart_config/
 - role: satellite_kickstart_config
   vars:
     kickstart_files_path: "/var/www/html/ks"
-    kickstart_web_url: "http://satellite.example.com/ks"
+    kickstart_web_url: "http://scenario_satellite.example.com/ks"
 ```
 
 ## Accessing Kickstart Files
@@ -154,16 +154,16 @@ cat /var/lib/foreman/public/kickstarts/rhel9-fullstack.ks
 
 ```bash
 # RHEL 9 BaseOS Minimal
-curl https://satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks
+curl https://scenario_satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks
 
 # RHEL 10 BaseOS Minimal
-curl https://satellite.example.com/pub/kickstarts/rhel10-baseos-minimal.ks
+curl https://scenario_satellite.example.com/pub/kickstarts/rhel10-baseos-minimal.ks
 
 # RHEL 9 Full Stack
-curl https://satellite.example.com/pub/kickstarts/rhel9-fullstack.ks
+curl https://scenario_satellite.example.com/pub/kickstarts/rhel9-fullstack.ks
 
 # RHEL 10 Full Stack
-curl https://satellite.example.com/pub/kickstarts/rhel10-fullstack.ks
+curl https://scenario_satellite.example.com/pub/kickstarts/rhel10-fullstack.ks
 ```
 
 ## Integration with RHIS Stack
@@ -181,22 +181,22 @@ Phase 2: Content Infrastructure
    └─ Creates organizations and locations
 
 Phase 3: Lifecycle Management
-└─ satellite_lifecycle_config
+└─ scenario_satellite_lifecycle_config
    └─ Creates environments (Dev → Staging → Prod)
    └─ Creates content views with filters
 
 Phase 4: Subscription Management
-└─ satellite_activation_config
+└─ scenario_satellite_activation_config
    └─ Creates activation keys
    └─ Manages subscriptions and repositories
 
 Phase 5: Provisioning Templates
 └─ satellite_kickstart_config [NEW]
    ├─ Creates RHEL 9/10 kickstarts
-   ├─ Manages provisioning templates
+   ├─ Manages platform_provisioning templates
    └─ Enables PXE-based installation
 
-Result: Fully automated provisioning infrastructure
+Result: Fully automated platform_provisioning platform_infrastructure_core
 ```
 
 ## Provisioning Flow
@@ -211,7 +211,7 @@ Result: Fully automated provisioning infrastructure
 2. **Anaconda loads kickstart**
    ```
    Anaconda → Satellite → Kickstart file
-   (e.g., https://satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks)
+   (e.g., https://scenario_satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks)
    ```
 
 3. **Automated installation proceeds**
@@ -228,7 +228,7 @@ Result: Fully automated provisioning infrastructure
    subscription-manager register \
      --org="Default Organization" \
      --activationkey="RHEL9_BaseOS" \
-     --server-hostname=satellite.example.com
+     --server-hostname=scenario_satellite.example.com
    ```
 
 5. **System ready for management**
@@ -320,7 +320,7 @@ rpm -ivh https://example.com/custom-package.rpm
 - Development tools included (Full Stack)
 - Container runtime available
 - Ansible compatible
-- Cloud-init support
+- Cloud-init ansible_dev_node_support
 
 **✅ Time Savings**
 - 30-45 minute installations → automatic
@@ -394,7 +394,7 @@ rpm -ivh https://example.com/custom-package.rpm
     - satellite_kickstart_config
     
   post_tasks:
-    - name: Trigger provisioning for batch of hosts
+    - name: Trigger platform_provisioning for batch of hosts
       community.libvirt.virt:
         name: "{{ item }}"
         command: create
@@ -418,7 +418,7 @@ rpm -ivh https://example.com/custom-package.rpm
 1. **Review kickstart content** in `/roles/satellite_kickstart_config/defaults/main.yml`
 2. **Test role** with `ansible-playbook roles/satellite_kickstart_config/tests/test_role.yml`
 3. **Verify kickstart files** created in `/var/lib/foreman/public/kickstarts/`
-4. **Configure Satellite provisioning** to use new templates
+4. **Configure Satellite platform_provisioning** to use new templates
 5. **Deploy test host** via PXE using RHEL 9 BaseOS minimal kickstart
 6. **Monitor deployment** for success
 
@@ -436,8 +436,8 @@ Created **satellite_kickstart_config** role that provides:
 - Security hardening
 - LVM partitioning
 - Compliance-ready layout
-- Satellite integration
-- Cloud-init support
+- Satellite integration_generic
+- Cloud-init ansible_dev_node_support
 - Container runtime
 
 ✅ **Production-ready content**
@@ -446,6 +446,6 @@ Created **satellite_kickstart_config** role that provides:
 - 5 role files
 - Fully tested and validated
 
-**Status**: ✅ Complete and integrated with RHIS Satellite provisioning stack
+**Status**: ✅ Complete and integrated with RHIS Satellite platform_provisioning stack
 
 **Next**: Provision your first RHEL 9/10 system via Satellite using these kickstarts!

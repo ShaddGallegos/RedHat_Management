@@ -1,5 +1,5 @@
 ---
-- name: Collect management system prompts (Satellite, AAP, IdM, Insights)
+- name: Collect management system ansible_dev_node_prompts (Satellite, AAP, IdM, Insights)
   hosts: localhost
   gather_facts: true
 
@@ -18,7 +18,7 @@
     - name: satellite_fqdn
       prompt: "Satellite FQDN"
       private: false
-      default: "{{ ansible_fqdn | default('satellite.' + (ansible_domain | default('example.com'))) }}"
+      default: "{{ ansible_fqdn | default('scenario_satellite.' + (ansible_domain | default('example.com'))) }}"
 
     - name: satellite_fqdn_ip
       prompt: "Satellite FQDN IP (leave blank to auto-detect)"
@@ -156,12 +156,12 @@
       default: "10.168.0.10"
 
     - name: node_satellite_fqdn
-      prompt: "satellite VM FQDN"
+      prompt: "scenario_satellite VM FQDN"
       private: false
-      default: "satellite.{{ ansible_domain | default('example.com') }}"
+      default: "scenario_satellite.{{ ansible_domain | default('example.com') }}"
 
     - name: node_satellite_ip
-      prompt: "satellite VM IP"
+      prompt: "scenario_satellite VM IP"
       private: false
       default: "10.168.0.11"
 

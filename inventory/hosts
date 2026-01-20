@@ -10,8 +10,8 @@ kaso.prod.spg
 [installer]
 ansible.prod.spg ansible_host=10.168.151.121 ansible_user=admin ansible_password=REMOVED_AAP_PASSWORD ansible_become=true
 
-[satellite]
-satellite.prod.spg ansible_host=10.168.151.120 ansible_user=admin ansible_password=REMOVED_AAP_PASSWORD ansible_become=true
+[scenario_satellite]
+scenario_satellite.prod.spg ansible_host=10.168.151.120 ansible_user=admin ansible_password=REMOVED_AAP_PASSWORD ansible_become=true
 
 [aap]
 aap.prod.spg ansible_host=10.168.151.122 ansible_user=admin ansible_password=REMOVED_AAP_PASSWORD ansible_become=true

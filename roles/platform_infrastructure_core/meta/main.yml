@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: "Red Hat Management"
+  description: "Infrastructure - Multi-platform platform_infrastructure_core platform_provisioning and management"
+  company: "Red Hat"
+  license: "Apache-2.0"
+  min_ansible_version: "2.10"
+  max_ansible_version: "2.16"
+  platforms:
+    - name: EL
+      versions:
+        - "9"
+        - "10"
+  categories:
+    - cloud
+    - networking
+
+dependencies: []

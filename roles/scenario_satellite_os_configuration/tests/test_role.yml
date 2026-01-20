@@ -1,0 +1,16 @@
+---
+# Test the scenario_satellite_os_configuration role
+- name: Test scenario_satellite_os_configuration Role
+  hosts: localhost
+  gather_facts: true
+  vars:
+    satellite_os_config_enabled: true
+  
+  tasks:
+    - name: Run scenario_satellite_os_configuration role
+      include_role:
+        name: scenario_satellite_os_configuration
+
+    - name: Test role completed successfully
+      ansible.builtin.debug:
+        msg: "✓ scenario_satellite_os_configuration role test completed successfully"

@@ -1,0 +1,362 @@
+---
+# Tasks for platform_provisioning services configuration
+
+- name: Ensure platform_provisioning services directory exists
+  block:
+    - name: Create backup directory for configurations
+      file:
+        path: "{{ backup_directory }}"
+        state: directory
+        mode: "0755"
+      when: backup_enabled
+
+- name: Configure Primary Network Interface (External Network - libvirt NAT)
+  block:
+    - name: "Configure primary ethernet interface ({{ provisioning_primary_interface }})"
+      nmcli:
+        conn_name: "{{ provisioning_primary_interface }}"
+        ifname: "{{ provisioning_primary_interface }}"
+        type: ethernet
+        method4: auto
+        autoconnect: true
+        state: present
+      notify: restart network service
+
+    - name: Bring up primary interface
+      command: "nmcli connection up {{ provisioning_primary_interface }}"
+      changed_when: false
+
+    - name: Display primary interface configuration
+      command: "ip addr show {{ provisioning_primary_interface }}"
+      register: primary_interface_config
+      changed_when: false
+
+    - name: Show primary interface
+      debug:
+        msg: |
+          Primary Interface (External - libvirt NAT):
+          {{ primary_interface_config.stdout_lines }}
+
+- name: Configure Secondary Network Interface (Private Network - 10.168.0.0/16)
+  block:
+    - name: "Configure secondary ethernet interface ({{ provisioning_secondary_interface }})"
+      nmcli:
+        conn_name: "{{ provisioning_secondary_interface }}"
+        ifname: "{{ provisioning_secondary_interface }}"
+        type: ethernet
+        ip4: "{{ provisioning_interface_ip }}/16"
+        gw4: "{{ provisioning_interface_gateway }}"
+        method4: manual
+        autoconnect: true
+        state: present
+      notify: restart network service
+
+    - name: Bring up secondary interface
+      command: "nmcli connection up {{ provisioning_secondary_interface }}"
+      changed_when: false
+
+    - name: Display secondary interface configuration
+      command: "ip addr show {{ provisioning_secondary_interface }}"
+      register: secondary_interface_config
+      changed_when: false
+
+    - name: Show secondary interface
+      debug:
+        msg: |
+          Secondary Interface (Private - 10.168.0.0/16 Provisioning):
+          {{ secondary_interface_config.stdout_lines }}
+
+- name: Configure Resolv.conf with Nameserver
+  block:
+    - name: Backup original resolv.conf
+      copy:
+        src: "{{ resolv_conf_path }}"
+        dest: "{{ resolv_conf_path }}.bak.{{ ansible_date_time.iso8601_basic }}"
+        remote_src: true
+      when: backup_enabled
+      ignore_errors: true
+
+    - name: Configure resolv.conf with nameserver and options
+      lineinfile:
+        path: "{{ resolv_conf_path }}"
+        create: true
+        state: present
+        line: "{{ item }}"
+        regexp: "^{{ item | split('\\s+') | first }}"
+      loop:
+        - "nameserver 10.168.0.1"
+        - "search example.com prod.example.com lab.example.com"
+        - "options rotate timeout:2 attempts:3"
+      notify: update resolv.conf
+
+    - name: Verify resolv.conf contents
+      command: "cat {{ resolv_conf_path }}"
+      register: resolv_conf_contents
+      changed_when: false
+
+    - name: Display resolv.conf contents
+      debug:
+        msg: "{{ resolv_conf_contents.stdout_lines }}"
+
+- name: Install and Configure DHCP Server
+  block:
+    - name: Install DHCP server package
+      package:
+        name: "{{ dhcp_package }}"
+        state: present
+
+    - name: Create DHCP configuration
+      template:
+        src: dhcpd.conf.j2
+        dest: "{{ dhcp_config_file }}"
+        backup: true
+        owner: root
+        group: root
+        mode: "0644"
+      notify: restart dhcp service
+      register: dhcp_config_result
+
+    - name: Initialize DHCP leases file
+      file:
+        path: "{{ dhcp_leases_file }}"
+        state: touch
+        owner: dhcpd
+        group: dhcpd
+        mode: "0640"
+
+    - name: Enable DHCP service on boot
+      systemd:
+        name: "{{ dhcp_service }}"
+        enabled: true
+        daemon_reload: true
+      when: service_enable_on_boot
+
+    - name: Start DHCP service
+      systemd:
+        name: "{{ dhcp_service }}"
+        state: started
+      when: service_restart_enabled
+
+- name: Install and Configure DNS Server
+  block:
+    - name: Install BIND DNS package
+      package:
+        name: "{{ dns_package }}"
+        state: present
+
+    - name: Create DNS zones directory
+      file:
+        path: "{{ dns_zones_dir }}"
+        state: directory
+        owner: named
+        group: named
+        mode: "0750"
+
+    - name: Create BIND configuration
+      template:
+        src: named.conf.j2
+        dest: "{{ dns_config_file }}"
+        backup: true
+        owner: root
+        group: named
+        mode: "0644"
+      notify: restart dns service
+
+    - name: Create zone configuration
+      template:
+        src: named.zones.j2
+        dest: "{{ dns_zones_dir }}/named.zones"
+        owner: named
+        group: named
+        mode: "0644"
+      notify: restart dns service
+
+    - name: Create DNS zone files
+      template:
+        src: "{{ item }}.j2"
+        dest: "{{ dns_zones_dir }}/{{ item }}"
+        owner: named
+        group: named
+        mode: "0644"
+      loop:
+        - "named.example.com"
+        - "named.prod.example.com"
+      notify: restart dns service
+
+    - name: Enable DNS service on boot
+      systemd:
+        name: "{{ dns_service }}"
+        enabled: true
+        daemon_reload: true
+      when: service_enable_on_boot
+
+    - name: Start DNS service
+      systemd:
+        name: "{{ dns_service }}"
+        state: started
+      when: service_restart_enabled
+
+    - name: Validate BIND configuration
+      command: "named-checkconf {{ dns_config_file }}"
+      changed_when: false
+      register: bind_check
+      failed_when: bind_check.rc != 0
+
+- name: Install and Configure TFTP Server
+  block:
+    - name: Install TFTP server packages
+      package:
+        name:
+          - "{{ tftp_package }}"
+          - "xinetd"
+        state: present
+
+    - name: Create TFTP root directory
+      file:
+        path: "{{ tftp_root }}"
+        state: directory
+        owner: "{{ tftp_user }}"
+        group: "{{ tftp_group }}"
+        mode: "{{ tftp_permissions }}"
+
+    - name: Download PXE bootloader
+      block:
+        - name: Ensure syslinux package is installed
+          package:
+            name: "syslinux-tftpboot"
+            state: present
+
+        - name: Copy PXE bootloader to TFTP root
+          copy:
+            src: "/tftpboot/{{ pxe_bootloader }}"
+            dest: "{{ tftp_root }}/{{ pxe_bootloader }}"
+            owner: "{{ tftp_user }}"
+            group: "{{ tftp_group }}"
+            mode: "{{ tftp_file_permissions }}"
+            remote_src: true
+          ignore_errors: true
+
+    - name: Create PXE menu directory
+      file:
+        path: "{{ tftp_root }}/pxelinux.cfg"
+        state: directory
+        owner: "{{ tftp_user }}"
+        group: "{{ tftp_group }}"
+        mode: "{{ tftp_permissions }}"
+
+    - name: Create PXE boot menu
+      template:
+        src: pxelinux.cfg.default.j2
+        dest: "{{ tftp_root }}/pxelinux.cfg/default"
+        owner: "{{ tftp_user }}"
+        group: "{{ tftp_group }}"
+        mode: "{{ tftp_file_permissions }}"
+
+    - name: Configure TFTP via xinetd
+      template:
+        src: xinetd.tftp.j2
+        dest: "/etc/xinetd.d/tftp"
+        owner: root
+        group: root
+        mode: "0644"
+      notify: restart xinetd service
+
+    - name: Enable xinetd on boot
+      systemd:
+        name: xinetd
+        enabled: true
+        daemon_reload: true
+      when: service_enable_on_boot
+
+    - name: Start xinetd service
+      systemd:
+        name: xinetd
+        state: started
+      when: service_restart_enabled
+
+- name: Configure Firewall Rules
+  block:
+    - name: Ensure firewalld is installed and running
+      package:
+        name: firewalld
+        state: present
+
+    - name: Start and enable firewalld
+      systemd:
+        name: firewalld
+        state: started
+        enabled: true
+
+    - name: Configure firewall for DHCP
+      firewalld:
+        service: dhcp
+        permanent: true
+        state: enabled
+        immediate: true
+      when: firewall_enabled and dhcp_enabled
+
+    - name: Configure firewall for DNS
+      firewalld:
+        service: dns
+        permanent: true
+        state: enabled
+        immediate: true
+      when: firewall_enabled and dns_enabled
+
+    - name: Configure firewall for TFTP
+      firewalld:
+        service: tftp
+        permanent: true
+        state: enabled
+        immediate: true
+      when: firewall_enabled and tftp_enabled
+
+    - name: Configure firewall for PXE boot
+      firewalld:
+        rich_rule: "rule family='ipv4' destination address='10.168.0.1' port='4011' protocol='udp' accept"
+        permanent: true
+        state: enabled
+        immediate: true
+      when: firewall_enabled and pxe_enabled
+
+- name: Validate Provisioning Services
+  block:
+    - name: Verify secondary interface is up
+      command: "ip addr show {{ provisioning_secondary_interface }}"
+      register: interface_check
+      changed_when: false
+      failed_when: "provisioning_interface_ip not in interface_check.stdout"
+
+    - name: Verify DHCP service is running
+      systemd:
+        name: "{{ dhcp_service }}"
+        state: started
+      register: dhcp_status
+      when: dhcp_enabled
+
+    - name: Verify DNS service is running
+      systemd:
+        name: "{{ dns_service }}"
+        state: started
+      register: dns_status
+      when: dns_enabled
+
+    - name: Verify xinetd service is running
+      systemd:
+        name: xinetd
+        state: started
+      register: tftp_status
+      when: tftp_enabled
+
+    - name: Test DNS resolution
+      command: "dig @10.168.0.1 scenario_satellite.prod.spg.example.com"
+      register: dns_test
+      changed_when: false
+      failed_when: dns_test.rc != 0
+
+    - name: Display DNS test results
+      debug:
+        msg: "{{ dns_test.stdout_lines }}"
+
+- name: Handlers for Service Restart
+  include_tasks: handlers.yml

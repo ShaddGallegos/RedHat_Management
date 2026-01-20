@@ -31,7 +31,7 @@ Monthly Backups:
 │   ├── daily/
 │   ├── weekly/
 │   └── monthly/
-├── satellite/
+├── scenario_satellite/
 │   ├── daily/
 │   ├── weekly/
 │   └── monthly/
@@ -108,10 +108,10 @@ sudo docker-compose -f /opt/aap-setup/docker-compose.yml ps
 
 ```bash
 # Use Satellite backup utility
-sudo satellite-backup --verbose /backup/satellite/weekly/
+sudo scenario_satellite-backup --verbose /backup/scenario_satellite/weekly/
 
 # Backup directory contains:
-# - satellite.log
+# - scenario_satellite.log
 # - foreman-backup-TIMESTAMP.tar.gz
 # - candlepin-backup-TIMESTAMP.tar.gz
 # - pulp-backup-TIMESTAMP.tar.gz
@@ -121,7 +121,7 @@ sudo satellite-backup --verbose /backup/satellite/weekly/
 
 ```bash
 # After first full backup, use incremental
-sudo satellite-backup --incremental /backup/satellite/daily/
+sudo scenario_satellite-backup --incremental /backup/scenario_satellite/daily/
 
 # Smaller backup size, faster execution
 # Requires full backup as base
@@ -131,21 +131,21 @@ sudo satellite-backup --incremental /backup/satellite/daily/
 
 ```bash
 # Export repository data
-mkdir -p /backup/satellite/repos/
-tar czf /backup/satellite/repos/repos-$(date +%Y%m%d).tar.gz \
+mkdir -p /backup/scenario_satellite/repos/
+tar czf /backup/scenario_satellite/repos/repos-$(date +%Y%m%d).tar.gz \
   /var/lib/pulp/
 
 # This captures published repository content
-du -sh /backup/satellite/repos/
+du -sh /backup/scenario_satellite/repos/
 ```
 
 ### Satellite Recovery
 
 ```bash
-# Restore from satellite-backup
-sudo satellite-restore \
+# Restore from scenario_satellite-backup
+sudo scenario_satellite-restore \
   --verbose \
-  /backup/satellite/weekly/satellite-backup-2024.01.16.tar.gz
+  /backup/scenario_satellite/weekly/scenario_satellite-backup-2024.01.16.tar.gz
 
 # Restoration steps:
 # 1. Stops services
@@ -155,7 +155,7 @@ sudo satellite-restore \
 # 5. Verifies restoration
 
 # Monitor restoration
-sudo tail -100f /var/log/foreman-installer/satellite.log
+sudo tail -100f /var/log/foreman-installer/scenario_satellite.log
 ```
 
 ## IdM Backup and Recovery
@@ -210,32 +210,32 @@ sudo ipactl status
 
 ```bash
 # Create VM snapshot before updates
-virsh snapshot-create-as prod-satellite \
+virsh snapshot-create-as prod-scenario_satellite \
   --name pre-update \
   --description "Snapshot before package updates"
 
 # List snapshots
-virsh snapshot-list prod-satellite
+virsh snapshot-list prod-scenario_satellite
 
 # Revert to snapshot
-virsh snapshot-revert prod-satellite pre-update
+virsh snapshot-revert prod-scenario_satellite pre-update
 
 # Delete snapshot
-virsh snapshot-delete prod-satellite pre-update
+virsh snapshot-delete prod-scenario_satellite pre-update
 ```
 
 ### VM Disk Backup
 
 ```bash
 # Full VM disk backup
-cp /var/lib/libvirt/images/prod-satellite.qcow2 \
-   /backup/vms/prod-satellite-$(date +%Y%m%d).qcow2
+cp /var/lib/libvirt/images/prod-scenario_satellite.qcow2 \
+   /backup/vms/prod-scenario_satellite-$(date +%Y%m%d).qcow2
 
 # Compress backup
-gzip /backup/vms/prod-satellite-20240116.qcow2
+gzip /backup/vms/prod-scenario_satellite-20240116.qcow2
 
 # Verify backup
-qemu-img info /backup/vms/prod-satellite-20240116.qcow2.gz
+qemu-img info /backup/vms/prod-scenario_satellite-20240116.qcow2.gz
 ```
 
 ## Backup Automation
@@ -260,7 +260,7 @@ sudo docker exec aap-postgres-1 pg_dump -U awx awx | \
 
 # Satellite Backup
 echo "Backing up Satellite..." | tee -a $LOG_FILE
-sudo satellite-backup ${BACKUP_ROOT}/satellite/daily/ >> $LOG_FILE 2>&1
+sudo scenario_satellite-backup ${BACKUP_ROOT}/scenario_satellite/daily/ >> $LOG_FILE 2>&1
 
 # IdM Backup
 echo "Backing up IdM..." | tee -a $LOG_FILE
@@ -306,7 +306,7 @@ psql -d test_db -c "SELECT COUNT(*) FROM main_job;"
 ```bash
 # Verify backup completeness
 ls -lh /backup/aap/daily/
-ls -lh /backup/satellite/daily/
+ls -lh /backup/scenario_satellite/daily/
 ls -lh /backup/idm/daily/
 
 # Check backup age (should be recent)
@@ -322,7 +322,7 @@ find /backup -size 0
 
 ```bash
 # Check what's lost
-systemctl status aap satellite ipa
+systemctl status aap scenario_satellite ipa
 docker ps -a
 sudo ipactl status
 ```
@@ -347,7 +347,7 @@ sudo nmcli connection up "System eth0"
 sudo ipa-backup-restore /backup/idm/weekly/ipabackup-latest.tar.gz
 
 # 2. Satellite (dependency for AAP)
-sudo satellite-restore /backup/satellite/weekly/satellite-backup-latest.tar.gz
+sudo scenario_satellite-restore /backup/scenario_satellite/weekly/scenario_satellite-backup-latest.tar.gz
 
 # 3. AAP (depends on IdM, Satellite)
 docker exec aap-postgres-1 psql -U awx awx < /backup/aap/weekly/aap-db-latest.sql
@@ -358,7 +358,7 @@ docker exec aap-postgres-1 psql -U awx awx < /backup/aap/weekly/aap-db-latest.sq
 ```bash
 # Test each component
 curl -k https://idm.example.com/ipa/json
-curl -k https://satellite.example.com/api/v2/
+curl -k https://scenario_satellite.example.com/api/v2/
 curl -k https://aap.example.com/api/v2/
 
 # Verify integrations
@@ -386,8 +386,8 @@ Disaster snapshots: Keep indefinitely (offline storage)
 
 find /backup/aap/daily -name "*.gz" -mtime +7 -delete
 find /backup/aap/weekly -name "*.gz" -mtime +28 -delete
-find /backup/satellite/daily -name "*.tar.gz" -mtime +7 -delete
-find /backup/satellite/weekly -name "*.tar.gz" -mtime +28 -delete
+find /backup/scenario_satellite/daily -name "*.tar.gz" -mtime +7 -delete
+find /backup/scenario_satellite/weekly -name "*.tar.gz" -mtime +28 -delete
 
 echo "Old backups removed"
 ```

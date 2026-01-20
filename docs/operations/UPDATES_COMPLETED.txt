@@ -17,7 +17,7 @@ VERSION: 1.0.0
    • Created ROLE_VERIFICATION_SUMMARY.md - Role audit and verification report
    • Updated docs/README.md - Documentation guide for easy navigation
    • Created docs/archive/README.md - Archive documentation guide
-   • Archived 18 legacy documentation files to docs/archive/
+   • Archived 18 ansible_dev_node_legacy_archive documentation files to docs/archive/
    
    Result: 
    - Active docs: 12 files (focused, production-ready)
@@ -51,51 +51,51 @@ VERSION: 1.0.0
    • Templates: 7 Jinja2 templates
    • Kickstart: Integration with Satellite kickstart
    
-   Location: roles/services_provisioning_stack/ (13 files, 2,500+ lines)
+   Location: roles/platform_services_provisioning_stack/ (13 files, 2,500+ lines)
 
 4. ✅ DUAL NETWORK CONFIGURATION
    ──────────────────────────────
    Network architecture verified and documented:
    • eth0 (Primary): External network with libvirt NAT + DHCP
    • eth1 (Secondary): Private 10.168.0.0/16 network (10.168.0.1/16)
-   • NetworkManager integration for both interfaces
+   • NetworkManager integration_generic for both interfaces
    • Firewall rules per interface
    • DNS configuration with nameserver 10.168.0.1
    • DNS rotate option for load balancing
    
-   Location: roles/network_infrastructure_config/
+   Location: roles/platform_network_infrastructure/
    Documentation: docs/NETWORK_INTERFACE_CONFIGURATION.md, docs/DUAL_NETWORK_UPDATE.md
 
 5. ✅ SATELLITE INTEGRATION
    ───────────────────────
    • satellite_6_18_deployment: Core Satellite installation
    • satellite_content_config: Repository and content management
-   • satellite_lifecycle_config: Environment and content view setup
-   • satellite_activation_config: Activation key management
+   • scenario_satellite_lifecycle_config: Environment and content view setup
+   • scenario_satellite_activation_config: Activation key management
    • satellite_kickstart_config: Kickstart template configuration
-   • satellite_os_configuration: RHEL 9 & 10 OS definitions
+   • scenario_satellite_os_configuration: RHEL 9 & 10 OS definitions
    
    Status: All 6 Satellite roles complete and integrated
 
 6. ✅ AAP (ANSIBLE AUTOMATION PLATFORM) INTEGRATION
    ────────────────────────────────────────────────
-   • aap_2_6_setup: Platform deployment
-   • aap_credentials_config: Credential management
-   • aap_inventories_config: Inventory configuration
-   • aap_projects_config: Project management
-   • aap_templates_config: Job template configuration
+   • scenario_aap_setup: Platform deployment
+   • scenario_aap_credentials: Credential management
+   • scenario_aap_inventories: Inventory configuration
+   • scenario_aap_projects: Project management
+   • scenario_aap_templates: Job template configuration
    
    Status: All 4 AAP roles complete and integrated
 
 7. ✅ INFRASTRUCTURE ROLES
    ──────────────────────
    • idm_integration: Identity Management setup
-   • network_infrastructure_config: Network configuration
-   • infrastructure_prep: Base system preparation
-   • infrastructure_manager: Infrastructure management
-   • 25+ additional infrastructure and support roles
+   • platform_network_infrastructure: Network configuration
+   • platform_infrastructure_prep: Base system preparation
+   • platform_infrastructure_manager: Infrastructure management
+   • 25+ additional platform_infrastructure_core and ansible_dev_node_support roles
    
-   Status: All 29+ infrastructure roles verified and organized
+   Status: All 29+ platform_infrastructure_core roles verified and organized
 
 8. ✅ PROJECT DOCUMENTATION CREATED
    ────────────────────────────────
@@ -108,19 +108,19 @@ VERSION: 1.0.0
    • docs/archive/README.md - Archive guide (NEW)
    
    Active documentation: 12 focused guides
-   Archived documentation: 19 legacy/status files
+   Archived documentation: 19 ansible_dev_node_legacy_archive/status files
    Total documentation: 31 files
 
 9. ✅ DEPLOYMENT & TESTING INFRASTRUCTURE
    ────────────────────────────────────────
-   • 10 playbooks for orchestration
+   • 10 playbooks for ansible_dev_node_orchestration
    • 72 Jinja2 templates for configuration
    • Complete Makefile with targets: install, test, lint, bootstrap, site
    • Test suite for each role
    • Syntax validation (make test)
    • Lint validation (make lint)
    
-   Status: All infrastructure in place and tested
+   Status: All platform_infrastructure_core in place and tested
 
 10. ✅ VARIABLE ORGANIZATION & CONSISTENCY
     ───────────────────────────────────────
@@ -205,7 +205,7 @@ FOR SATELLITE ADMINS:
 ✅ All services are properly configured
 ✅ Network architecture is fully implemented
 ✅ Integration dependencies are mapped
-✅ Testing infrastructure is in place
+✅ Testing platform_infrastructure_core is in place
 ✅ Deployment playbooks are ready
 
 NEXT STEPS:
@@ -240,17 +240,17 @@ To verify the project is complete:
 
 ✅ REQUIREMENTS MET:
 
-☑️  Create comprehensive RHIS infrastructure with provisioning services
+☑️  Create comprehensive RHIS platform_infrastructure_core with platform_provisioning services
     → ✅ COMPLETE: DHCP, DNS, TFTP, PXE all implemented and integrated
 
-☑️  Dual network configuration (external NAT + internal provisioning)
+☑️  Dual network configuration (external NAT + internal platform_provisioning)
     → ✅ COMPLETE: eth0 external, eth1 internal (10.168.0.0/16)
 
 ☑️  Update all roles and ensure complete configuration
     → ✅ COMPLETE: All 41 roles verified and consistent
 
 ☑️  Update docs and remove non-related files
-    → ✅ COMPLETE: 12 active docs, 19 archived legacy docs
+    → ✅ COMPLETE: 12 active docs, 19 archived ansible_dev_node_legacy_archive docs
 
 ☑️  General reorganization as needed
     → ✅ COMPLETE: Project fully organized and ready for deployment

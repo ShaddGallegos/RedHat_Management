@@ -8,6 +8,6 @@ Files:
 - `inventory.ini` — sample Ansible inventory for local testing.
 - `group_vars/example.yml` — group-level variables used by playbooks.
 - `host_vars/example.yml` — host-level variables.
-- `templates/` — sample provisioning templates (placeholders).
+- `templates/` — sample platform_provisioning templates (placeholders).
 
 Populate these with your real values or copy upstream files into this directory to enable `rhis-provisioner` and other builder flows.

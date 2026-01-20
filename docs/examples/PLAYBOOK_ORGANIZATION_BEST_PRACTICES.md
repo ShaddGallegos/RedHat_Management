@@ -11,7 +11,7 @@ Complete guide for organizing playbooks using tags, scenarios, and platforms wit
 - Shared variables and configurations
 - Consistent error handling
 - Easier maintenance and updates
-- Better orchestration of dependencies
+- Better ansible_dev_node_orchestration of dependencies
 - Reduced code duplication
 - Clear execution flow
 
@@ -26,7 +26,7 @@ Complete guide for organizing playbooks using tags, scenarios, and platforms wit
 **Use only when:**
 - Components are completely independent
 - Different teams manage different playbooks
-- Playbooks need to run on completely different infrastructure
+- Playbooks need to run on completely different platform_infrastructure_core
 - Playbook complexity exceeds 500 lines
 
 ## Tag-Based Execution Strategy
@@ -36,7 +36,7 @@ Complete guide for organizing playbooks using tags, scenarios, and platforms wit
 ```
 scenario tags
 └── platform tags
-    └── os tags
+    └── os_generic tags
         └── component tags
             └── task tags
 ```
@@ -49,7 +49,7 @@ scenario tags
 - "aap_only"
 - "full_stack"
 
-# Platform tags (selects infrastructure)
+# Platform tags (selects platform_infrastructure_core)
 - "libvirt"
 - "aws"
 - "azure"
@@ -60,15 +60,15 @@ scenario tags
 - "rhel-10"
 
 # Component tags (specific products)
-- "satellite"
+- "scenario_satellite"
 - "aap"
 - "idm"
-- "openshift"
+- "scenario_openshift"
 
 # Feature tags (specific features)
 - "networking"
 - "storage"
-- "integration"
+- "integration_generic"
 - "monitoring"
 
 # Task tags (granular control)
@@ -142,17 +142,17 @@ ansible-playbook redhat_management-site.yml \
   # Phase 2: Infrastructure Preparation
   - name: Infrastructure Preparation
     block:
-      - include_tasks: infrastructure/libvirt.yml
+      - include_tasks: platform_infrastructure_core/libvirt.yml
         when: deployment_platform == "libvirt"
-      - include_tasks: infrastructure/aws.yml
+      - include_tasks: platform_infrastructure_core/aws.yml
         when: deployment_platform == "aws"
-    tags: ["infrastructure"]
+    tags: ["platform_infrastructure_core"]
   
   # Phase 3: Component Deployment
   - name: Deploy Satellite
-    include_tasks: components/satellite/deploy.yml
-    when: "'satellite' in deployment_components"
-    tags: ["satellite", "install"]
+    include_tasks: components/scenario_satellite/deploy.yml
+    when: "'scenario_satellite' in deployment_components"
+    tags: ["scenario_satellite", "install"]
   
   - name: Deploy AAP
     include_tasks: components/aap/deploy.yml
@@ -162,9 +162,9 @@ ansible-playbook redhat_management-site.yml \
   # Phase 4: Integration
   - name: Configure Integrations
     block:
-      - include_tasks: integration/satellite_aap.yml
-        when: "'satellite' in deployment_components and 'aap' in deployment_components"
-    tags: ["integration"]
+      - include_tasks: integration_generic/satellite_aap.yml
+        when: "'scenario_satellite' in deployment_components and 'aap' in deployment_components"
+    tags: ["integration_generic"]
   
   # Phase 5: Validation
   - name: Validate Deployment
@@ -216,13 +216,13 @@ vars_files:
 ```yaml
 - name: Deploy Satellite
   block:
-    - include_tasks: satellite/install.yml
+    - include_tasks: scenario_satellite/install.yml
       tags: ["install"]
-    - include_tasks: satellite/configure.yml
+    - include_tasks: scenario_satellite/configure.yml
       tags: ["configure"]
-    - include_tasks: satellite/validate.yml
+    - include_tasks: scenario_satellite/validate.yml
       tags: ["validate"]
-  tags: ["satellite"]
+  tags: ["scenario_satellite"]
 ```
 
 **Avoid:**
@@ -230,11 +230,11 @@ vars_files:
 - name: Deploy Satellite
   block:
     - name: Install
-      yum: name=satellite
+      yum: name=scenario_satellite
     - name: Configure
-      template: src=satellite.j2
+      template: src=scenario_satellite.j2
     - name: Validate
-      command: satellite-health-check
+      command: scenario_satellite-health-check
 ```
 
 ### 2. Use Include_Tasks with When Conditions
@@ -290,16 +290,16 @@ vars_files:
 # Each task/block should document its tags
 - name: Install Satellite Packages
   yum:
-    name: satellite
+    name: scenario_satellite
   tags:
-    - satellite         # Component tag
+    - scenario_satellite         # Component tag
     - install           # Phase tag
     - rhel-9            # OS tag
     - "{{ deployment_platform }}"  # Platform tag
   
   # Documentation comment
   # This task: Installs Satellite 6.18 packages
-  # Will run with: --tags "satellite,install"
+  # Will run with: --tags "scenario_satellite,install"
   # Skipped with: --skip-tags "install"
 ```
 
@@ -331,7 +331,7 @@ group_vars/
 ├── all.yml (shared)
 ├── libvirt.yml (platform-specific)
 ├── aws.yml (platform-specific)
-├── satellite.yml (component-specific)
+├── scenario_satellite.yml (component-specific)
 ├── aap.yml (component-specific)
 └── idm.yml (component-specific)
 ```
@@ -350,24 +350,24 @@ Start
   ├─→ [preflight] Run pre-deployment checks
   │     └─→ [validate] Verify configuration
   │
-  ├─→ [infrastructure] Prepare infrastructure
+  ├─→ [platform_infrastructure_core] Prepare platform_infrastructure_core
   │     ├─→ [libvirt] Setup KVM VMs
   │     ├─→ [aws] Setup EC2 instances
   │     └─→ [azure] Setup Azure VMs
   │
   ├─→ [install] Install components
-  │     ├─→ [satellite] Install Satellite 6.18
+  │     ├─→ [scenario_satellite] Install Satellite 6.18
   │     ├─→ [aap] Install AAP 2.6
   │     └─→ [idm] Install IdM 3.0
   │
   ├─→ [configure] Configure components
-  │     ├─→ [satellite-configure] Configure Satellite
+  │     ├─→ [scenario_satellite-configure] Configure Satellite
   │     ├─→ [aap-configure] Configure AAP
   │     └─→ [idm-configure] Configure IdM
   │
-  ├─→ [integration] Configure integrations
-  │     ├─→ [satellite-aap] Satellite ↔ AAP
-  │     ├─→ [satellite-idm] Satellite ↔ IdM
+  ├─→ [integration_generic] Configure integrations
+  │     ├─→ [scenario_satellite-aap] Satellite ↔ AAP
+  │     ├─→ [scenario_satellite-idm] Satellite ↔ IdM
   │     └─→ [aap-idm] AAP ↔ IdM
   │
   ├─→ [monitoring] Setup monitoring
@@ -379,7 +379,7 @@ Start
   │
   └─→ [validate] Validate deployment
         ├─→ [health-check] Component health checks
-        └─→ [integration-test] Integration tests
+        └─→ [integration_generic-test] Integration tests
 End
 ```
 
@@ -434,14 +434,14 @@ ansible-playbook playbooks/redhat_management-site.yml \
 ### Dry-run with specific tags
 ```bash
 ansible-playbook playbooks/redhat_management-site.yml \
-  --tags "satellite" \
+  --tags "scenario_satellite" \
   --check
 ```
 
 ### Debug tag matching
 ```bash
 ansible-playbook playbooks/redhat_management-site.yml \
-  --tags "satellite" \
+  --tags "scenario_satellite" \
   -vvv  # Verbose output shows tag matching
 ```
 
@@ -468,7 +468,7 @@ playbooks/
 └── redhat_management-site.yml
 
 # Run with tags
-ansible-playbook redhat_management-site.yml --tags "satellite,aap,idm"
+ansible-playbook redhat_management-site.yml --tags "scenario_satellite,aap,idm"
 ```
 
 ## Documentation

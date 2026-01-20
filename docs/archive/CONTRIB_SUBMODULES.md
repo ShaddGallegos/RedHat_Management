@@ -14,13 +14,13 @@ The `contrib/` directory now contains three git submodules that provide referenc
 **Purpose:**
 - Reference implementation for multi-product Red Hat deployments
 - Lab and demonstration environment building
-- Documentation and examples for infrastructure deployment
+- Documentation and examples for platform_infrastructure_core deployment
 - Ansible playbooks and roles for product configuration
 
 **Key Resources:**
 - Wiki: https://github.com/parmstro/labbuilder2/wiki
 - Configuration guides for buildimage variables
-- IdM integration patterns
+- IdM integration_generic patterns
 - Satellite configuration examples
 
 ### 2. rhis-builder-baremetal-init
@@ -32,8 +32,8 @@ The `contrib/` directory now contains three git submodules that provide referenc
 **Purpose:**
 - Automated baremetal system builds with kickstart files
 - OEMDRV USB drive creation workflows
-- Ansible Image Builder integration for automated ISO generation
-- BMC-managed boot orchestration
+- Ansible Image Builder integration_generic for automated ISO generation
+- BMC-managed boot ansible_dev_node_orchestration
 
 **Key Features:**
 - Multiple initialization methods (USB OEMDRV, automated ISO generation)
@@ -95,7 +95,7 @@ The contrib/ submodules provide:
 
 1. **Reference Implementations:** Examples of complete RHIS deployments
 2. **Building Blocks:** Reusable roles, playbooks, and templates
-3. **Best Practices:** Documented patterns for Red Hat infrastructure
+3. **Best Practices:** Documented patterns for Red Hat platform_infrastructure_core
 4. **Community Contributions:** Access to rhis-builder ecosystem projects
 
 ## Development Workflow

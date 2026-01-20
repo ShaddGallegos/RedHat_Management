@@ -17,11 +17,11 @@
 
     # Product definitions
     products:
-      satellite:
+      scenario_satellite:
         name: "Red Hat Satellite 6.18"
         version: "6.18"
-        tags: ["satellite"]
-        roles: ["satellite"]
+        tags: ["scenario_satellite"]
+        roles: ["scenario_satellite"]
       aap:
         name: "Ansible Automation Platform 2.6"
         version: "2.6"
@@ -32,42 +32,42 @@
         version: "3.0"
         tags: ["idm"]
         roles: ["idm"]
-      openshift:
+      scenario_openshift:
         name: "OpenShift 4.21+"
         version: "4.21"
-        tags: ["openshift"]
-        roles: ["openshift"]
+        tags: ["scenario_openshift"]
+        roles: ["scenario_openshift"]
 
     # Platform definitions
     platforms:
       libvirt:
         name: "LibVirt (KVM)"
-        provisioner_role: "libvirt_vm_provisioner"
+        provisioner_role: "platform_libvirt_vm_provisioner"
         tags: ["libvirt", "local"]
       baremetal:
         name: "Bare Metal"
-        provisioner_role: "baremetal_provisioner"
+        provisioner_role: "platform_baremetal_provisioner"
         tags: ["baremetal", "enterprise"]
       aws:
         name: "Amazon Web Services"
-        provisioner_role: "infrastructure_manager"
+        provisioner_role: "platform_infrastructure_manager"
         tags: ["aws", "cloud"]
       azure:
         name: "Microsoft Azure"
-        provisioner_role: "infrastructure_manager"
+        provisioner_role: "platform_infrastructure_manager"
         tags: ["azure", "cloud"]
       gcp:
         name: "Google Cloud Platform"
-        provisioner_role: "infrastructure_manager"
+        provisioner_role: "platform_infrastructure_manager"
         tags: ["gcp", "cloud"]
-      vmware:
+      platform_vmware:
         name: "VMware vSphere"
-        provisioner_role: "infrastructure_manager"
-        tags: ["vmware", "enterprise"]
-      nutanix:
+        provisioner_role: "platform_infrastructure_manager"
+        tags: ["platform_vmware", "enterprise"]
+      platform_nutanix:
         name: "Nutanix HCI"
-        provisioner_role: "infrastructure_manager"
-        tags: ["nutanix", "enterprise"]
+        provisioner_role: "platform_infrastructure_manager"
+        tags: ["platform_nutanix", "enterprise"]
 
     # Scenario definitions (derived from deployment_scenario variable)
     scenario_config: "{{ lookup('vars', 'scenarios_' + deployment_scenario | replace('-', '_')) | default({}) }}"
@@ -112,7 +112,7 @@
             deployment_config:
               scenario: "{{ deployment_scenario | default('full_stack') }}"
               platform: "{{ deployment_platform | default('libvirt') }}"
-              os: "{{ deployment_os | default('rhel-9') }}"
+              os_generic: "{{ deployment_os | default('rhel-9') }}"
               install_method: "{{ install_method | default('oemdrv') }}"
           when: not config_stat.stat.exists
 
@@ -155,8 +155,8 @@
           - "aws"
           - "azure"
           - "gcp"
-          - "vmware"
-          - "nutanix"
+          - "platform_vmware"
+          - "platform_nutanix"
 
   tasks:
     # ========================================================================
@@ -189,13 +189,13 @@
           tags: ["init", "credentials"]
 
     - name: "PHASE 2 - Platform Infrastructure Preparation"
-      tags: ["phase2", "prepare", "infrastructure"]
+      tags: ["phase2", "prepare", "platform_infrastructure_core"]
       block:
         - name: "Prepare platform - {{ deployment_platform }}"
           ansible.builtin.include_role:
             name: "platform_prep"
             tasks_from: "{{ deployment_platform }}"
-          tags: ["phase2", "prepare", "infrastructure"]
+          tags: ["phase2", "prepare", "platform_infrastructure_core"]
 
         - name: "Configure platform networking - {{ deployment_platform }}"
           ansible.builtin.include_role:
@@ -214,7 +214,7 @@
       block:
         - name: "Build dynamic inventory"
           ansible.builtin.include_role:
-            name: "inventory_generator"
+            name: "ansible_dev_node_inventory_generator"
             tasks_from: "main"
           vars:
             inventory_generator_scenario: "{{ deployment_scenario }}"
@@ -223,7 +223,7 @@
 
         - name: "Validate generated inventory"
           ansible.builtin.include_role:
-            name: "inventory_generator"
+            name: "ansible_dev_node_inventory_generator"
             tasks_from: "validate"
           tags: ["phase3", "inventory", "validate"]
 
@@ -232,14 +232,14 @@
     # ========================================================================
 
     - name: "PHASE 4A - Deploy Satellite 6.18"
-      when: "'satellite' in deployment_scenario"
-      tags: ["phase4a", "satellite"]
+      when: "'scenario_satellite' in deployment_scenario"
+      tags: ["phase4a", "scenario_satellite"]
       block:
         - name: "Provision Satellite VM/Instance"
           ansible.builtin.include_role:
             name: "{{ platforms[deployment_platform].provisioner_role }}"
             tasks_from: "provision_satellite"
-          tags: ["phase4a", "satellite", "provision"]
+          tags: ["phase4a", "scenario_satellite", "provision"]
 
         - name: "Configure Satellite base OS"
           ansible.builtin.include_role:
@@ -247,19 +247,19 @@
             tasks_from: "main"
           vars:
             rhel_base_target_os: "{{ deployment_os }}"
-          tags: ["phase4a", "satellite", "os"]
+          tags: ["phase4a", "scenario_satellite", "os_generic"]
 
         - name: "Install and configure Satellite 6.18"
           ansible.builtin.include_role:
-            name: "satellite"
+            name: "scenario_satellite"
             tasks_from: "install"
-          tags: ["phase4a", "satellite", "install", "configure"]
+          tags: ["phase4a", "scenario_satellite", "install", "configure"]
 
         - name: "Post-configuration tasks for Satellite"
           ansible.builtin.include_role:
-            name: "satellite"
+            name: "scenario_satellite"
             tasks_from: "postconfigure"
-          tags: ["phase4a", "satellite", "configure"]
+          tags: ["phase4a", "scenario_satellite", "configure"]
 
     - name: "PHASE 4B - Deploy AAP 2.6"
       when: "'aap' in deployment_scenario"
@@ -277,7 +277,7 @@
             tasks_from: "main"
           vars:
             rhel_base_target_os: "{{ deployment_os }}"
-          tags: ["phase4b", "aap", "os"]
+          tags: ["phase4b", "aap", "os_generic"]
 
         - name: "Install and configure AAP 2.6"
           ansible.builtin.include_role:
@@ -307,7 +307,7 @@
             tasks_from: "main"
           vars:
             rhel_base_target_os: "{{ deployment_os }}"
-          tags: ["phase4c", "idm", "os"]
+          tags: ["phase4c", "idm", "os_generic"]
 
         - name: "Install and configure IdM 3.0"
           ansible.builtin.include_role:
@@ -322,14 +322,14 @@
           tags: ["phase4c", "idm", "configure"]
 
     - name: "PHASE 4D - Deploy OpenShift"
-      when: "'openshift' in deployment_scenario"
-      tags: ["phase4d", "openshift"]
+      when: "'scenario_openshift' in deployment_scenario"
+      tags: ["phase4d", "scenario_openshift"]
       block:
-        - name: "Provision OpenShift infrastructure"
+        - name: "Provision OpenShift platform_infrastructure_core"
           ansible.builtin.include_role:
             name: "{{ platforms[deployment_platform].provisioner_role }}"
             tasks_from: "provision_openshift"
-          tags: ["phase4d", "openshift", "provision"]
+          tags: ["phase4d", "scenario_openshift", "provision"]
 
         - name: "Configure OpenShift base OS"
           ansible.builtin.include_role:
@@ -337,67 +337,67 @@
             tasks_from: "main"
           vars:
             rhel_base_target_os: "{{ deployment_os }}"
-          tags: ["phase4d", "openshift", "os"]
+          tags: ["phase4d", "scenario_openshift", "os_generic"]
 
         - name: "Install and configure OpenShift"
           ansible.builtin.include_role:
-            name: "openshift"
+            name: "scenario_openshift"
             tasks_from: "install"
-          tags: ["phase4d", "openshift", "install", "configure"]
+          tags: ["phase4d", "scenario_openshift", "install", "configure"]
 
         - name: "Post-configuration tasks for OpenShift"
           ansible.builtin.include_role:
-            name: "openshift"
+            name: "scenario_openshift"
             tasks_from: "postconfigure"
-          tags: ["phase4d", "openshift", "configure"]
+          tags: ["phase4d", "scenario_openshift", "configure"]
 
     # ========================================================================
     # PHASE 5: Integration Configuration
     # ========================================================================
 
     - name: "PHASE 5 - Configure Integrations"
-      tags: ["phase5", "integrate", "integration"]
+      tags: ["phase5", "integrate", "integration_generic"]
       block:
         - name: "Configure Satellite ↔ AAP Integration"
           ansible.builtin.include_role:
-            name: "integration"
+            name: "integration_generic"
             tasks_from: "satellite_aap"
-          when: "'satellite' in deployment_scenario and 'aap' in deployment_scenario"
+          when: "'scenario_satellite' in deployment_scenario and 'aap' in deployment_scenario"
           tags: ["phase5", "integrate", "satellite_aap"]
 
         - name: "Configure Satellite ↔ IdM Integration"
           ansible.builtin.include_role:
-            name: "integration"
+            name: "integration_generic"
             tasks_from: "satellite_idm"
-          when: "'satellite' in deployment_scenario and 'idm' in deployment_scenario"
+          when: "'scenario_satellite' in deployment_scenario and 'idm' in deployment_scenario"
           tags: ["phase5", "integrate", "satellite_idm"]
 
         - name: "Configure Satellite ↔ OpenShift Integration"
           ansible.builtin.include_role:
-            name: "integration"
+            name: "integration_generic"
             tasks_from: "satellite_openshift"
-          when: "'satellite' in deployment_scenario and 'openshift' in deployment_scenario"
+          when: "'scenario_satellite' in deployment_scenario and 'scenario_openshift' in deployment_scenario"
           tags: ["phase5", "integrate", "satellite_openshift"]
 
         - name: "Configure AAP ↔ IdM Integration"
           ansible.builtin.include_role:
-            name: "integration"
+            name: "integration_generic"
             tasks_from: "aap_idm"
           when: "'aap' in deployment_scenario and 'idm' in deployment_scenario"
           tags: ["phase5", "integrate", "aap_idm"]
 
         - name: "Configure AAP → OpenShift Integration"
           ansible.builtin.include_role:
-            name: "integration"
+            name: "integration_generic"
             tasks_from: "aap_openshift"
-          when: "'aap' in deployment_scenario and 'openshift' in deployment_scenario"
+          when: "'aap' in deployment_scenario and 'scenario_openshift' in deployment_scenario"
           tags: ["phase5", "integrate", "aap_openshift"]
 
         - name: "Configure IdM ↔ OpenShift Integration"
           ansible.builtin.include_role:
-            name: "integration"
+            name: "integration_generic"
             tasks_from: "idm_openshift"
-          when: "'idm' in deployment_scenario and 'openshift' in deployment_scenario"
+          when: "'idm' in deployment_scenario and 'scenario_openshift' in deployment_scenario"
           tags: ["phase5", "integrate", "idm_openshift"]
 
     # ========================================================================
@@ -405,20 +405,20 @@
     # ========================================================================
 
     - name: "PHASE 6 - Setup Ansible-CMDB"
-      tags: ["phase6", "cmdb"]
+      tags: ["phase6", "scenario_ansible_cmdb_core"]
       block:
         - name: "Install and configure Ansible-CMDB on Satellite"
           ansible.builtin.include_role:
-            name: "cmdb"
+            name: "scenario_ansible_cmdb_core"
             tasks_from: "main"
-          when: "'satellite' in deployment_scenario"
-          tags: ["phase6", "cmdb", "setup"]
+          when: "'scenario_satellite' in deployment_scenario"
+          tags: ["phase6", "scenario_ansible_cmdb_core", "setup"]
 
         - name: "Populate Ansible-CMDB with inventory facts"
           ansible.builtin.include_role:
-            name: "cmdb"
+            name: "scenario_ansible_cmdb_core"
             tasks_from: "populate"
-          tags: ["phase6", "cmdb", "populate"]
+          tags: ["phase6", "scenario_ansible_cmdb_core", "populate"]
 
     # ========================================================================
     # PHASE 7: Validation and Verification
@@ -429,19 +429,19 @@
       block:
         - name: "Run health checks for deployed products"
           ansible.builtin.include_role:
-            name: "support"
+            name: "ansible_dev_node_support"
             tasks_from: "health_check"
           tags: ["phase7", "validate", "health_check"]
 
         - name: "Validate integrations"
           ansible.builtin.include_role:
-            name: "support"
+            name: "ansible_dev_node_support"
             tasks_from: "validate_integrations"
           tags: ["phase7", "validate", "integrations"]
 
         - name: "Generate deployment report"
           ansible.builtin.include_role:
-            name: "support"
+            name: "ansible_dev_node_support"
             tasks_from: "deployment_report"
           tags: ["phase7", "validate", "report"]
 
@@ -462,10 +462,10 @@
 
           Next Steps:
             1. Review deployment logs
-            2. Access Satellite: https://satellite-host
+            2. Access Satellite: https://scenario_satellite-host
             3. Access AAP: https://aap-controller
             4. Access IdM: https://idm-host
-            5. Access Ansible-CMDB: http://satellite-host:8081
+            5. Access Ansible-CMDB: http://scenario_satellite-host:8081
           For troubleshooting, see:
             - docs/troubleshooting/
             - logs/deployment_{{ deployment_timestamp }}.log

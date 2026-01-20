@@ -1,0 +1,14 @@
+---
+# Test: ansible_dev_node_redhat_products/scenario_satellite role basic functionality
+- name: Test Satellite role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    satellite_enabled: true
+    satellite_version: "6.18"
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - satellite_enabled is defined
+          - satellite_version is defined

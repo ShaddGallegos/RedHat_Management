@@ -1,0 +1,72 @@
+---
+# Entry point for scenario_satellite mail + stack bootstrap
+
+- name: Stat scenario_satellite mail vaulted file (only when explicitly requested)
+  ansible.builtin.stat:
+    path: "{{ satellite_mail_vault_file }}"
+  register: satellite_mail_vault_stat
+  when: (satellite_mail_vault_file is defined and satellite_mail_vault_file != '') and (use_local_env | default(false) | bool)
+
+- name: Load vaulted/env variables (only when explicitly requested)
+  ansible.builtin.include_vars:
+    file: "{{ satellite_mail_vault_file }}"
+  when: (satellite_mail_vault_file is defined and satellite_mail_vault_file != '') and (use_local_env | default(false) | bool) and satellite_mail_vault_stat.stat.exists
+  ignore_errors: false
+  no_log: true
+
+- name: Determine install targets from defaults or overrides
+  set_fact:
+    sms_selected_targets: "{{ satellite_mail_targets | default(['scenario_satellite','aap','scenario_openshift']) }}"
+
+- name: Validate required secrets are provided
+  ansible.builtin.include_tasks: validate.yml
+
+- name: Render master variables file for stack
+  ansible.builtin.template:
+    src: master_vars.yml.j2
+    dest: "{{ satellite_mail_master_vars_dest | default('./master_vars.yml') }}"
+    mode: '0640'
+  delegate_to: localhost
+  run_once: true
+  no_log: true
+
+- name: Render installer inventory for selected targets
+  ansible.builtin.template:
+    src: generated_inventory.yml.j2
+    dest: "{{ satellite_mail_inventory_dest | default('./installer_inventory.yml') }}"
+    mode: '0640'
+  delegate_to: localhost
+  run_once: true
+  no_log: true
+
+- name: Ensure libvirt VM exists for Satellite (POC)
+  when: "'scenario_satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: provision_libvirt.yml
+
+- name: Pre-work for admin/root on Satellite host
+  when: "'scenario_satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: prework.yml
+
+- name: Configure network basics (hosts/resolv)
+  when: "'scenario_satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: network.yml
+
+- name: Install and configure Satellite
+  when: "'scenario_satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: satellite_install.yml
+
+- name: Configure Satellite mail server (Postfix)
+  when: "'scenario_satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: satellite_mail.yml
+
+- name: Configure IdM server (placeholder/minimal)
+  when: "'scenario_satellite' in sms_selected_targets"
+  ansible.builtin.include_tasks: idm.yml
+
+- name: Install Ansible Automation Platform (placeholder)
+  when: "'aap' in sms_selected_targets"
+  ansible.builtin.include_tasks: aap.yml
+
+- name: Configure OpenShift integration_generic (placeholder)
+  when: "'scenario_openshift' in sms_selected_targets"
+  ansible.builtin.include_tasks: scenario_openshift.yml

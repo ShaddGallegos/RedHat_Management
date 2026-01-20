@@ -3,7 +3,7 @@
 # Configures TFTP and PXE boot services on secondary ethernet
 
 - name: Configure TFTP and PXE Boot Services
-  hosts: satellite
+  hosts: scenario_satellite
   gather_facts: true
   become: true
   
@@ -13,7 +13,7 @@
     setup_tftp_pxe_only: true
   
   roles:
-    - role: services_provisioning_stack
+    - role: platform_services_provisioning_stack
       tags:
         - tftp
         - pxe

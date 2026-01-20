@@ -19,9 +19,9 @@ several high-impact improvement opportunities:
 ### 1. MISSING ROLE METADATA (meta/main.yml)
 
 **Current Status**: Only 3 of 33 top-level roles have meta/main.yml
-- ✓ common_tasks
-- ✓ configuration_manager
-- ✓ orchestration_master
+- ✓ ansible_dev_node_common_tasks
+- ✓ ansible_dev_node_configuration_manager
+- ✓ ansible_dev_node_orchestration_master
 - ✗ 30 other roles missing
 
 **Impact**: 
@@ -29,18 +29,18 @@ several high-impact improvement opportunities:
 - Cannot specify Ansible version requirements
 - Missing role metadata, author info, license info
 - Cannot specify min/max Ansible versions
-- Missing support documentation links
+- Missing ansible_dev_node_support documentation links
 
 **Example Missing**:
 ```
-aap_2_6_setup/
-baremetal_provisioner/
-deployment_setup/
-infrastructure_manager/
-integration/
-os/
-redhat_products/*
-support/
+scenario_aap_setup/
+platform_baremetal_provisioner/
+ansible_dev_node_deployment_setup/
+platform_infrastructure_manager/
+integration_generic/
+os_generic/
+ansible_dev_node_redhat_products/*
+ansible_dev_node_support/
 ... and 20+ more
 ```
 
@@ -65,7 +65,7 @@ support/
 - Missing quick reference
 - No variable dependency documentation
 
-**Examples Missing**: aap_2_6_setup, baremetal_provisioner, deployment_setup, infrastructure_manager, integration, os/, redhat_products/*, support/ (30+ roles)
+**Examples Missing**: scenario_aap_setup, platform_baremetal_provisioner, ansible_dev_node_deployment_setup, platform_infrastructure_manager, integration_generic, os_generic/, ansible_dev_node_redhat_products/*, ansible_dev_node_support/ (30+ roles)
 
 ---
 
@@ -184,9 +184,9 @@ Standardize role documentation with template:
 
 #### 3. Standardize Error Handling
 Add rescue blocks to roles with critical operations:
-- infrastructure_manager (provisioning)
-- redhat_products/* (product deployment)
-- integration/* (integration logic)
+- platform_infrastructure_manager (platform_provisioning)
+- ansible_dev_node_redhat_products/* (product deployment)
+- integration_generic/* (integration_generic logic)
 **Effort**: 1 hour | **Impact**: High | **Files**: 12
 
 #### 4. Create Standardized Variable Naming Convention
@@ -220,9 +220,9 @@ Document and apply consistent naming:
 ### Phase 3: Error Handling (1-2 hours)
 1. Identify critical roles
 2. Add rescue blocks to:
-   - infrastructure_manager
-   - All redhat_products/* roles
-   - integration/* roles
+   - platform_infrastructure_manager
+   - All ansible_dev_node_redhat_products/* roles
+   - integration_generic/* roles
 3. Test error scenarios
 
 ### Phase 4: Standardization (1-2 hours)
@@ -236,26 +236,26 @@ Document and apply consistent naming:
 
 ### Infrastructure Roles
 ```
-infrastructure_manager/      → Add error handling, meta/main.yml, README
-baremetal_provisioner/       → Add meta/main.yml, README, validation
-libvirt_vm_provisioner/      → Add meta/main.yml, README, timeouts
-infrastructure_prep/         → Add meta/main.yml, README, error handling
+platform_infrastructure_manager/      → Add error handling, meta/main.yml, README
+platform_baremetal_provisioner/       → Add meta/main.yml, README, validation
+platform_libvirt_vm_provisioner/      → Add meta/main.yml, README, timeouts
+platform_infrastructure_prep/         → Add meta/main.yml, README, error handling
 ```
 
 ### Product Roles
 ```
-redhat_products/aap/         → Add error handling, meta/main.yml, README
-redhat_products/satellite/   → Add error handling, meta/main.yml, README
-redhat_products/idm/         → Add error handling, meta/main.yml, README
-redhat_products/openshift/   → Add error handling, meta/main.yml, README
+ansible_dev_node_redhat_products/aap/         → Add error handling, meta/main.yml, README
+ansible_dev_node_redhat_products/scenario_satellite/   → Add error handling, meta/main.yml, README
+ansible_dev_node_redhat_products/idm/         → Add error handling, meta/main.yml, README
+ansible_dev_node_redhat_products/scenario_openshift/   → Add error handling, meta/main.yml, README
 ```
 
 ### Support Roles
 ```
-support/                      → Add meta/main.yml, README, consistent error handling
-cmdb/                         → Add meta/main.yml, README
-integration/                  → Add error handling, meta/main.yml, README
-os/                           → Add meta/main.yml, README per subrole
+ansible_dev_node_support/                      → Add meta/main.yml, README, consistent error handling
+scenario_ansible_cmdb_core/                         → Add meta/main.yml, README
+integration_generic/                  → Add error handling, meta/main.yml, README
+os_generic/                           → Add meta/main.yml, README per subrole
 ```
 
 ---
@@ -301,7 +301,7 @@ os/                           → Add meta/main.yml, README per subrole
 ### ROI:
 - Improved maintainability: +40%
 - Faster onboarding: +50%
-- Reduced support questions: +60%
+- Reduced ansible_dev_node_support questions: +60%
 - Better error diagnosis: +70%
 
 ---
@@ -312,12 +312,12 @@ os/                           → Add meta/main.yml, README per subrole
 
 **Option 1 - Quick Polish (2 hours)**
 - Add meta/main.yml to all roles (batch template)
-- This enables Galaxy integration, better documentation
+- This enables Galaxy integration_generic, better documentation
 
 **Option 2 - Comprehensive (4-5 hours)**
 - Add meta/main.yml to all roles
 - Add README.md to critical roles (15-20 most important)
-- Enhance error handling in infrastructure/product roles
+- Enhance error handling in platform_infrastructure_core/product roles
 
 **Option 3 - Full Professional (8-10 hours)**
 - All of Option 2

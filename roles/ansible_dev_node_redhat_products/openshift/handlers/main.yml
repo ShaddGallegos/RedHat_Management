@@ -1,0 +1,26 @@
+---
+# handlers for OpenShift role
+
+- name: "Restart OpenShift API"
+  ansible.builtin.service:
+    name: "scenario_openshift-api"
+    state: "restarted"
+  listen: "restart scenario_openshift api"
+
+- name: "Restart OpenShift Controller"
+  ansible.builtin.service:
+    name: "scenario_openshift-controller-manager"
+    state: "restarted"
+  listen: "restart scenario_openshift controller"
+
+- name: "Restart OpenShift Scheduler"
+  ansible.builtin.service:
+    name: "scenario_openshift-scheduler"
+    state: "restarted"
+  listen: "restart scenario_openshift scheduler"
+
+- name: "Reload OpenShift Configuration"
+  ansible.builtin.service:
+    name: "scenario_openshift"
+    state: "reloaded"
+  listen: "reload scenario_openshift config"
