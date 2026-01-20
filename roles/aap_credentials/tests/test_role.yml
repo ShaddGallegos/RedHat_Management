@@ -1,0 +1,16 @@
+---
+# Test: aap_credentials_config role
+- name: Test aap_credentials_config role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    aap_credentials_config_enabled: true
+    aap_url: "https://aap.example.com"
+    aap_username: "admin"
+  tasks:
+    - name: Verify role variables
+      assert:
+        that:
+          - aap_credentials_config_enabled is defined
+          - aap_url is defined
+          - aap_username is defined

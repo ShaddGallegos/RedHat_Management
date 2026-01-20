@@ -1,0 +1,29 @@
+---
+# Default variables for rhis_aap_deployment role
+
+# AAP installer settings
+aap_installer_version: "2.6"
+aap_installer_download_url: "https://access.redhat.com/downloads/content/..."
+aap_installer_bundle_dir: "/opt/aap-installer"
+aap_installer_inventory_dir: "{{ aap_installer_bundle_dir }}/inventory"
+
+# Content download settings
+aap_content_source_path: "/opt/aap-content"
+aap_content_download_timeout: 3600
+
+# SSH settings for deployment
+builder_key_file: "~/.ssh/id_rsa"
+deployment_user: "root"
+
+# Controller target
+controllers: []
+  # Example:
+  # - name: controller1
+  #   fqdn: "controller1.example.com"
+
+# Installer configuration
+aap_installer_template_src: "templates/aap/rhis_controller_inventory.j2"
+aap_installer_template_dest: "{{ aap_installer_inventory_dir }}/hosts"
+
+# Verbosity
+aap_install_verbosity: "-v"

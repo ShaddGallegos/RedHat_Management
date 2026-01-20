@@ -1,0 +1,120 @@
+---
+# Default variables for aap_templates_config role
+aap_templates_config_enabled: true
+aap_templates_config_version: "1.0"
+aap_templates_config_timeout: 600
+
+# AAP Connection
+aap_url: "https://aap.example.com"
+aap_username: "admin"
+# aap_password: use vault!
+aap_verify_ssl: true
+
+# Templates Organization
+aap_templates_organization: "Default"
+
+# Job Templates
+create_job_templates: true
+job_templates:
+  - name: "RHIS_Deploy_Infrastructure"
+    description: "Deploy RHIS infrastructure"
+    inventory: "RHIS_Infrastructure"
+    project: "RHIS_Playbooks"
+    playbook: "playbooks/deploy_components.yml"
+    credential: "RHIS_SSH_Key"
+    verbosity: 1
+    limit: ""
+    skip_tags: ""
+    tags: ["rhis", "infrastructure", "deploy"]
+    extra_vars: {}
+
+  - name: "RHIS_Configure_Satellite"
+    description: "Configure Satellite 6.18"
+    inventory: "Satellite_Hosts"
+    project: "Satellite_Playbooks"
+    playbook: "playbooks/satellite_config.yml"
+    credential: "RHIS_SSH_Key"
+    verbosity: 1
+    tags: ["rhis", "satellite", "config"]
+    extra_vars: {}
+
+  - name: "RHIS_Setup_AAP"
+    description: "Setup Ansible Automation Platform"
+    inventory: "AAP_Controllers"
+    project: "AAP_Playbooks"
+    playbook: "playbooks/aap_setup.yml"
+    credential: "RHIS_SSH_Key"
+    verbosity: 1
+    tags: ["rhis", "aap", "setup"]
+    extra_vars: {}
+
+  - name: "RHIS_Configure_IdM"
+    description: "Configure Identity Management"
+    inventory: "RHIS_Infrastructure"
+    project: "IdM_Playbooks"
+    playbook: "playbooks/idm_config.yml"
+    credential: "RHIS_SSH_Key"
+    vault_credential: "RHIS_Vault"
+    verbosity: 1
+    tags: ["rhis", "idm", "config"]
+    extra_vars: {}
+
+  - name: "RHIS_Provision_Infrastructure"
+    description: "Provision infrastructure via Libvirt or cloud"
+    inventory: "RHIS_Infrastructure"
+    project: "Infrastructure_Playbooks"
+    playbook: "playbooks/provision.yml"
+    credential: "RHIS_SSH_Key"
+    verbosity: 1
+    ask_inventory: true
+    ask_variables: true
+    tags: ["rhis", "infrastructure", "provision"]
+    extra_vars: {}
+
+# Workflow Templates
+create_workflow_templates: true
+workflow_templates:
+  - name: "RHIS_Complete_Deployment"
+    description: "Complete RHIS deployment workflow"
+    organization: "{{ aap_templates_organization }}"
+    tags: ["rhis", "workflow", "complete"]
+
+  - name: "RHIS_Infrastructure_Setup"
+    description: "Infrastructure setup and validation"
+    organization: "{{ aap_templates_organization }}"
+    tags: ["rhis", "workflow", "infrastructure"]
+
+  - name: "RHIS_Product_Deployment"
+    description: "Deploy all RHIS products"
+    organization: "{{ aap_templates_organization }}"
+    tags: ["rhis", "workflow", "products"]
+
+# Workflow Job Template Nodes (define the workflow steps)
+workflow_nodes:
+  - name: "RHIS_Complete_Deployment"
+    nodes:
+      - id: 1
+        job_template: "RHIS_Deploy_Infrastructure"
+        success_nodes: [2, 3]
+        failure_nodes: []
+      - id: 2
+        job_template: "RHIS_Configure_Satellite"
+        success_nodes: [5]
+        failure_nodes: []
+      - id: 3
+        job_template: "RHIS_Setup_AAP"
+        success_nodes: [5]
+        failure_nodes: []
+      - id: 4
+        job_template: "RHIS_Configure_IdM"
+        success_nodes: [5]
+        failure_nodes: []
+      - id: 5
+        job_template: "RHIS_Provision_Infrastructure"
+        success_nodes: []
+        failure_nodes: []
+
+# Feature toggles
+aap_templates_validate_connectivity: true
+aap_templates_test_validation: true
+aap_templates_ask_variables: false

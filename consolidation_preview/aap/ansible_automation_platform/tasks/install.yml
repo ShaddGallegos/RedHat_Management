@@ -1,0 +1,4 @@
+---
+- name: AAP install placeholder
+  ansible.builtin.debug:
+    msg: "Implement AAP install here."

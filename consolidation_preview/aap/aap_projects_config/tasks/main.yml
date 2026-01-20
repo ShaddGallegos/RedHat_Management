@@ -1,0 +1,148 @@
+---
+# Configure AAP Projects
+- name: Validate AAP Projects Configuration
+  block:
+    - name: Authenticate with AAP
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/auth/token/"
+        method: POST
+        user: "{{ aap_username }}"
+        password: "{{ aap_password }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+      register: aap_auth
+      no_log: true
+
+    - name: Extract AAP Token
+      ansible.builtin.set_fact:
+        aap_token: "{{ aap_auth.json.token }}"
+      no_log: true
+
+  when: aap_projects_config_enabled
+  tags: ["aap_projects", "validation"]
+
+- name: Get Organization ID
+  ansible.builtin.uri:
+    url: "{{ aap_url }}/api/v2/organizations/?name={{ aap_projects_organization }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ aap_token }}"
+    validate_certs: "{{ aap_verify_ssl }}"
+  register: org_response
+  no_log: true
+
+- name: Set Organization ID
+  ansible.builtin.set_fact:
+    aap_organization_id: "{{ org_response.json.results[0].id }}"
+  when: org_response.json.results | length > 0
+  no_log: true
+
+- name: Configure Git Projects
+  block:
+    - name: Create Git Projects
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/projects/"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          organization: "{{ aap_organization_id }}"
+          scm_type: "{{ item.scm_type }}"
+          scm_url: "{{ item.scm_url }}"
+          scm_branch: "{{ item.scm_branch | default('main') }}"
+          scm_update_on_launch: "{{ item.update_on_launch | default(false) }}"
+      register: git_proj_results
+      loop: "{{ git_projects }}"
+      no_log: true
+      when: create_git_projects
+
+    - name: Sync Git Projects on Launch
+      block:
+        - name: Get created project IDs
+          ansible.builtin.set_fact:
+            project_ids: "{{ project_ids | default([]) + [item.json.id] }}"
+          loop: "{{ git_proj_results.results }}"
+          when:
+            - aap_projects_sync_on_create
+            - item.json is defined
+
+        - name: Trigger project sync
+          ansible.builtin.uri:
+            url: "{{ aap_url }}/api/v2/projects/{{ proj_id }}/update/"
+            method: POST
+            headers:
+              Authorization: "Bearer {{ aap_token }}"
+            validate_certs: "{{ aap_verify_ssl }}"
+          loop: "{{ project_ids }}"
+          loop_control:
+            loop_var: proj_id
+          no_log: true
+          when: aap_projects_sync_on_create
+
+      when: create_git_projects and git_proj_results.results is defined
+
+    - name: Display Git Projects Created
+      ansible.builtin.debug:
+        msg: "Created git project: {{ item.item.name }}"
+      loop: "{{ git_proj_results.results }}"
+      when: create_git_projects and git_proj_results.results is defined
+
+  when: aap_projects_config_enabled
+  tags: ["aap_projects", "git"]
+
+- name: Configure Manual Projects
+  block:
+    - name: Create Manual Projects
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/projects/"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          organization: "{{ aap_organization_id }}"
+          scm_type: ""
+      register: manual_proj_results
+      loop: "{{ manual_projects }}"
+      no_log: true
+      when: create_manual_projects
+
+    - name: Display Manual Projects Created
+      ansible.builtin.debug:
+        msg: "Created manual project: {{ item.item.name }}"
+      loop: "{{ manual_proj_results.results }}"
+      when: create_manual_projects and manual_proj_results.results is defined
+
+  when: aap_projects_config_enabled
+  tags: ["aap_projects", "manual"]
+
+- name: Test Projects
+  block:
+    - name: Retrieve All Projects
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/projects/?organization={{ aap_organization_id }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+      register: all_projects
+      no_log: true
+
+    - name: Display Projects Summary
+      ansible.builtin.debug:
+        msg: |
+          Projects configured: {{ all_projects.json.count }}
+          
+          Project List:
+          {% for proj in all_projects.json.results %}
+          - {{ proj.name }} (Type: {{ proj.scm_type | default('manual') }}, Status: {{ proj.status }})
+          {% endfor %}
+
+  when: aap_projects_config_enabled
+  tags: ["aap_projects", "test"]

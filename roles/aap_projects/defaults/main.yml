@@ -1,0 +1,73 @@
+---
+# Default variables for aap_projects_config role
+aap_projects_config_enabled: true
+aap_projects_config_version: "1.0"
+aap_projects_config_timeout: 600
+
+# AAP Connection
+aap_url: "https://aap.example.com"
+aap_username: "admin"
+# aap_password: use vault!
+aap_verify_ssl: true
+
+# Projects Organization
+aap_projects_organization: "Default"
+
+# Git Projects
+create_git_projects: true
+git_projects:
+  - name: "RHIS_Playbooks"
+    description: "RHIS deployment playbooks and roles"
+    scm_type: "git"
+    scm_url: "https://github.com/example/rhis.git"
+    scm_branch: "main"
+    scm_credential: null
+    update_on_launch: true
+    tags: ["rhis", "playbooks"]
+
+  - name: "Satellite_Playbooks"
+    description: "Satellite management playbooks"
+    scm_type: "git"
+    scm_url: "https://github.com/example/satellite.git"
+    scm_branch: "main"
+    scm_credential: null
+    update_on_launch: false
+    tags: ["rhis", "satellite"]
+
+  - name: "IdM_Playbooks"
+    description: "Identity Management automation"
+    scm_type: "git"
+    scm_url: "https://github.com/example/idm.git"
+    scm_branch: "main"
+    scm_credential: null
+    update_on_launch: false
+    tags: ["rhis", "idm"]
+
+  - name: "AAP_Playbooks"
+    description: "AAP deployment and configuration"
+    scm_type: "git"
+    scm_url: "https://github.com/example/aap.git"
+    scm_branch: "main"
+    scm_credential: null
+    update_on_launch: false
+    tags: ["rhis", "aap"]
+
+  - name: "Infrastructure_Playbooks"
+    description: "Infrastructure provisioning playbooks"
+    scm_type: "git"
+    scm_url: "https://github.com/example/infrastructure.git"
+    scm_branch: "main"
+    scm_credential: null
+    update_on_launch: false
+    tags: ["rhis", "infrastructure"]
+
+# Manual Projects
+create_manual_projects: true
+manual_projects:
+  - name: "RHIS_Local"
+    description: "Local RHIS playbooks"
+    tags: ["rhis", "local"]
+
+# Feature toggles
+aap_projects_validate_connectivity: true
+aap_projects_sync_on_create: true

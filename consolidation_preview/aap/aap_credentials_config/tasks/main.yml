@@ -1,0 +1,204 @@
+---
+# Configure AAP Credentials
+- name: Validate AAP Credentials Configuration
+  block:
+    - name: Check AAP connectivity
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/ping/"
+        method: GET
+        user: "{{ aap_username }}"
+        password: "{{ aap_password }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+      register: aap_ping
+      failed_when: aap_ping.status not in [200, 401]
+
+    - name: Authenticate with AAP
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/auth/token/"
+        method: POST
+        user: "{{ aap_username }}"
+        password: "{{ aap_password }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+      register: aap_auth
+      no_log: true
+
+    - name: Extract AAP Token
+      ansible.builtin.set_fact:
+        aap_token: "{{ aap_auth.json.token }}"
+      no_log: true
+
+  when: aap_credentials_config_enabled
+  tags: ["aap_credentials", "validation"]
+
+- name: Get Organization ID
+  ansible.builtin.uri:
+    url: "{{ aap_url }}/api/v2/organizations/?name={{ aap_credentials_organization }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ aap_token }}"
+    validate_certs: "{{ aap_verify_ssl }}"
+  register: org_response
+  no_log: true
+
+- name: Set Organization ID
+  ansible.builtin.set_fact:
+    aap_organization_id: "{{ org_response.json.results[0].id }}"
+  when: org_response.json.results | length > 0
+  no_log: true
+
+- name: Configure Machine Credentials
+  block:
+    - name: Create Machine Credentials
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/credentials/"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          credential_type: 1
+          organization: "{{ aap_organization_id }}"
+          inputs:
+            username: "{{ item.username }}"
+            ssh_key_data: "{{ lookup('file', item.ssh_key_data) }}"
+            become_method: "{{ item.become_method | default('sudo') }}"
+      register: machine_cred_results
+      loop: "{{ machine_credentials }}"
+      no_log: true
+      when: create_machine_credentials
+
+    - name: Display Machine Credentials Created
+      ansible.builtin.debug:
+        msg: "Created machine credential: {{ item.item.name }}"
+      loop: "{{ machine_cred_results.results }}"
+      when: create_machine_credentials and machine_cred_results.results is defined
+
+  when: aap_credentials_config_enabled
+  tags: ["aap_credentials", "machine"]
+
+- name: Configure Vault Credentials
+  block:
+    - name: Create Vault Credentials
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/credentials/"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          credential_type: 3
+          organization: "{{ aap_organization_id }}"
+          inputs:
+            vault_password: "{{ item.vault_password }}"
+      register: vault_cred_results
+      loop: "{{ vault_credentials }}"
+      no_log: true
+      when: create_vault_credentials
+
+    - name: Display Vault Credentials Created
+      ansible.builtin.debug:
+        msg: "Created vault credential: {{ item.item.name }}"
+      loop: "{{ vault_cred_results.results }}"
+      when: create_vault_credentials and vault_cred_results.results is defined
+
+  when: aap_credentials_config_enabled
+  tags: ["aap_credentials", "vault"]
+
+- name: Configure Registry Credentials
+  block:
+    - name: Create Registry Credentials
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/credentials/"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          credential_type: 18
+          organization: "{{ aap_organization_id }}"
+          inputs:
+            host: "{{ item.host }}"
+            username: "{{ item.username }}"
+            password: "{{ item.password }}"
+      register: registry_cred_results
+      loop: "{{ registry_credentials }}"
+      no_log: true
+      when: create_registry_credentials
+
+    - name: Display Registry Credentials Created
+      ansible.builtin.debug:
+        msg: "Created registry credential: {{ item.item.name }}"
+      loop: "{{ registry_cred_results.results }}"
+      when: create_registry_credentials and registry_cred_results.results is defined
+
+  when: aap_credentials_config_enabled
+  tags: ["aap_credentials", "registry"]
+
+- name: Configure Satellite Credentials
+  block:
+    - name: Create Satellite Credentials
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/credentials/"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          credential_type: 16
+          organization: "{{ aap_organization_id }}"
+          inputs:
+            host: "{{ item.host }}"
+            username: "{{ item.username }}"
+            password: "{{ item.password }}"
+      register: satellite_cred_results
+      loop: "{{ satellite_credentials }}"
+      no_log: true
+      when: create_satellite_credentials
+
+    - name: Display Satellite Credentials Created
+      ansible.builtin.debug:
+        msg: "Created satellite credential: {{ item.item.name }}"
+      loop: "{{ satellite_cred_results.results }}"
+      when: create_satellite_credentials and satellite_cred_results.results is defined
+
+  when: aap_credentials_config_enabled
+  tags: ["aap_credentials", "satellite"]
+
+- name: Test Credentials
+  block:
+    - name: Retrieve All Credentials
+      ansible.builtin.uri:
+        url: "{{ aap_url }}/api/v2/credentials/?organization={{ aap_organization_id }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ aap_verify_ssl }}"
+      register: all_credentials
+      no_log: true
+
+    - name: Display Credentials Summary
+      ansible.builtin.debug:
+        msg: |
+          Credentials configured: {{ all_credentials.json.count }}
+          
+          Credential List:
+          {% for cred in all_credentials.json.results %}
+          - {{ cred.name }} (Type: {{ cred.credential_type_display }})
+          {% endfor %}
+
+  when:
+    - aap_credentials_config_enabled
+    - aap_credentials_test_connections
+  tags: ["aap_credentials", "test"]

@@ -1,0 +1,4 @@
+---
+- name: AAP restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement AAP restore/undo here."

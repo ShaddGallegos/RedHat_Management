@@ -1,0 +1,73 @@
+---
+# Default variables for aap_inventories_config role
+aap_inventories_config_enabled: true
+aap_inventories_config_version: "1.0"
+aap_inventories_config_timeout: 600
+
+# AAP Connection
+aap_url: "https://aap.example.com"
+aap_username: "admin"
+# aap_password: use vault!
+aap_verify_ssl: true
+
+# Inventories Organization
+aap_inventories_organization: "Default"
+
+# Static Inventories
+create_static_inventories: true
+static_inventories:
+  - name: "RHIS_Infrastructure"
+    description: "RHIS infrastructure hosts"
+    variables:
+      ansible_connection: "ssh"
+      ansible_user: "ansible"
+    tags: ["rhis", "infrastructure"]
+
+  - name: "Satellite_Hosts"
+    description: "Satellite server inventory"
+    variables:
+      ansible_connection: "ssh"
+    tags: ["rhis", "satellite"]
+
+  - name: "AAP_Controllers"
+    description: "AAP controller nodes"
+    variables:
+      ansible_connection: "ssh"
+    tags: ["rhis", "aap"]
+
+# Dynamic Inventories
+create_dynamic_inventories: true
+dynamic_inventories:
+  - name: "Satellite_Sync"
+    description: "Satellite dynamic inventory"
+    source: "satellite"
+    source_vars:
+      satellite_host: "satellite.example.com"
+      satellite_credential: "Satellite_API"
+      satellite_group_prefix: "satellite_"
+    tags: ["rhis", "satellite", "dynamic"]
+
+  - name: "AWS_Dynamic"
+    description: "AWS EC2 inventory"
+    source: "aws_ec2"
+    source_vars:
+      regions:
+        - "us-east-1"
+      compose:
+        ansible_host: "private_ip_address"
+    tags: ["rhis", "aws", "dynamic"]
+
+# Inventory Sources
+create_inventory_sources: true
+inventory_sources:
+  - name: "RHIS_Project_Sync"
+    description: "Sync from RHIS project"
+    inventory: "RHIS_Infrastructure"
+    source: "project"
+    source_path: "inventory/hosts"
+    overwrite: true
+    tags: ["rhis", "source"]
+
+# Feature toggles
+aap_inventories_validate_connectivity: true
+aap_inventories_test_imports: true
