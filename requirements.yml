@@ -8,21 +8,7 @@ collections:
   - name: redhat.rhel_system_roles
   - name: redhat.scenario_satellite
   - name: redhat.insights
-  # redhat.libvirt removed due to hub dependency resolution issues
-  # redhat.virtualization removed due to hub dependency resolution issues
-  # redhat.migration removed due to hub dependency resolution issues
-  # redhat.cloudforms removed due to hub dependency resolution issues
-  # redhat.certificates removed due to hub dependency resolution issues
-  # redhat.firewall removed due to hub dependency resolution issues
-  # redhat.logging removed due to hub dependency resolution issues
-  # redhat.monitoring removed due to hub dependency resolution issues
-  # redhat.network_insights removed due to hub dependency resolution issues
-  # redhat.storage removed due to hub dependency resolution issues
-  # redhat.system_roles removed due to hub dependency resolution issues
-  # redhat.users removed due to hub dependency resolution issues
-  # redhat.workloads removed due to hub dependency resolution issues
   - name: ansible.utils
-  # ansible.builtin removed from requirements (builtin collection)
   - name: community.os_windows
   - name: community.platform_vmware
   - name: community.docker
@@ -35,96 +21,24 @@ collections:
   - name: community.azure
   - name: community.google
   - name: community.hashi_vault
-  # hashivault.hashivault removed due to dependency resolution issues
-  # ansible.ansible_dev_node_legacy_archive removed (builtin/compat collection)
-  - name: ansible.os_windows
-  # ansible.cloud removed from requirements
-  # ansible.kubernetes removed from requirements
-  # ansible.platform_vmware removed from requirements
-  # ansible.docker removed from requirements
-  # ansible.hashivault removed from requirements
-  - name: community.general
-  - name: community.crypto
-  - name: ansible.posix
-  - name: ansible.netcommon
-  - name: redhat.rhel_system_roles
-  - name: redhat.scenario_satellite
-  - name: redhat.insights
-  # redhat.libvirt removed due to hub dependency resolution issues
-  # redhat.virtualization removed due to hub dependency resolution issues
-  # redhat.migration removed due to hub dependency resolution issues
-  # redhat.cloudforms removed due to hub dependency resolution issues
-  # redhat.certificates removed due to hub dependency resolution issues
-  # redhat.firewall removed due to hub dependency resolution issues
-  # redhat.logging removed due to hub dependency resolution issues
-  # redhat.monitoring removed due to hub dependency resolution issues
-  # redhat.network_insights removed due to hub dependency resolution issues
-  # redhat.storage removed due to hub dependency resolution issues
-  # redhat.system_roles removed due to hub dependency resolution issues
-  # redhat.users removed due to hub dependency resolution issues
-  # redhat.workloads removed due to hub dependency resolution issues
-  - name: ansible.utils
-  # ansible.builtin removed from requirements (builtin collection)
-  - name: community.os_windows
-  - name: community.platform_vmware
-  - name: community.docker
-  - name: community.kubernetes
-  - name: kubernetes.core
-  - name: google.cloud
-  - name: amazon.aws
-  - name: azure.azcollection
-  - name: community.aws
-  - name: community.azure
-  - name: community.google
-  - name: community.hashi_vault
-  # hashivault.hashivault removed due to dependency resolution issues
-  # ansible.ansible_dev_node_legacy_archive removed (builtin/compat collection)
-  - name: ansible.os_windows
-  # ansible.cloud removed from requirements
-  # ansible.kubernetes removed from requirements
-  # ansible.platform_vmware removed from requirements
-  # ansible.docker removed from requirements
-  # ansible.hashivault removed from requirements
-  - name: community.general
-  - name: community.crypto
-  - name: ansible.posix
-  - name: ansible.netcommon
-  - name: redhat.rhel_system_roles
-  - name: redhat.scenario_satellite
-  - name: redhat.insights
-  # redhat.libvirt removed due to hub dependency resolution issues
-  # redhat.virtualization removed due to hub dependency resolution issues
-  # redhat.migration removed due to hub dependency resolution issues
-  # redhat.cloudforms removed due to hub dependency resolution issues
-  # redhat.certificates removed due to hub dependency resolution issues
-  # redhat.firewall removed due to hub dependency resolution issues
-  # redhat.logging removed due to hub dependency resolution issues
-  # redhat.monitoring removed due to hub dependency resolution issues
-  # redhat.network_insights removed due to hub dependency resolution issues
-  # redhat.storage removed due to hub dependency resolution issues
-  # redhat.system_roles removed due to hub dependency resolution issues
-  # redhat.users removed due to hub dependency resolution issues
-  # redhat.workloads removed due to hub dependency resolution issues
-  - name: ansible.utils
-  # ansible.builtin removed from requirements (builtin collection)
-  - name: community.os_windows
-  - name: community.platform_vmware
-  - name: community.docker
-  - name: community.kubernetes
-  - name: kubernetes.core
-  - name: google.cloud
-  - name: amazon.aws
-  - name: azure.azcollection
-  - name: community.aws
-  - name: community.azure
-  - name: community.google
-  - name: community.hashi_vault
-  # hashivault.hashivault removed due to dependency resolution issues
-  # ansible.ansible_dev_node_legacy_archive removed (builtin/compat collection)
-  - name: ansible.os_windows
-  # ansible.cloud removed from requirements
-  # ansible.kubernetes removed from requirements
-  # ansible.platform_vmware removed from requirements
-  # ansible.docker removed from requirements
-  # ansible.hashivault removed from requirements
-roles: []
+  collections:
+    - name: ansible.posix
+    - name: ansible.netcommon
+    - name: community.crypto
+    - name: redhat.rhel_system_roles
+    - name: redhat.insights
+    - name: ansible.utils
+    - name: community.os_windows
+    - name: community.platform_vmware
+    - name: community.docker
+    - name: community.kubernetes
+    - name: kubernetes.core
+    - name: google.cloud
+    - name: amazon.aws
+    - name: azure.azcollection
+    - name: community.aws
+    - name: community.azure
+    - name: community.google
+    - name: community.hashi_vault
+    - name: ansible.os_windows
+    - name: community.general
