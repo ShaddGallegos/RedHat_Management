@@ -36,3 +36,8 @@ __pycache__/
 
 # Ignore contrib directory (local helpers and build scripts)
 contrib/
+cache/
+archived/
+*.backup
+*.trunk
+trunk/
