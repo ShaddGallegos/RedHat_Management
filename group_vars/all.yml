@@ -5,14 +5,14 @@ satellite_url: "https://{{ satellite.satellite_hostname }}"
 aap_installer_inventory: "{{ aap.aap_path_to_local_tar_gz_installer | default('inventory/generated_inventory.ini') }}"
 aap_bundle_filename: "{{ aap.aap_path_to_local_tar_gz_installer | default('ansible-automation-platform-containerized-setup-bundle-2.6-4-x86_64.tar.gz') }}"
 aap_admin_user: "{{ aap.aap_admin_username }}"
-aap_admin_password: "{{ aap.aap_admin_password }}"
+aap_admin_password: "{{ vault_admin_password | default('') }}"
 
 # Satellite admin for API/module actions
 satellite_admin_user: "{{ satellite.satellite_admin_username }}"
-satellite_admin_password: "{{ satellite.satellite_admin_password }}"
+satellite_admin_password: "{{ vault_satellite_admin_password | default('') }}"
 
 # IDM admin
-idm_admin_password: "{{ idm.idm_admin_password }}"
+idm_admin_password: "{{ vault_admin_password | default('') }}"
 idm_directory_manager_password: "{{ idm.idm_directory_manager_password }}"
 # Product-specific firewall and SELinux settings
 firewall_product_rules:
@@ -72,7 +72,7 @@ firewall_product_rules:
 
 # Access
 admin_username: "admin"
-admin_password: "bj8H7ndC7$"
+admin_password: "{{ vault_admin_password | default('') }}"
 # AAP installer bundle (path on installer host)
 installer_bundle_path: "files/ansible-automation-platform-containerized-setup-bundle-2.6-4-x86_64.tar.gz"
 
@@ -83,7 +83,7 @@ installer_bundle_path: "files/ansible-automation-platform-containerized-setup-bu
 # Controller admin and root machine credential for controller
 
 # Satellite admin for API/module actions
-ansible_root_password: "bj8H7ndC7$"
+ansible_root_password: "{{ vault_ansible_root_password | default('') }}"
 
 # Domain and networking for Satellite
 project_domain: "prod.spg"
@@ -99,24 +99,24 @@ selected_integrations:
 ansible_log_path: "logs/ansible.log"
 
 # Global admin alias (used by some role defaults)
-global_admin_password: "bj8H7ndC7$"
+global_admin_password: "{{ vault_admin_password | default('') }}"
 
 # Libvirt / compute defaults
 libvirt:
-  ansible_root_password: "{{ global_admin_password }}"
+  ansible_root_password: "{{ vault_ansible_root_password | default('') }}"
   libvirt_pool: default
   libvirt_external_network: virbr0
   libvirt_external_network_ip: 192.168.122.1
-  satellite_admin_password: "{{ global_admin_password }}"
+  satellite_admin_password: "{{ vault_satellite_admin_password | default('') }}"
   libvirt_internal_network: virbr1
   libvirt_internal_network_ip: 10.168.0.1
   libvirt_internal_network_netmask: 255.255.0.0
-  global_admin_password: "{{ global_admin_password }}"
+  global_admin_password: "{{ vault_admin_password | default('') }}"
   satellite_vm_memory_mb: 25000
   satellite_vm_vcpus: 8
   satellite_vm_disk_gb: 200
   satellite_root_ssh_pubkey: ""
-  idm_admin_password: "{{ global_admin_password }}"
+  idm_admin_password: "{{ vault_admin_password | default('') }}"
   idm_directory_manager_password: "{{ global_admin_password }}"
   libvirt_network_devices:
     - name: enp1s0
@@ -177,7 +177,7 @@ idm:
   idm_subnet_mask_bits: 16
   idm_gateway: 10.168.0.1
   idm_admin_username: admin
-  idm_admin_password: "{{ global_admin_password }}"
+  idm_admin_password: "{{ vault_admin_password | default('') }}"
   idm_ldap_base_dn: "dc=prod,dc=spg"
   idm_kerberos_realm: "PROD.SPG"
   idm_directory_manager_password: "{{ aap_password | default(aap_admin_password) }}"
@@ -189,7 +189,7 @@ idm:
 satellite:
   satellite_ip: 10.168.151.127
   satellite_admin_username: admin
-  satellite_admin_password: "bj8H7ndC7$"
+  satellite_admin_password: "{{ vault_satellite_admin_password | default('') }}"
   rhel_versions: [8, 9, 10]
   satellite_version: "6.18"
   satellite_domain: prod.spg
@@ -213,7 +213,7 @@ satellite:
   create_content_views: true
   create_activation_keys: true
   foreman_admin_username: admin
-  foreman_admin_password: "{{ global_admin_password }}"
+  foreman_admin_password: "{{ vault_admin_password | default('') }}"
   scenario: satellite
   reset_foreman_proxy_dns_forwarders: true
   foreman_initial_organization: "DefaultOrg"
@@ -258,7 +258,7 @@ aap:
   aap_version: "2.6"
   aap_path_to_local_tar.gz_installer: files/ansible-automation-platform-containerized-setup-bundle-2.6-4-x86_64.tar.gz
   aap_admin_username: admin
-  aap_admin_password: "{{ global_admin_password }}"
+  aap_admin_password: "{{ vault_admin_password | default('') }}"
   aap_primary_interface: enp2s0
   aap_ip: 10.168.151.126
   aap_subnet_mask_bits: 16
@@ -268,7 +268,7 @@ aap:
   automationhub: "{{ aap_hostname }}"
   automationeda: "{{ aap_hostname }}"
   database: "{{ aap_hostname }}"
-  platform_admin_password: "{{ global_admin_password }}"
+  platform_admin_password: "{{ vault_admin_password | default('') }}"
   aap_password: "{{ aap_admin_password }}"
 
 # Global settings provided by user
@@ -277,9 +277,9 @@ global:
   domain: prod.spg
   aap_password: "bj8H7ndC7$"
   redhat_cdn_username: "shadd@redhat.com"
-  redhat_cdn_password: "bj8H7ndC7$"
-  console_redhat_token: "eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI0NzQzYTkzMC03YmJiLTRkZGQtOTgzMS00ODcxNGRlZDc0YjUifQ.eyJpYXQiOjE3NjYxNjA3ODAsImp0aSI6IjY3YjQ2OGQyLTNhZWQtNDk3NC04ODNiLTUzYzVkZmQ1NTNkYiIsImlzcyI6Imh0dHBzOi8vc3NvLnJlZGhhdC5jb20vYXV0aC9yZWFsbXMvcmVkaGF0LWV4dGVybmFsIiwiYXVkIjoiaHR0cHM6Ly9zc28ucmVkaGF0LmNvbS9hdXRoL3JlYWxtcy9yZWRoYXQtZXh0ZXJuYWwiLCJzdWIiOiI1MDAxMDExMyIsInR5cCI6Ik9mZmxpbmUiLCJhenAiOiJjbG91ZC1zZXJ2aWNlcyIsIm5vbmNlIjoiMTFmNDhhNjQtNDdkYy00ZjRjLWFiYWYtMjk3MDA0ZTJhMjM1Iiwic2lkIjoiZmQwN2Q1YmEtN2U0YS00NGQ2LTgwZWUtYmMwZjBjZWM2NWUwIiwic2NvcGUiOiJvcGVuaWQgYXBpLmNvbnNvbGUgYmFzaWMgcm9sZXMgd2ViLW9yaWdpbnMgY2xpZW50X3R5cGUucHJlX2tjMjUgYXBpLmFza19yZWRfaGF0IG9mZmxpbmVfYWNjZXNzIn0.L4oHmHKKqAqsbgXg_r37oFBUkTBbuGWXhX0CQev_j6Skg45xLCWrUKUFzHGWa5oUAULPYl7494xUMX4xF5S5qg"
-  global_admin_password: "bj8H7ndC7$"
+  redhat_cdn_password: "{{ vault_redhat_cdn_password | default('') }}"
+  console_redhat_token: "{{ vault_console_redhat_token | default('') }}"
+  global_admin_password: "{{ vault_admin_password | default('') }}"
 project_name: test-lab
 domain: prod.spg
 compute_platform: libvirt
