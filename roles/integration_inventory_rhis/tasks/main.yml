@@ -16,12 +16,12 @@
   ansible.builtin.debug:
     msg:
       - "RHIS Inventory Integration Role Loaded"
-      - "Available templates in templates/rhis/"
+      - "Available templates in templates/"
       - "  - Provisioning: ~25 scenario_satellite platform_provisioning templates"
       - "  - Configs: ~10 configuration templates"
       - "  - Inventory: 8 topology inventory templates"
       - "  - Execution-env: Execution environment templates"
-      - "Available files in files/rhis/"
+      - "Available files in files/"
       - "  - OpenSCAP content files (RHEL 7, 8, 9)"
       - "  - Supporting scripts and RPMs"
       - "  - Configuration examples"

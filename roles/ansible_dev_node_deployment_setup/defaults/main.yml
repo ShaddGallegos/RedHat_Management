@@ -6,8 +6,8 @@ deployment_setup_version: "1.0"
 # Directory structure
 deployment_setup_directories:
   - "/opt/rhis"
-  - "/opt/rhis/reports"
-  - "/opt/rhis/inventory"
+  - "/opt/reports"
+  - "/opt/inventory"
   - "/var/log/rhis"
 
 # Feature toggles

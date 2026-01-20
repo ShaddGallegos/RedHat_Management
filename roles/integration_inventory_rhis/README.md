@@ -12,13 +12,13 @@ This role:
 
 ## Templates Available
 
-### Provisioning Templates (templates/rhis/platform_provisioning/)
+### Provisioning Templates (templates/platform_provisioning/)
 - 20+ Satellite platform_provisioning templates
 - PXE boot templates
 - Partition table configurations
 - Job templates for host platform_provisioning
 
-### Configuration Templates (templates/rhis/configs/)
+### Configuration Templates (templates/configs/)
 - Chrony configuration
 - PostgreSQL tuning
 - Keycloak configuration
@@ -26,7 +26,7 @@ This role:
 - Foreman configuration
 - /etc/hosts template
 
-### Inventory Templates (templates/rhis/inventory/)
+### Inventory Templates (templates/inventory/)
 - Enterprise topology (container)
 - Enterprise topology (RPM)
 - Growth topology (container)
@@ -36,10 +36,10 @@ This role:
 - Ansible inventory generator
 - Custom RPM inventory
 
-### Execution Environment (templates/rhis/execution-env/)
+### Execution Environment (templates/execution-env/)
 - Execution environment YAML template
 
-## Supporting Files (files/rhis/)
+## Supporting Files (files/)
 
 - OpenSCAP content (RHEL 7, 8, 9)
 - Tailoring files for security compliance

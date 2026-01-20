@@ -5,7 +5,7 @@ inventory_generator_version: "1.0"
 
 # Inventory configuration
 inventory_generator_format: "ini"
-inventory_generator_output: "/opt/rhis/inventory/hosts.generated"
+inventory_generator_output: "/opt/inventory/hosts.generated"
 
 # Feature toggles
 inventory_generator_validate_syntax: true
