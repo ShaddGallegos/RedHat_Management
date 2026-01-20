@@ -47,7 +47,7 @@ test_types:
   - integration_generic
 
 # Backup settings
-backup_destination: "/backup/rhis"
+backup_destination: "/backup"
 backup_retention_days: 30
 backup_schedule: "daily"  # daily, weekly, monthly
 

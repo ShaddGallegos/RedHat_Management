@@ -5,10 +5,10 @@ deployment_setup_version: "1.0"
 
 # Directory structure
 deployment_setup_directories:
-  - "/opt/rhis"
+  - "/opt"
   - "/opt/reports"
   - "/opt/inventory"
-  - "/var/log/rhis"
+  - "/var/log"
 
 # Feature toggles
 deployment_setup_validate_environment: true

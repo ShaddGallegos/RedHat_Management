@@ -10,7 +10,7 @@ backup_and_restore: false
 configure_cmdb: true
 
 # Backup configuration
-backup_destination: "/backup/rhis"
+backup_destination: "/backup"
 backup_retention_days: 30
 
 # Feature toggles

@@ -1,7 +1,7 @@
 ---
 # Backup role defaults
 
-backup_base_dir: "/var/backups/rhis"
+backup_base_dir: "/var/backups"
 backup_retention_days: 30
 backup_compression: "gz"
 backup_verify: true
