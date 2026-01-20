@@ -1,5 +1,5 @@
 ---
-# Public Ansible Galaxy collections for local development/linting
+# Public Ansible Galaxy collections for local development and ansible-lint
 collections:
   - name: ansible.posix
   - name: ansible.netcommon

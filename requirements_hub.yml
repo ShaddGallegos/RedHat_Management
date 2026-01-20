@@ -10,6 +10,8 @@ collections:
     version: ">=2.6.0"
   - name: redhat.insights
     version: ">=1.3.0"
+  # The following community/ansible entries are placed here when pinned
+  # to specific versions intended for Automation Hub installs only.
   - name: ansible.utils
     version: ">=2.11.0"
   - name: community.general
@@ -22,7 +24,7 @@ collections:
     version: ">=3.0.0"
   - name: community.os_windows
     version: ">=2.0.0"
-  - name: community.platform_vmware  
+  - name: community.platform_vmware
     version: ">=3.0.0"
   - name: community.docker
     version: ">=2.0.0"
@@ -48,29 +50,9 @@ collections:
     version: ">=2.5.0"
   - name: redhat.workloads
     version: ">=2.5.0"
-  - name: ansible.utils
-    version: ">=2.11.0"
-  - name: community.general
-    version: ">=6.0.0"
-  - name: ansible.posix
-    version: ">=2.0.0"
-  - name: ansible.netcommon
-    version: ">=4.0.0"
-  - name: community.crypto
-    version: ">=3.0.0"
-  - name: community.os_windows
-    version: ">=2.0.0"
-  - name: community.platform_vmware  
-    version: ">=3.0.0"
-  - name: community.docker
-    version: ">=2.0.0"
-  - name: community.kubernetes
-    version: ">=2.0.0"
-  - name: community.hashi_vault
-    version: ">=3.0.0"
   - name: ansible.kubernetes
     version: ">=2.0.0"
-  - name: ansible.platform_vmware 
+  - name: ansible.platform_vmware
     version: ">=2.0.0"
   - name: ansible.docker
     version: ">=2.0.0"
