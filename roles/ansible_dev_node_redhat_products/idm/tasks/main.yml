@@ -4,7 +4,7 @@
 # Coordinates base, replica, and integration_generic components
 
 - name: "RED HAT IDENTITY MANAGEMENT (IdM) - Initialize"
-  debug:
+  ansible.builtin.debug:
     msg: |
       Red Hat Identity Management Deployment
       ========================================
@@ -25,7 +25,7 @@
 - name: "Execute IdM installation workflow"
   block:
     - name: "Deploy IdM base components"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/idm"
         tasks_from: "idm_base/main.yml"
         apply:
@@ -33,7 +33,7 @@
       tags: ["idm"]
 
     - name: "Configure IdM replicas (if applicable)"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/idm"
         tasks_from: "idm_replica/main.yml"
         apply:
@@ -42,7 +42,7 @@
       tags: ["idm"]
 
     - name: "Configure IdM integrations"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/idm"
         tasks_from: "idm_integration/main.yml"
         apply:
@@ -52,17 +52,17 @@
 
   rescue:
     - name: "Capture IdM deployment error"
-      debug:
+      ansible.builtin.debug:
         msg: |
           IdM deployment encountered an error.
           Review logs for specific failure information.
       tags: ["idm", "error"]
 
     - name: "IdM deployment failed - detailed error"
-      fail:
+      ansible.builtin.fail:
         msg: |
           ❌ IdM DEPLOYMENT FAILED
-          
+
           Common causes:
           1. DNS/domain configuration issues
           2. Network connectivity problems
@@ -70,7 +70,7 @@
           4. Port conflicts (389, 636, 88, 464, etc.)
           5. Directory corruption or conflicts
           6. Kerberos/LDAP protocol issues
-          
+
           Recovery steps:
           1. Verify DNS resolution: nslookup $(hostname -f)
           2. Confirm network connectivity to all hosts
@@ -78,11 +78,11 @@
           4. Verify ports are available: netstat -tuln
           5. Check for conflicting LDAP/Kerberos services
           6. Review Kerberos configuration
-          
+
           Check logs above for detailed error information.
   tags: ["idm"]
 
 - name: "IdM deployment completed"
-  debug:
+  ansible.builtin.debug:
     msg: "Red Hat Identity Management deployment complete."
   tags: ["idm", "info"]

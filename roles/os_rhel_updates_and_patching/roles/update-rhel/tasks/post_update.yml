@@ -27,7 +27,7 @@
   when: update_rhel_os_info.major_version >= 8
 
 - name: Check for systemd reboot indicators
-  command: systemctl is-system-running
+  ansible.builtin.command: systemctl is-system-running
   register: update_rhel_system_status
   failed_when: false
   changed_when: false
@@ -42,7 +42,7 @@
       }}
 
 - name: Display kernel information
-  debug:
+  ansible.builtin.debug:
     msg: |
       Kernel Analysis:
       - Current running: {{ update_rhel_os_info.kernel }}
@@ -51,7 +51,7 @@
   when: update_rhel_verbose | default(true)
 
 - name: Display reboot requirement analysis
-  debug:
+  ansible.builtin.debug:
     msg: |
       Reboot Analysis:
       {% if update_rhel_reboot_needed %}
@@ -71,7 +71,7 @@
   when: update_rhel_verbose | default(true)
 
 - name: Display update summary
-  debug:
+  ansible.builtin.debug:
     msg: |
       Update Summary:
       - System: {{ update_rhel_os_info.distribution }} {{ update_rhel_os_info.version }}

@@ -4,7 +4,7 @@
 # Routes to appropriate platform-specific tasks
 
 - name: "INFRASTRUCTURE MANAGEMENT - Initialize"
-  debug:
+  ansible.builtin.debug:
     msg: |
       Infrastructure Management and Provisioning
       ============================================
@@ -22,7 +22,7 @@
 - name: "Route to platform-specific platform_infrastructure_core tasks"
   block:
     - name: "Call platform platform_provisioning task"
-      debug:
+      ansible.builtin.debug:
         msg: |
           Provisioning for platform: {{ deployment_platform }}
           Use tasks_from parameter for platform-specific operations:
@@ -37,7 +37,7 @@
 
   rescue:
     - name: "Infrastructure platform_provisioning failed"
-      fail:
+      ansible.builtin.fail:
         msg: |
           Infrastructure platform_provisioning failed for platform: {{ deployment_platform }}
           Please verify platform credentials, connectivity, and configuration.
@@ -45,6 +45,6 @@
   tags: ["platform_infrastructure_core", "platform_provisioning"]
 
 - name: "Infrastructure setup and validation completed"
-  debug:
+  ansible.builtin.debug:
     msg: "Infrastructure ready for {{ deployment_platform }} platform"
   tags: ["platform_infrastructure_core", "info"]

@@ -3,7 +3,7 @@
 # Configures network-based installation via TFTP boot
 
 - name: "Configure Installation Method: TFTP"
-  debug:
+  ansible.builtin.debug:
     msg: |
       Installation Method: TFTP
       ==========================
@@ -15,7 +15,7 @@
 - name: "Validate TFTP installation setup"
   block:
     - name: "Check TFTP server status"
-      shell: systemctl is-active tftp || systemctl is-active tftpd-hpa
+      ansible.builtin.shell: systemctl is-active tftp || systemctl is-active tftpd-hpa
       register: tftp_status
       changed_when: false
       failed_when: false
@@ -38,6 +38,6 @@
   tags: ["installation", "tftp", "validate"]
 
 - name: "TFTP installation method configured"
-  debug:
+  ansible.builtin.debug:
     msg: "TFTP installation method ready for network platform_provisioning"
   tags: ["installation", "tftp", "info"]

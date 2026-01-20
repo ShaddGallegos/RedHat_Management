@@ -10,26 +10,26 @@
     update_rhel_pre_package_count: "{{ update_rhel_packages_pre.ansible_facts.packages.keys() | length }}"
 
 - name: Display pre-update package summary
-  debug:
+  ansible.builtin.debug:
     msg: "Pre-update: {{ update_rhel_pre_package_count }} packages installed"
   when: update_rhel_verbose | default(true)
 
 - name: Install delta RPM package for RHEL 7
-  package:
+  ansible.builtin.package:
 - name: deltarpm
     state: present
   when: update_rhel_os_info.major_version == 7
   ignore_errors: true
 
 - name: Install delta RPM package for RHEL 8+
-  package:
+  ansible.builtin.package:
 - name: drpm
     state: present
   when: update_rhel_os_info.major_version >= 8
   ignore_errors: true
 
 - name: Clean package manager cache
-  shell: "{{ update_rhel_os_info.package_manager }} clean all"
+  ansible.builtin.shell: "{{ update_rhel_os_info.package_manager }} clean all"
   changed_when: true
   when: update_rhel_clean_cache | default(true)
 
@@ -50,7 +50,7 @@
     update_rhel_updates_available: "{{ update_rhel_available_updates.results | length }}"
 
 - name: Display available updates summary
-  debug:
+  ansible.builtin.debug:
     msg: |
       Available updates: {{ update_rhel_updates_available }}
       {% if update_rhel_show_updates | default(false) and update_rhel_updates_available > 0 %}

@@ -187,12 +187,12 @@
       ansible.builtin.debug:
         msg: |
           RHEL Repository Sets Status:
-          
+
           Successfully enabled RHEL yum repositories for:
           {% for item in repository_sets_to_enable %}
           - {{ item.name }} (RelVer: {{ item.releasever }})
           {% endfor %}
-          
+
           These repositories are now available for content views and activation keys.
       when: enable_repository_sets and repo_set_results.changed
 
@@ -241,10 +241,10 @@
       ansible.builtin.debug:
         msg: |
           Satellite Content Configuration Summary:
-          
+
           Organization: {{ satellite_organization }}
           Location: {{ satellite_location }}
-          
+
           Configurations Applied:
           - Organizations: {{ 'Configured' if create_organizations else 'Skipped' }}
           - Locations: {{ 'Configured' if create_locations else 'Skipped' }}

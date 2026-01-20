@@ -181,15 +181,15 @@
       ansible.builtin.debug:
         msg: |
           Satellite Lifecycle Configuration Summary:
-          
+
           Organization: {{ satellite_organization }}
-          
+
           Configurations Applied:
           - Lifecycle Environments: {{ 'Configured' if create_lifecycle_environments else 'Skipped' }}
           - Content Views: {{ 'Configured' if create_content_views else 'Skipped' }}
           - Filters: {{ 'Configured' if create_filters else 'Skipped' }}
           - Composite Views: {{ 'Configured' if create_content_views else 'Skipped' }}
-          
+
           Lifecycle Path: Library → Development → Staging → Production
 
   when: satellite_lifecycle_config_enabled

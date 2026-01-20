@@ -124,7 +124,7 @@
       notify: restart httpd
 
     - name: Ensure httpd is started and enabled
-      systemd:
+      ansible.builtin.systemd:
         name: httpd
         state: started
         enabled: yes
@@ -173,7 +173,7 @@
 
 handlers:
   - name: restart httpd
-    systemd:
+    ansible.builtin.systemd:
       name: httpd
       state: restarted
     become: true

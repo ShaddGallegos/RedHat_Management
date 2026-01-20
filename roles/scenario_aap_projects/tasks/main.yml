@@ -138,7 +138,7 @@
       ansible.builtin.debug:
         msg: |
           Projects configured: {{ all_projects.json.count }}
-          
+
           Project List:
           {% for proj in all_projects.json.results %}
           - {{ proj.name }} (Type: {{ proj.scm_type | default('manual') }}, Status: {{ proj.status }})

@@ -34,7 +34,7 @@
 
     - name: Allow services
       ansible.builtin.firewalld:
-        service: "{{ item }}"
+        ansible.builtin.service: "{{ item }}"
         permanent: true
         immediate: true
         state: enabled

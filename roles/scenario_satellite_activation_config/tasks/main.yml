@@ -142,9 +142,9 @@
       ansible.builtin.debug:
         msg: |
           Satellite Activation Configuration Summary:
-          
+
           Organization: {{ satellite_organization }}
-          
+
           Activation Keys Configured:
           {% for ak in ak_summary.json.results | default([]) %}
           - {{ ak.name }}
@@ -152,7 +152,7 @@
             Content View: {{ ak.content_view.name | default('') }}
             Auto-attach: {{ ak.auto_attach }}
           {% endfor %}
-          
+
           Host Collections: {{ 'Configured' if configure_host_collections else 'Skipped' }}
           Subscriptions: {{ 'Configured' if attach_subscriptions else 'Skipped' }}
 

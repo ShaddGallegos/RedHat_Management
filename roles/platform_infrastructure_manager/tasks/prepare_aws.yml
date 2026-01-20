@@ -3,7 +3,7 @@
 # Prepares AWS environment for EC2 instance platform_provisioning
 
 - name: "Prepare AWS Infrastructure"
-  debug:
+  ansible.builtin.debug:
     msg: |
       AWS Infrastructure Preparation
       ================================
@@ -14,13 +14,13 @@
 - name: "Validate AWS prerequisites"
   block:
     - name: "Check AWS CLI installation"
-      shell: aws --version
+      ansible.builtin.shell: aws --version
       register: aws_cli_check
       changed_when: false
       failed_when: false
 
     - name: "Check AWS credentials"
-      shell: aws sts get-caller-identity
+      ansible.builtin.shell: aws sts get-caller-identity
       register: aws_creds_check
       changed_when: false
       failed_when: false
@@ -36,6 +36,6 @@
   tags: ["platform_infrastructure_core", "aws", "validate"]
 
 - name: "AWS platform_infrastructure_core ready for platform_provisioning"
-  debug:
+  ansible.builtin.debug:
     msg: "AWS platform_infrastructure_core prepared successfully"
   tags: ["platform_infrastructure_core", "aws", "info"]

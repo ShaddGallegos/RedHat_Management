@@ -4,17 +4,17 @@
 # This role orchestrates bare metal platform_infrastructure_core deployment
 
 - name: "BAREMETAL PROVISIONING - Initialize"
-  debug:
+  ansible.builtin.debug:
     msg: |
       Bare Metal Provisioner
       =====================
       Platform: {{ deployment_platform | default('baremetal') }}
       Deployment: {{ deployment_scenario | default('undefined') }}
-      
+
   tags: ["baremetal", "platform_provisioning"]
 
 - name: Load survey for baremetal platform_provisioning (if present)
-  include_role:
+  ansible.builtin.include_role:
     name: integration_survey_loader
   run_once: true
   delegate_to: localhost
@@ -31,12 +31,12 @@
 - name: "Baremetal platform_provisioning workflow"
   block:
     - name: "Check platform_infrastructure_manager for platform_provisioning capability"
-      debug:
+      ansible.builtin.debug:
         msg: "Delegating baremetal platform_provisioning to platform_infrastructure_manager role"
       tags: ["platform_provisioning"]
 
     - name: "Call platform_infrastructure_manager for baremetal platform_infrastructure_core setup"
-      include_role:
+      ansible.builtin.include_role:
         name: "platform_infrastructure_manager"
         tasks_from: "prepare_baremetal"
       when: deploy_infrastructure | default(true)
@@ -44,7 +44,7 @@
 
   rescue:
     - name: "Baremetal platform_provisioning failed"
-      fail:
+      ansible.builtin.fail:
         msg: |
           Baremetal platform_provisioning failed for {{ deployment_scenario }}.
           Ensure DHCP and TFTP services are configured on platform_infrastructure_core host.

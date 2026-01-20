@@ -59,7 +59,7 @@
       become: true
 
     - name: Enable container services
-      systemd:
+      ansible.builtin.systemd:
         name: podman
         state: started
         enabled: yes

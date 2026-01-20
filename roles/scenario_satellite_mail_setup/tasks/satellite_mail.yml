@@ -55,7 +55,7 @@
 
 - name: Allow mail traffic in firewalld if present
   ansible.builtin.firewalld:
-    service: smtp
+    ansible.builtin.service: smtp
     state: enabled
     permanent: true
     immediate: true

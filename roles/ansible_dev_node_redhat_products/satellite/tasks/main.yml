@@ -4,7 +4,7 @@
 # Coordinates base, API, content, hosts, and reporting components
 
 - name: "RED HAT SATELLITE - Initialize"
-  debug:
+  ansible.builtin.debug:
     msg: |
       Red Hat Satellite 6.18 Deployment
       ===================================
@@ -25,7 +25,7 @@
 - name: "Execute Satellite installation workflow"
   block:
     - name: "Pre-deployment checks"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_satellite"
         tasks_from: "satellite_prechecks/main.yml"
         apply:
@@ -33,7 +33,7 @@
       tags: ["scenario_satellite"]
 
     - name: "Deploy Satellite base components"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_satellite"
         tasks_from: "satellite_base/main.yml"
         apply:
@@ -41,7 +41,7 @@
       tags: ["scenario_satellite"]
 
     - name: "Configure Satellite API"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_satellite"
         tasks_from: "satellite_api/main.yml"
         apply:
@@ -50,7 +50,7 @@
       tags: ["scenario_satellite"]
 
     - name: "Configure Satellite content management"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_satellite"
         tasks_from: "satellite_content/main.yml"
         apply:
@@ -59,7 +59,7 @@
       tags: ["scenario_satellite"]
 
     - name: "Configure Satellite hosts"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_satellite"
         tasks_from: "satellite_hosts/main.yml"
         apply:
@@ -68,7 +68,7 @@
       tags: ["scenario_satellite"]
 
     - name: "Configure Satellite post-deployment"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_satellite"
         tasks_from: "satellite_postcfg/main.yml"
         apply:
@@ -77,7 +77,7 @@
       tags: ["scenario_satellite"]
 
     - name: "Deploy Satellite reporting"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_satellite"
         tasks_from: "satellite_reporting/main.yml"
         apply:
@@ -87,17 +87,17 @@
 
   rescue:
     - name: "Capture Satellite deployment error"
-      debug:
+      ansible.builtin.debug:
         msg: |
           Satellite deployment encountered an error.
           Review logs for specific failure information.
       tags: ["scenario_satellite", "error"]
 
     - name: "Satellite deployment failed - detailed error"
-      fail:
+      ansible.builtin.fail:
         msg: |
           ❌ SATELLITE DEPLOYMENT FAILED
-          
+
           Common causes:
           1. Insufficient disk space (Satellite requires 500GB+ for content)
           2. Repository synchronization failures
@@ -105,7 +105,7 @@
           4. Invalid subscription/credentials
           5. Port conflicts (80, 443, 5432, etc.)
           6. Firewall restrictions
-          
+
           Recovery steps:
           1. Verify disk space: Available disk must exceed 500GB
           2. Check repository sync status
@@ -113,11 +113,11 @@
           4. Confirm subscription credentials
           5. Review firewall and port configurations
           6. Check SELinux/AppArmor policies if enforcing
-          
+
           Check logs above for detailed error information.
   tags: ["scenario_satellite"]
 
 - name: "Satellite deployment completed"
-  debug:
+  ansible.builtin.debug:
     msg: "Red Hat Satellite deployment complete."
   tags: ["scenario_satellite", "info"]

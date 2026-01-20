@@ -69,12 +69,12 @@
       ansible.builtin.debug:
         msg: |
           Kickstart files created successfully:
-          
+
           RHEL 9 BaseOS Minimal: {{ kickstart_files_path }}/rhel9-baseos-minimal.ks
           RHEL 10 BaseOS Minimal: {{ kickstart_files_path }}/rhel10-baseos-minimal.ks
           RHEL 9 Full Stack: {{ kickstart_files_path }}/rhel9-fullstack.ks
           RHEL 10 Full Stack: {{ kickstart_files_path }}/rhel10-fullstack.ks
-          
+
           Available via URL:
           {{ kickstart_web_url }}/rhel9-baseos-minimal.ks
           {{ kickstart_web_url }}/rhel10-baseos-minimal.ks
@@ -90,33 +90,33 @@
       ansible.builtin.debug:
         msg: |
           Kickstart Templates Available in Satellite:
-          
+
           1. RHEL 9 BaseOS Kickstart (Minimal)
              - Template Type: Provisioning
              - OS: RHEL 9
              - Description: RHEL 9 BaseOS minimal installation template for RHIS
              - Use Case: Minimal deployments
-          
+
           2. RHEL 10 BaseOS Kickstart (Minimal)
              - Template Type: Provisioning
              - OS: RHEL 10
              - Description: RHEL 10 BaseOS minimal installation template for RHIS
              - Use Case: Minimal deployments
-          
+
           3. RHEL 9 Full Stack Kickstart
              - Template Type: Provisioning
              - OS: RHEL 9
              - Description: RHEL 9 BaseOS + AppStream installation
              - Includes: Development tools, container ansible_dev_node_support, Ansible
              - Use Case: Application server deployments
-          
+
           4. RHEL 10 Full Stack Kickstart
              - Template Type: Provisioning
              - OS: RHEL 10
              - Description: RHEL 10 BaseOS + AppStream installation
              - Includes: Development tools, container ansible_dev_node_support, Ansible
              - Use Case: Application server deployments
-          
+
           Kickstart Features:
           ✅ Satellite subscription management integration_generic
           ✅ RHEL 9 and RHEL 10 BaseOS ansible_dev_node_support
@@ -125,7 +125,7 @@
           ✅ Cloud-init and Insights integration_generic
           ✅ Container ansible_dev_node_support (Podman, Buildah)
           ✅ Development tools (optional)
-          
+
           To use these kickstarts in Satellite:
           1. Navigate to Hosts → Provisioning Templates → Provisioning Templates
           2. Create new template or use defaults
@@ -152,20 +152,20 @@
       ansible.builtin.debug:
         msg: |
           Satellite Kickstart Configuration Summary:
-          
+
           Organization: {{ satellite_organization }}
-          
+
           Configurations Applied:
           - Provisioning Templates: {{ 'Configured' if create_provisioning_templates else 'Skipped' }}
           - Kickstart Files: {{ 'Uploaded' if upload_kickstart_files else 'Skipped' }}
-          
+
           Files Created:
           {% for stat in ks_file_stat.results %}
           - {{ stat.stat.path }}: {{ stat.stat.exists | ternary('✓ Exists', '✗ Not found') }} ({{ stat.stat.size | default('N/A') }} bytes)
           {% endfor %}
-          
+
           Kickstart Web URL: {{ kickstart_web_url }}
-          
+
           Next Steps:
           1. Verify kickstart files in Satellite web interface
           2. Create platform_provisioning templates in Satellite

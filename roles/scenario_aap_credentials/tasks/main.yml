@@ -192,7 +192,7 @@
       ansible.builtin.debug:
         msg: |
           Credentials configured: {{ all_credentials.json.count }}
-          
+
           Credential List:
           {% for cred in all_credentials.json.results %}
           - {{ cred.name }} (Type: {{ cred.credential_type_display }})

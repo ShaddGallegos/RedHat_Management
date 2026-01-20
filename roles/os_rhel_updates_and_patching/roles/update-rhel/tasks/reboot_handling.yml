@@ -2,7 +2,7 @@
 # Reboot handling tasks
 
 - name: Display pre-reboot message
-  debug:
+  ansible.builtin.debug:
     msg: |
       Preparing to reboot system...
       Reason: {{ 'Kernel update' if update_rhel_kernel_reboot_needed | default(false) else 'System update' }}
@@ -41,7 +41,7 @@
       kernel: "{{ ansible_kernel }}"
 
 - name: Verify reboot success
-  debug:
+  ansible.builtin.debug:
     msg: |
       Reboot completed successfully!
       - System: {{ update_rhel_os_info_post_reboot.distribution }} {{ update_rhel_os_info_post_reboot.version }}
@@ -50,7 +50,7 @@
   when: update_rhel_verbose | default(true)
 
 - name: Verify kernel update success
-  debug:
+  ansible.builtin.debug:
     msg: |
       Kernel update verification:
       {% if update_rhel_latest_kernel is defined and update_rhel_os_info_post_reboot.kernel == update_rhel_latest_kernel %}
@@ -65,14 +65,14 @@
     - update_rhel_kernel_reboot_needed | default(false)
 
 - name: Run post-reboot validation commands
-  command: "{{ item }}"
+  ansible.builtin.command: "{{ item }}"
   loop: "{{ update_rhel_post_reboot_commands | default([]) }}"
   register: update_rhel_post_reboot_validation
   failed_when: false
   when: update_rhel_post_reboot_commands is defined
 
 - name: Display post-reboot validation results
-  debug:
+  ansible.builtin.debug:
     msg: |
       Post-reboot validation:
       {% for result in update_rhel_post_reboot_validation.results %}
@@ -87,7 +87,7 @@
     - update_rhel_verbose | default(true)
 
 - name: Final reboot summary
-  debug:
+  ansible.builtin.debug:
     msg: |
       Reboot Summary:
       - Reboot completed: {{ update_rhel_reboot_result.elapsed }} seconds

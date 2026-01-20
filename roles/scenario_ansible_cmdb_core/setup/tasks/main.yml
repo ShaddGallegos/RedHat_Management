@@ -3,10 +3,10 @@
 # Setup Ansible-CMDB for platform_infrastructure_core visibility and "Source of Truth" dashboard
 
 - name: "Display CMDB setup information"
-  debug:
+  ansible.builtin.debug:
     msg: |
       Setting up Ansible-CMDB on {{ cmdb_host | default('scenario_satellite') }}
-      
+
       Purpose:
       - Centralized platform_infrastructure_core visibility
       - Source of Truth for all managed systems
@@ -34,7 +34,7 @@
   become: yes
 
 - name: "Create directories for CMDB"
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: '0755'
@@ -48,7 +48,7 @@
     - /var/log/ansible-scenario_ansible_cmdb_core
 
 - name: "Create ansible-scenario_ansible_cmdb_core collection playbook"
-  copy:
+  ansible.builtin.copy:
     dest: /opt/ansible-scenario_ansible_cmdb_core/collect_facts.yml
     mode: '0644'
     content: |
@@ -56,15 +56,15 @@
       - name: "Collect facts from all managed systems"
         hosts: all
         gather_facts: yes
-        
+
         tasks:
           - name: "Generate fact cache"
-            command: "ansible -i inventory/hosts -m setup --tree /var/lib/ansible-scenario_ansible_cmdb_core/facts"
+            ansible.builtin.command: "ansible -i inventory/hosts -m setup --tree /var/lib/ansible-scenario_ansible_cmdb_core/facts"
             delegate_to: localhost
             run_once: yes
 
 - name: "Create systemd service for ansible-scenario_ansible_cmdb_core dashboard"
-  copy:
+  ansible.builtin.copy:
     dest: /etc/systemd/system/ansible-scenario_ansible_cmdb_core.service
     mode: '0644'
     content: |
@@ -73,7 +73,7 @@
       Documentation=https://ansible-scenario_ansible_cmdb_core.readthedocs.io/
       After=network.target
       Wants=ansible-scenario_ansible_cmdb_core-facts.timer
-      
+
       [Service]
       Type=simple
       User=root
@@ -83,44 +83,44 @@
       RestartSec=10
       StandardOutput=journal
       StandardError=journal
-      
+
       # Security hardening
       NoNewPrivileges=true
       PrivateTmp=true
-      
+
       [Install]
       WantedBy=multi-user.target
   become: yes
   notify: "Reload systemd daemon"
 
 - name: "Create systemd timer for periodic fact collection"
-  copy:
+  ansible.builtin.copy:
     dest: /etc/systemd/system/ansible-scenario_ansible_cmdb_core-facts.timer
     mode: '0644'
     content: |
       [Unit]
       Description=Collect Ansible facts for CMDB
       Requires=ansible-scenario_ansible_cmdb_core-facts.service
-      
+
       [Timer]
       OnBootSec=1h
       OnUnitActiveSec=1h
       AccuracySec=1s
-      
+
       [Install]
       WantedBy=timers.target
   become: yes
   notify: "Reload systemd daemon"
 
 - name: "Create systemd service for periodic fact collection"
-  copy:
+  ansible.builtin.copy:
     dest: /etc/systemd/system/ansible-scenario_ansible_cmdb_core-facts.service
     mode: '0644'
     content: |
       [Unit]
       Description=Collect Ansible facts for CMDB
       After=network.target
-      
+
       [Service]
       Type=oneshot
       User=root
@@ -131,7 +131,7 @@
   become: yes
 
 - name: "Configure firewall for CMDB access"
-  firewalld:
+  ansible.posix.firewalld:
     port: "{{ cmdb_port | default('8081') }}/tcp"
     permanent: yes
     state: enabled
@@ -139,7 +139,7 @@
   notify: "Reload firewall"
 
 - name: "Enable and start ansible-scenario_ansible_cmdb_core service"
-  systemd:
+  ansible.builtin.systemd:
     name: "{{ item }}"
     enabled: yes
     state: started
@@ -156,27 +156,27 @@
     timeout: 30
 
 - name: "Display CMDB access information"
-  debug:
+  ansible.builtin.debug:
     msg: |
       ✓ Ansible-CMDB installed and configured
-      
+
       Access Information:
       Dashboard URL:     http://{{ inventory_hostname }}:{{ cmdb_port | default('8081') }}
-      
+
       Facts Directory:   /var/lib/ansible-scenario_ansible_cmdb_core/facts
       Output Directory:  /var/lib/ansible-scenario_ansible_cmdb_core/output
       Systemd Service:   ansible-scenario_ansible_cmdb_core
-      
+
       Fact Collection:
       Scheduled every 1 hour via systemd timer
       Manual collection: ansible -i inventory/hosts -m setup --tree /var/lib/ansible-scenario_ansible_cmdb_core/facts
-      
+
       Next Steps:
       1. Visit the dashboard at: http://{{ inventory_hostname }}:{{ cmdb_port | default('8081') }}
       2. Review platform_infrastructure_core overview
       3. Configure integration_generic with monitoring (Prometheus, Grafana, etc.)
       4. Setup authentication for dashboard (optional)
-      
+
       Facts Collected:
       - System information (OS, kernel, CPU, memory)
       - Network configuration (interfaces, IP addresses, routes)

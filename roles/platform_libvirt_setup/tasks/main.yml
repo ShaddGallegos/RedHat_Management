@@ -5,7 +5,7 @@
   when: ansible_facts is defined
 
 - name: Try to install libvirt and virtualization packages via package manager (use globs on RedHat)
-  shell: "dnf install -y {{ libvirt_packages | join(' ') }} --skip-broken --allowerasing --best"
+  ansible.builtin.shell: "dnf install -y {{ libvirt_packages | join(' ') }} --skip-broken --allowerasing --best"
   register: libvirt_install_shell
   failed_when: false
   ignore_errors: yes
@@ -21,54 +21,54 @@
   when: virbr0_stat is defined
 
 - name: Ensure libvirt service is enabled and running
-  service:
+  ansible.builtin.service:
     name: libvirtd
     state: started
     enabled: true
 
 - name: Ensure default network is active (ignore failures)
-  command: virsh net-start default
+  ansible.builtin.command: virsh net-start default
   args:
     warn: false
   register: libvirt_net_start
   failed_when: false
 
 - name: Render external libvirt network XML
-  template:
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/../templates/networks/external_nat.xml.j2"
     dest: "/tmp/libvirt-external.xml"
 
 - name: Define external libvirt network (idempotent)
-  command: virsh net-define /tmp/libvirt-external.xml
+  ansible.builtin.command: virsh net-define /tmp/libvirt-external.xml
   register: define_external
   failed_when: define_external.rc not in [0,1]
 
 - name: Start external libvirt network
-  command: virsh net-start external
+  ansible.builtin.command: virsh net-start external
   register: start_external
   failed_when: start_external.rc not in [0,1]
 
 - name: Autostart external libvirt network
-  command: virsh net-autostart external
+  ansible.builtin.command: virsh net-autostart external
   ignore_errors: true
 
 - name: Render internal libvirt network XML
-  template:
+  ansible.builtin.template:
     src: "{{ playbook_dir }}/../templates/networks/internal_priv.xml.j2"
     dest: "/tmp/libvirt-internal.xml"
 
 - name: Define internal libvirt network (idempotent)
-  command: virsh net-define /tmp/libvirt-internal.xml
+  ansible.builtin.command: virsh net-define /tmp/libvirt-internal.xml
   register: define_internal
   failed_when: define_internal.rc not in [0,1]
 
 - name: Start internal libvirt network
-  command: virsh net-start internal_priv
+  ansible.builtin.command: virsh net-start internal_priv
   register: start_internal
   failed_when: start_internal.rc not in [0,1]
 
 - name: Autostart internal libvirt network
-  command: virsh net-autostart internal_priv
+  ansible.builtin.command: virsh net-autostart internal_priv
   ignore_errors: true
 
 - name: Check for persistent setup marker file
@@ -88,7 +88,7 @@
     when: ansible_facts is defined
 
   - name: Try to install libvirt and virtualization packages via package manager (use globs on RedHat)
-    shell: "dnf install -y {{ libvirt_packages | join(' ') }} --skip-broken --allowerasing --best"
+    ansible.builtin.shell: "dnf install -y {{ libvirt_packages | join(' ') }} --skip-broken --allowerasing --best"
     register: libvirt_install_shell
     failed_when: false
     ignore_errors: yes
@@ -104,58 +104,58 @@
     when: virbr0_stat is defined
 
   - name: Ensure libvirt service is enabled and running
-    service:
+    ansible.builtin.service:
       name: libvirtd
       state: started
       enabled: true
 
   - name: Ensure default network is active (ignore failures)
-    command: virsh net-start default
+    ansible.builtin.command: virsh net-start default
     args:
       warn: false
     register: libvirt_net_start
     failed_when: false
 
   - name: Render external libvirt network XML
-    template:
+    ansible.builtin.template:
       src: "{{ playbook_dir }}/../templates/networks/external_nat.xml.j2"
       dest: "/tmp/libvirt-external.xml"
 
   - name: Define external libvirt network (idempotent)
-    command: virsh net-define /tmp/libvirt-external.xml
+    ansible.builtin.command: virsh net-define /tmp/libvirt-external.xml
     register: define_external
     failed_when: define_external.rc not in [0,1]
 
   - name: Start external libvirt network
-    command: virsh net-start external
+    ansible.builtin.command: virsh net-start external
     register: start_external
     failed_when: start_external.rc not in [0,1]
 
   - name: Autostart external libvirt network
-    command: virsh net-autostart external
+    ansible.builtin.command: virsh net-autostart external
     ignore_errors: true
 
   - name: Render internal libvirt network XML
-    template:
+    ansible.builtin.template:
       src: "{{ playbook_dir }}/../templates/networks/internal_priv.xml.j2"
       dest: "/tmp/libvirt-internal.xml"
 
   - name: Define internal libvirt network (idempotent)
-    command: virsh net-define /tmp/libvirt-internal.xml
+    ansible.builtin.command: virsh net-define /tmp/libvirt-internal.xml
     register: define_internal
     failed_when: define_internal.rc not in [0,1]
 
   - name: Start internal libvirt network
-    command: virsh net-start internal_priv
+    ansible.builtin.command: virsh net-start internal_priv
     register: start_internal
     failed_when: start_internal.rc not in [0,1]
 
   - name: Autostart internal libvirt network
-    command: virsh net-autostart internal_priv
+    ansible.builtin.command: virsh net-autostart internal_priv
     ignore_errors: true
 
   - name: Create persistent marker file to indicate setup completed
-    file:
+    ansible.builtin.file:
       path: /var/lib/rhm
       state: directory
       owner: root
@@ -164,7 +164,7 @@
     become: true
 
   - name: Touch marker file
-    file:
+    ansible.builtin.file:
       path: /var/lib/rhm/platform_libvirt_setup_done
       state: touch
       owner: root
@@ -173,7 +173,7 @@
     become: true
 
   - name: Write ansible facts file for persistent recognition
-    copy:
+    ansible.builtin.copy:
       dest: /etc/ansible/facts.d/rhm.fact
       content: '{"platform_libvirt_setup_done": true}'
       mode: '0644'

@@ -5,10 +5,10 @@
   gather_facts: true
   vars:
     satellite_os_config_enabled: true
-  
+
   tasks:
     - name: Run scenario_satellite_os_configuration role
-      include_role:
+      ansible.builtin.include_role:
         name: scenario_satellite_os_configuration
 
     - name: Test role completed successfully

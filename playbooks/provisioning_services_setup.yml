@@ -8,12 +8,12 @@
   hosts: scenario_satellite
   gather_facts: true
   become: true
-  
+
   vars:
     provisioning_host: "scenario_satellite.prod.spg"
     provisioning_secondary_interface: "eth1"
     provisioning_interface_ip: "10.168.0.1"
-  
+
   roles:
     - role: platform_services_provisioning_stack
       tags:
@@ -25,9 +25,9 @@
 
   post_tasks:
     - name: Display platform_provisioning services summary
-      debug:
+      ansible.builtin.debug:
         msg: |
-          
+
           ╔════════════════════════════════════════════════════════════════════╗
           ║         PROVISIONING SERVICES DEPLOYMENT COMPLETE                 ║
           ╠════════════════════════════════════════════════════════════════════╣

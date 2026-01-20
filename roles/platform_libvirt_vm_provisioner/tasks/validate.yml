@@ -14,7 +14,7 @@
   failed_when: not ks_stat.stat.exists
 
 - name: Verify libvirtd is running
-  systemd:
+  ansible.builtin.systemd:
     name: libvirtd
     state: started
   become: true

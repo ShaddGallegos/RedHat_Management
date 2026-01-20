@@ -8,7 +8,7 @@
     msg: |
 
            Configuring Infrastructure Setup
-           
+
 
 
 - name: Gather Infrastructure Information
@@ -20,7 +20,7 @@
     - name: Prompt for Infrastructure Type
       ansible.builtin.pause:
         prompt: |
-          
+
           Select platform_infrastructure_core type:
           1) Libvirt (Local KVM/QEMU)
           2) Nutanix AHV
@@ -28,7 +28,7 @@
           4) AWS
           5) GCP
           6) Azure
-          
+
           Choice [1-6]
       register: infra_type_input
 
@@ -48,7 +48,7 @@
     - name: Prompt for Libvirt host short name
       ansible.builtin.pause:
         prompt: |
-          
+
           Enter the short hostname for your Libvirt host (e.g., 'libvirt01', 'kvm-host'):
       register: libvirt_host_input
 
@@ -59,19 +59,19 @@
     - name: Prompt for Libvirt networks
       ansible.builtin.pause:
         prompt: |
-          
+
           Configure Libvirt networks:
-          
+
           Primary Network (eth0 - NAT/External):
             IP Range: 192.168.0.0/24
             Gateway: 192.168.0.1
             Purpose: Internet access
-            
+
           Secondary Network (eth1 - Private/Internal):
             IP Range: 10.168.0.0/16
             Gateway: 10.168.0.1
             Purpose: Ansible, TFTP, DHCP, DNS services
-          
+
           Enter internal network IP (or press Enter for 10.168.0):
       register: libvirt_internal_net_input
 
@@ -84,14 +84,14 @@
     - name: Prompt for service node IPs
       ansible.builtin.pause:
         prompt: |
-          
+
           Configure Service Nodes (10.168.0.0/16):
-          
+
           Gateway/Installer: 10.168.0.1 (installer.{{ ansible_domain }})
           AAP:               10.168.0.26 (aap.{{ ansible_domain }})
           Satellite:         10.168.0.27 (scenario_satellite.{{ ansible_domain }})
           IdM:               10.168.0.28 (idm.{{ ansible_domain }})
-          
+
           Enter Satellite IP (or press Enter for 10.168.0.27):
       register: libvirt_satellite_ip_input
 
@@ -105,27 +105,27 @@
     - name: Display Libvirt Configuration Summary
       ansible.builtin.debug:
         msg: |
-          
+
           ============================================================
                     LIBVIRT CONFIGURATION SUMMARY
           ============================================================
-          
+
           Host Short Name:         {{ libvirt_host_short_name }}
           Ansible Domain:          {{ ansible_domain }}
-          
+
           External Network:        192.168.0.0/24 (NAT/eth0)
-          
+
           Internal Network:        {{ libvirt_internal_network_subnet }}
           Gateway:                 {{ libvirt_internal_network_gw }}
-          
+
           Service Nodes (eth1):
             Installer/Control:    {{ libvirt_installer_node_ip }} installer.{{ ansible_domain }}
             AAP:                  {{ libvirt_aap_ip }} aap.{{ ansible_domain }}
             Satellite:            {{ libvirt_satellite_ip }} scenario_satellite.{{ ansible_domain }}
             IdM Directory:        {{ libvirt_idm_ip }} idm.{{ ansible_domain }}
-          
+
           ============================================================
-          
+
 
   when: infrastructure_type | int == 1
 
@@ -134,15 +134,15 @@
     - name: Prompt for Ansible Domain
       ansible.builtin.pause:
         prompt: |
-          
+
           Configure Ansible Domain:
-          
+
           This will be used for all FQDNs:
             installer.<domain> - Control machine
             aap.<domain> - Automation Platform
             scenario_satellite.<domain> - Satellite server
             idm.<domain> - Identity Management
-          
+
             Enter ansible domain (or press Enter for 'example.com'):
       register: ansible_domain_input
 
@@ -164,29 +164,29 @@
           ---
           # Infrastructure Configuration
           # Generated: {{ ansible_date_time.iso8601 }}
-          
+
           infrastructure_type: {{ infrastructure_type }}
-          
+
           {% if infrastructure_type | int == 1 %}
           # Libvirt Configuration
           libvirt_host_short_name: {{ libvirt_host_short_name }}
           libvirt_internal_network: {{ libvirt_internal_network }}
           libvirt_internal_network_subnet: {{ libvirt_internal_network_subnet }}
           libvirt_internal_network_gw: {{ libvirt_internal_network_gw }}
-          
+
           # Ansible Domain
           ansible_domain: {{ ansible_domain }}
-          
+
           # Service Node IPs and FQDNs
           libvirt_installer_node_ip: {{ libvirt_installer_node_ip }}
           libvirt_installer_node_fqdn: installer.{{ ansible_domain }}
-          
+
           libvirt_aap_ip: {{ libvirt_aap_ip }}
           libvirt_aap_fqdn: aap.{{ ansible_domain }}
-          
+
           libvirt_satellite_ip: {{ libvirt_satellite_ip }}
           libvirt_satellite_fqdn: scenario_satellite.{{ ansible_domain }}
-          
+
           libvirt_idm_ip: {{ libvirt_idm_ip }}
           libvirt_idm_fqdn: idm.{{ ansible_domain }}
           {% endif %}
@@ -197,18 +197,18 @@
     - name: Display success message
       ansible.builtin.debug:
         msg: |
-          
+
           ============================================================
                    INFRASTRUCTURE CONFIGURATION SAVED
           ============================================================
-          
+
           Configuration saved to:
             {{ infra_config_saved.dest }}
-          
+
           Next steps:
           1. Networks will be created using these settings
           2. Inventory will be generated based on configuration
           3. Group and host variables will be created
-          
+
           ============================================================
-          
+

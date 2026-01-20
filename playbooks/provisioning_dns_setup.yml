@@ -6,12 +6,12 @@
   hosts: scenario_satellite
   gather_facts: true
   become: true
-  
+
   vars:
     provisioning_secondary_interface: "eth1"
     provisioning_interface_ip: "10.168.0.1"
     setup_dns_only: true
-  
+
   roles:
     - role: platform_services_provisioning_stack
       tags: dns
@@ -20,17 +20,17 @@
     - name: Verify DNS configuration
       block:
         - name: Check DNS service status
-          systemd:
+          ansible.builtin.systemd:
             name: named
             state: started
           register: dns_status
 
         - name: Validate BIND configuration
-          command: named-checkconf /etc/named.conf
+          ansible.builtin.command: named-checkconf /etc/named.conf
           changed_when: false
 
         - name: Show DNS status
-          debug:
+          ansible.builtin.debug:
             msg: |
               DNS Server Status:
               • Service: {{ dns_status.status.ActiveState }}
@@ -39,7 +39,7 @@
               • Options: rotate, timeout:2, attempts:3
 
     - name: Test DNS resolution
-      command: "dig @10.168.0.1 scenario_satellite.prod.spg.example.com"
+      ansible.builtin.command: "dig @10.168.0.1 scenario_satellite.prod.spg.example.com"
       register: dns_test
       changed_when: false
       failed_when: dns_test.rc != 0

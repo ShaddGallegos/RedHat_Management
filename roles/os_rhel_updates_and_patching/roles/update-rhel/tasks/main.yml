@@ -2,7 +2,7 @@
 # tasks file for update-rhel
 
 - name: Validate RHEL version compatibility
-  fail:
+  ansible.builtin.fail:
     msg: "This role supports RHEL 7, 8, 9, and 10 only. Detected: {{ ansible_distribution }} {{ ansible_distribution_major_version }}"
   when:
     - ansible_distribution != "RedHat"
@@ -19,7 +19,7 @@
       kernel: "{{ ansible_kernel }}"
 
 - name: Display current system information
-  debug:
+  ansible.builtin.debug:
     msg:
       - "System: {{ update_rhel_os_info.distribution }} {{ update_rhel_os_info.version }}"
       - "Kernel: {{ update_rhel_os_info.kernel }}"
@@ -42,14 +42,14 @@
     - update_reboot_kernel | default(false)
 
 - name: Install deltarpm for RHEL 7 (performance optimization)
-  package:
+  ansible.builtin.package:
     name: deltarpm
     state: present
   when: ansible_distribution_major_version|int == 7
   ignore_errors: true
 
 - name: Install drpm for RHEL 8+ (delta RPM ansible_dev_node_support)
-  package:
+  ansible.builtin.package:
     name: drpm
     state: present
   when: ansible_distribution_major_version|int >= 8
@@ -68,7 +68,7 @@
   when: ansible_distribution_major_version|int >= 8
 
 - name: Display available updates summary
-  debug:
+  ansible.builtin.debug:
     msg: |
       {{ inventory_hostname }} has {{ available_updates.results|length }} updates available.
       {% if update_rhel_show_updates | default(false) %}
@@ -117,7 +117,7 @@
     package_update_result: "{{ yum_update_result if ansible_distribution_major_version|int == 7 else dnf_update_result }}"
 
 - name: Display update results
-  debug:
+  ansible.builtin.debug:
     msg: |
       Package update completed.
       {% if package_update_result.changed %}
@@ -151,12 +151,12 @@
   when: packages_list_post_update.ansible_facts.packages.kernel is defined
 
 - name: Show current kernel version
-  debug:
+  ansible.builtin.debug:
     msg: "Current running kernel: {{ ansible_kernel }}"
   when: update_rhel_verbose | default(true)
 
 - name: Show latest installed kernel version
-  debug:
+  ansible.builtin.debug:
     msg: "Latest installed kernel: {{ latest_kernel_version | default('Unable to determine') }}"
   when:
     - update_rhel_verbose | default(true)
@@ -177,7 +177,7 @@
     system_reboot_needed: "{{ system_reboot_needed or (reboot_required_file.stat.exists | default(false)) }}"
 
 - name: Display reboot requirement
-  debug:
+  ansible.builtin.debug:
     msg: |
       {% if system_reboot_needed %}
       REBOOT REQUIRED
@@ -195,7 +195,7 @@
 - name: Perform system reboot if required
   block:
     - name: Display reboot message
-      debug:
+      ansible.builtin.debug:
         msg: "Rebooting system due to kernel or system updates..."
 
     - name: Reboot the system
@@ -218,14 +218,14 @@
           kernel: "{{ ansible_kernel }}"
 
     - name: Display OS information after reboot
-      debug:
+      ansible.builtin.debug:
         msg:
           - "Post-reboot OS: {{ os_info_post_update.distribution }} {{ os_info_post_update.distribution_version }}"
           - "Post-reboot kernel: {{ os_info_post_update.kernel }}"
       when: update_rhel_verbose | default(true)
 
     - name: Verify kernel update success
-      debug:
+      ansible.builtin.debug:
         msg: "Kernel update successful! Now running: {{ ansible_kernel }}"
       when:
         - latest_kernel_version is defined
@@ -235,7 +235,7 @@
     - system_reboot_needed | bool
 
 - name: Display final update summary
-  debug:
+  ansible.builtin.debug:
     msg: |
       RHEL {{ ansible_distribution_major_version }} Update Summary:
       - Pre-update packages: {{ packages_list_pre_update.ansible_facts.packages.keys() | length }}

@@ -9,7 +9,7 @@
 
 - name: Load survey variables from controller when present
   include_vars:
-    file: files/cache/survey.yml
+    ansible.builtin.file: files/cache/survey.yml
     name: survey
   when: survey_file.stat.exists
   delegate_to: localhost

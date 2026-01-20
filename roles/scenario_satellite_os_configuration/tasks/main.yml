@@ -133,7 +133,7 @@
       ansible.builtin.debug:
         msg: |
           Kickstart Repository configured:
-          
+
           Name: {{ kickstart_repository.name }}
           Product: {{ kickstart_repository.product }}
           Content Type: {{ kickstart_repository.content_type }}
@@ -207,16 +207,16 @@
       ansible.builtin.debug:
         msg: |
           Satellite OS Configuration Summary:
-          
+
           Operating Systems: {{ os_list.json.total | default(0) }}
           Install Media: {{ media_list.json.total | default(0) }}
-          
+
           Configurations Applied:
           - Operating Systems: {{ 'Configured' if create_operatingsystems else 'Skipped' }}
           - Install Media: {{ 'Configured' if create_install_media else 'Skipped' }}
           - Kickstart Repository: {{ 'Configured' if create_kickstart_repo else 'Skipped' }}
           - Sync Jobs: {{ 'Configured' if configure_sync_job else 'Skipped' }}
-          
+
           Status: ✅ Ready for platform_provisioning template assignment
 
   when: satellite_os_config_enabled

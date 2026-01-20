@@ -156,7 +156,7 @@
       ansible.builtin.debug:
         msg: |
           Inventories configured: {{ all_inventories.json.count }}
-          
+
           Inventory List:
           {% for inv in all_inventories.json.results %}
           - {{ inv.name }} (Kind: {{ inv.kind }}, Hosts: {{ inv.has_hosts }})

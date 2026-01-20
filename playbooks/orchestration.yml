@@ -103,7 +103,7 @@
 
         - name: "Load deployment configuration from file"
           ansible.builtin.include_vars:
-            file: "{{ deployment_config_file }}"
+            ansible.builtin.file: "{{ deployment_config_file }}"
             name: deployment_config
           when: config_stat.stat.exists
 

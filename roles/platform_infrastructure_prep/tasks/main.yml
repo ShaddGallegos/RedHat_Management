@@ -13,7 +13,7 @@
 - name: Verify Libvirt prerequisites
   block:
     - name: Check libvirtd service
-      systemd:
+      ansible.builtin.systemd:
         name: libvirtd
         state: started
         enabled: yes

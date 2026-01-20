@@ -315,13 +315,13 @@
 
 handlers:
   - name: restart sssd
-    systemd:
+    ansible.builtin.systemd:
       name: sssd
       state: restarted
     become: true
 
   - name: restart krb5
-    systemd:
+    ansible.builtin.systemd:
       name: krb5kdc
       state: restarted
     become: true

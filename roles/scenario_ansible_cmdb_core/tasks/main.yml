@@ -4,7 +4,7 @@
 # Consolidates ansible-scenario_ansible_cmdb_core setup and configuration
 
 - name: "CMDB Setup and Configuration"
-  debug:
+  ansible.builtin.debug:
     msg: |
       CMDB (Configuration Management Database)
       ==========================================
@@ -13,7 +13,7 @@
   tags: ["scenario_ansible_cmdb_core", "configuration"]
 
 - name: "Execute CMDB setup subrole"
-  include_role:
+  ansible.builtin.include_role:
     name: "scenario_ansible_cmdb_core"
     tasks_from: "setup/main.yml"
     apply:
@@ -21,6 +21,6 @@
   tags: ["scenario_ansible_cmdb_core"]
 
 - name: "CMDB setup completed"
-  debug:
+  ansible.builtin.debug:
     msg: "CMDB configuration complete. Configuration database ready for use."
   tags: ["scenario_ansible_cmdb_core", "info"]

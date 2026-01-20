@@ -11,11 +11,11 @@
       ansible.builtin.debug:
         msg: |
           Network Infrastructure Configuration Summary:
-          
+
           Primary Subnet: {{ primary_subnet.network }}/{{ primary_subnet.prefix }}
           Gateway: {{ primary_subnet.gateway }}
           Broadcast: {{ primary_subnet.broadcast }}
-          
+
           Current Routes:
           {{ current_routes.stdout }}
 
@@ -28,18 +28,18 @@
       ansible.builtin.debug:
         msg: |
           Configuring Primary RHIS Subnet:
-          
+
           Network: {{ primary_subnet.network }}/{{ primary_subnet.prefix }}
           Netmask: {{ primary_subnet.netmask }}
           Gateway: {{ primary_subnet.gateway }}
-          
+
           DHCP Configuration:
           - Enabled: {{ dhcp_primary.enabled }}
           - Range: {{ dhcp_primary.range_start }} - {{ dhcp_primary.range_end }}
           - Lease Time: {{ dhcp_primary.lease_time }}
           - DNS Servers: {{ dhcp_primary.dns_servers | join(', ') }}
           - NTP Servers: {{ dhcp_primary.ntp_servers | join(', ') }}
-          
+
           DNS Configuration:
           - Primary Resolver: {{ dns_primary.resolver_1 }}
           - Secondary Resolver: {{ dns_primary.resolver_2 }}
@@ -54,7 +54,7 @@
       ansible.builtin.debug:
         msg: |
           Configuring Host Group Subnets within 10.168.0.0/16:
-          
+
           {% for group in host_groups %}
           {{ loop.index }}. {{ group.name }}
              Subnet: {{ group.subnet }}
@@ -72,7 +72,7 @@
       ansible.builtin.debug:
         msg: |
           Static Host Reservations:
-          
+
           {% for host in static_hosts %}
           - {{ host.hostname }}.{{ host.domain }}
             IP: {{ host.ip_address }}
@@ -89,7 +89,7 @@
       ansible.builtin.debug:
         msg: |
           Network Firewall Rules for 10.168.0.0/16:
-          
+
           {% for rule in firewall_rules %}
           - Source: {{ rule.source_subnet }}
             Destination: {{ rule.destination }}
@@ -107,17 +107,17 @@
       ansible.builtin.debug:
         msg: |
           ✅ Network Infrastructure Configuration Complete
-          
+
           Primary Network: {{ primary_subnet.network }}/{{ primary_subnet.prefix }}
           Host Groups Configured: {{ host_groups | length }}
           Static Hosts Configured: {{ static_hosts | length }}
           Firewall Rules Configured: {{ firewall_rules | length }}
-          
+
           Subnets Configured:
           {% for group in host_groups %}
           - {{ group.name }}: {{ group.subnet }}
           {% endfor %}
-          
+
           Ready for platform_provisioning and host registration!
 
   when: network_config_enabled

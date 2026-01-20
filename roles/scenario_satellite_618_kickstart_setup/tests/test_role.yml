@@ -7,10 +7,10 @@
     satellite_kickstart_config_enabled: true
     kickstart_files_path: "/tmp/test_kickstarts"
     upload_kickstart_files: true
-  
+
   tasks:
     - name: Run satellite_kickstart_config role
-      include_role:
+      ansible.builtin.include_role:
         name: satellite_kickstart_config
 
     - name: Verify kickstart files were created

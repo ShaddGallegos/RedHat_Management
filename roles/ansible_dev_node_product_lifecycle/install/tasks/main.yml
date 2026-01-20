@@ -2,7 +2,7 @@
 # Product Installation Role - Installation tasks executor
 # This role handles product-specific installation tasks
 # Calls product-specific roles (e.g., scenario_aap_setup, satellite_base, idm_base)
-# 
+#
 # Usage:
 #   - name: Install AAP
 #     hosts: aap

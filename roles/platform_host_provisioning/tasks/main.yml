@@ -50,7 +50,7 @@
       - rhis_host_provision
 
   - name: Create marker directory
-    file:
+    ansible.builtin.file:
       path: /var/lib/rhm
       state: directory
       owner: root
@@ -59,7 +59,7 @@
     become: true
 
   - name: Touch platform_host_provisioning marker
-    file:
+    ansible.builtin.file:
       path: /var/lib/rhm/platform_host_provisioning_done
       state: touch
       owner: root
@@ -68,7 +68,7 @@
     become: true
 
   - name: Write ansible facts file for platform_host_provisioning
-    copy:
+    ansible.builtin.copy:
       dest: /etc/ansible/facts.d/rhm_host_provisioning.fact
       content: '{"platform_host_provisioning_done": true}'
       mode: '0644'

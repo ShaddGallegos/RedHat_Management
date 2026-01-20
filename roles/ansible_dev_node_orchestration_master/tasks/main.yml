@@ -4,14 +4,14 @@
 # Implements 7-phase RHIS deployment with scenario and platform selection
 
 - name: "Display RHIS Deployment Banner"
-  debug:
+  ansible.builtin.debug:
     msg: |
       ╔════════════════════════════════════════════════════════╗
       ║   RHIS Orchestration - Red Hat Infrastructure Standard ║
       ║   Version: {{ rhis_deployment_version }}                      ║
       ║   Timestamp: {{ rhis_deployment_timestamp }}               ║
       ╚════════════════════════════════════════════════════════╝
-      
+
       Deployment Configuration:
         Scenario: {{ deployment_scenario | default('unset') }}
         Platform: {{ deployment_platform | default('unset') }}
@@ -51,7 +51,7 @@
 
     - name: "Load deployment configuration from file"
       include_vars:
-        file: "{{ lookup('env', 'HOME') }}/.ansible/conf/deployment_config.yml"
+        ansible.builtin.file: "{{ lookup('env', 'HOME') }}/.ansible/conf/deployment_config.yml"
         name: deployment_config
       when: lookup('env', 'HOME') | default('') != ''
       ignore_errors: yes
@@ -64,17 +64,17 @@
       tags: ["config", "setup"]
 
     - name: "Display scenario details"
-      debug:
+      ansible.builtin.debug:
         msg: |
           Scenario: {{ scenario_config.name }}
           Description: {{ scenario_config.description }}
           Products: {{ scenario_config.products | join(', ') }}
           Integrations: {{ scenario_config.integrations | default([]) | join(', ') or 'None' }}
-          
+
           Platform: {{ platform_config.name }}
           Provisioning: {{ platform_config.provisioning_type }}
           Storage: {{ platform_config.storage }}
-          
+
           Minimum Resources:
             CPU: {{ scenario_config.min_resources.cpu }} cores
             Memory: {{ scenario_config.min_resources.memory }} GB
@@ -89,7 +89,7 @@
 - name: "PHASE 1 - Initialize Ansible Developer Node"
   block:
     - name: "Setup ansible developer host environment"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_deployment_setup"
         tasks_from: "main"
       vars:
@@ -97,7 +97,7 @@
       tags: ["phase1", "setup"]
 
     - name: "Install platform-specific requirements"
-      include_role:
+      ansible.builtin.include_role:
         name: "platform_infrastructure_manager"
         tasks_from: "validate_requirements"
       vars:
@@ -106,7 +106,7 @@
       tags: ["phase1", "setup", "requirements"]
 
     - name: "Initialize credential management"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_configuration_manager"
         tasks_from: "setup_credentials"
       tags: ["phase1", "credentials"]
@@ -120,13 +120,13 @@
 - name: "PHASE 2 - Platform Infrastructure Preparation"
   block:
     - name: "Prepare platform platform_infrastructure_core"
-      include_role:
+      ansible.builtin.include_role:
         name: "platform_infrastructure_manager"
         tasks_from: "prepare_{{ deployment_platform }}"
       tags: ["phase2", "prepare"]
 
     - name: "Configure platform networking"
-      include_role:
+      ansible.builtin.include_role:
         name: "platform_infrastructure_manager"
         tasks_from: "networking"
       vars:
@@ -134,7 +134,7 @@
       tags: ["phase2", "networking"]
 
     - name: "Setup installation method: {{ install_method | default('oemdrv') }}"
-      include_role:
+      ansible.builtin.include_role:
         name: "platform_infrastructure_manager"
         tasks_from: "install_method_{{ install_method | default('oemdrv') }}"
       tags: ["phase2", "install_method"]
@@ -148,7 +148,7 @@
 - name: "PHASE 3 - Generate Dynamic Inventory"
   block:
     - name: "Build dynamic inventory"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_inventory_generator"
         tasks_from: "generate"
       vars:
@@ -158,7 +158,7 @@
       tags: ["phase3", "inventory"]
 
     - name: "Validate generated inventory"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_inventory_generator"
         tasks_from: "validate"
       tags: ["phase3", "validate"]
@@ -172,13 +172,13 @@
 - name: "PHASE 4A - Deploy Satellite 6.18"
   block:
     - name: "Provision Satellite"
-      include_role:
+      ansible.builtin.include_role:
         name: "{{ platform_config.provisioner_role }}"
         tasks_from: "provision_satellite"
       tags: ["phase4a", "scenario_satellite", "provision"]
 
     - name: "Configure Satellite base OS"
-      include_role:
+      ansible.builtin.include_role:
         name: "os_generic"
         tasks_from: "configure_rhel_base"
       vars:
@@ -186,13 +186,13 @@
       tags: ["phase4a", "scenario_satellite", "os_generic"]
 
     - name: "Install Satellite 6.18"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_satellite"
         tasks_from: "install"
       tags: ["phase4a", "scenario_satellite", "install"]
 
     - name: "Post-configuration for Satellite"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_satellite"
         tasks_from: "postconfigure"
       tags: ["phase4a", "scenario_satellite", "postconfigure"]
@@ -202,13 +202,13 @@
 - name: "PHASE 4B - Deploy AAP 2.6"
   block:
     - name: "Provision AAP"
-      include_role:
+      ansible.builtin.include_role:
         name: "{{ platform_config.provisioner_role }}"
         tasks_from: "provision_aap"
       tags: ["phase4b", "aap", "provision"]
 
     - name: "Configure AAP base OS"
-      include_role:
+      ansible.builtin.include_role:
         name: "os_generic"
         tasks_from: "configure_rhel_base"
       vars:
@@ -216,13 +216,13 @@
       tags: ["phase4b", "aap", "os_generic"]
 
     - name: "Install AAP 2.6"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/aap"
         tasks_from: "install"
       tags: ["phase4b", "aap", "install"]
 
     - name: "Post-configuration for AAP"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/aap"
         tasks_from: "postconfigure"
       tags: ["phase4b", "aap", "postconfigure"]
@@ -232,13 +232,13 @@
 - name: "PHASE 4C - Deploy IdM 3.0"
   block:
     - name: "Provision IdM"
-      include_role:
+      ansible.builtin.include_role:
         name: "{{ platform_config.provisioner_role }}"
         tasks_from: "provision_idm"
       tags: ["phase4c", "idm", "provision"]
 
     - name: "Configure IdM base OS"
-      include_role:
+      ansible.builtin.include_role:
         name: "os_generic"
         tasks_from: "configure_rhel_base"
       vars:
@@ -246,13 +246,13 @@
       tags: ["phase4c", "idm", "os_generic"]
 
     - name: "Install IdM 3.0"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/idm"
         tasks_from: "install"
       tags: ["phase4c", "idm", "install"]
 
     - name: "Post-configuration for IdM"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/idm"
         tasks_from: "postconfigure"
       tags: ["phase4c", "idm", "postconfigure"]
@@ -262,13 +262,13 @@
 - name: "PHASE 4D - Deploy OpenShift"
   block:
     - name: "Provision OpenShift"
-      include_role:
+      ansible.builtin.include_role:
         name: "{{ platform_config.provisioner_role }}"
         tasks_from: "provision_openshift"
       tags: ["phase4d", "scenario_openshift", "provision"]
 
     - name: "Configure OpenShift base OS"
-      include_role:
+      ansible.builtin.include_role:
         name: "os_generic"
         tasks_from: "configure_rhel_base"
       vars:
@@ -276,13 +276,13 @@
       tags: ["phase4d", "scenario_openshift", "os_generic"]
 
     - name: "Install OpenShift"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_openshift"
         tasks_from: "install"
       tags: ["phase4d", "scenario_openshift", "install"]
 
     - name: "Post-configuration for OpenShift"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_redhat_products/scenario_openshift"
         tasks_from: "postconfigure"
       tags: ["phase4d", "scenario_openshift", "postconfigure"]
@@ -296,7 +296,7 @@
 - name: "PHASE 5 - Configure Integrations"
   block:
     - name: "Configure integrations for scenario"
-      include_role:
+      ansible.builtin.include_role:
         name: "integration_generic"
         tasks_from: "{{ item }}"
       loop: "{{ scenario_config.integrations | default([]) }}"
@@ -311,14 +311,14 @@
 - name: "PHASE 6 - Setup Ansible-CMDB"
   block:
     - name: "Setup Ansible-CMDB"
-      include_role:
+      ansible.builtin.include_role:
         name: "scenario_ansible_cmdb_core"
         tasks_from: "main"
       when: "'scenario_satellite' in scenario_config.products"
       tags: ["phase6", "scenario_ansible_cmdb_core"]
 
     - name: "Populate CMDB with inventory"
-      include_role:
+      ansible.builtin.include_role:
         name: "scenario_ansible_cmdb_core"
         tasks_from: "populate"
       tags: ["phase6", "scenario_ansible_cmdb_core", "populate"]
@@ -332,19 +332,19 @@
 - name: "PHASE 7 - Validate Deployment"
   block:
     - name: "Run health checks"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_support"
         tasks_from: "health_check"
       tags: ["phase7", "validate"]
 
     - name: "Validate integrations"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_support"
         tasks_from: "validate_integrations"
       tags: ["phase7", "validate"]
 
     - name: "Generate deployment report"
-      include_role:
+      ansible.builtin.include_role:
         name: "ansible_dev_node_support"
         tasks_from: "deployment_report"
       vars:
@@ -359,28 +359,28 @@
 # ============================================================================
 
 - name: "Display Deployment Completion Summary"
-  debug:
+  ansible.builtin.debug:
     msg: |
       ╔════════════════════════════════════════════════════════╗
       ║                 DEPLOYMENT COMPLETE                     ║
       ╚════════════════════════════════════════════════════════╝
-      
+
       Deployment Details:
         Scenario: {{ deployment_scenario }}
         Platform: {{ deployment_platform }}
         OS: {{ deployment_os }}
         Timestamp: {{ rhis_deployment_timestamp }}
-      
+
       Deployed Products:
         {% for product in scenario_config.products %}
         - {{ rhis_products[product].name }}
         {% endfor %}
-      
+
       Next Steps:
         1. Review deployment logs: logs/deployment_{{ rhis_deployment_timestamp }}.log
         2. Access deployed products via Web UI
         3. Configure integrations as needed
         4. Run post-deployment validation
-      
+
       Documentation: See docs/deployment/ for guides
   tags: ["always"]

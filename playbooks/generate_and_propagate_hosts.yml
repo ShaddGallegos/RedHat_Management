@@ -39,7 +39,7 @@
       loop: "{{ host_list.split(',') }}"
 
     - name: Show parsed hosts (for verification)
-      debug:
+      ansible.builtin.debug:
         var: hosts_entries
 
     - name: Ensure installer is included in hosts_entries
@@ -64,7 +64,7 @@
       loop: "{{ hosts_entries }}"
 
     - name: (optional) Reverse-DNS validation per host (run lookup and fail if mismatch)
-      command: getent hosts {{ item.ip }}
+      ansible.builtin.command: getent hosts {{ item.ip }}
       register: rdns_single
       failed_when: rdns_single.stdout == '' or (item.name not in rdns_single.stdout.split())
       changed_when: false
@@ -78,17 +78,17 @@
     # (e.g., by setting variables or invoking a helper). Proceed using prompted values.
 
     - name: Render /etc/hosts template to files/generated_hosts
-      template:
+      ansible.builtin.template:
         src: ../templates/hosts.j2
         dest: ../files/generated_hosts
 
     - name: Render inventory to inventory/hosts
-      template:
+      ansible.builtin.template:
         src: ../templates/inventory_hosts.j2
         dest: ../inventory/hosts
 
     - name: Ensure generated_hosts is readable
-      file:
+      ansible.builtin.file:
         path: ../files/generated_hosts
         mode: '0644'
 
@@ -98,14 +98,14 @@
         satellite_ns: "{{ (hosts_entries | selectattr('type','equalto','scenario_satellite') | map(attribute='ip') | list)[0] | default((hosts_entries | selectattr('ip','match','^10\\.168\\.') | map(attribute='ip') | list)[0] | default('')) }}"
 
     - name: Render resolv.conf on controller for verification
-      template:
+      ansible.builtin.template:
         src: ../templates/resolv.conf.j2
         dest: ../files/generated_resolv.conf
       vars:
         nameservers: "{{ ([installer_ns] + ([satellite_ns] if satellite_ns != '' else [])) | unique }}"
 
     - name: Render env.conf with GitHub credentials (controller)
-      template:
+      ansible.builtin.template:
         src: ../templates/env.conf.j2
         dest: ../files/env.conf
       vars:
@@ -134,7 +134,7 @@
             label: "{{ item.name }}"
 
         - name: Show reachability report
-          debug:
+          ansible.builtin.debug:
             msg: "{{ item.item.name }} ({{ item.item.ip }}) reachable={{ not item.failed }} elapsed={{ item.elapsed | default('n/a') }}"
           loop: "{{ wait_host_res.results }}"
 
@@ -154,7 +154,7 @@
         satellite_ns: "{{ (hosts_entries | selectattr('type','equalto','scenario_satellite') | map(attribute='ip') | list)[0] | default((hosts_entries | selectattr('ip','match','^10\\.168\\.') | map(attribute='ip') | list)[0] | default('')) }}"
 
     - name: Render resolv.conf with both nameservers and rotate option
-      template:
+      ansible.builtin.template:
         src: ../templates/resolv.conf.j2
         dest: ../files/generated_resolv.conf
       vars:
@@ -163,7 +163,7 @@
     - name: Copy files to remote machines (hosts, resolv.conf, inventory) honoring dry-run
       block:
         - name: Show files to copy (dry-run)
-          debug:
+          ansible.builtin.debug:
             msg: |
               DRY-RUN: would copy these files to {{ inventory_hostname }}:\n  - ../files/generated_hosts -> /etc/hosts\n  - ../files/generated_resolv.conf -> /etc/resolv.conf\n  - ../inventory/hosts -> /etc/ansible_hosts
           when: dry_run | default(false) | bool
@@ -178,7 +178,7 @@
           when: dry_run | default(false) | bool
 
         - name: Display /etc/hosts diff (dry-run)
-          debug:
+          ansible.builtin.debug:
             msg: "{{ diff_hosts.stdout if diff_hosts.stdout != '' else 'No differences for /etc/hosts' }}"
           when: dry_run | default(false) | bool
 
@@ -192,12 +192,12 @@
           when: dry_run | default(false) | bool
 
         - name: Display /etc/resolv.conf diff (dry-run)
-          debug:
+          ansible.builtin.debug:
             msg: "{{ diff_resolv.stdout if diff_resolv.stdout != '' else 'No differences for /etc/resolv.conf' }}"
           when: dry_run | default(false) | bool
 
         - name: Copy generated /etc/hosts to remote machine
-          copy:
+          ansible.builtin.copy:
             src: ../files/generated_hosts
             dest: /etc/hosts
             owner: root
@@ -206,7 +206,7 @@
           when: not (dry_run | default(false) | bool)
 
         - name: Copy generated resolv.conf to remote machine
-          copy:
+          ansible.builtin.copy:
             src: ../files/generated_resolv.conf
             dest: /etc/resolv.conf
             owner: root
@@ -215,7 +215,7 @@
           when: not (dry_run | default(false) | bool)
 
         - name: Copy inventory hosts to remote machine
-          copy:
+          ansible.builtin.copy:
             src: ../inventory/hosts
             dest: /etc/ansible_hosts
             owner: root

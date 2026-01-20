@@ -32,7 +32,7 @@
 
 - name: Attach new disk to VM
   community.libvirt.virt:
-    command: attach_device
+    ansible.builtin.command: attach_device
     name: "{{ inventory_hostname }}"
     xml: |
       <disk type='file' device='disk'>

@@ -9,7 +9,7 @@
 
 - name: Load vaulted/env variables (only when explicitly requested)
   ansible.builtin.include_vars:
-    file: "{{ satellite_mail_vault_file }}"
+    ansible.builtin.file: "{{ satellite_mail_vault_file }}"
   when: (satellite_mail_vault_file is defined and satellite_mail_vault_file != '') and (use_local_env | default(false) | bool) and satellite_mail_vault_stat.stat.exists
   ignore_errors: false
   no_log: true

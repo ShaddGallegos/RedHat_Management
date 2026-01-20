@@ -3,7 +3,7 @@
 # Prepares KVM/LibVirt environment for virtual machine platform_provisioning
 
 - name: "Prepare LibVirt Infrastructure"
-  debug:
+  ansible.builtin.debug:
     msg: |
       LibVirt Infrastructure Preparation
       ==================================
@@ -14,7 +14,7 @@
 - name: "Validate LibVirt prerequisites"
   block:
     - name: "Check LibVirt daemon"
-      shell: systemctl is-active libvirtd
+      ansible.builtin.shell: systemctl is-active libvirtd
       register: libvirt_status
       changed_when: false
       failed_when: false
@@ -34,6 +34,6 @@
   tags: ["platform_infrastructure_core", "libvirt", "validate"]
 
 - name: "LibVirt platform_infrastructure_core ready for platform_provisioning"
-  debug:
+  ansible.builtin.debug:
     msg: "LibVirt platform_infrastructure_core prepared successfully"
   tags: ["platform_infrastructure_core", "libvirt", "info"]

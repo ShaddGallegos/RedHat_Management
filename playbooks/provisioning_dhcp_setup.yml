@@ -6,12 +6,12 @@
   hosts: scenario_satellite
   gather_facts: true
   become: true
-  
+
   vars:
     provisioning_secondary_interface: "eth1"
     provisioning_interface_ip: "10.168.0.1"
     setup_dhcp_only: true
-  
+
   roles:
     - role: platform_services_provisioning_stack
       tags: dhcp
@@ -20,18 +20,18 @@
     - name: Verify DHCP configuration
       block:
         - name: Check DHCP service status
-          systemd:
+          ansible.builtin.systemd:
             name: dhcpd
             state: started
           register: dhcp_status
 
         - name: Display DHCP configuration
-          command: cat /etc/dhcp/dhcpd.conf
+          ansible.builtin.command: cat /etc/dhcp/dhcpd.conf
           register: dhcp_config
           changed_when: false
 
         - name: Show DHCP status
-          debug:
+          ansible.builtin.debug:
             msg: |
               DHCP Server Status:
               • Service: {{ dhcp_status.status.ActiveState }}

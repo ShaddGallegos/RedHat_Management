@@ -8,10 +8,10 @@
     provisioning_host: "scenario_satellite.prod.spg"
     provisioning_secondary_interface: "eth1"
     provisioning_interface_ip: "10.168.0.1"
-  
+
   tasks:
     - name: Verify platform_provisioning role variables
-      debug:
+      ansible.builtin.debug:
         msg: |
           Testing platform_services_provisioning_stack role
           ==========================================

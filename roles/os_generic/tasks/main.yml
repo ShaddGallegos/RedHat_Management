@@ -4,7 +4,7 @@
 # Performs foundational system configuration for deployed hosts
 
 - name: "OPERATING SYSTEM CONFIGURATION - Initialize"
-  debug:
+  ansible.builtin.debug:
     msg: |
       Operating System Configuration
       ================================
@@ -39,20 +39,20 @@
 
       rescue:
         - name: "Package update failed - continuing"
-          debug:
+          ansible.builtin.debug:
             msg: "Package installation encountered issues. Continuing with configuration."
 
     - name: "Configure system settings"
-      debug:
+      ansible.builtin.debug:
         msg: "OS-specific configuration completed"
 
   rescue:
     - name: "OS configuration failed"
-      fail:
+      ansible.builtin.fail:
         msg: "Operating system configuration failed. Check logs above for details."
   tags: ["os_generic"]
 
 - name: "OS configuration completed"
-  debug:
+  ansible.builtin.debug:
     msg: "Operating system {{ deployment_os }} configured successfully."
   tags: ["os_generic", "info"]

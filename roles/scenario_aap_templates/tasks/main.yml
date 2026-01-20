@@ -166,12 +166,12 @@
         msg: |
           Job Templates configured: {{ all_job_templates.json.count }}
           Workflow Templates configured: {{ all_workflow_templates.json.count }}
-          
+
           Job Template List:
           {% for tmpl in all_job_templates.json.results %}
           - {{ tmpl.name }} (Playbook: {{ tmpl.playbook }})
           {% endfor %}
-          
+
           Workflow Template List:
           {% for tmpl in all_workflow_templates.json.results %}
           - {{ tmpl.name }}

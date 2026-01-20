@@ -17,7 +17,7 @@
         name: tftp-server
         state: present
       become: yes
-      
+
     - name: Install tftp-server package
       ansible.builtin.yum:
         name: tftp-server
@@ -40,7 +40,7 @@
         - /var/lib/tftpboot/pxelinux.cfg
         - /var/lib/tftpboot/images
         - /var/lib/tftpboot/iso
-        
+
     - name: Copy ISO files from files/ to TFTP directory
       ansible.builtin.shell: |
         if [ -d "{{ project_root }}/files" ] && [ -f "{{ project_root }}/files"/*.iso ]; then
@@ -53,7 +53,7 @@
       register: iso_copy_result
       become: yes
       changed_when: "'copied' in iso_copy_result.stdout"
-      
+
     - name: Copy OEMDRV files from files/ to TFTP directory
       ansible.builtin.shell: |
         if [ -d "{{ project_root }}/files" ] && [ -f "{{ project_root }}/files"/OEMDRV* ]; then
@@ -77,18 +77,18 @@
 - name: Start and Enable TFTP Service
   block:
     - name: Enable TFTP socket
-      systemd:
+      ansible.builtin.systemd:
         name: tftp.socket
         enabled: yes
         state: started
       become: yes
 
     - name: Verify TFTP service is running
-      systemd:
+      ansible.builtin.systemd:
         name: tftp.socket
         state: started
       become: yes
-      
+
     - name: Configure firewall for TFTP (if firewalld is active)
       ansible.posix.firewalld:
         ansible.builtin.service: tftp
@@ -96,7 +96,7 @@
         immediate: yes
         state: enabled
       become: yes
-      when: 
+      when:
         - ansible_os_family == "RedHat"
         - tftp_enable_firewall | default(true)
       ignore_errors: yes
@@ -141,51 +141,51 @@
     - name: Display TFTP Server Status
       ansible.builtin.debug:
         msg: |
-          
+
           ============================================================
                       TFTP BOOT SERVER CONFIGURED
           ============================================================
-          
+
           Status:              ACTIVE
           Service:             tftp.socket (xinetd)
           Root Directory:      /var/lib/tftpboot
           Server IP:           {{ host_ips.stdout_lines[0] | default('IP detection failed') }}
           Server Port:         69/UDP
-          
+
           Directories Created:
             - /var/lib/tftpboot          (root)
             - /var/lib/tftpboot/iso      (ISO files)
             - /var/lib/tftpboot/images   (boot images)
             - /var/lib/tftpboot/pxelinux.cfg (PXE boot configs)
-          
+
           Symbolic Links:
             - /var/lib/tftpboot/project-files -> {{ project_root }}/files
-          
+
           Available Files in TFTP ({{ tftp_files.matched }} files):
           {% for file in tftp_files.files %}
             - {{ file.path | regex_replace('^/var/lib/tftpboot/', '') }}
           {% endfor %}
-          
+
           How to Use:
-          
+
           1. NETWORK BOOT via DHCP/PXE:
              Configure your DHCP server to point to this TFTP server
              for network boot operations.
-          
+
           2. MANUAL TFTP ACCESS:
              tftp {{ host_ips.stdout_lines[0].split()[0] | default('SERVER_IP') }}
              > get iso/RHEL-10-x86_64-dvd.iso
-          
+
           3. FROM FILES DIRECTORY:
              Any ISO or OEMDRV file in {{ project_root }}/files/
              will be automatically available via TFTP at:
              tftp://{{ host_ips.stdout_lines[0].split()[0] | default('SERVER_IP') }}/iso/filename.iso
              tftp://{{ host_ips.stdout_lines[0].split()[0] | default('SERVER_IP') }}/OEMDRV
-          
+
           4. FIREWALL RULES:
              TFTP (port 69/UDP) has been opened in firewalld
              (if firewalld is active)
-          
+
           ============================================================
 
 - name: Create monitoring script
@@ -195,7 +195,7 @@
     content: |
       #!/bin/bash
       # TFTP Server Status and Monitoring Script
-      
+
       echo "TFTP Server Status"
       echo "==================="
       systemctl status tftp.socket
@@ -217,31 +217,31 @@
     content: |
       #!/bin/bash
       # Sync ISO and OEMDRV files from project files/ to TFTP
-      
+
       PROJECT_ROOT="${1:-{{ project_root }}}"
       TFTP_ROOT="/var/lib/tftpboot"
-      
+
       if [ ! -d "$PROJECT_ROOT/files" ]; then
           echo "Error: $PROJECT_ROOT/files directory not found"
           exit 1
       fi
-      
+
       echo "Syncing files from $PROJECT_ROOT/files to $TFTP_ROOT..."
-      
+
       # Sync ISOs
       if ls "$PROJECT_ROOT"/files/*.iso 1> /dev/null 2>&1; then
           cp -v "$PROJECT_ROOT"/files/*.iso "$TFTP_ROOT/iso/"
           chmod 644 "$TFTP_ROOT/iso"/*.iso
           echo "ISO files synced"
       fi
-      
+
       # Sync OEMDRV
       if ls "$PROJECT_ROOT"/files/OEMDRV* 1> /dev/null 2>&1; then
           cp -v "$PROJECT_ROOT"/files/OEMDRV* "$TFTP_ROOT/"
           chmod 644 "$TFTP_ROOT"/OEMDRV*
           echo "OEMDRV files synced"
       fi
-      
+
       echo "Sync complete!"
       tftp-server-status
   become: yes

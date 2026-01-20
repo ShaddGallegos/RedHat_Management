@@ -340,19 +340,19 @@ rhis_products:
     version: "6.18"
     tags: ["scenario_satellite"]
     roles: ["ansible_dev_node_redhat_products/scenario_satellite"]
-    
+
   aap:
     name: "Ansible Automation Platform 2.6"
     version: "2.6"
     tags: ["aap"]
     roles: ["ansible_dev_node_redhat_products/aap"]
-    
+
   idm:
     name: "Red Hat Identity Management 3.0"
     version: "3.0"
     tags: ["idm"]
     roles: ["ansible_dev_node_redhat_products/idm"]
-    
+
   scenario_openshift:
     name: "OpenShift 4.21+"
     version: "4.21"

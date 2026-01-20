@@ -105,27 +105,27 @@ firewall_enabled: true
 firewall_rules:
   - port: 67
     protocol: "udp"
-    service: "dhcp"
+    ansible.builtin.service: "dhcp"
     state: "enabled"
   - port: 68
     protocol: "udp"
-    service: "dhcp-client"
+    ansible.builtin.service: "dhcp-client"
     state: "enabled"
   - port: 53
     protocol: "udp"
-    service: "dns"
+    ansible.builtin.service: "dns"
     state: "enabled"
   - port: 53
     protocol: "tcp"
-    service: "dns-tcp"
+    ansible.builtin.service: "dns-tcp"
     state: "enabled"
   - port: 69
     protocol: "udp"
-    service: "tftp"
+    ansible.builtin.service: "tftp"
     state: "enabled"
   - port: 4011
     protocol: "udp"
-    service: "pxe-dhcp"
+    ansible.builtin.service: "pxe-dhcp"
     state: "enabled"
 
 # Logging Configuration

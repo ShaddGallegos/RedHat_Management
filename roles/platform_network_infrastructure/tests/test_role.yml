@@ -3,10 +3,10 @@
 - name: Test platform_network_infrastructure Role
   hosts: localhost
   gather_facts: true
-  
+
   tasks:
     - name: Run platform_network_infrastructure role
-      include_role:
+      ansible.builtin.include_role:
         name: platform_network_infrastructure
 
     - name: Test role completed successfully

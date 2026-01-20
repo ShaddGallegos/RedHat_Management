@@ -3,7 +3,7 @@
 # Configures operating system installation via OEM-supplied drivers and media
 
 - name: "Configure Installation Method: OEM Driver"
-  debug:
+  ansible.builtin.debug:
     msg: |
       Installation Method: OEM Driver
       ================================
@@ -29,6 +29,6 @@
   tags: ["installation", "oemdrv", "validate"]
 
 - name: "OEM Driver installation method configured"
-  debug:
+  ansible.builtin.debug:
     msg: "OEM driver installation method ready"
   tags: ["installation", "oemdrv", "info"]
