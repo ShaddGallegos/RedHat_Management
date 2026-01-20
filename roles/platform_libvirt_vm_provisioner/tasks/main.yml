@@ -1,6 +1,15 @@
 ---
 - name: Build vm list in role
   # Check for a locally-written survey file and load it if present (runs on controller)
+- name: Check for persistent marker for libvirt VM provisioner
+  stat:
+    path: /var/lib/rhm/platform_libvirt_vm_provisioner_done
+  register: vmprov_marker_stat
+
+- name: Set platform_libvirt_vm_provisioner_done fact
+  set_fact:
+    platform_libvirt_vm_provisioner_done: "{{ vmprov_marker_stat.stat.exists | default(false) }}"
+
 - name: Check for survey file on controller
   stat:
     path: files/cache/survey.yml
@@ -214,6 +223,33 @@
       become: true
       when: use_cloud_init_iso | default(true) | bool
 
-      loop: "{{ vm_list }}"
-      loop_control:
-      loop_var: item
+        loop: "{{ vm_list }}"
+        loop_control:
+        loop_var: item
+    when: not (platform_libvirt_vm_provisioner_done | default(false))
+
+- name: Create marker directory for VM provisioner
+  file:
+    path: /var/lib/rhm
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Touch platform_libvirt_vm_provisioner marker
+  file:
+    path: /var/lib/rhm/platform_libvirt_vm_provisioner_done
+    state: touch
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Write facts file for libvirt vm provisioner
+  copy:
+    dest: /etc/ansible/facts.d/rhm_vmprov.fact
+    content: '{"platform_libvirt_vm_provisioner_done": true}'
+    mode: '0644'
+  become: true
+  when: not (platform_libvirt_vm_provisioner_done | default(false))
