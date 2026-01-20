@@ -1,0 +1,26 @@
+[purge] Starting at Tue Jan 20 03:40:28 PM MST 2026
+[purge] Creating offline backup bundle...
+[purge] Preparing mirror clone at /tmp/RedHat_Management-mirror.git
+[purge] Checking for git-filter-repo...
+[purge] Running git-filter-repo on mirror (no push)
+Note: Some branches outside the refs/remotes/ hierarchy were not removed;
+to delete them, use:
+  git branch -d dependabot/pip/pip-ef7f14c0ab
+  git branch -d feature/consolidate-platform-roles
+  git branch -d feature/merge-cmdb-roles
+  git branch -d feature/rename-roles
+  git branch -d main
+  git branch -d missing-defaults-curated
+  git branch -d review/smoke-test-fix
+NOTICE: Removing 'origin' remote; see 'Why is my origin removed?'
+        in the manual if you want to push back there.
+        (was /home/sgallego/Downloads/RedHat_Management)
+Parsed 44 commits
+New history written in 0.07 seconds; now repacking/cleaning...
+Repacking your repo and cleaning out old unneeded objects
+Completely finished after 0.13 seconds.
+[purge] Verification: searching rewritten mirror for original secrets
+[ok] No matches found for the targeted secrets in the rewritten mirror.
+[purge] Mirror rewrite complete. Mirror path: /tmp/RedHat_Management-mirror.git
+[purge] No push performed. To push, inspect the mirror and then run: git push --force --all origin && git push --force --tags origin
+[purge] Done at Tue Jan 20 03:40:28 PM MST 2026

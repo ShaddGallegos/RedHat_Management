@@ -4,11 +4,11 @@
 
 ```
 scenario_satellite.prod.spg (eth1: 10.168.0.1)
-│
-├─ DHCP   (port 67/UDP)  → 10.168.50.0 - 10.168.200.255
-├─ DNS    (port 53)      → example.com, prod.example.com
-├─ TFTP   (port 69/UDP)  → /var/lib/tftpboot
-└─ PXE    (via DHCP)     → pxelinux.0 + menu
+
+ DHCP   (port 67/UDP)  → 10.168.50.0 - 10.168.200.255
+ DNS    (port 53)      → example.com, prod.example.com
+ TFTP   (port 69/UDP)  → /var/lib/tftpboot
+ PXE    (via DHCP)     → pxelinux.0 + menu
 ```
 
 ## Deployed Services

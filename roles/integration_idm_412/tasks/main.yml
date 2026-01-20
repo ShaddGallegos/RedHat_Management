@@ -293,7 +293,7 @@
              SSSD: /etc/sssd/sssd.conf
              IdM Vars: /etc/ipa/ipa-install-vars.yml
 
-          ▶  To Complete Installation:
+            To Complete Installation:
              1. ipa-server-install --no-host-dns --setup-dns
                 Or manually with: ipa-server-install
 

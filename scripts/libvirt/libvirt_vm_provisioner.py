@@ -213,9 +213,9 @@ class LibvirtVMProvisioner:
     def display_vm_info(self):
         """Display VM information and management commands"""
         print(f"\n{Colors.GREEN}")
-        print("╔════════════════════════════════════════╗")
-        print("║  VM Created Successfully!              ║")
-        print("╚════════════════════════════════════════╝")
+        print("")
+        print("  VM Created Successfully!              ")
+        print("")
         print(f"{Colors.END}")
         
         print(f"\n{Colors.BLUE}VM Details:{Colors.END}")
@@ -307,9 +307,9 @@ def main():
     
     # Display configuration
     print(f"\n{Colors.GREEN}")
-    print("╔════════════════════════════════════════╗")
-    print("║  Libvirt VM Provisioner                ║")
-    print("╚════════════════════════════════════════╝")
+    print("")
+    print("  Libvirt VM Provisioner                ")
+    print("")
     print(f"{Colors.END}")
     
     print(f"\n{Colors.BLUE}Configuration:{Colors.END}")

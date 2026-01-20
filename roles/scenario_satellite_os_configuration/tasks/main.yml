@@ -217,7 +217,7 @@
           - Kickstart Repository: {{ 'Configured' if create_kickstart_repo else 'Skipped' }}
           - Sync Jobs: {{ 'Configured' if configure_sync_job else 'Skipped' }}
 
-          Status: ✅ Ready for platform_provisioning template assignment
+          Status:  Ready for platform_provisioning template assignment
 
   when: satellite_os_config_enabled
   tags: ["satellite_os", "test"]

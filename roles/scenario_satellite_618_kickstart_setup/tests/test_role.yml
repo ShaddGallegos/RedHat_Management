@@ -33,4 +33,4 @@
 
     - name: Test role completed successfully
       ansible.builtin.debug:
-        msg: "✓ satellite_kickstart_config role test completed successfully"
+        msg: " satellite_kickstart_config role test completed successfully"

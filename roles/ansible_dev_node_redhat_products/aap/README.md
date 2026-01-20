@@ -89,7 +89,7 @@ aap_db_pool_size: 50
         deployment_scenario: "aap_only"
         configure_aap_rbac: true
         deploy_aap_eda: true
-        aap_hostname: "aap.prod.example.com"
+        aap_hostname: "aap.prod.spg"
 ```
 
 ### AAP with Custom Execution Environment

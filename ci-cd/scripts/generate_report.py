@@ -35,7 +35,7 @@ def generate_report():
     
     # Summary
     report.append("## Summary\n")
-    report.append("✓ **RHIS Project Quality Validation Complete**\n")
+    report.append(" **RHIS Project Quality Validation Complete**\n")
     report.append("\nKey Metrics:\n")
     report.append("- Metadata Coverage: 100% (33/33 roles)\n")
     report.append("- Documentation Coverage: 70%+ (23/33 roles)\n")
@@ -54,7 +54,7 @@ def generate_report():
         f.write("\n".join(report))
     
     print("\n".join(report))
-    print("\n✓ Report saved to /tmp/validation-report.html")
+    print("\n Report saved to /tmp/validation-report.html")
 
 if __name__ == "__main__":
     generate_report()

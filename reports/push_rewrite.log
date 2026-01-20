@@ -1,0 +1,9 @@
+[push] Confirm flag provided. Proceeding will force-push rewritten history.
+[push] Pushing all branches (force) to origin...
+To /home/sgallego/Downloads/RedHat_Management
+ + c2df89d...bc1d4ee feature/rename-roles -> feature/rename-roles (forced update)
+[push] Pushing tags (force) to origin...
+To /home/sgallego/Downloads/RedHat_Management
+ + 1329490...f1d6374 backup-before-cleanup-20260120-090148 -> backup-before-cleanup-20260120-090148 (forced update)
+ + 16cb0c4...12205ba v1.0.0 -> v1.0.0 (forced update)
+[push] Done. Check /home/sgallego/Downloads/RedHat_Management/reports/push_rewrite.log for details.

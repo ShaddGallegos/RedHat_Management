@@ -77,12 +77,12 @@ Enhanced documentation with:
 By default, the role now enables:
 
 ### RHEL 9 Repositories
-- ✅ Red Hat Enterprise Linux Server (v. 9 for x86_64) - **BaseOS**
-- ✅ Red Hat Enterprise Linux AppStream (v. 9 for x86_64) - **Applications**
+-  Red Hat Enterprise Linux Server (v. 9 for x86_64) - **BaseOS**
+-  Red Hat Enterprise Linux AppStream (v. 9 for x86_64) - **Applications**
 
 ### RHEL 10 Repositories
-- ✅ Red Hat Enterprise Linux Server (v. 10 for x86_64) - **BaseOS**
-- ✅ Red Hat Enterprise Linux AppStream (v. 10 for x86_64) - **Applications**
+-  Red Hat Enterprise Linux Server (v. 10 for x86_64) - **BaseOS**
+-  Red Hat Enterprise Linux AppStream (v. 10 for x86_64) - **Applications**
 
 ## How It Works
 
@@ -175,25 +175,25 @@ RHEL yum repos available for:
    ↓ (Deploys Satellite 6.18)
    
 2. satellite_content_config [UPDATED]
-   ├─ Creates organizations
-   ├─ Creates locations
-   ├─ Configures products
-   ├─ Configures repositories
-   └─ [NEW] Enables RHEL yum repository sets ✓
+    Creates organizations
+    Creates locations
+    Configures products
+    Configures repositories
+    [NEW] Enables RHEL yum repository sets 
    ↓
    
 3. scenario_satellite_lifecycle_config
-   ├─ Creates lifecycle environments (Dev → Staging → Prod)
-   ├─ Creates content views
-   ├─ Filters content (uses RHEL repos ✓)
-   └─ Promotes content across environments
+    Creates lifecycle environments (Dev → Staging → Prod)
+    Creates content views
+    Filters content (uses RHEL repos )
+    Promotes content across environments
    ↓
    
 4. scenario_satellite_activation_config
-   ├─ Creates host collections
-   ├─ Creates activation keys
-   ├─ Attaches subscriptions (uses RHEL repos ✓)
-   └─ Enables repository sets per key
+    Creates host collections
+    Creates activation keys
+    Attaches subscriptions (uses RHEL repos )
+    Enables repository sets per key
    ↓
    
 5. Hosts register with activation key
@@ -204,22 +204,22 @@ RHEL yum repos available for:
 
 ## Benefits
 
-✅ **Automated RHEL Repository Setup**
+ **Automated RHEL Repository Setup**
 - No manual repository enablement required
 - Reduces human error and setup time
 - Ensures consistency across environments
 
-✅ **Full RHEL 9 & RHEL 10 Support**
+ **Full RHEL 9 & RHEL 10 Support**
 - BaseOS repositories enabled for both versions
 - AppStream repositories enabled for both versions
 - Multi-version deployments fully supported
 
-✅ **Seamless Content Lifecycle Integration**
+ **Seamless Content Lifecycle Integration**
 - Enabled repos automatically available in content views
 - Content can be filtered and promoted
 - Activation keys automatically have access
 
-✅ **Time Savings**
+ **Time Savings**
 - Eliminates manual repository set enablement steps
 - Reduces deployment time
 - Fewer configuration errors
@@ -320,4 +320,4 @@ curl -k -u admin:password \
 
 The `satellite_content_config` role now automatically enables RHEL yum repositories for all configured products, ensuring RHEL BaseOS and AppStream repositories are available for content views, lifecycle environments, and host registrations. This eliminates manual repository enablement steps and streamlines the Satellite 6.18 configuration process.
 
-**Status**: ✅ Complete and integrated with RHIS stack
+**Status**:  Complete and integrated with RHIS stack

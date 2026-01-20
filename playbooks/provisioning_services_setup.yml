@@ -28,42 +28,42 @@
       ansible.builtin.debug:
         msg: |
 
-          ╔════════════════════════════════════════════════════════════════════╗
-          ║         PROVISIONING SERVICES DEPLOYMENT COMPLETE                 ║
-          ╠════════════════════════════════════════════════════════════════════╣
-          ║                                                                    ║
-          ║  Host: {{ provisioning_host }}                                    ║
-          ║  Interface: {{ provisioning_secondary_interface }}                ║
-          ║  IP Address: {{ provisioning_interface_ip }}                      ║
-          ║  Network: 10.168.0.0/16                                          ║
-          ║                                                                    ║
-          ║  ✓ DHCP Server Configured                                        ║
-          ║    • Range: 10.168.50.0 - 10.168.200.255                        ║
-          ║    • Lease: 24 hours                                            ║
-          ║    • Nameservers: 10.168.0.1, 10.168.1.53, 8.8.8.8            ║
-          ║                                                                    ║
-          ║  ✓ DNS Server Configured                                         ║
-          ║    • Zones: example.com, prod.example.com                       ║
-          ║    • Resolver: 10.168.0.1:53                                     ║
-          ║    • Options: rotate, timeout:2, attempts:3                     ║
-          ║                                                                    ║
-          ║  ✓ TFTP Server Configured                                        ║
-          ║    • Root: /var/lib/tftpboot                                     ║
-          ║    • Port: 69/UDP                                               ║
-          ║                                                                    ║
-          ║  ✓ PXE Boot Menu Configured                                      ║
-          ║    • Bootloader: pxelinux.0                                      ║
-          ║    • Options: RHEL 9, RHEL 10, Rescue, Memtest                 ║
-          ║                                                                    ║
-          ║  ✓ Resolv.conf Updated                                           ║
-          ║    • Nameserver: 10.168.0.1                                      ║
-          ║    • Search: example.com prod.example.com lab.example.com       ║
-          ║    • Options: rotate                                            ║
-          ║                                                                    ║
-          ║  ✓ Firewall Rules Applied                                        ║
-          ║    • DHCP (67/UDP), DNS (53), TFTP (69/UDP)                    ║
-          ║    • PXE (4011/UDP)                                             ║
-          ║                                                                    ║
-          ║  Ready for automated system platform_provisioning!                        ║
-          ║                                                                    ║
-          ╚════════════════════════════════════════════════════════════════════╝
+          
+                   PROVISIONING SERVICES DEPLOYMENT COMPLETE                 
+          
+                                                                              
+            Host: {{ provisioning_host }}                                    
+            Interface: {{ provisioning_secondary_interface }}                
+            IP Address: {{ provisioning_interface_ip }}                      
+            Network: 10.168.0.0/16                                          
+                                                                              
+             DHCP Server Configured                                        
+               Range: 10.168.50.0 - 10.168.200.255                        
+               Lease: 24 hours                                            
+               Nameservers: 10.168.0.1, 10.168.1.53, 8.8.8.8            
+                                                                              
+             DNS Server Configured                                         
+               Zones: example.com, prod.spg                       
+               Resolver: 10.168.0.1:53                                     
+               Options: rotate, timeout:2, attempts:3                     
+                                                                              
+             TFTP Server Configured                                        
+               Root: /var/lib/tftpboot                                     
+               Port: 69/UDP                                               
+                                                                              
+             PXE Boot Menu Configured                                      
+               Bootloader: pxelinux.0                                      
+               Options: RHEL 9, RHEL 10, Rescue, Memtest                 
+                                                                              
+             Resolv.conf Updated                                           
+               Nameserver: 10.168.0.1                                      
+               Search: example.com prod.spg lab.example.com       
+               Options: rotate                                            
+                                                                              
+             Firewall Rules Applied                                        
+               DHCP (67/UDP), DNS (53), TFTP (69/UDP)                    
+               PXE (4011/UDP)                                             
+                                                                              
+            Ready for automated system platform_provisioning!                        
+                                                                              
+          

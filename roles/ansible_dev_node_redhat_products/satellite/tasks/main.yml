@@ -96,7 +96,7 @@
     - name: "Satellite deployment failed - detailed error"
       ansible.builtin.fail:
         msg: |
-          ❌ SATELLITE DEPLOYMENT FAILED
+           SATELLITE DEPLOYMENT FAILED
 
           Common causes:
           1. Insufficient disk space (Satellite requires 500GB+ for content)

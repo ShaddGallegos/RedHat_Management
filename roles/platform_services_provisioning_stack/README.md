@@ -9,36 +9,36 @@ This role deploys and configures all platform_provisioning services on `scenario
 - **eth0**: External network (libvirt NAT) - DHCP auto IP
 - **eth1**: Private network (10.168.0.0/16) - Static 10.168.0.1
 - **DHCP Server**: Automatic IP allocation for 10.168.0.0/16 network
-- **DNS Server**: BIND DNS with zones for example.com and prod.example.com
+- **DNS Server**: BIND DNS with zones for example.com and prod.spg
 - **TFTP Server**: Boot file delivery for PXE clients
 - **PXE Boot**: Network boot menu with RHEL 9 and 10 options
 - **Resolv.conf**: Configured with 10.168.0.1 nameserver and rotate option
 
 ## Features
 
-✅ Primary ethernet interface configuration (eth0 - external/libvirt NAT)  
-✅ Secondary ethernet interface configuration (eth1 - private platform_provisioning)  
-✅ DHCP with static host reservations  
-✅ BIND DNS with forward and reverse zones  
-✅ TFTP with PXE menu configuration  
-✅ Resolv.conf with nameserver 10.168.0.1  
-✅ Options rotate for DNS query load balancing  
-✅ Firewall rules for all services  
-✅ Service validation and health checks  
-✅ Dual network isolation and independence  
+ Primary ethernet interface configuration (eth0 - external/libvirt NAT)  
+ Secondary ethernet interface configuration (eth1 - private platform_provisioning)  
+ DHCP with static host reservations  
+ BIND DNS with forward and reverse zones  
+ TFTP with PXE menu configuration  
+ Resolv.conf with nameserver 10.168.0.1  
+ Options rotate for DNS query load balancing  
+ Firewall rules for all services  
+ Service validation and health checks  
+ Dual network isolation and independence  
 
 ## Network Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│   scenario_satellite.prod.spg                    │
-├──────────────────┬──────────────────────┤
-│  eth0            │  eth1                │
-│  External        │  Private             │
-│  libvirt NAT     │  10.168.0.0/16       │
-│  DHCP (auto)     │  10.168.0.1 (static) │
-│  Package mgmt    │  DHCP/DNS/TFTP/PXE   │
-└──────────────────┴──────────────────────┘
+
+   scenario_satellite.prod.spg                    
+
+  eth0              eth1                
+  External          Private             
+  libvirt NAT       10.168.0.0/16       
+  DHCP (auto)       10.168.0.1 (static) 
+  Package mgmt      DHCP/DNS/TFTP/PXE   
+
 ```
 
 ## Service Details
@@ -65,14 +65,14 @@ This role deploys and configures all platform_provisioning services on `scenario
 - **Static Hosts**: scenario_satellite (10.168.0.10), idm (10.168.0.20), aap (10.168.0.30)
 
 ### DNS
-- **Zones**: example.com, prod.example.com
+- **Zones**: example.com, prod.spg
 - **Nameserver**: 10.168.0.1:53
 - **Forward Resolution**: A and CNAME records
 - **Reverse Resolution**: PTR zones for 10.168.0.0/16
 
 ### Resolv.conf
 - **Nameserver**: 10.168.0.1
-- **Search Domains**: example.com, prod.example.com, lab.example.com
+- **Search Domains**: example.com, prod.spg, lab.example.com
 - **Options**: rotate, timeout:2, attempts:3
 
 ### TFTP/PXE

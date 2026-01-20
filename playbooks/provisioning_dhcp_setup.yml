@@ -34,7 +34,7 @@
           ansible.builtin.debug:
             msg: |
               DHCP Server Status:
-              • Service: {{ dhcp_status.status.ActiveState }}
-              • Subnet: 10.168.0.0/16
-              • Range: 10.168.50.0 - 10.168.200.255
-              • Lease Time: 24 hours
+               Service: {{ dhcp_status.status.ActiveState }}
+               Subnet: 10.168.0.0/16
+               Range: 10.168.50.0 - 10.168.200.255
+               Lease Time: 24 hours

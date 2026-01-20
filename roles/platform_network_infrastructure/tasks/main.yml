@@ -106,7 +106,7 @@
     - name: Display Final Configuration Summary
       ansible.builtin.debug:
         msg: |
-          ✅ Network Infrastructure Configuration Complete
+           Network Infrastructure Configuration Complete
 
           Primary Network: {{ primary_subnet.network }}/{{ primary_subnet.prefix }}
           Host Groups Configured: {{ host_groups | length }}

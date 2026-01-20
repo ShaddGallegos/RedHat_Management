@@ -70,7 +70,7 @@
     - name: "AAP deployment failed - detailed error"
       ansible.builtin.fail:
         msg: |
-          ❌ AAP DEPLOYMENT FAILED
+           AAP DEPLOYMENT FAILED
 
           Common causes:
           1. Insufficient system resources (CPU, memory, disk)

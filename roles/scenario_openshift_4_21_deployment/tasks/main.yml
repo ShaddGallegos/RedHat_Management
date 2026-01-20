@@ -310,7 +310,7 @@
              Ingress: /opt/scenario_openshift/ingress-config.yaml
              Pull Secrets: /opt/scenario_openshift/pull-secrets/
 
-          ▶  Installation Steps:
+            Installation Steps:
              1. Download scenario_openshift-install and oc tools
              2. Create pull-secret.txt from Red Hat console
              3. Configure SSH keys for access

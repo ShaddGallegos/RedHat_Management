@@ -22,29 +22,29 @@ Installation Method (OEMDRV/TFTP)
 Configuration Review & Confirmation
       ↓
 Deployment Initialization
-      ├→ Ansible Developer Node Setup
-      ├→ Platform Infrastructure Preparation
-      ├→ Inventory Generation
-      └→ Credential Management
+      → Ansible Developer Node Setup
+      → Platform Infrastructure Preparation
+      → Inventory Generation
+      → Credential Management
       ↓
 Product Deployment (in order)
-      ├→ Satellite 6.18 Installation & Configuration
-      ├→ AAP 2.6 Installation & Configuration
-      ├→ IdM 3.0 Installation & Configuration
-      └→ OpenShift Latest Installation & Configuration
+      → Satellite 6.18 Installation & Configuration
+      → AAP 2.6 Installation & Configuration
+      → IdM 3.0 Installation & Configuration
+      → OpenShift Latest Installation & Configuration
       ↓
 Integration Configuration
-      ├→ Satellite ↔ AAP Integration
-      ├→ Satellite ↔ IdM Integration
-      ├→ AAP ↔ IdM Integration
-      ├→ AAP → OpenShift Integration
-      └→ Ansible-CMDB Setup (Port 8081)
+      → Satellite ↔ AAP Integration
+      → Satellite ↔ IdM Integration
+      → AAP ↔ IdM Integration
+      → AAP → OpenShift Integration
+      → Ansible-CMDB Setup (Port 8081)
       ↓
 Post-Deployment Validation
-      ├→ Health Checks
-      ├→ Integration Tests
-      ├→ Connectivity Verification
-      └→ Ansible-CMDB Population
+      → Health Checks
+      → Integration Tests
+      → Connectivity Verification
+      → Ansible-CMDB Population
       ↓
 Deployment Complete
 ```
@@ -130,88 +130,88 @@ Deployment Complete
 
 ```
 RedHat_Management/
-├── RHIS-Installer-Enhanced.sh         # Main installer entry point
-├── RHIS-Installer.sh                  # Original installer (kept for compatibility)
-├── playbooks/
-│   ├── redhat_management-site.yml     # Main ansible_dev_node_orchestration playbook
-│   ├── init_installer_host.yml        # Initialize ansible developer node
-│   ├── prepare_platform.yml           # Platform-specific preparation
-│   ├── build_inventory.yml            # Dynamic inventory generation
-│   ├── deploy_satellite.yml           # Satellite installation/config
-│   ├── deploy_aap.yml                 # AAP installation/config
-│   ├── deploy_idm.yml                 # IdM installation/config
-│   ├── deploy_openshift.yml           # OpenShift installation/config
-│   ├── configure_integrations.yml     # Post-deployment integrations
-│   ├── setup_cmdb.yml                 # Ansible-CMDB setup
-│   └── validation.yml                 # Deployment validation
-├── roles/
-│   ├── installer_host/                # Ansible developer node setup
-│   ├── platform_prep/                 # Platform preparation
-│   ├── ansible_dev_node_inventory_generator/           # Inventory generation
-│   ├── platform_libvirt_vm_provisioner/       # LibVirt VM platform_provisioning
-│   ├── platform_infrastructure_manager/        # Platform management (AWS, Azure, GCP, VMware, Nutanix)
-│   ├── ansible_dev_node_redhat_products/              # Product deployment roles
-│   │   ├── scenario_satellite/
-│   │   ├── aap/
-│   │   ├── idm/
-│   │   └── scenario_openshift/
-│   ├── scenario_ansible_cmdb_core/                          # Ansible-CMDB role
-│   ├── integration_generic/                   # Integration roles
-│   └── ansible_dev_node_support/                       # Support utilities
-├── group_vars/
-│   ├── all.yml                        # Global variables
-│   ├── scenario_satellite.yml                  # Satellite-specific
-│   ├── aap.yml                        # AAP-specific
-│   ├── idm.yml                        # IdM-specific
-│   ├── scenario_openshift.yml                  # OpenShift-specific
-│   ├── libvirt.yml                    # LibVirt-specific
-│   ├── aws.yml                        # AWS-specific
-│   ├── azure.yml                      # Azure-specific
-│   ├── gcp.yml                        # GCP-specific
-│   ├── platform_vmware.yml                     # VMware-specific
-│   └── platform_nutanix.yml                    # Nutanix-specific
-├── templates/
-│   ├── ansible.cfg.j2                 # Ansible config template
-│   ├── oemdrv/                        # OEMDRV kickstart templates
-│   │   ├── scenario_satellite-ks.cfg.j2
-│   │   ├── aap-ks.cfg.j2
-│   │   ├── idm-ks.cfg.j2
-│   │   └── scenario_openshift-ks.cfg.j2
-│   └── repo-enable/                   # Repo enablement per scenario
-│       ├── scenario_satellite-repos.sh.j2
-│       ├── aap-repos.sh.j2
-│       ├── idm-repos.sh.j2
-│       └── scenario_openshift-repos.sh.j2
-├── files/
-│   ├── OEMDRV/                        # OEMDRV files per product
-│   │   ├── scenario_satellite-ks.cfg
-│   │   ├── aap-ks.cfg
-│   │   ├── idm-ks.cfg
-│   │   └── scenario_openshift-ks.cfg
-│   ├── rhel-iso/                      # RHEL ISO location
-│   ├── rpms/                          # Required RPMs not in repos
-│   └── tftp/                          # TFTP boot files
-├── inventory/
-│   ├── hosts                          # Generated inventory
-│   ├── generated/                     # Dynamic inventory output
-│   └── examples/                      # Example inventory files
-├── defaults/
-│   └── global.yml                     # Global defaults
-├── group_vars/
-│   └── all.yml                        # Shared variables
-├── host_vars/
-│   └── [host-specific]                # Host-specific variables
-├── docs/
-│   ├── deployment/                    # Deployment documentation
-│   ├── platforms/                     # Platform-specific guides
-│   ├── products/                      # Product-specific guides
-│   ├── operations/                    # Operations documentation
-│   └── examples/                      # Example configurations
-├── logs/
-│   └── deployment_*.log               # Deployment logs
-└── .ansible/conf/
-    ├── env.yml                        # Vault-encrypted credentials
-    └── deployment_config.yml          # Deployment configuration
+ RHIS-Installer-Enhanced.sh         # Main installer entry point
+ RHIS-Installer.sh                  # Original installer (kept for compatibility)
+ playbooks/
+    redhat_management-site.yml     # Main ansible_dev_node_orchestration playbook
+    init_installer_host.yml        # Initialize ansible developer node
+    prepare_platform.yml           # Platform-specific preparation
+    build_inventory.yml            # Dynamic inventory generation
+    deploy_satellite.yml           # Satellite installation/config
+    deploy_aap.yml                 # AAP installation/config
+    deploy_idm.yml                 # IdM installation/config
+    deploy_openshift.yml           # OpenShift installation/config
+    configure_integrations.yml     # Post-deployment integrations
+    setup_cmdb.yml                 # Ansible-CMDB setup
+    validation.yml                 # Deployment validation
+ roles/
+    installer_host/                # Ansible developer node setup
+    platform_prep/                 # Platform preparation
+    ansible_dev_node_inventory_generator/           # Inventory generation
+    platform_libvirt_vm_provisioner/       # LibVirt VM platform_provisioning
+    platform_infrastructure_manager/        # Platform management (AWS, Azure, GCP, VMware, Nutanix)
+    ansible_dev_node_redhat_products/              # Product deployment roles
+       scenario_satellite/
+       aap/
+       idm/
+       scenario_openshift/
+    scenario_ansible_cmdb_core/                          # Ansible-CMDB role
+    integration_generic/                   # Integration roles
+    ansible_dev_node_support/                       # Support utilities
+ group_vars/
+    all.yml                        # Global variables
+    scenario_satellite.yml                  # Satellite-specific
+    aap.yml                        # AAP-specific
+    idm.yml                        # IdM-specific
+    scenario_openshift.yml                  # OpenShift-specific
+    libvirt.yml                    # LibVirt-specific
+    aws.yml                        # AWS-specific
+    azure.yml                      # Azure-specific
+    gcp.yml                        # GCP-specific
+    platform_vmware.yml                     # VMware-specific
+    platform_nutanix.yml                    # Nutanix-specific
+ templates/
+    ansible.cfg.j2                 # Ansible config template
+    oemdrv/                        # OEMDRV kickstart templates
+       scenario_satellite-ks.cfg.j2
+       aap-ks.cfg.j2
+       idm-ks.cfg.j2
+       scenario_openshift-ks.cfg.j2
+    repo-enable/                   # Repo enablement per scenario
+        scenario_satellite-repos.sh.j2
+        aap-repos.sh.j2
+        idm-repos.sh.j2
+        scenario_openshift-repos.sh.j2
+ files/
+    OEMDRV/                        # OEMDRV files per product
+       scenario_satellite-ks.cfg
+       aap-ks.cfg
+       idm-ks.cfg
+       scenario_openshift-ks.cfg
+    rhel-iso/                      # RHEL ISO location
+    rpms/                          # Required RPMs not in repos
+    tftp/                          # TFTP boot files
+ inventory/
+    hosts                          # Generated inventory
+    generated/                     # Dynamic inventory output
+    examples/                      # Example inventory files
+ defaults/
+    global.yml                     # Global defaults
+ group_vars/
+    all.yml                        # Shared variables
+ host_vars/
+    [host-specific]                # Host-specific variables
+ docs/
+    deployment/                    # Deployment documentation
+    platforms/                     # Platform-specific guides
+    products/                      # Product-specific guides
+    operations/                    # Operations documentation
+    examples/                      # Example configurations
+ logs/
+    deployment_*.log               # Deployment logs
+ .ansible/conf/
+     env.yml                        # Vault-encrypted credentials
+     deployment_config.yml          # Deployment configuration
 ```
 
 ## Tag Structure for Selective Execution
@@ -263,12 +263,12 @@ ansible-playbook playbooks/redhat_management-site.yml \
 ### Vault-Encrypted Storage
 ```
 ~/.ansible/conf/env.yml (vault-encrypted)
-├── Red Hat CDN credentials
-├── Offline token
-├── Product admin passwords
-├── Database credentials
-├── Integration credentials
-└── SSH keys for platform_provisioning
+ Red Hat CDN credentials
+ Offline token
+ Product admin passwords
+ Database credentials
+ Integration credentials
+ SSH keys for platform_provisioning
 ```
 
 ### Never Hard-Coded
@@ -297,10 +297,10 @@ ansible-playbook playbooks/redhat_management-site.yml \
 Per-scenario repo enablement scripts:
 ```
 templates/repo-enable/
-├── scenario_satellite-repos.sh.j2          # Satellite-specific repos
-├── aap-repos.sh.j2                # AAP-specific repos
-├── idm-repos.sh.j2                # IdM-specific repos
-└── scenario_openshift-repos.sh.j2          # OpenShift-specific repos
+ scenario_satellite-repos.sh.j2          # Satellite-specific repos
+ aap-repos.sh.j2                # AAP-specific repos
+ idm-repos.sh.j2                # IdM-specific repos
+ scenario_openshift-repos.sh.j2          # OpenShift-specific repos
 ```
 
 Each script enables:

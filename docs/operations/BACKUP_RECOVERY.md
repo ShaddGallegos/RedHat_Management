@@ -27,20 +27,20 @@ Monthly Backups:
 
 ```
 /backup/
-├── aap/
-│   ├── daily/
-│   ├── weekly/
-│   └── monthly/
-├── scenario_satellite/
-│   ├── daily/
-│   ├── weekly/
-│   └── monthly/
-├── idm/
-│   ├── daily/
-│   ├── weekly/
-│   └── monthly/
-└── system-snapshots/
-    └── monthly/
+ aap/
+    daily/
+    weekly/
+    monthly/
+ scenario_satellite/
+    daily/
+    weekly/
+    monthly/
+ idm/
+    daily/
+    weekly/
+    monthly/
+ system-snapshots/
+     monthly/
 ```
 
 ## AAP Backup and Recovery

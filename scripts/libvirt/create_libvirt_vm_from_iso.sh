@@ -303,9 +303,9 @@ verify_vm() {
 # Main execution
 main() {
     echo -e "${GREEN}"
-    echo "╔════════════════════════════════════════════╗"
-    echo "║  Libvirt VM Creation from ISO & Kickstart  ║"
-    echo "╚════════════════════════════════════════════╝"
+    echo ""
+    echo "  Libvirt VM Creation from ISO & Kickstart  "
+    echo ""
     echo -e "${NC}"
     
     echo "Configuration:"

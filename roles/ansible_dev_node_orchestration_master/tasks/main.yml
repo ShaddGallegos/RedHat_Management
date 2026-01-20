@@ -6,11 +6,11 @@
 - name: "Display RHIS Deployment Banner"
   ansible.builtin.debug:
     msg: |
-      ╔════════════════════════════════════════════════════════╗
-      ║   RHIS Orchestration - Red Hat Infrastructure Standard ║
-      ║   Version: {{ rhis_deployment_version }}                      ║
-      ║   Timestamp: {{ rhis_deployment_timestamp }}               ║
-      ╚════════════════════════════════════════════════════════╝
+      
+         RHIS Orchestration - Red Hat Infrastructure Standard 
+         Version: {{ rhis_deployment_version }}                      
+         Timestamp: {{ rhis_deployment_timestamp }}               
+      
 
       Deployment Configuration:
         Scenario: {{ deployment_scenario | default('unset') }}
@@ -361,9 +361,9 @@
 - name: "Display Deployment Completion Summary"
   ansible.builtin.debug:
     msg: |
-      ╔════════════════════════════════════════════════════════╗
-      ║                 DEPLOYMENT COMPLETE                     ║
-      ╚════════════════════════════════════════════════════════╝
+      
+                       DEPLOYMENT COMPLETE                     
+      
 
       Deployment Details:
         Scenario: {{ deployment_scenario }}

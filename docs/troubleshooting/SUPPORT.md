@@ -232,21 +232,21 @@ KCS#1556677: IdM replication conflict
 
 ```
 1. Self-Service
-   └─> Search knowledgebase
-       └─> Review documentation
-           └─> Try suggested solutions
+   > Search knowledgebase
+       > Review documentation
+           > Try suggested solutions
 
 2. Support Portal
-   └─> Create ansible_dev_node_support case
-       └─> Initial response (24 hours)
-           └─> Troubleshooting (48 hours)
-                └─> Engineering engagement
-                    └─> Resolution or workaround
+   > Create ansible_dev_node_support case
+       > Initial response (24 hours)
+           > Troubleshooting (48 hours)
+                > Engineering engagement
+                    > Resolution or workaround
 
 3. Priority Escalation (if SLA not met)
-   └─> Request manager escalation
-       └─> Request TAM (Technical Account Manager)
-           └─> Request executive escalation
+   > Request manager escalation
+       > Request TAM (Technical Account Manager)
+           > Request executive escalation
 ```
 
 ### Escalation Contacts

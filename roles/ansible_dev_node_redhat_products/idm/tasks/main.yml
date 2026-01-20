@@ -61,7 +61,7 @@
     - name: "IdM deployment failed - detailed error"
       ansible.builtin.fail:
         msg: |
-          ❌ IdM DEPLOYMENT FAILED
+           IdM DEPLOYMENT FAILED
 
           Common causes:
           1. DNS/domain configuration issues

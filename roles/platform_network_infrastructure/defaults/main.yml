@@ -1,16 +1,16 @@
 ---
 # Default variables for platform_network_infrastructure role
-network_config_enabled: true
-network_config_version: "1.0"
-network_config_timeout: 600
+platform_network_infrastructure_network_config_enabled: true
+platform_network_infrastructure_network_config_version: "1.0"
+platform_network_infrastructure_network_config_timeout: 600
 
 # Network Configuration
-network_interface: "virbr0"  # libvirt bridge interface
-network_name: "RHIS-Internal"
-network_domain: "example.com"
+platform_network_infrastructure_network_interface: "virbr0"  # libvirt bridge interface
+platform_network_infrastructure_network_name: "RHIS-Internal"
+platform_network_infrastructure_network_domain: "example.com"
 
 # Primary Subnet Configuration (10.168.0.0/16)
-primary_subnet:
+platform_network_infrastructure_primary_subnet:
   name: "RHIS-10.168.0.0/16"
   network: "10.168.0.0"
   netmask: "255.255.0.0"
@@ -21,14 +21,14 @@ primary_subnet:
   tags: ["rhis", "primary", "platform_infrastructure_core"]
 
 # DHCP Configuration for Primary Subnet
-dhcp_primary:
+platform_network_infrastructure_dhcp_primary:
   enabled: true
   range_start: "10.168.50.0"
   range_end: "10.168.200.255"
   lease_time: 86400
   search_domains:
     - "example.com"
-    - "prod.example.com"
+    - "prod.spg"
     - "lab.example.com"
   ntp_servers:
     - "10.168.0.1"
@@ -40,7 +40,7 @@ dhcp_primary:
   tags: ["rhis", "dhcp", "primary"]
 
 # DNS Configuration for Primary Subnet
-dns_primary:
+platform_network_infrastructure_dns_primary:
   enabled: true
   resolver_1: "10.168.0.53"
   resolver_2: "10.168.1.53"
@@ -49,7 +49,7 @@ dns_primary:
   tags: ["rhis", "dns", "primary"]
 
 # Host Groups and Subnets (Reserved Ranges within 10.168.0.0/16)
-host_groups:
+platform_network_infrastructure_host_groups:
   - name: "Infrastructure"
     subnet: "10.168.0.0/24"
     gateway: "10.168.0.1"
@@ -93,30 +93,30 @@ host_groups:
     tags: ["reserved", "internal"]
 
 # Static Host Reservations
-static_hosts:
+platform_network_infrastructure_static_hosts:
   - hostname: "scenario_satellite"
-    domain: "prod.example.com"
+    domain: "prod.spg"
     ip_address: "10.168.0.10"
     mac_address: "52:54:00:00:00:10"
     subnet: "Infrastructure"
     tags: ["scenario_satellite", "core"]
 
   - hostname: "idm"
-    domain: "prod.example.com"
+    domain: "prod.spg"
     ip_address: "10.168.0.20"
     mac_address: "52:54:00:00:00:20"
     subnet: "Infrastructure"
     tags: ["idm", "core"]
 
   - hostname: "aap"
-    domain: "prod.example.com"
+    domain: "prod.spg"
     ip_address: "10.168.0.30"
     mac_address: "52:54:00:00:00:30"
     subnet: "Infrastructure"
     tags: ["aap", "core"]
 
 # Firewall Configuration for Subnets
-firewall_rules:
+platform_network_infrastructure_firewall_rules:
   - source_subnet: "10.168.0.0/16"
     destination: "any"
     ansible.builtin.service: "DNS"
@@ -150,7 +150,7 @@ firewall_rules:
     tags: ["ssh"]
 
 # Network Validation
-network_validation:
+platform_network_infrastructure_network_validation:
   check_connectivity: true
   test_ping: true
   test_dns: true

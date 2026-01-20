@@ -45,7 +45,7 @@ subnet {{ dhcp_subnet }} netmask {{ dhcp_netmask }} {
 class "platform_infrastructure_core-servers" {
   match if (substring(hardware, 1, 3) = 52:54:00) and
            (binary-to-ascii(10, 8, ".", leased-address) ~= "^10\.168\.0\.");
-  option domain-name "prod.example.com";
+  option domain-name "prod.spg";
   option domain-name-servers 10.168.0.1, 10.168.1.53, 8.8.8.8;
 }
 

@@ -28,13 +28,13 @@ cmd_pull() {
         podman tag ${REGISTRY}/${REPO}/rhis-provisioner-9-2.4:latest localhost/rhis-provisioner-9-2.4:latest
         podman pull ${REGISTRY}/${REPO}/rhis-provisioner-9-2.5:latest
         podman tag ${REGISTRY}/${REPO}/rhis-provisioner-9-2.5:latest localhost/rhis-provisioner-9-2.5:latest
-        echo "✓ All containers refreshed!"
+        echo " All containers refreshed!"
     else
         # Pull specific version
         echo "Pulling RHIS provisioner-9-${version}..."
         podman pull ${REGISTRY}/${REPO}/rhis-provisioner-9-${version}:latest
         podman tag ${REGISTRY}/${REPO}/rhis-provisioner-9-${version}:latest localhost/rhis-provisioner-9-${version}:latest
-        echo "✓ Container ${version} refreshed!"
+        echo " Container ${version} refreshed!"
     fi
 }
 
@@ -236,7 +236,7 @@ cmd_export() {
     local container_src="${pull_location}/rhis-provisioner-9-${version}:latest"
     echo "Archiving container to tarfile: $output_file"
     buildah push "$container_src" "docker-archive:${output_file}"
-    echo "✓ Container archived successfully!"
+    echo " Container archived successfully!"
 }
 
 # ============================================================================

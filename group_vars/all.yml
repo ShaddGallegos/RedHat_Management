@@ -272,7 +272,7 @@ aap:
   aap_password: "{{ aap_admin_password }}"
 
 # Global settings provided by user
-global:
+globals:
   project_name: test-lab
   domain: prod.spg
   aap_password: "REMOVED_AAP_PASSWORD"

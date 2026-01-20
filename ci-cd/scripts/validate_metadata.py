@@ -49,15 +49,15 @@ def validate_role_metadata():
             issues.append(f"Invalid YAML in {role_dir.name}: {e}")
     
     # Report results
-    print(f"✓ Valid role metadata: {valid_count}/33")
+    print(f" Valid role metadata: {valid_count}/33")
     
     if issues:
-        print(f"\n⚠ Issues found ({len(issues)}):")
+        print(f"\n Issues found ({len(issues)}):")
         for issue in issues:
             print(f"  - {issue}")
         return 1
     
-    print("\n✓ All metadata files valid!")
+    print("\n All metadata files valid!")
     return 0
 
 if __name__ == "__main__":

@@ -81,11 +81,11 @@
       tags: ["always"]
       ansible.builtin.debug:
         msg: |
-          ╔════════════════════════════════════════════════════════╗
-          ║   RHIS Orchestration - Red Hat Infrastructure Standard ║
-          ║   Version: {{ deployment_version }}                           ║
-          ║   Timestamp: {{ deployment_timestamp }}               ║
-          ╚════════════════════════════════════════════════════════╝
+          
+             RHIS Orchestration - Red Hat Infrastructure Standard 
+             Version: {{ deployment_version }}                           
+             Timestamp: {{ deployment_timestamp }}               
+          
 
           Deployment Configuration:
             Scenario: {{ deployment_scenario }}
@@ -450,9 +450,9 @@
       tags: ["always"]
       ansible.builtin.debug:
         msg: |
-          ╔════════════════════════════════════════════════════════╗
-          ║                 DEPLOYMENT COMPLETE                     ║
-          ╚════════════════════════════════════════════════════════╝
+          
+                           DEPLOYMENT COMPLETE                     
+          
 
           Scenario: {{ deployment_scenario }}
           Platform: {{ deployment_platform }}

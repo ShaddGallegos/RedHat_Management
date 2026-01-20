@@ -3,26 +3,26 @@
 ## Integration Architecture
 
 ```
-┌─────────────────────────────────────────┐
-│      Ansible Automation Platform        │
-│            (AAP 2.6)                    │
-└────────────────┬────────────────────────┘
-                 │
-     ┌───────────┼───────────┐
-     │           │           │
-     ▼           ▼           ▼
-┌─────────┐  ┌──────────┐  ┌──────────┐
-│Identity │  │Satellite │  │Insights  │
-│  Mgmt   │  │  6.18    │  │          │
-│ (IdM)   │  │          │  │          │
-└────┬────┘  └────┬─────┘  └──────────┘
-     │            │
-     │            ▼
-     │      ┌──────────────────┐
-     │      │ OpenShift / K8s  │
-     │      └──────────────────┘
-     │
-     └──────────────────────────────────>  All integrate with IdM for auth
+
+      Ansible Automation Platform        
+            (AAP 2.6)                    
+
+                 
+     
+                           
+                           
+    
+Identity   Satellite   Insights  
+  Mgmt       6.18                
+ (IdM)                           
+    
+                 
+                 
+           
+            OpenShift / K8s  
+           
+     
+     >  All integrate with IdM for auth
 ```
 
 ## Integration Order

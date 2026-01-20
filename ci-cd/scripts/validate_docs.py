@@ -47,17 +47,17 @@ def validate_documentation():
             issues.append(f"Error reading {role_dir.name}: {e}")
     
     # Report results
-    print(f"✓ Documentation coverage: {valid_count}/33 roles")
+    print(f" Documentation coverage: {valid_count}/33 roles")
     
     if issues:
-        print(f"\n⚠ Issues found ({len(issues)}):")
+        print(f"\n Issues found ({len(issues)}):")
         for issue in issues[:10]:  # Show first 10
             print(f"  - {issue}")
         if len(issues) > 10:
             print(f"  ... and {len(issues) - 10} more")
         return 1
     
-    print("\n✓ All documentation valid!")
+    print("\n All documentation valid!")
     return 0
 
 if __name__ == "__main__":

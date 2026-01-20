@@ -104,10 +104,10 @@ fi
 # Print styled header
 print_header() {
     clear
-    echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${MAGENTA}Red Hat Infrastructure Standard (RHIS) - Deployment Installer${NC}"
-    echo -e "${CYAN}║${NC}  Version: ${RHIS_VERSION}  |  Installer: ${INSTALLER_VERSION}"
-    echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${CYAN}${NC}"
+    echo -e "${CYAN}${NC}  ${MAGENTA}Red Hat Infrastructure Standard (RHIS) - Deployment Installer${NC}"
+    echo -e "${CYAN}${NC}  Version: ${RHIS_VERSION}  |  Installer: ${INSTALLER_VERSION}"
+    echo -e "${CYAN}${NC}"
     echo ""
     echo -e "Project Root: ${BLUE}${PROJECT_ROOT}${NC}"
     echo ""
@@ -117,9 +117,9 @@ print_header() {
 print_section() {
     local title="$1"
     echo ""
-    echo -e "${BLUE}┌─────────────────────────────────────────────────────────────────────────────┐${NC}"
-    echo -e "${BLUE}│${NC} ${title}"
-    echo -e "${BLUE}└─────────────────────────────────────────────────────────────────────────────┘${NC}"
+    echo -e "${BLUE}${NC}"
+    echo -e "${BLUE}${NC} ${title}"
+    echo -e "${BLUE}${NC}"
     echo ""
 }
 
@@ -133,12 +133,12 @@ print_option() {
 
 # Print success message
 print_success() {
-    echo -e "${GREEN}✓ $1${NC}"
+    echo -e "${GREEN} $1${NC}"
 }
 
 # Print error message
 print_error() {
-    echo -e "${RED}✗ $1${NC}"
+    echo -e "${RED} $1${NC}"
 }
 
 # Print info message
@@ -148,7 +148,7 @@ print_info() {
 
 # Print warning message
 print_warning() {
-    echo -e "${YELLOW}⚠ $1${NC}"
+    echo -e "${YELLOW} $1${NC}"
 }
 
 # Logging function

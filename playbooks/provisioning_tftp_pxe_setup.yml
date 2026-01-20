@@ -41,11 +41,11 @@
           ansible.builtin.debug:
             msg: |
               TFTP/PXE Boot Status:
-              • xinetd Service: {{ tftp_status.status.ActiveState }}
-              • TFTP Root: {{ tftp_root.stat.exists | ternary('Present', 'Missing') }}
-              • PXE Menu: {{ pxe_menu.stat.exists | ternary('Present', 'Missing') }}
-              • Boot Port: 69/UDP
-              • Menu Options: RHEL 9, RHEL 10, Rescue, Memtest, Local Boot
+               xinetd Service: {{ tftp_status.status.ActiveState }}
+               TFTP Root: {{ tftp_root.stat.exists | ternary('Present', 'Missing') }}
+               PXE Menu: {{ pxe_menu.stat.exists | ternary('Present', 'Missing') }}
+               Boot Port: 69/UDP
+               Menu Options: RHEL 9, RHEL 10, Rescue, Memtest, Local Boot
 
     - name: Display PXE menu
       ansible.builtin.command: cat /var/lib/tftpboot/pxelinux.cfg/default

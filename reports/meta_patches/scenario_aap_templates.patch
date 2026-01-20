@@ -1,0 +1,18 @@
+--- roles/scenario_aap_templates/meta/main.yml
++++ roles/scenario_aap_templates/meta/main.yml (patched)
+@@ -4,11 +4,13 @@
+   license: Apache-2.0
+   version: "1.0"
+   min_ansible_version: "2.10"
+-  max_ansible_version: "2.16"
+   platforms:
+     - name: EL
+       versions: ["9", "10"]
+-  categories:
++  galaxy_tags:
++  - automation
++  - aap
++  - templates
+     - automation
+     - aap
+     - templates

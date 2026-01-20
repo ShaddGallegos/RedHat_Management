@@ -1,0 +1,21 @@
+--- roles/platform_services_provisioning_stack/meta/main.yml
++++ roles/platform_services_provisioning_stack/meta/main.yml (patched)
+@@ -1,6 +1,5 @@
+ ---
+ galaxy_info:
+-  name: platform_services_provisioning_stack
+   author: RHIS Infrastructure Team
+   description: "Configure DHCP, DNS, PXE, and TFTP services on secondary ethernet device for 10.168.0.0/16 network"
+   license: GPL-3.0-or-later
+@@ -11,7 +10,10 @@
+         - 8
+         - 9
+         - 10
+-  categories:
++  galaxy_tags:
++  - networking
++  - system
++  - platform-provisioning
+     - networking
+     - system
+     - platform_provisioning

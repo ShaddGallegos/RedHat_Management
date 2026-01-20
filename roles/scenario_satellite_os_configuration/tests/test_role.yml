@@ -13,4 +13,4 @@
 
     - name: Test role completed successfully
       ansible.builtin.debug:
-        msg: "✓ scenario_satellite_os_configuration role test completed successfully"
+        msg: " scenario_satellite_os_configuration role test completed successfully"

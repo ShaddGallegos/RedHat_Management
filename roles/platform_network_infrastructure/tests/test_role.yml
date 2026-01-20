@@ -11,4 +11,4 @@
 
     - name: Test role completed successfully
       ansible.builtin.debug:
-        msg: "✓ platform_network_infrastructure role test completed successfully"
+        msg: " platform_network_infrastructure role test completed successfully"

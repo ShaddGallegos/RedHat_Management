@@ -15,12 +15,12 @@ This role automates the complete process of creating and configuring RHEL 10 vir
 
 ## Features
 
-✅ **Fully Automated** - Zero manual intervention after setup
-✅ **Idempotent** - Can be run multiple times safely
-✅ **Customizable** - All aspects configurable via variables
-✅ **Monitored** - Real-time installation progress tracking
-✅ **Error Handling** - Comprehensive validation and error messages
-✅ **Production Ready** - Security hardening included
+ **Fully Automated** - Zero manual intervention after setup
+ **Idempotent** - Can be run multiple times safely
+ **Customizable** - All aspects configurable via variables
+ **Monitored** - Real-time installation progress tracking
+ **Error Handling** - Comprehensive validation and error messages
+ **Production Ready** - Security hardening included
 
 ## Requirements
 
@@ -201,26 +201,26 @@ See [defaults/main.yml](defaults/main.yml) for complete list.
 
 ```
 platform_libvirt_vm_provisioner/
-├── tasks/
-│   ├── main.yml              # Main entry point
-│   ├── validate.yml          # Prerequisite validation
-│   ├── logging.yml           # Logging setup
-│   ├── http_server.yml       # HTTP server for kickstart
-│   ├── create_vm.yml         # VM creation
-│   ├── monitor.yml           # Installation monitoring
-│   ├── verify.yml            # VM verification
-│   ├── display_info.yml      # Display connection info
-│   └── cleanup.yml           # Cleanup
-├── handlers/
-│   └── main.yml              # Event handlers
-├── templates/
-│   └── kickstart.j2          # Jinja2 kickstart template
-├── files/                    # Static files (if needed)
-├── defaults/
-│   └── main.yml              # Default variables
-├── vars/
-│   └── main.yml              # Role variables
-└── README.md                 # This file
+ tasks/
+    main.yml              # Main entry point
+    validate.yml          # Prerequisite validation
+    logging.yml           # Logging setup
+    http_server.yml       # HTTP server for kickstart
+    create_vm.yml         # VM creation
+    monitor.yml           # Installation monitoring
+    verify.yml            # VM verification
+    display_info.yml      # Display connection info
+    cleanup.yml           # Cleanup
+ handlers/
+    main.yml              # Event handlers
+ templates/
+    kickstart.j2          # Jinja2 kickstart template
+ files/                    # Static files (if needed)
+ defaults/
+    main.yml              # Default variables
+ vars/
+    main.yml              # Role variables
+ README.md                 # This file
 ```
 
 ## Task Flow

@@ -188,6 +188,6 @@ if [ $FAIL -eq 0 ]; then
     echo "  3. Review: ROLE_RESTRUCTURE.md for usage information"
     exit 0
 else
-    echo "⚠  Some validation checks failed. Review above."
+    echo "  Some validation checks failed. Review above."
     exit 1
 fi

@@ -8,20 +8,20 @@ Complete setup for DHCP, DNS, PXE, and TFTP services running on the secondary et
 
 ```
 10.168.0.0/16 Network
-    │
-    ├─ DHCP Server (port 67/UDP)
-    │  └─ Range: 10.168.50.0 - 10.168.200.255
-    │
-    ├─ DNS Server (port 53/UDP,TCP)
-    │  └─ Zones: example.com, prod.example.com
-    │  └─ Resolver: 10.168.0.1
-    │
-    ├─ TFTP Server (port 69/UDP)
-    │  └─ Root: /var/lib/tftpboot
-    │
-    └─ PXE Boot Service (port 4011/UDP)
-       └─ Menu: pxelinux.cfg/default
-       └─ Options: RHEL 9, RHEL 10, Rescue, Memtest
+    
+     DHCP Server (port 67/UDP)
+       Range: 10.168.50.0 - 10.168.200.255
+    
+     DNS Server (port 53/UDP,TCP)
+       Zones: example.com, prod.example.com
+       Resolver: 10.168.0.1
+    
+     TFTP Server (port 69/UDP)
+       Root: /var/lib/tftpboot
+    
+     PXE Boot Service (port 4011/UDP)
+        Menu: pxelinux.cfg/default
+        Options: RHEL 9, RHEL 10, Rescue, Memtest
 ```
 
 ## Secondary Interface Configuration
@@ -72,19 +72,19 @@ option ntp-servers 10.168.0.1, 8.8.8.8;
 ### Static Host Reservations
 ```
 Host: scenario_satellite.prod.spg
-├─ IP: 10.168.0.10
-├─ MAC: 52:54:00:00:00:10
-└─ Domain: prod.example.com
+ IP: 10.168.0.10
+ MAC: 52:54:00:00:00:10
+ Domain: prod.example.com
 
 Host: idm.prod.spg
-├─ IP: 10.168.0.20
-├─ MAC: 52:54:00:00:00:20
-└─ Domain: prod.example.com
+ IP: 10.168.0.20
+ MAC: 52:54:00:00:00:20
+ Domain: prod.example.com
 
 Host: aap.prod.spg
-├─ IP: 10.168.0.30
-├─ MAC: 52:54:00:00:00:30
-└─ Domain: prod.example.com
+ IP: 10.168.0.30
+ MAC: 52:54:00:00:00:30
+ Domain: prod.example.com
 ```
 
 ### PXE Boot Integration
@@ -190,15 +190,15 @@ service tftp {
 ### Boot Files
 ```
 /var/lib/tftpboot/
-├── pxelinux.0              (PXE bootloader)
-├── pxelinux.cfg/
-│   └── default             (PXE menu)
-├── rhel9/
-│   ├── vmlinuz
-│   └── initrd.img
-└── rhel10/
-    ├── vmlinuz
-    └── initrd.img
+ pxelinux.0              (PXE bootloader)
+ pxelinux.cfg/
+    default             (PXE menu)
+ rhel9/
+    vmlinuz
+    initrd.img
+ rhel10/
+     vmlinuz
+     initrd.img
 ```
 
 ## PXE Boot Configuration
@@ -260,7 +260,7 @@ biosdevname=0
 ### Firewall Rules
 ```
 Service          Port        Protocol   Description
-─────────────────────────────────────────────────────
+
 DHCP             67          UDP        DHCP Server
 DHCP Client      68          UDP        DHCP Client
 DNS              53          UDP/TCP    DNS Resolution
@@ -491,40 +491,40 @@ tcpdump -i eth1 -n 'udp port 67 or udp port 69'
 ### Role Structure
 ```
 roles/platform_services_provisioning_stack/
-├── meta/main.yml
-├── defaults/main.yml
-├── tasks/main.yml
-├── handlers/main.yml
-├── templates/
-│   ├── dhcpd.conf.j2
-│   ├── named.conf.j2
-│   ├── named.zones.j2
-│   ├── named.example.com.j2
-│   ├── named.prod.example.com.j2
-│   ├── pxelinux.cfg.default.j2
-│   └── xinetd.tftp.j2
-├── tests/test.yml
-└── README.md
+ meta/main.yml
+ defaults/main.yml
+ tasks/main.yml
+ handlers/main.yml
+ templates/
+    dhcpd.conf.j2
+    named.conf.j2
+    named.zones.j2
+    named.example.com.j2
+    named.prod.example.com.j2
+    pxelinux.cfg.default.j2
+    xinetd.tftp.j2
+ tests/test.yml
+ README.md
 ```
 
 ### Playbooks
 ```
 playbooks/
-├── provisioning_services_setup.yml      (Complete stack)
-├── provisioning_dhcp_setup.yml          (DHCP only)
-├── provisioning_dns_setup.yml           (DNS only)
-└── provisioning_tftp_pxe_setup.yml      (TFTP/PXE only)
+ provisioning_services_setup.yml      (Complete stack)
+ provisioning_dhcp_setup.yml          (DHCP only)
+ provisioning_dns_setup.yml           (DNS only)
+ provisioning_tftp_pxe_setup.yml      (TFTP/PXE only)
 ```
 
 ### Documentation
 ```
 docs/
-└── PROVISIONING_SERVICES_CONFIGURATION.md  (This file)
+ PROVISIONING_SERVICES_CONFIGURATION.md  (This file)
 ```
 
 ## Status
 
-✅ **Production Ready**
+ **Production Ready**
 
 - All services configured and tested
 - High availability design

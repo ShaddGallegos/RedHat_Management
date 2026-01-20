@@ -60,7 +60,7 @@
     - name: "Support tasks failed - detailed error"
       ansible.builtin.fail:
         msg: |
-          ❌ SUPPORT TASKS FAILED
+           SUPPORT TASKS FAILED
 
           Common causes:
           1. Preflight checks failed

@@ -9,9 +9,9 @@ zone "example.com" IN {
   allow-query { any; };
 };
 
-zone "prod.example.com" IN {
+zone "prod.spg" IN {
   type master;
-  file "named.prod.example.com";
+  file "named.prod.spg";
   allow-transfer { none; };
   allow-query { any; };
 };

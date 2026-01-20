@@ -58,7 +58,7 @@ Complete documentation for RHIS (Red Hat Infrastructure Standard) deployment and
 
 ## Documentation Coverage
 
-### Complete (✅)
+### Complete ()
 - Getting Started (Quick Start, Concepts, Prerequisites)
 - Deployment (Overview, AWS, Azure, GCP)
 - Products (AAP, Satellite, IdM deployment guides)

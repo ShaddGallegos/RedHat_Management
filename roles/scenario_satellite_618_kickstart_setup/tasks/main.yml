@@ -118,13 +118,13 @@
              - Use Case: Application server deployments
 
           Kickstart Features:
-          ✅ Satellite subscription management integration_generic
-          ✅ RHEL 9 and RHEL 10 BaseOS ansible_dev_node_support
-          ✅ LVM partitioning for compliance
-          ✅ SSH security hardening
-          ✅ Cloud-init and Insights integration_generic
-          ✅ Container ansible_dev_node_support (Podman, Buildah)
-          ✅ Development tools (optional)
+           Satellite subscription management integration_generic
+           RHEL 9 and RHEL 10 BaseOS ansible_dev_node_support
+           LVM partitioning for compliance
+           SSH security hardening
+           Cloud-init and Insights integration_generic
+           Container ansible_dev_node_support (Podman, Buildah)
+           Development tools (optional)
 
           To use these kickstarts in Satellite:
           1. Navigate to Hosts → Provisioning Templates → Provisioning Templates
@@ -161,7 +161,7 @@
 
           Files Created:
           {% for stat in ks_file_stat.results %}
-          - {{ stat.stat.path }}: {{ stat.stat.exists | ternary('✓ Exists', '✗ Not found') }} ({{ stat.stat.size | default('N/A') }} bytes)
+          - {{ stat.stat.path }}: {{ stat.stat.exists | ternary(' Exists', ' Not found') }} ({{ stat.stat.size | default('N/A') }} bytes)
           {% endfor %}
 
           Kickstart Web URL: {{ kickstart_web_url }}

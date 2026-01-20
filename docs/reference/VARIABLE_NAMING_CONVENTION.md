@@ -238,7 +238,7 @@ deployment_max_retries: 10
 
 ## Naming Do's and Don'ts
 
-### ✅ DO
+###  DO
 
 - Use lowercase with underscores
 - Start with role name
@@ -247,7 +247,7 @@ deployment_max_retries: 10
 - Use singular/plural appropriately
 - Include units in variable names (e.g., `_mb`, `_gb`, `_seconds`)
 
-### ❌ DON'T
+###  DON'T
 
 - Use CamelCase or mixed case
 - Use hyphens instead of underscores

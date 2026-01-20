@@ -75,8 +75,8 @@ dns_config_file: "/etc/named.conf"
 dns_zones_dir: "/var/named"
 dns_zone_name: "example.com"
 dns_zone_file: "named.example.com"
-dns_secondary_zone_name: "prod.example.com"
-dns_secondary_zone_file: "named.prod.example.com"
+dns_secondary_zone_name: "prod.spg"
+dns_secondary_zone_file: "named.prod.spg"
 dns_nameserver_ip: "10.168.0.1"
 dns_secondary_ip: "10.168.1.53"
 dns_forward_servers:
@@ -89,7 +89,7 @@ resolv_conf_nameservers:
   - "10.168.0.1"
 resolv_conf_search_domains:
   - "example.com"
-  - "prod.example.com"
+  - "prod.spg"
   - "lab.example.com"
 resolv_conf_options:
   - "rotate"

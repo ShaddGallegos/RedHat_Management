@@ -137,22 +137,22 @@ virsh destroy <vm-name>  # Force power off
 
 ```
 /home/sgallego/Downloads/RedHat_Management/
-├── site.yml                    # Main playbook
-├── playbooks/                  # Playbook directory
-├── roles/                      # Ansible roles
-├── inventory/                  # Inventory files
-├── group_vars/                 # Group variables
-├── host_vars/                  # Host variables
-└── vault.yml                   # Encrypted secrets
+ site.yml                    # Main playbook
+ playbooks/                  # Playbook directory
+ roles/                      # Ansible roles
+ inventory/                  # Inventory files
+ group_vars/                 # Group variables
+ host_vars/                  # Host variables
+ vault.yml                   # Encrypted secrets
 ```
 
 ### Satellite
 
 ```
 /opt/
-├── scenario_satellite-installer/        # Installer directory
-├── foreman/                    # Foreman application
-└── rh-postgresql-12/           # Database
+ scenario_satellite-installer/        # Installer directory
+ foreman/                    # Foreman application
+ rh-postgresql-12/           # Database
 
 Configuration:
 /etc/foreman/                   # Foreman config

@@ -85,7 +85,7 @@
         regexp: "^{{ item | split('\\s+') | first }}"
       loop:
         - "nameserver 10.168.0.1"
-        - "search example.com prod.example.com lab.example.com"
+        - "search example.com prod.spg lab.example.com"
         - "options rotate timeout:2 attempts:3"
       notify: update resolv.conf
 
@@ -180,7 +180,7 @@
         mode: "0644"
       loop:
         - "named.example.com"
-        - "named.prod.example.com"
+        - "named.prod.spg"
       notify: restart dns service
 
     - name: Enable DNS service on boot
@@ -349,7 +349,7 @@
       when: tftp_enabled
 
     - name: Test DNS resolution
-      ansible.builtin.command: "dig @10.168.0.1 scenario_satellite.prod.spg.example.com"
+      ansible.builtin.command: "dig @10.168.0.1 scenario_satellite.prod.spg"
       register: dns_test
       changed_when: false
       failed_when: dns_test.rc != 0

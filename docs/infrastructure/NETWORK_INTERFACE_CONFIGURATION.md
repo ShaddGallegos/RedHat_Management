@@ -5,36 +5,36 @@
 ### Architecture Overview
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│          scenario_satellite.prod.spg (KVM Virtual Machine)       │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │ eth0: External Network (libvirt NAT)             │  │
-│  ├──────────────────────────────────────────────────┤  │
-│  │ • Connection Type: DHCP (Auto)                   │  │
-│  │ • IP Source: libvirt DHCP Server                 │  │
-│  │ • Network: 192.168.x.0/24 (NAT from host)       │  │
-│  │ • Gateway: libvirt default gateway               │  │
-│  │ • Purpose: External connectivity, package mgmt  │  │
-│  │ • Status: Autoconnect enabled                    │  │
-│  └──────────────────────────────────────────────────┘  │
-│                                                         │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │ eth1: Private Network (Provisioning Services)    │  │
-│  ├──────────────────────────────────────────────────┤  │
-│  │ • Connection Type: Static IP                      │  │
-│  │ • IP Address: 10.168.0.1/16                       │  │
-│  │ • Netmask: 255.255.0.0                            │  │
-│  │ • Gateway: 10.168.0.1 (local)                     │  │
-│  │ • Purpose: DHCP, DNS, TFTP, PXE platform_provisioning     │  │
-│  │ • Status: Autoconnect enabled                     │  │
-│  │ • Services: DHCP, DNS, TFTP/PXE running here     │  │
-│  └──────────────────────────────────────────────────┘  │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-         │                                    │
-         └────────────────────────────────────┘
+
+          scenario_satellite.prod.spg (KVM Virtual Machine)       
+
+                                                         
+    
+   eth0: External Network (libvirt NAT)               
+    
+    Connection Type: DHCP (Auto)                     
+    IP Source: libvirt DHCP Server                   
+    Network: 192.168.x.0/24 (NAT from host)         
+    Gateway: libvirt default gateway                 
+    Purpose: External connectivity, package mgmt    
+    Status: Autoconnect enabled                      
+    
+                                                         
+    
+   eth1: Private Network (Provisioning Services)      
+    
+    Connection Type: Static IP                        
+    IP Address: 10.168.0.1/16                         
+    Netmask: 255.255.0.0                              
+    Gateway: 10.168.0.1 (local)                       
+    Purpose: DHCP, DNS, TFTP, PXE platform_provisioning       
+    Status: Autoconnect enabled                       
+    Services: DHCP, DNS, TFTP/PXE running here       
+    
+                                                         
+
+                                             
+         
           libvirt Virtual Network (2 bridges)
 ```
 
@@ -178,8 +178,8 @@ Client (10.168.x.x)
 ### Network Manager Connections
 ```
 /etc/NetworkManager/system-connections/
-├── eth0.nmconnection      (DHCP - External)
-└── eth1.nmconnection      (Static - Private)
+ eth0.nmconnection      (DHCP - External)
+ eth1.nmconnection      (Static - Private)
 ```
 
 ### Interface Configuration Example

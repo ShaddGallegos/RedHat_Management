@@ -4,7 +4,7 @@ Complete guide for organizing playbooks using tags, scenarios, and platforms wit
 
 ## Architecture Decision: Tags vs Individual Playbooks
 
-### ✅ Recommended Approach: Unified Playbook with Tags
+###  Recommended Approach: Unified Playbook with Tags
 
 **Benefits:**
 - Single source of truth for deployment logic
@@ -21,7 +21,7 @@ Complete guide for organizing playbooks using tags, scenarios, and platforms wit
 - Complex multi-component deployments
 - When order of execution matters
 
-### ⚠️ Alternative: Individual Playbooks
+### ️ Alternative: Individual Playbooks
 
 **Use only when:**
 - Components are completely independent
@@ -35,10 +35,10 @@ Complete guide for organizing playbooks using tags, scenarios, and platforms wit
 
 ```
 scenario tags
-└── platform tags
-    └── os_generic tags
-        └── component tags
-            └── task tags
+ platform tags
+     os_generic tags
+         component tags
+             task tags
 ```
 
 ### Example Tag Structure
@@ -309,77 +309,77 @@ vars_files:
 
 ```
 env.yml (vault-encrypted)
-├── Global Credentials
-│   ├── admin_password
-│   ├── rhsm_username/password
-│   └── offline_token
-├── Service Credentials
-│   ├── aap_admin_password
-│   ├── satellite_admin_password
-│   ├── idm_admin_password
-│   └── eda_password
-└── Integration Credentials
-    ├── servicenow_api_token
-    ├── aws_access_key
-    └── vmware_password
+ Global Credentials
+    admin_password
+    rhsm_username/password
+    offline_token
+ Service Credentials
+    aap_admin_password
+    satellite_admin_password
+    idm_admin_password
+    eda_password
+ Integration Credentials
+     servicenow_api_token
+     aws_access_key
+     vmware_password
 ```
 
 ### Configuration Hierarchy
 
 ```
 group_vars/
-├── all.yml (shared)
-├── libvirt.yml (platform-specific)
-├── aws.yml (platform-specific)
-├── scenario_satellite.yml (component-specific)
-├── aap.yml (component-specific)
-└── idm.yml (component-specific)
+ all.yml (shared)
+ libvirt.yml (platform-specific)
+ aws.yml (platform-specific)
+ scenario_satellite.yml (component-specific)
+ aap.yml (component-specific)
+ idm.yml (component-specific)
 ```
 
 ## Execution Flow Diagram
 
 ```
 Start
-  │
-  ├─→ [setup] Validate prerequisites
-  │     └─→ [verify] Check ansible, python, packages
-  │
-  ├─→ [interactive] Prompt for scenario/platform
-  │     └─→ Save configuration
-  │
-  ├─→ [preflight] Run pre-deployment checks
-  │     └─→ [validate] Verify configuration
-  │
-  ├─→ [platform_infrastructure_core] Prepare platform_infrastructure_core
-  │     ├─→ [libvirt] Setup KVM VMs
-  │     ├─→ [aws] Setup EC2 instances
-  │     └─→ [azure] Setup Azure VMs
-  │
-  ├─→ [install] Install components
-  │     ├─→ [scenario_satellite] Install Satellite 6.18
-  │     ├─→ [aap] Install AAP 2.6
-  │     └─→ [idm] Install IdM 3.0
-  │
-  ├─→ [configure] Configure components
-  │     ├─→ [scenario_satellite-configure] Configure Satellite
-  │     ├─→ [aap-configure] Configure AAP
-  │     └─→ [idm-configure] Configure IdM
-  │
-  ├─→ [integration_generic] Configure integrations
-  │     ├─→ [scenario_satellite-aap] Satellite ↔ AAP
-  │     ├─→ [scenario_satellite-idm] Satellite ↔ IdM
-  │     └─→ [aap-idm] AAP ↔ IdM
-  │
-  ├─→ [monitoring] Setup monitoring
-  │     ├─→ [prometheus] Setup metrics collection
-  │     └─→ [grafana] Setup dashboards
-  │
-  ├─→ [backup] Configure backups
-  │     └─→ [backup-setup] Setup backup procedures
-  │
-  └─→ [validate] Validate deployment
-        ├─→ [health-check] Component health checks
-        └─→ [integration_generic-test] Integration tests
+  
+  → [setup] Validate prerequisites
+       → [verify] Check ansible, python, packages
+  
+  → [interactive] Prompt for scenario/platform
+       → Save configuration
+  
+  → [preflight] Run pre-deployment checks
+       → [validate] Verify configuration
+  
+  → [platform_infrastructure_core] Prepare platform_infrastructure_core
+       → [libvirt] Setup KVM VMs
+       → [aws] Setup EC2 instances
+       → [azure] Setup Azure VMs
+  
+  → [install] Install components
+       → [scenario_satellite] Install Satellite 6.18
+       → [aap] Install AAP 2.6
+       → [idm] Install IdM 3.0
+  
+  → [configure] Configure components
+       → [scenario_satellite-configure] Configure Satellite
+       → [aap-configure] Configure AAP
+       → [idm-configure] Configure IdM
+  
+  → [integration_generic] Configure integrations
+       → [scenario_satellite-aap] Satellite ↔ AAP
+       → [scenario_satellite-idm] Satellite ↔ IdM
+       → [aap-idm] AAP ↔ IdM
+  
+  → [monitoring] Setup monitoring
+       → [prometheus] Setup metrics collection
+       → [grafana] Setup dashboards
+  
+  → [backup] Configure backups
+       → [backup-setup] Setup backup procedures
+  
+  → [validate] Validate deployment
+        → [health-check] Component health checks
+        → [integration_generic-test] Integration tests
 End
 ```
 
@@ -452,9 +452,9 @@ If you have separate playbooks, consolidate them:
 ### Before (3 separate playbooks)
 ```
 playbooks/
-├── deploy_satellite.yml
-├── deploy_aap.yml
-└── deploy_idm.yml
+ deploy_satellite.yml
+ deploy_aap.yml
+ deploy_idm.yml
 
 # Run them manually in order
 ansible-playbook deploy_satellite.yml
@@ -465,7 +465,7 @@ ansible-playbook deploy_idm.yml
 ### After (1 unified playbook)
 ```
 playbooks/
-└── redhat_management-site.yml
+ redhat_management-site.yml
 
 # Run with tags
 ansible-playbook redhat_management-site.yml --tags "scenario_satellite,aap,idm"

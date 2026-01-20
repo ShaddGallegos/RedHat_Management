@@ -33,13 +33,13 @@
           ansible.builtin.debug:
             msg: |
               DNS Server Status:
-              • Service: {{ dns_status.status.ActiveState }}
-              • Resolver IP: 10.168.0.1:53
-              • Zones: example.com, prod.example.com
-              • Options: rotate, timeout:2, attempts:3
+               Service: {{ dns_status.status.ActiveState }}
+               Resolver IP: 10.168.0.1:53
+               Zones: example.com, prod.spg
+               Options: rotate, timeout:2, attempts:3
 
     - name: Test DNS resolution
-      ansible.builtin.command: "dig @10.168.0.1 scenario_satellite.prod.spg.example.com"
+      ansible.builtin.command: "dig @10.168.0.1 scenario_satellite.prod.spg"
       register: dns_test
       changed_when: false
       failed_when: dns_test.rc != 0

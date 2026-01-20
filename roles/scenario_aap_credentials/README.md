@@ -98,7 +98,7 @@ satellite_credentials:
   roles:
     - role: scenario_aap_credentials
       vars:
-        aap_url: "https://aap.prod.example.com"
+        aap_url: "https://aap.prod.spg"
         aap_username: "admin"
         aap_password: "{{ vault_aap_admin_pwd }}"
         create_machine_credentials: true

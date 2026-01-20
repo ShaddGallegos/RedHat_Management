@@ -252,28 +252,28 @@ https://scenario_satellite.example.com/pub/kickstarts/rhel10-fullstack.ks
 
 ```
 1. satellite_6_18_deployment
-   └─ Deploys Satellite 6.18 core
+    Deploys Satellite 6.18 core
    
 2. satellite_content_config
-   └─ Enables RHEL BaseOS/AppStream repositories
+    Enables RHEL BaseOS/AppStream repositories
    
 3. scenario_satellite_lifecycle_config
-   └─ Creates content views and environments
+    Creates content views and environments
    
 4. scenario_satellite_activation_config
-   └─ Creates activation keys for subscription management
+    Creates activation keys for subscription management
    
 5. satellite_kickstart_config [THIS ROLE]
-   ├─ Creates RHEL 9/10 kickstart templates
-   ├─ Stores kickstart files for PXE boot
-   └─ Enables automated platform_provisioning
+    Creates RHEL 9/10 kickstart templates
+    Stores kickstart files for PXE boot
+    Enables automated platform_provisioning
    
 6. System Provisioning
-   ├─ Boot via PXE
-   ├─ Load kickstart from Satellite
-   ├─ Automated installation
-   ├─ Register with activation key
-   └─ Ready for management
+    Boot via PXE
+    Load kickstart from Satellite
+    Automated installation
+    Register with activation key
+    Ready for management
 ```
 
 ## Kickstart Customization

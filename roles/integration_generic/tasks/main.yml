@@ -68,7 +68,7 @@
     - name: "Integration configuration failed - detailed error"
       ansible.builtin.fail:
         msg: |
-          ❌ INTEGRATION CONFIGURATION FAILED
+           INTEGRATION CONFIGURATION FAILED
 
           Common causes:
           1. Missing integration_generic prerequisites

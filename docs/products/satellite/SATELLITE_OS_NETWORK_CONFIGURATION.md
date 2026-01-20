@@ -219,41 +219,41 @@ ansible-playbook playbooks/satellite_infrastructure_setup.yml \
 
 ```
 1. satellite_6_18_deployment
-   └─ Deploys Satellite 6.18 core
+    Deploys Satellite 6.18 core
 
 2. satellite_content_config
-   └─ Enables RHEL repositories
-   └─ Creates organizations/locations
+    Enables RHEL repositories
+    Creates organizations/locations
 
 3. scenario_satellite_lifecycle_config
-   └─ Creates environments (Dev → Staging → Prod)
-   └─ Creates content views
+    Creates environments (Dev → Staging → Prod)
+    Creates content views
 
 4. scenario_satellite_activation_config
-   └─ Creates activation keys
-   └─ Manages subscriptions
+    Creates activation keys
+    Manages subscriptions
 
 5. satellite_kickstart_config
-   └─ Creates kickstart templates
+    Creates kickstart templates
 
 6. scenario_satellite_os_configuration [NEW]
-   ├─ Defines Operating Systems (RHEL 9, 10)
-   ├─ Configures Installation Media
-   ├─ Creates Kickstart Repository
-   └─ Enables weekly sync
+    Defines Operating Systems (RHEL 9, 10)
+    Configures Installation Media
+    Creates Kickstart Repository
+    Enables weekly sync
 
 7. platform_network_infrastructure [NEW]
-   ├─ Configures 10.168.0.0/16 subnet
-   ├─ Sets up DHCP and DNS
-   ├─ Defines host groups
-   └─ Configures firewall rules
+    Configures 10.168.0.0/16 subnet
+    Sets up DHCP and DNS
+    Defines host groups
+    Configures firewall rules
 
 8. Ready for Automated Provisioning
-   ├─ PXE boot systems
-   ├─ Anaconda loads kickstart
-   ├─ System installation and configuration
-   ├─ Registration with Satellite
-   └─ Lifecycle management ready
+    PXE boot systems
+    Anaconda loads kickstart
+    System installation and configuration
+    Registration with Satellite
+    Lifecycle management ready
 ```
 
 ## Lifecycle Integration
@@ -373,14 +373,14 @@ dhclient -v eth0         # Test DHCP
 ## Summary
 
 Complete platform_infrastructure_core setup for RHIS with:
-- ✅ RHEL 9 and 10 OS definitions
-- ✅ Installation media configured
-- ✅ Kickstart repository with weekly sync
-- ✅ 10.168.0.0/16 network platform_infrastructure_core
-- ✅ DHCP and DNS configuration
-- ✅ 6 host group subnets
-- ✅ 3 static core platform_infrastructure_core hosts
-- ✅ Network firewall rules
+-  RHEL 9 and 10 OS definitions
+-  Installation media configured
+-  Kickstart repository with weekly sync
+-  10.168.0.0/16 network platform_infrastructure_core
+-  DHCP and DNS configuration
+-  6 host group subnets
+-  3 static core platform_infrastructure_core hosts
+-  Network firewall rules
 
 **Status**: Production-ready for automated platform_provisioning
 

@@ -133,49 +133,49 @@ ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
 
 ```
 RedHat_Management/
-├── RHIS-Installer-Enhanced.sh    ← NEW: Enhanced installer with menus
-├── RHIS-Installer.sh             ← Original installer (backup)
-├── playbooks/
-│   ├── ansible_dev_node_orchestration.yml         ← Main ansible_dev_node_orchestration playbook
-│   ├── scenario_configs.yml      ← Scenario definitions
-│   └── ...                         (other playbooks)
-├── roles/
-│   ├── installer_host/           ← Ansible developer node setup
-│   ├── platform_prep/            ← Platform preparation
-│   ├── ansible_dev_node_inventory_generator/      ← Inventory generation
-│   ├── platform_libvirt_vm_provisioner/  ← VM platform_provisioning
-│   ├── platform_infrastructure_manager/   ← Cloud platform_infrastructure_core
-│   ├── ansible_dev_node_redhat_products/          ← Product deployment
-│   ├── scenario_ansible_cmdb_core/                     ← Ansible-CMDB setup
-│   ├── integration_generic/              ← Product integrations
-│   └── ansible_dev_node_support/                  ← Utilities
-├── group_vars/
-│   ├── all.yml                   ← Global variables
-│   ├── scenario_satellite.yml             ← Satellite-specific
-│   ├── aap.yml                   ← AAP-specific
-│   ├── idm.yml                   ← IdM-specific
-│   ├── scenario_openshift.yml             ← OpenShift-specific
-│   └── [platform].yml            ← Platform-specific
-├── templates/
-│   ├── ansible.cfg.j2            ← Ansible config template
-│   ├── oemdrv/                   ← OEMDRV kickstart templates
-│   └── repo-enable/              ← Repo enablement scripts
-├── files/
-│   ├── OEMDRV/                   ← OEMDRV kickstart files
-│   ├── rhel-iso/                 ← RHEL ISO location
-│   └── tftp/                     ← TFTP boot files
-├── inventory/
-│   ├── hosts                     ← Generated inventory
-│   └── generated/                ← Dynamic inventory
-├── docs/
-│   ├── deployment/
-│   │   ├── RHIS_DEPLOYMENT_ARCHITECTURE.md
-│   │   └── README.md
-│   ├── platforms/                ← Platform guides
-│   ├── products/                 ← Product guides
-│   └── examples/
-└── logs/
-    └── deployment_*.log          ← Deployment logs
+ RHIS-Installer-Enhanced.sh    ← NEW: Enhanced installer with menus
+ RHIS-Installer.sh             ← Original installer (backup)
+ playbooks/
+    ansible_dev_node_orchestration.yml         ← Main ansible_dev_node_orchestration playbook
+    scenario_configs.yml      ← Scenario definitions
+    ...                         (other playbooks)
+ roles/
+    installer_host/           ← Ansible developer node setup
+    platform_prep/            ← Platform preparation
+    ansible_dev_node_inventory_generator/      ← Inventory generation
+    platform_libvirt_vm_provisioner/  ← VM platform_provisioning
+    platform_infrastructure_manager/   ← Cloud platform_infrastructure_core
+    ansible_dev_node_redhat_products/          ← Product deployment
+    scenario_ansible_cmdb_core/                     ← Ansible-CMDB setup
+    integration_generic/              ← Product integrations
+    ansible_dev_node_support/                  ← Utilities
+ group_vars/
+    all.yml                   ← Global variables
+    scenario_satellite.yml             ← Satellite-specific
+    aap.yml                   ← AAP-specific
+    idm.yml                   ← IdM-specific
+    scenario_openshift.yml             ← OpenShift-specific
+    [platform].yml            ← Platform-specific
+ templates/
+    ansible.cfg.j2            ← Ansible config template
+    oemdrv/                   ← OEMDRV kickstart templates
+    repo-enable/              ← Repo enablement scripts
+ files/
+    OEMDRV/                   ← OEMDRV kickstart files
+    rhel-iso/                 ← RHEL ISO location
+    tftp/                     ← TFTP boot files
+ inventory/
+    hosts                     ← Generated inventory
+    generated/                ← Dynamic inventory
+ docs/
+    deployment/
+       RHIS_DEPLOYMENT_ARCHITECTURE.md
+       README.md
+    platforms/                ← Platform guides
+    products/                 ← Product guides
+    examples/
+ logs/
+     deployment_*.log          ← Deployment logs
 ```
 
 ## Deployment Workflow
