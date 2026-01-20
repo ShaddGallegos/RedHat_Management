@@ -6,11 +6,11 @@
       <port start="1024" end="65535"/>
     </nat>
   </forward>
-  <bridge name="virbr0" stp="on" delay="0"/>
+  <bridge name="{{ libvirt_external_bridge | default('external_nat') }}" stp="on" delay="0"/>
   <mac address="{{ mac_address_external | default('52:54:00:12:34:56') }}"/>
-  <ip address="{{ libvirt_external_network_gw }}" netmask="255.255.255.0">
+  <ip address="{{ libvirt_external_network_gw | default('192.168.0.1') }}" netmask="255.255.255.0">
     <dhcp>
-      <range start="{{ libvirt_external_network | regex_replace('\.0/24$', '.2') }}" end="{{ libvirt_external_network | regex_replace('\.0/24$', '.254') }}"/>
+      <range start="{{ (libvirt_external_network | default('192.168.0.0/24')) | regex_replace('\\.0/24$', '.2') }}" end="{{ (libvirt_external_network | default('192.168.0.0/24')) | regex_replace('\\.0/24$', '.254') }}"/>
     </dhcp>
   </ip>
 </network>

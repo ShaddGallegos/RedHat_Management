@@ -143,12 +143,12 @@
             satellite.<domain> - Satellite server
             idm.<domain> - Identity Management
           
-          Enter ansible domain (or press Enter for 'lab.local'):
+            Enter ansible domain (or press Enter for 'example.com'):
       register: ansible_domain_input
 
     - name: Set ansible domain
       ansible.builtin.set_fact:
-        ansible_domain: "{{ ansible_domain_input.user_input | lower | default('lab.local') }}"
+        ansible_domain: "{{ ansible_domain_input.user_input | lower | default('example.com') }}"
 
 - name: Save Infrastructure Configuration
   block:

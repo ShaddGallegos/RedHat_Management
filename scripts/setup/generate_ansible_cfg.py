@@ -78,15 +78,24 @@ def merge_env(env_conf, env_yml):
     merged.update(env_yml or {})
     merged.update(env_conf or {})
 
-    # Normalize token key for templates: rh_credentials_token
+    # Normalize token keys for templates: allow many possible names and expose
+    # them under multiple normalized keys so templates can reference any of
+    # `redhat_token`, `rh_credentials_token`, or `redhat_automation_hub_token`.
     token = (
-        merged.get("rh_credentials_token")
+        merged.get("redhat_token")
+        or merged.get("rh_credentials_token")
         or merged.get("RH_CREDENTIALS_TOKEN")
         or merged.get("RH_TOKEN")
+        or merged.get("redhat_automation_hub_token")
+        or merged.get("automation_hub_token")
         or merged.get("token")
+        or merged.get("redhat_automation_hub_token_vault")
         or ""
     )
+    # Expose the token under several well-known names for templates
     merged["rh_credentials_token"] = token
+    merged["redhat_token"] = token
+    merged["redhat_automation_hub_token"] = token
 
     # Useful defaults; template has fixed URLs for published/validated/community
     merged.setdefault("AUTOMATION_HUB_URL", "https://console.redhat.com/api/automation-hub/")
@@ -98,12 +107,15 @@ def merge_env(env_conf, env_yml):
     return merged
 
 def prompt_for_missing_token(env_vars):
-    token = env_vars.get("rh_credentials_token", "").strip()
+    # Prefer user-visible key `redhat_token` but accept others
+    token = env_vars.get("redhat_token", "").strip() or env_vars.get("rh_credentials_token", "").strip()
     if not token:
         print("\nRed Hat Automation Hub token not found.")
         token = input("Enter your Red Hat Credentials Token (or press Enter to skip): ").strip()
         if token:
+            env_vars["redhat_token"] = token
             env_vars["rh_credentials_token"] = token
+            env_vars["redhat_automation_hub_token"] = token
     return env_vars
 
 def save_env_yml(path, env_vars):
@@ -118,7 +130,8 @@ def save_env_yml(path, env_vars):
 def save_env_conf(path, env_vars):
     lines = []
     # Persist only relevant keys to conf; include the normalized token
-    token = env_vars.get("rh_credentials_token", "")
+    token = env_vars.get("redhat_token", "") or env_vars.get("rh_credentials_token", "")
+    lines.append(f"redhat_token={token}")
     lines.append(f"rh_credentials_token={token}")
     try:
         with open(path, 'w') as f:
@@ -139,8 +152,10 @@ def render_cfg(template_path, output_path, env_vars):
         template = env.get_template(template_file)
 
         context = env_vars.copy()
-        # Ensure the template variable exists
+        # Ensure common token variables exist for templates
         context["rh_credentials_token"] = env_vars.get("rh_credentials_token", "")
+        context["redhat_token"] = env_vars.get("redhat_token", "")
+        context["redhat_automation_hub_token"] = env_vars.get("redhat_automation_hub_token", "")
 
         output = template.render(**context)
 
@@ -193,7 +208,11 @@ def main():
     args = parse_args()
 
     project_root = os.path.abspath(args.project_root)
-    env_yml_path = os.path.abspath(args.env_yml)
+    # Default env.yml to ~/.ansible/conf/env.yml when not provided
+    if args.env_yml:
+        env_yml_path = os.path.abspath(args.env_yml)
+    else:
+        env_yml_path = os.path.join(HOME, ".ansible", "conf", "env.yml")
     env_conf_path = os.path.abspath(args.env_conf)
     template_path = os.path.join(project_root, args.template)
     output_path = os.path.join(project_root, args.output)

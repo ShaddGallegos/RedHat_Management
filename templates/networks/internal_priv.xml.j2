@@ -8,9 +8,9 @@
   </forward>
   <bridge name="virbr1" stp="on" delay="0"/>
   <mac address="{{ mac_address_internal | default('52:54:00:65:43:21') }}"/>
-  <ip address="{{ libvirt_internal_network_gw }}" netmask="255.255.0.0">
+  <ip address="{{ libvirt_internal_network_gw | default('10.168.0.1') }}" netmask="255.255.0.0">
     <dhcp>
-      <range start="{{ libvirt_internal_network }}.2" end="{{ libvirt_internal_network }}.254"/>
+      <range start="{{ (libvirt_internal_network | default('10.168.0')) }}.2" end="{{ (libvirt_internal_network | default('10.168.0')) }}.254"/>
     </dhcp>
   </ip>
 </network>

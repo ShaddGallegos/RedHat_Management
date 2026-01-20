@@ -1,4 +1,9 @@
----
+- name: Load survey for AWS (if present)
+  include_role:
+    name: survey_loader
+  run_once: true
+  delegate_to: localhost
+
 - name: AWS role main dispatcher
   ansible.builtin.import_tasks: install.yml
   tags: [install]

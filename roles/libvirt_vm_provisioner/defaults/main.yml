@@ -55,3 +55,11 @@ libvirt_cleanup_temp_files: true
 libvirt_log_level: "info"  # debug, info, warning, error
 libvirt_save_logs: true
 libvirt_logs_dir: "/tmp/libvirt-provisioner-logs"
+
+# Cloud-init and seed options
+use_cloud_init_iso: true
+use_cloud_init_disk: false
+cloud_init_allow_password_auth: false
+seed_disk_size_mb: 64
+# Optional SSH public key to inject into provisioned VMs
+ssh_public_key: ""

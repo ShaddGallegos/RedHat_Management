@@ -4,7 +4,7 @@
 # Includes preflight checks, testing, and reporting
 
 - name: "SUPPORT TASKS - Initialize"
-  debug:
+  ansible.builtin.debug:
     msg: |
       Support and Validation Tasks
       ==============================
@@ -13,7 +13,7 @@
   tags: ["support", "always"]
 
 - name: "Execute preflight validation tests"
-  include_role:
+  ansible.builtin.include_role:
     name: "support"
     tasks_from: "preflight_tests/main.yml"
     apply:
@@ -22,7 +22,7 @@
   tags: ["support", "preflight"]
 
 - name: "Execute ansible-cmdb setup (if needed)"
-  include_role:
+  ansible.builtin.include_role:
     name: "support"
     tasks_from: "ansible_cmdb_setup/main.yml"
     apply:
@@ -31,7 +31,7 @@
   tags: ["support"]
 
 - name: "Execute backup and restore procedures (if needed)"
-  include_role:
+  ansible.builtin.include_role:
     name: "support"
     tasks_from: "backup_restore/main.yml"
     apply:
@@ -40,7 +40,7 @@
   tags: ["support"]
 
 - name: "Execute testing tasks (if needed)"
-  include_role:
+  ansible.builtin.include_role:
     name: "support"
     tasks_from: "testing/main.yml"
     apply:
@@ -49,31 +49,32 @@
   tags: ["support"]
 
 - name: "Support tasks completed"
+  tags: ["support"]
   block:
     - name: "Validate support tasks successful"
-      debug:
+      ansible.builtin.debug:
         msg: "Support validation and setup complete."
       tags: ["support", "info"]
 
   rescue:
     - name: "Support tasks failed - detailed error"
-      fail:
+      ansible.builtin.fail:
         msg: |
           ❌ SUPPORT TASKS FAILED
-          
+
           Common causes:
           1. Preflight checks failed
           2. Testing framework issues
           3. Insufficient permissions
           4. Service connectivity problems
           5. Backup/restore operation failure
-          
+
           Recovery steps:
           1. Review preflight check results
           2. Verify test framework availability
           3. Confirm required permissions
           4. Check service connectivity
           5. Verify backup storage and permissions
-          
+
           Check logs above for detailed error information.
-  tags: ["support"]
+      tags: ["support"]
