@@ -1,0 +1,24 @@
+<domain type='kvm'>
+  <name>{{ vm.name }}</name>
+  <memory unit='MiB'>{{ vm.memory }}</memory>
+  <vcpu>{{ vm.vcpus }}</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+    <boot dev='hd'/>
+  </os>
+  <devices>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='qcow2'/>
+      <source file='{{ vm.disk }}'/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <interface type='network'>
+      {% if vm.mac is defined and vm.mac != '' %}
+      <mac address='{{ vm.mac }}'/>
+      {% endif %}
+      <source network='{{ vm.network }}'/>
+      <model type='virtio'/>
+    </interface>
+    <graphics type='vnc' port='-1' autoport='yes'/>
+  </devices>
+</domain>

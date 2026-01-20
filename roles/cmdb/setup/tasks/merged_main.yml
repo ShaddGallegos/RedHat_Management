@@ -1,0 +1,146 @@
+---
+# Merged CMDB setup tasks (combines previous systemd-based and httpd-based approaches)
+
+- name: "Display CMDB setup information"
+  debug:
+    msg: |
+      Setting up Ansible-CMDB (merged role)
+      Dashboard port: {{ cmdb_port | default('8081') }}
+
+- name: "Install system packages required for CMDB"
+  package:
+    name:
+      - python3-pip
+      - git
+      - python3-devel
+      - gcc
+      - httpd
+    state: present
+  become: true
+
+- name: "Install Python packages via pip"
+  pip:
+    name:
+      - ansible-cmdb
+      - pyyaml
+      - jinja2
+    state: present
+    executable: pip3
+  become: true
+
+- name: "Create CMDB directories"
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  loop:
+    - "{{ cmdb_output_dir | default('/var/www/html/cmdb') }}"
+    - "{{ cmdb_facts_dir | default('/var/lib/ansible/facts.d') }}"
+    - /opt/ansible-cmdb
+    - /var/log/ansible-cmdb
+  become: true
+
+- name: "Generate CMDB HTML from inventory"
+  command: >-
+    ansible-cmdb -i "{{ inventory_file | default(playbook_dir + '/inventory/hosts') }}"
+    -o "{{ cmdb_output_dir | default('/var/www/html/cmdb') }}/index.html"
+  environment:
+    ANSIBLE_CACHE_PLUGIN: jsonfile
+    ANSIBLE_CACHE_PLUGIN_CONNECTION: "{{ cmdb_facts_dir | default('/var/lib/ansible/facts.d') }}"
+  register: cmdb_generate
+  changed_when: true
+  become: true
+
+- name: "Create httpd configuration for CMDB"
+  copy:
+    dest: /etc/httpd/conf.d/cmdb.conf
+    content: |
+      # Ansible CMDB Virtual Host Configuration
+      Listen {{ cmdb_port | default('8081') }}
+
+      <VirtualHost *:{{ cmdb_port | default('8081') }}>
+          ServerName cmdb.local
+          DocumentRoot {{ cmdb_output_dir | default('/var/www/html/cmdb') }}
+
+          <Directory {{ cmdb_output_dir | default('/var/www/html/cmdb') }}>
+              Options Indexes FollowSymLinks
+              AllowOverride All
+              Require all granted
+          </Directory>
+
+          ErrorLog /var/log/httpd/cmdb_error.log
+          CustomLog /var/log/httpd/cmdb_access.log combined
+      </VirtualHost>
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  notify: restart httpd
+
+- name: "Ensure httpd is started and enabled"
+  systemd:
+    name: httpd
+    state: started
+    enabled: yes
+    daemon_reload: yes
+  become: true
+
+- name: "Configure firewall to allow CMDB port"
+  ansible.builtin.shell: |
+    if command -v firewall-cmd >/dev/null 2>&1; then
+      firewall-cmd --permanent --add-port={{ cmdb_port | default('8081') }}/tcp || true
+      firewall-cmd --reload || true
+    fi
+  become: true
+
+- name: "Create systemd timer to collect facts periodically (optional)"
+  copy:
+    dest: /etc/systemd/system/ansible-cmdb-facts.timer
+    content: |
+      [Unit]
+      Description=Collect Ansible facts for CMDB
+      Requires=ansible-cmdb-facts.service
+
+      [Timer]
+      OnBootSec=1h
+      OnUnitActiveSec=1h
+      AccuracySec=1s
+
+      [Install]
+      WantedBy=timers.target
+    mode: '0644'
+  become: true
+  notify: Reload systemd daemon
+
+- name: "Create systemd oneshot service to collect facts (optional)"
+  copy:
+    dest: /etc/systemd/system/ansible-cmdb-facts.service
+    content: |
+      [Unit]
+      Description=Collect Ansible facts for CMDB
+      After=network.target
+
+      [Service]
+      Type=oneshot
+      User=root
+      WorkingDirectory=/opt/ansible-cmdb
+      ExecStart=/usr/bin/ansible -i {{ inventory_file | default(playbook_dir + '/inventory/hosts') }} -m setup --tree {{ cmdb_facts_dir | default('/var/lib/ansible/facts.d') }}
+      StandardOutput=journal
+      StandardError=journal
+    mode: '0644'
+  become: true
+  notify: Reload systemd daemon
+
+- name: "Reload systemd and enable timer"
+  systemd:
+    name: ansible-cmdb-facts.timer
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  become: true
+
+- name: "Display CMDB generation result"
+  debug:
+    msg: "CMDB generation: rc={{ cmdb_generate.rc | default('n/a') }}, stdout={{ cmdb_generate.stdout | default('') ) }}"

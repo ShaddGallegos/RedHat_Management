@@ -23,8 +23,8 @@
 
 - name: "Execute ansible-cmdb setup (if needed)"
   ansible.builtin.include_role:
-    name: "support"
-    tasks_from: "ansible_cmdb_setup/main.yml"
+    name: "cmdb"
+    tasks_from: "setup/merged_main.yml"
     apply:
       tags: ["support", "cmdb"]
   when: configure_cmdb | default(false)

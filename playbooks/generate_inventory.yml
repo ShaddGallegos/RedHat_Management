@@ -1,0 +1,45 @@
+---
+- name: Generate inventory and /etc/hosts entries for chosen scenario
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    inventory_path: "inventory/hosts.generated"
+    hosts_file: "files/hosts.generated"
+
+  tasks:
+    - name: Build node list
+      ansible.builtin.set_fact:
+        generated_nodes:
+          - name: "{{ node_ansibledev_fqdn }}"
+            ip: "{{ node_ansibledev_ip }}"
+          - name: "{{ node_satellite_fqdn }}"
+            ip: "{{ node_satellite_ip }}"
+          - name: "{{ node_aap_fqdn }}"
+            ip: "{{ node_aap_ip }}"
+          - name: "{{ node_idm_fqdn }}"
+            ip: "{{ node_idm_ip }}"
+
+    - name: Render inventory file
+      ansible.builtin.copy:
+        dest: "{{ inventory_path }}"
+        mode: '0640'
+        content: |
+          [all]
+          {% for n in generated_nodes %}
+          {{ n.name }} ansible_host={{ n.ip }} ansible_user={{ inventory_admin_user }} ansible_password={{ inventory_admin_password }} ansible_become=true
+          {% endfor %}
+
+    - name: Render hosts file for propagation
+      ansible.builtin.copy:
+        dest: "{{ hosts_file }}"
+        mode: '0644'
+        content: |
+          # Generated /etc/hosts entries
+          {% for n in generated_nodes %}
+          {{ n.ip }} {{ n.name }}
+          {% endfor %}
+
+    - name: Display inventory location
+      ansible.builtin.debug:
+        msg: "Wrote inventory to {{ inventory_path }} and hosts to {{ hosts_file }}"

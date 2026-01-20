@@ -1,0 +1,75 @@
+---
+- name: Prepare Ansible-dev (installer) and libvirt platform
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    simulate_local: false
+    key_path: "{{ lookup('env','HOME') }}/.ssh/id_rsa"
+    pub_key_path: "{{ lookup('env','HOME') }}/.ssh/id_rsa.pub"
+  tasks:
+    - name: Stat user env overrides file
+      ansible.builtin.stat:
+        path: "{{ lookup('env', 'HOME') }}/.ansible/conf/env.yml"
+      register: user_env_file
+
+    - name: Include user env overrides if present
+      ansible.builtin.include_vars:
+        file: "{{ lookup('env', 'HOME') }}/.ansible/conf/env.yml"
+      when: user_env_file.stat.exists
+
+    - name: Ensure local SSH key exists
+      ansible.builtin.stat:
+        path: "{{ key_path }}"
+      register: local_key
+
+    - name: Generate local SSH keypair if missing
+      ansible.builtin.openssh_keypair:
+        path: "{{ key_path }}"
+        type: rsa
+        size: 4096
+        force: no
+      register: generated_key
+      when: not local_key.stat.exists
+
+    - name: Read local public key
+      ansible.builtin.slurp:
+        src: "{{ pub_key_path }}"
+      register: local_pubkey
+
+    - name: Set public key fact
+      ansible.builtin.set_fact:
+        controller_pubkey: "{{ local_pubkey.content | b64decode }}"
+
+- name: Prepare installer and inventory hosts
+  hosts: "{{ 'localhost' if simulate_local | default(false) else 'ansibledev:all' }}"
+  connection: "{{ (simulate_local | default(false)) | ternary('local', omit) }}"
+  become: true
+  gather_facts: true
+  vars:
+    scenario_user: "{{ scenario_default_user | default('admin') }}"
+    scenario_pass_plain: "{{ scenario_default_password | default('r3dh4t7!') }}"
+    scenario_pass_hash: "{{ scenario_pass_plain | password_hash('sha512') }}"
+    controller_pubkey: "{{ hostvars['localhost']['controller_pubkey'] | default(lookup('file', lookup('env', 'HOME') + '/.ssh/id_rsa.pub')) }}"
+  tasks:
+    - name: Include ansibledev_node role
+      ansible.builtin.include_role:
+        name: ansibledev_node
+      vars:
+        ansibledev_node_user: "{{ scenario_user }}"
+        ansibledev_node_pass_hash: "{{ scenario_pass_hash }}"
+        ansibledev_node_controller_pubkey: "{{ controller_pubkey }}"
+
+- name: Prepare libvirt host
+  hosts: "{{ 'localhost' if simulate_local | default(false) else 'libvirt:all' }}"
+  connection: "{{ (simulate_local | default(false)) | ternary('local', omit) }}"
+  become: true
+  gather_facts: true
+  vars:
+    libvirt_platform_install_cmd: "dnf install -y yum-utils 'libvirt*' 'qemu*' virt-manager 'kvm*' --skip-broken --allowerasing --best"
+    libvirt_platform_builddep_cmd: "yum-builddep -y libvirt || true"
+    libvirt_platform_upgrade_cmd: "dnf upgrade -y --skip-broken --allowerasing --best"
+  tasks:
+    - name: Include libvirt_platform role
+      ansible.builtin.include_role:
+        name: libvirt_platform

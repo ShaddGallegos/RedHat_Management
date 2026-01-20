@@ -1,0 +1,10 @@
+---
+# Placeholder main playbook used when the full orchestration playbook
+# is unavailable or has syntax errors. Safe for smoke-tests.
+- name: RHIS Placeholder Main Playbook
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Inform placeholder
+      ansible.builtin.debug:
+        msg: "Placeholder playbook executed (fallback)"

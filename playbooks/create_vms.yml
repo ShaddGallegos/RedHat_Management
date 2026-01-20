@@ -1,0 +1,76 @@
+---
+- name: Create VMs on libvirt host
+  hosts: "{{ libvirt_host_fqdn | default(libvirt_host_ip | default('127.0.0.1')) }}"
+  become: true
+  gather_facts: false
+
+  vars:
+    vm_list:
+      - name: "{{ node_ansibledev_fqdn }}"
+        memory: 8192
+        vcpus: 4
+        disk: /var/lib/libvirt/images/ansibledev.qcow2
+        network: default
+      - name: "{{ node_satellite_fqdn }}"
+        memory: 8192
+        vcpus: 4
+        disk: /var/lib/libvirt/images/satellite.qcow2
+        network: default
+      - name: "{{ node_aap_fqdn }}"
+        memory: 4096
+        vcpus: 2
+        disk: /var/lib/libvirt/images/aap.qcow2
+        network: internal
+      - name: "{{ node_idm_fqdn }}"
+        memory: 4096
+        vcpus: 2
+        disk: /var/lib/libvirt/images/idm.qcow2
+        network: internal
+
+  tasks:
+    - name: Ensure image directory exists
+      file:
+        path: /var/lib/libvirt/images
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Assign deterministic MAC addresses to VMs when not provided
+      set_fact:
+        vm_list: "{{ (vm_list_updated | default([])) + [ item | combine({'mac': (item.mac | default('52:54:00:' + (item.name | hash('sha1'))[0:2] + ':' + (item.name | hash('sha1'))[2:4] + ':' + (item.name | hash('sha1'))[4:6])) }) ] }}"
+      loop: "{{ vm_list }}"
+      loop_control:
+        loop_var: item
+    - name: Render VM XML template for each VM
+      template:
+        src: "templates/vm_default.xml.j2"
+        dest: "/tmp/{{ item.name }}.xml"
+      loop: "{{ vm_list }}"
+      loop_control:
+        loop_var: item
+      vars:
+        vm: "{{ item }}"
+
+    - name: Define domain from XML (idempotent) for each VM
+      command: virsh define /tmp/{{ item.name }}.xml
+      loop: "{{ vm_list }}"
+      loop_control:
+        loop_var: item
+      register: virsh_define
+      failed_when: virsh_define.rc not in [0,1]
+
+    - name: Start domain for each VM
+      command: virsh start {{ item.name }}
+      loop: "{{ vm_list }}"
+      loop_control:
+        loop_var: item
+      register: virsh_start
+      failed_when: virsh_start.rc not in [0,1]
+
+    - name: Show created VMs
+      command: virsh list --all
+      register: virsh_list
+
+    - debug:
+        var: virsh_list.stdout_lines

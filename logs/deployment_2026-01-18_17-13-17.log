@@ -1,0 +1,18 @@
+RHIS Deployment Log - 2026-01-18_17-13-17
+=========================================
+[2026-01-18 17:13:49] [INFO] Credentials collected successfully
+[2026-01-18 17:13:53] [INFO] Deployment scenario selected: satellite_aap_idm
+[2026-01-18 17:13:59] [INFO] Deployment platform selected: libvirt
+[2026-01-18 17:14:11] [INFO] Deployment OS selected: rhel-10
+[2026-01-18 17:14:26] [INFO] Installation method selected: TFTP
+[2026-01-18 17:14:32] [INFO] Configuration confirmed by user
+[2026-01-18 17:14:32] [INFO] === DEPLOYMENT STARTED ===
+[2026-01-18 17:14:32] [INFO] Scenario: satellite_aap_idm
+[2026-01-18 17:14:32] [INFO] Platform: libvirt
+[2026-01-18 17:14:32] [INFO] OS: rhel-10
+[2026-01-18 17:14:32] [INFO] Installation Method: tftp
+[2026-01-18 17:14:32] [INFO] Deployment configuration file created
+[2026-01-18 17:14:32] [INFO] Ansible environment setup completed
+[2026-01-18 17:14:32] [INFO] Running playbook with tags: satellite_aap_idm,libvirt,rhel-10
+[0;31mERROR! the playbook: /home/sgallego/Downloads/RedHat_Management/playbooks/redhat_management-site.yml could not be found[0m
+[0;34mUsing /home/sgallego/Downloads/RedHat_Management/ansible.cfg as config file[0m

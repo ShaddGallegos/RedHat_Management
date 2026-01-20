@@ -1,0 +1,288 @@
+---
+- name: Interactive inventory survey
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars_prompt:
+    - name: "scenario"
+      prompt: "Which scenario? (e.g. default11)"
+      private: false
+      default: "default11"
+    - name: platform
+      prompt: "Target platform (libvirt/vmware/nutanix/aws/azure/baremetal)"
+      private: false
+      default: "libvirt"
+    - name: inventory_admin_user
+      prompt: "Inventory admin user"
+      private: false
+      default: "admin"
+    - name: inventory_admin_password
+      prompt: "Inventory admin password (will be stored locally if you continue)"
+      private: true
+    - name: console_redhat_token
+      prompt: "console.redhat.com token (for Satellite registrations)"
+      private: true
+      default: ""
+    - name: rhel_cdn_username
+      prompt: "RHEL CDN username (for registration)"
+      private: false
+      default: ""
+    - name: rhel_cdn_password
+      prompt: "RHEL CDN password (for registration)"
+      private: true
+      default: ""
+    - name: include_satellite
+      prompt: "Include Satellite in this scenario? (true/false)"
+      private: false
+      default: "true"
+    - name: include_aap
+      prompt: "Include Ansible Automation Platform (AAP)? (true/false)"
+      private: false
+      default: "true"
+    - name: include_idm
+      prompt: "Include IDM (Directory Service)? (true/false)"
+      private: false
+      default: "true"
+    - name: include_openshift
+      prompt: "Include OpenShift? (true/false)"
+      private: false
+      default: "false"
+    - name: console_redhat_token
+      prompt: "console.redhat.com token (for API/automation)"
+      private: true
+      default: ""
+
+  tasks:
+
+    - name: Stat user env overrides file
+      ansible.builtin.stat:
+      path: "{{ lookup('env', 'HOME') + '/.ansible/conf/env.yml' }}"
+      register: user_env_file
+
+    - name: Include user env overrides if present
+      ansible.builtin.include_vars:
+      file: "{{ lookup('env', 'HOME') + '/.ansible/conf/env.yml' }}"
+      when: user_env_file.stat.exists
+
+    - name: "Platform-specific prompts: libvirt"
+      when: platform == 'libvirt'
+      block:
+      - name: Prompt for libvirt host FQDN or IP
+        ansible.builtin.pause:
+        prompt: "Libvirt host FQDN or IP (enter to accept default)"
+        register: libvirt_host_in
+
+      - name: Prompt for installer FQDN
+        ansible.builtin.pause:
+        prompt: "Installer falsede FQDN (enter to accept default)"
+        register: installer_fqdn_in
+
+      - name: Prompt for installer IP
+        ansible.builtin.pause:
+        prompt: "Installer falsede IP (enter to accept default)"
+        register: installer_ip_in
+
+      - name: Prompt for satellite FQDN
+        ansible.builtin.pause:
+        prompt: "Satellite FQDN (enter to accept default)"
+        register: satellite_fqdn_in
+
+      - name: Prompt for satellite IP
+        ansible.builtin.pause:
+        prompt: "Satellite IP (enter to accept default)"
+        register: satellite_ip_in
+
+      - name: Prompt for AAP FQDN
+        ansible.builtin.pause:
+        prompt: "AAP FQDN (enter to accept default)"
+        register: aap_fqdn_in
+
+      - name: Prompt for AAP IP
+        ansible.builtin.pause:
+        prompt: "AAP IP (enter to accept default)"
+        register: aap_ip_in
+
+      - name: Prompt for IDM FQDN
+        ansible.builtin.pause:
+        prompt: "IDM FQDN (enter to accept default)"
+        register: idm_fqdn_in
+
+      - name: Prompt for IDM IP
+        ansible.builtin.pause:
+        prompt: "IDM IP (enter to accept default)"
+        register: idm_ip_in
+
+      - name: "Set libvirt defaults from prompts"
+        ansible.builtin.set_fact:
+        installer_name: "{{ installer_fqdn_in.user_input | default('installer.' + (ansible_domain | default('example.com'))) }}"
+        installer_ip: "{{ installer_ip_in.user_input | default(libvirt_installer_falsede_ip | default('10.168.0.1')) }}"
+        satellite_name: "{{ satellite_fqdn_in.user_input | default('satellite.' + (ansible_domain | default('example.com'))) }}"
+        satellite_ip: "{{ satellite_ip_in.user_input | default(libvirt_satellite_ip | default('10.168.0.27')) }}"
+        aap_name: "{{ aap_fqdn_in.user_input | default('aap.' + (ansible_domain | default('example.com'))) }}"
+        aap_ip: "{{ aap_ip_in.user_input | default(libvirt_aap_ip | default('10.168.0.26')) }}"
+        idm_name: "{{ idm_fqdn_in.user_input | default('idm.' + (ansible_domain | default('example.com'))) }}"
+        idm_ip: "{{ idm_ip_in.user_input | default(libvirt_idm_ip | default('10.168.0.28')) }}"
+
+      - name: "Compose libvirt hosts_entries"
+        ansible.builtin.set_fact:
+        hosts_entries: >-
+          {{ [ {'name': installer_name, 'ip': installer_ip, 'type': 'installer'} ]
+           + ((include_satellite | default('true') | bool)
+            | ternary([ {'name': satellite_name, 'ip': satellite_ip, 'type': 'satellite'} ], []))
+           + ((include_aap | default('true') | bool)
+            | ternary([ {'name': aap_name, 'ip': aap_ip, 'type': 'aap'} ], []))
+           + ((include_idm | default('true') | bool)
+            | ternary([ {'name': idm_name, 'ip': idm_ip, 'type': 'idm'} ], []))
+          }}
+
+      - name: "Compose libvirt vm_list"
+        ansible.builtin.set_fact:
+        vm_list: >-
+          {{ [ {'name': installer_name, 'memory': 8192, 'vcpus': 4,
+            'disk': '/var/lib/libvirt/images/ansibledev.qcow2', 'network': 'internal_priv'} ]
+           + ((include_satellite | default('true') | bool)
+            | ternary([ {'name': satellite_name, 'memory': 8192, 'vcpus': 4,
+                   'disk': '/var/lib/libvirt/images/satellite.qcow2', 'network': 'internal_priv'} ], []))
+           + ((include_aap | default('true') | bool)
+            | ternary([ {'name': aap_name, 'memory': 4096, 'vcpus': 2,
+                   'disk': '/var/lib/libvirt/images/aap.qcow2', 'network': 'internal_priv'} ], []))
+           + ((include_idm | default('true') | bool)
+            | ternary([ {'name': idm_name, 'memory': 4096, 'vcpus': 2,
+                   'disk': '/var/lib/libvirt/images/idm.qcow2', 'network': 'internal_priv'} ], []))
+          }}
+
+    - name: "Platform-specific prompts: vmware"
+      when: platform == 'vmware'
+      block:
+      - name: Prompt for vCenter server
+        ansible.builtin.pause:
+        prompt: "vCenter server FQDN or IP"
+        register: vmware_vcenter
+
+      - name: Prompt for vCenter user
+        ansible.builtin.pause:
+        prompt: "vCenter admin user"
+        register: vmware_user
+
+      - name: Prompt for vCenter password
+        ansible.builtin.pause:
+        prompt: "vCenter admin password"
+        echo: false
+        register: vmware_password
+
+      - name: "Set vmware survey facts"
+        ansible.builtin.set_fact:
+        vmware:
+          vcenter: "{{ vmware_vcenter.user_input }}"
+          user: "{{ vmware_user.user_input }}"
+          password: "{{ vmware_password.user_input }}"
+
+    - name: "Platform-specific prompts: nutanix"
+      when: platform == 'nutanix'
+      block:
+      - name: Prompt for Nutanix Prism host
+        ansible.builtin.pause:
+        prompt: "Nutanix Prism FQDN or IP"
+        register: nutanix_prism
+
+      - name: Prompt for Nutanix user
+        ansible.builtin.pause:
+        prompt: "Nutanix admin user"
+        register: nutanix_user
+
+      - name: Prompt for Nutanix password
+        ansible.builtin.pause:
+        prompt: "Nutanix admin password"
+        echo: false
+        register: nutanix_password
+
+      - name: "Set nutanix survey facts"
+        ansible.builtin.set_fact:
+        nutanix:
+          prism: "{{ nutanix_prism.user_input }}"
+          user: "{{ nutanix_user.user_input }}"
+          password: "{{ nutanix_password.user_input }}"
+
+    - name: "Platform-specific prompts: aws"
+      when: platform == 'aws'
+      block:
+      - name: Prompt for AWS region
+        ansible.builtin.pause:
+        prompt: "AWS region"
+        register: aws_region
+
+      - name: Prompt for AWS VPC id (optional)
+        ansible.builtin.pause:
+        prompt: "AWS VPC id (optional)"
+        register: aws_vpc
+
+      - name: "Set aws survey facts"
+        ansible.builtin.set_fact:
+        aws:
+          region: "{{ aws_region.user_input }}"
+          vpc: "{{ aws_vpc.user_input }}"
+
+    - name: "Platform-specific prompts: azure"
+      when: platform == 'azure'
+      block:
+      - name: Prompt for Azure subscription id
+        ansible.builtin.pause:
+        prompt: "Azure subscription id"
+        register: azure_sub
+
+      - name: Prompt for Azure resource group
+        ansible.builtin.pause:
+        prompt: "Azure resource group"
+        register: azure_rg
+
+      - name: "Set azure survey facts"
+        ansible.builtin.set_fact:
+        azure:
+          subscription: "{{ azure_sub.user_input }}"
+          resource_group: "{{ azure_rg.user_input }}"
+
+    - name: "Platform-specific prompts: baremetal"
+      when: platform == 'baremetal'
+      block:
+      - name: Prompt for PXE/TFTP host
+        ansible.builtin.pause:
+        prompt: "PXE/TFTP host FQDN or IP"
+        register: pxe_host
+
+      - name: "Set baremetal survey facts"
+        ansible.builtin.set_fact:
+        baremetal:
+          pxe_host: "{{ pxe_host.user_input }}"
+
+    - name: Ensure files cache exists
+      ansible.builtin.file:
+      path: "{{ playbook_dir }}/files/cache"
+      state: directory
+      mode: '0755'
+
+    - name: Write survey results to files/cache/survey.yml
+      ansible.builtin.copy:
+      dest: "{{ playbook_dir }}/files/cache/survey.yml"
+      content: |
+        platform: {{ platform }}
+        scenario: {{ scenario }}
+        vm_list: {{ (vm_list | default([])) | to_nice_yaml }}
+        hosts_entries: {{ (hosts_entries | default([])) | to_nice_yaml }}
+        inventory_admin_user: {{ inventory_admin_user }}
+        inventory_admin_password: {{ inventory_admin_password }}
+        rhel_cdn_username: {{ rhel_cdn_username }}
+        # rhel_cdn_password and console_redhat_token are sensitive and stored
+        rhel_cdn_password: {{ rhel_cdn_password | default('') }}
+        console_redhat_token: {{ console_redhat_token | default('') }}
+        platform_specific: {{ ((vmware | default({})) | combine(nutanix | default({})) | combine(aws | default({})) | combine(azure | default({})) | combine(baremetal | default({}))) | to_nice_yaml }}
+      mode: '0600'
+
+    - name: Render inventory from survey
+      ansible.builtin.template:
+      src: "{{ playbook_dir }}/../templates/inventory_hosts.j2"
+      dest: "{{ playbook_dir }}/../inventory/hosts"
+
+    - name: Show survey summary
+      ansible.builtin.debug:
+      msg: "Survey written to files/cache/survey.yml and inventory/hosts"

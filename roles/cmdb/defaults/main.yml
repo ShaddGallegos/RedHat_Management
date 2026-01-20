@@ -10,3 +10,9 @@ cmdb_update_frequency: 86400
 
 # Feature toggles
 cmdb_enable_tracking: true
+
+# Merged defaults from ansible_cmdb_setup (normalized)
+cmdb_output_dir: "/var/www/html/cmdb"
+cmdb_facts_dir: "/var/lib/ansible/facts.d"
+cmdb_port: 8081
+cmdb_generate_docs: true

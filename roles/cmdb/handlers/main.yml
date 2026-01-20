@@ -1,0 +1,21 @@
+---
+- name: restart httpd
+  systemd:
+    name: httpd
+    state: restarted
+  become: true
+
+- name: Reload systemd daemon
+  command: systemctl daemon-reload
+  become: true
+
+- name: Reload firewall
+  ansible.builtin.command: firewall-cmd --reload
+  become: true
+  ignore_errors: true
+
+- name: Reload nginx
+  ansible.builtin.service:
+    name: nginx
+    state: reloaded
+  become: true

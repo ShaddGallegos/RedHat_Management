@@ -15,7 +15,7 @@
 - name: "Execute CMDB setup subrole"
   include_role:
     name: "cmdb"
-    tasks_from: "setup/main.yml"
+    tasks_from: "setup/merged_main.yml"
     apply:
       tags: ["cmdb", "setup"]
   tags: ["cmdb"]
