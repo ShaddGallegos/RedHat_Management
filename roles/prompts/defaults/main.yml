@@ -6,7 +6,7 @@
 infrastructure_type: 1  # 1=Libvirt, 2=Nutanix, 3=VMware, 4=AWS, 5=GCP, 6=Azure
 
 # Ansible Domain
-ansible_domain: "lab.local"
+ansible_domain: "example.com"
 
 # Libvirt Configuration
 libvirt_host_short_name: "libvirt01"

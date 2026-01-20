@@ -8,3 +8,31 @@ parmstrong.ca
 /playbooks/.archive_deprecated/
 /docs/archive/
 /files/
+
+# Ignore large VM images, archives, and seed ISOs stored in files/
+files/*.qcow2
+files/*.qcow2.gz
+files/*.img
+files/*.iso
+files/*.tgz
+files/*.tar.gz
+files/*.gz
+files/*.xz
+files/cache/
+# Ansible generated files
+ansible.cfg
+*.retry
+# Credentials and secrets
+env.yml
+env.conf
+*.vault
+vault.yml
+vault.yaml
+# Backup files
+*.bak
+*~
+__pycache__/
+*.py[cod]
+
+# Ignore contrib directory (local helpers and build scripts)
+contrib/

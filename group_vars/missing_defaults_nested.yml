@@ -795,6 +795,8 @@ lce:
   name: ""
   prior: ""
 libvirt_certs_dir: "<REDACTED>"
+ansible_domain: "example.com"
+aap_shortname: "aap"
 libvirt_external_bridge: ""
 libvirt_external_iface: ""
 libvirt_external_network_name: ""

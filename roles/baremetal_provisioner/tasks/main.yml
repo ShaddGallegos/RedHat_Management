@@ -13,6 +13,13 @@
       
   tags: ["baremetal", "provisioning"]
 
+- name: Load survey for baremetal provisioning (if present)
+  include_role:
+    name: survey_loader
+  run_once: true
+  delegate_to: localhost
+  tags: ["baremetal", "provisioning"]
+
 - name: "Validate baremetal platform configuration"
   assert:
     that:

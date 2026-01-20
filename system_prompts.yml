@@ -123,6 +123,77 @@
       prompt: "Red Hat Insights password"
       private: true
 
+    # Installer / Libvirt / VM nodes
+    - name: installer_node_fqdn
+      prompt: "Installer node (ansibledev) FQDN"
+      private: false
+      default: "ansibledev.{{ ansible_domain | default('example.com') }}"
+
+    - name: installer_node_ip
+      prompt: "Installer node (ansibledev) IP"
+      private: false
+      default: "10.168.0.1"
+
+    - name: libvirt_host_fqdn
+      prompt: "Libvirt host FQDN (where VMs will be created)"
+      private: false
+      default: "libvirt.{{ ansible_domain | default('example.com') }}"
+
+    - name: libvirt_host_ip
+      prompt: "Libvirt host IP"
+      private: false
+      default: "10.168.0.1"
+
+    # Node definitions
+    - name: node_ansibledev_fqdn
+      prompt: "ansibledev VM FQDN"
+      private: false
+      default: "ansibledev.{{ ansible_domain | default('example.com') }}"
+
+    - name: node_ansibledev_ip
+      prompt: "ansibledev VM IP"
+      private: false
+      default: "10.168.0.10"
+
+    - name: node_satellite_fqdn
+      prompt: "satellite VM FQDN"
+      private: false
+      default: "satellite.{{ ansible_domain | default('example.com') }}"
+
+    - name: node_satellite_ip
+      prompt: "satellite VM IP"
+      private: false
+      default: "10.168.0.11"
+
+    - name: node_aap_fqdn
+      prompt: "aap VM FQDN"
+      private: false
+      default: "aap.{{ ansible_domain | default('example.com') }}"
+
+    - name: node_aap_ip
+      prompt: "aap VM IP"
+      private: false
+      default: "10.168.0.12"
+
+    - name: node_idm_fqdn
+      prompt: "idm VM FQDN"
+      private: false
+      default: "idm.{{ ansible_domain | default('example.com') }}"
+
+    - name: node_idm_ip
+      prompt: "idm VM IP"
+      private: false
+      default: "10.168.0.13"
+
+    - name: inventory_admin_user
+      prompt: "Default inventory admin username"
+      private: false
+      default: "admin"
+
+    - name: inventory_admin_password
+      prompt: "Default inventory admin password"
+      private: true
+
   tasks:
     - name: Build variable set from prompted values only
       set_fact:

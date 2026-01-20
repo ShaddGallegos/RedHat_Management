@@ -45,7 +45,7 @@ additional_build_steps:
     # RH automation hub
     - ENV ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_URL=https://cloud.redhat.com/api/automation-hub/
     - ENV ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_AUTH_URL=https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
-    - ENV ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN="{{ automation_hub_token }}"
+    - ENV ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN="{{ redhat_token }}"
     
     
   # adding the ca crt from IdM here allows it to be used
