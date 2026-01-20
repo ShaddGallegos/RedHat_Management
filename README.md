@@ -170,3 +170,13 @@ Helper and fixup scripts.
 
 **Last Updated:** January 16, 2026  
 **Status:** ✅ Fully organized and cleaned - no empty directories or unnecessary files
+
+Recent repo modernization notes (summary of changes on branch `feature/rename-roles`):
+
+- Applied namespace-style role renames for consistency (many `roles/*` renamed to `ansible_dev_node_*`, `platform_*`, `scenario_*`, `integration_*`, `os_*`).
+- Removed all `/rhis` path segments inside `roles/` and updated references.
+- Merged network defaults into `roles/platform_libvirt_setup/defaults/main.yml` and added usage documentation.
+- Added persistent marker behavior to platform roles (`platform_libvirt_setup`, `platform_host_provisioning`, `platform_libvirt_vm_provisioner`) so repeated runs can be skipped when setup already applied.
+- Removed legacy role `roles/ansible_dev_node_legacy_archive`.
+
+For a detailed changelog and PR link, see `docs/CHANGES-2026-01-20.md`.
