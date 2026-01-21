@@ -2,51 +2,51 @@
 
 ## Description
 
-The `satellite_content_config` role configures Satellite 6.18 content management including organizations, locations, products, repositories, and synchronization plans.
+The `satellite_content_config` role configures Satellite 6.18 content management including scenario_satellite_618_configure_provisioning_organizations, scenario_satellite_618_configure_provisioning_locations, scenario_satellite_618_configure_provisioning_products, scenario_satellite_618_configure_provisioning_repositories, and synchronization plans.
 
 **Key Responsibility**: Configure content management platform_infrastructure_core in Satellite.
 
 ## When to Use
 
 - Setting up Satellite content platform_infrastructure_core
-- Creating organizations and locations
-- Configuring repositories and products
+- Creating scenario_satellite_618_configure_provisioning_organizations and scenario_satellite_618_configure_provisioning_locations
+- Configuring scenario_satellite_618_configure_provisioning_repositories and scenario_satellite_618_configure_provisioning_products
 - Setting up synchronization schedules
 
 ## Features
 
-- **Organizations**: Create and manage organizations
-- **Locations**: Define geographic/logical locations
-- **Products**: Manage product repositories
-- **Repositories**: Configure content repositories with multiple URLs
-- **Repository Sets**: Enable official RHEL yum repositories for products
+- **Organizations**: Create and manage scenario_satellite_618_configure_provisioning_organizations
+- **Locations**: Define geographic/logical scenario_satellite_618_configure_provisioning_locations
+- **Products**: Manage product scenario_satellite_618_configure_provisioning_repositories
+- **Repositories**: Configure content scenario_satellite_618_configure_provisioning_repositories with multiple URLs
+- **Repository Sets**: Enable official RHEL yum scenario_satellite_618_configure_provisioning_repositories for scenario_satellite_618_configure_provisioning_products
 - **Sync Plans**: Automate repository synchronization schedules
 - **Repository Management**: Download policies, mirror settings
 
 ## Required Variables
 
 ```yaml
-satellite_url: "https://scenario_satellite.example.com"
-satellite_username: "admin"
+scenario_satellite_618_configure_provisioning_satellite_url: "https://scenario_satellite.example.com"
+scenario_satellite_618_configure_provisioning_satellite_username: "admin"
 satellite_password: "{{ vault_satellite_admin_pwd }}"
 ```
 
 ## Optional Variables
 
 ```yaml
-satellite_organization: "Default Organization"
-satellite_location: "Default Location"
-create_organizations: true
-create_locations: true
-create_products: false
-create_repositories: false
-synchronize_repositories: false
+scenario_satellite_618_configure_provisioning_satellite_organization: "Default Organization"
+scenario_satellite_618_configure_provisioning_satellite_location: "Default Location"
+scenario_satellite_618_configure_provisioning_create_organizations: true
+scenario_satellite_618_configure_provisioning_create_locations: true
+scenario_satellite_618_configure_provisioning_create_products: false
+scenario_satellite_618_configure_provisioning_create_repositories: false
+scenario_satellite_618_configure_provisioning_synchronize_repositories: false
 ```
 
 ## Organizations Configuration
 
 ```yaml
-organizations:
+scenario_satellite_618_configure_provisioning_organizations:
   - name: "My Organization"
     description: "Organization for RHIS"
     state: present
@@ -55,7 +55,7 @@ organizations:
 ## Locations Configuration
 
 ```yaml
-locations:
+scenario_satellite_618_configure_provisioning_locations:
   - name: "My Location"
     description: "Location for RHIS deployment"
     state: present
@@ -64,7 +64,7 @@ locations:
 ## Repositories Configuration
 
 ```yaml
-repositories:
+scenario_satellite_618_configure_provisioning_repositories:
   - name: "RHEL_9_BaseOS"
     product: "Red Hat Enterprise Linux Server"
     content_type: "yum"
@@ -75,7 +75,7 @@ repositories:
 ## Sync Plans Configuration
 
 ```yaml
-sync_plans:
+scenario_satellite_618_configure_provisioning_sync_plans:
   - name: "Daily_Sync"
     organization: "Default Organization"
     interval: "daily"
@@ -85,11 +85,11 @@ sync_plans:
 
 ## Repository Sets Configuration - Enable RHEL Yum Repositories
 
-The role automatically enables official RHEL repository sets for all configured products:
+The role automatically enables official RHEL repository sets for all configured scenario_satellite_618_configure_provisioning_products:
 
 ```yaml
-enable_repository_sets: true
-repository_sets_to_enable:
+scenario_satellite_618_configure_provisioning_enable_repository_sets: true
+scenario_satellite_618_configure_provisioning_repository_sets_to_enable:
   - name: "Red Hat Enterprise Linux Server (v. 9 for x86_64)"
     product: "Red Hat Enterprise Linux Server"
     basearch: "x86_64"
@@ -111,7 +111,7 @@ repository_sets_to_enable:
     releasever: "10"
 ```
 
-This ensures RHEL BaseOS and AppStream repositories are automatically enabled for both RHEL 9 and RHEL 10 products.
+This ensures RHEL BaseOS and AppStream scenario_satellite_618_configure_provisioning_repositories are automatically enabled for both RHEL 9 and RHEL 10 scenario_satellite_618_configure_provisioning_products.
 
 ## Usage Examples
 
@@ -122,25 +122,25 @@ This ensures RHEL BaseOS and AppStream repositories are automatically enabled fo
   roles:
     - role: satellite_content_config
       vars:
-        create_organizations: true
-        create_locations: true
-        create_sync_plans: true
+        scenario_satellite_618_configure_provisioning_create_organizations: true
+        scenario_satellite_618_configure_provisioning_create_locations: true
+        scenario_satellite_618_configure_provisioning_create_sync_plans: true
 ```
 
 ### Configure with Repositories and Repository Sets
 ```yaml
 - role: satellite_content_config
   vars:
-    create_repositories: true
-    synchronize_repositories: true
-    enable_repository_sets: true
+    scenario_satellite_618_configure_provisioning_create_repositories: true
+    scenario_satellite_618_configure_provisioning_synchronize_repositories: true
+    scenario_satellite_618_configure_provisioning_enable_repository_sets: true
 ```
 
 ### Disable Repository Set Enablement
 ```yaml
 - role: satellite_content_config
   vars:
-    enable_repository_sets: false  # Skip auto-enabling RHEL repos
+    scenario_satellite_618_configure_provisioning_enable_repository_sets: false  # Skip auto-enabling RHEL repos
 ```
 
 ## Output
@@ -149,7 +149,7 @@ This ensures RHEL BaseOS and AppStream repositories are automatically enabled fo
 - Locations configured
 - Products created
 - Repositories configured
-- RHEL yum repositories enabled for products
+- RHEL yum scenario_satellite_618_configure_provisioning_repositories enabled for scenario_satellite_618_configure_provisioning_products
 - Sync plans established
 
 ## Integration

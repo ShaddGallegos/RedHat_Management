@@ -2,4 +2,3 @@
 - name: Satellite install placeholder
   ansible.builtin.debug:
     msg: "Implement Satellite install steps here."
-

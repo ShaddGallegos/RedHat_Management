@@ -6,14 +6,6 @@ galaxy_info:
   min_ansible_version: "2.9"
 
   galaxy_tags:
-    - "ansible_dev_node_orchestration"
-    - "rhis"
-    - "red-hat"
-    - "scenario_satellite"
-    - "aap"
-    - "idm"
-    - "scenario_openshift"
-
 dependencies:
   - { role: "ansible_dev_node_configuration_manager" }
   - { role: "ansible_dev_node_deployment_setup" }

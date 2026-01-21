@@ -170,4 +170,3 @@
       OS: {{ deployment_os }}
 
       Configuration saved to: group_vars/deployment_config.yml
-

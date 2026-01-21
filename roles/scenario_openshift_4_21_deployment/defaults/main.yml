@@ -1,10 +1,10 @@
 ---
 # Default variables for scenario_openshift_4_21_deployment role
-openshift_4_21_deployment_enabled: false
-openshift_4_21_deployment_version: "1.0"
+scenario_openshift_4_21_deployment_openshift_4_21_deployment_enabled: false
+scenario_openshift_4_21_deployment_openshift_4_21_deployment_version: "1.0"
 
 # RHIS-specific OpenShift configuration
-openshift_rhis_environment: "production"
+scenario_openshift_4_21_deployment_openshift_rhis_environment: "production"
 
 # Feature toggles
-openshift_4_21_deployment_validate_config: true
+scenario_openshift_4_21_deployment_openshift_4_21_deployment_validate_config: true

@@ -4,12 +4,12 @@
   hosts: localhost
   gather_facts: false
   vars:
-    satellite_content_config_enabled: true
-    satellite_url: "https://scenario_satellite.example.com"
-    satellite_username: "admin"
+    scenario_satellite_618_configure_provisioning_satellite_content_config_enabled: true
+    scenario_satellite_618_configure_provisioning_satellite_url: "https://scenario_satellite.example.com"
+    scenario_satellite_618_configure_provisioning_satellite_username: "admin"
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - satellite_content_config_enabled is defined
-          - satellite_url is defined
+          - scenario_satellite_618_configure_provisioning_satellite_content_config_enabled is defined
+          - scenario_satellite_618_configure_provisioning_satellite_url is defined

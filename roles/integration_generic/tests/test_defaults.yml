@@ -9,4 +9,4 @@
     - name: Verify defaults loaded
       ansible.builtin.assert:
         that:
-          - integration_enabled is defined
+          - integration_generic_integration_enabled is defined

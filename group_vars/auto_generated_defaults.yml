@@ -1,0 +1,13 @@
+ansible_cfg:: ~
+ansible_inventory:: ~
+AUTOMATION_HUB_URL:: ~
+GALAXY_SERVER_URL:: ~
+github_repo:: ~
+github_token:: ''
+github_user:: ~
+inventory_plugins:: ~
+redhat_automation_hub_token:: ''
+redhat_password:: ''
+redhat_token:: ''
+redhat_user:: ~
+rh_credentials_token:: ''

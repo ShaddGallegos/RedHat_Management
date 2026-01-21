@@ -16,9 +16,9 @@
     backup: true
   loop:
     - { key: inet_interfaces, value: all }
-    - { key: myhostname, value: "{{ satellite_fqdn }}" }
+    - { key: myhostname, value: "{{ scenario_satellite_mail_setup_satellite_fqdn }}" }
     - { key: mydestination, value: "$myhostname, localhost.$mydomain, localhost" }
-    - { key: relayhost, value: "{{ satellite_mail_relay | default('') }}" }
+    - { key: relayhost, value: "{{ scenario_satellite_mail_setup_satellite_mail_relay | default('') }}" }
     - { key: smtp_use_tls, value: 'yes' }
     - { key: smtp_tls_security_level, value: may }
     - { key: smtp_tls_note_starttls_offer, value: 'yes' }
@@ -37,11 +37,11 @@
 - name: Optionally configure SMTP auth/relay credentials
   ansible.builtin.copy:
     dest: /etc/postfix/sasl_passwd
-    content: "{{ satellite_mail_relay_credentials | default('') }}\n"
+    content: "{{ scenario_satellite_mail_setup_satellite_mail_relay_credentials | default('') }}\n"
     owner: root
     group: root
     mode: '0600'
-  when: satellite_mail_relay_credentials is defined and satellite_mail_relay_credentials|length > 0
+  when: scenario_satellite_mail_setup_satellite_mail_relay_credentials is defined and scenario_satellite_mail_setup_satellite_mail_relay_credentials|length > 0
   notify:
     - Postmap sasl_passwd
     - Restart postfix
@@ -49,12 +49,12 @@
 
 - name: Ensure postmap sasl_passwd
   ansible.builtin.command: postmap /etc/postfix/sasl_passwd
-  when: satellite_mail_relay_credentials is defined and satellite_mail_relay_credentials|length > 0
+  when: scenario_satellite_mail_setup_satellite_mail_relay_credentials is defined and scenario_satellite_mail_setup_satellite_mail_relay_credentials|length > 0
   notify: Restart postfix
   become: true
 
 - name: Allow mail traffic in firewalld if present
-  ansible.builtin.firewalld:
+  ansible.posix.firewalld:
     ansible.builtin.service: smtp
     state: enabled
     permanent: true

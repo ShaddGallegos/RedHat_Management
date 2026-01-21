@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: true
   vars:
-    satellite_kickstart_config_enabled: true
-    kickstart_files_path: "/tmp/test_kickstarts"
-    upload_kickstart_files: true
+    scenario_satellite_618_kickstart_setup_satellite_kickstart_config_enabled: true
+    scenario_satellite_618_kickstart_setup_kickstart_files_path: "/tmp/test_kickstarts"
+    scenario_satellite_618_kickstart_setup_upload_kickstart_files: true
 
   tasks:
     - name: Run satellite_kickstart_config role

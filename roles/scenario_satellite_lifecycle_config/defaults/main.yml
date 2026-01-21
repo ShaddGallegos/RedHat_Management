@@ -1,48 +1,48 @@
 ---
 # Default variables for scenario_satellite_lifecycle_config role
-satellite_lifecycle_config_enabled: true
-satellite_lifecycle_config_version: "1.0"
-satellite_lifecycle_config_timeout: 1800
+scenario_satellite_lifecycle_config_satellite_lifecycle_config_enabled: true
+scenario_satellite_lifecycle_config_satellite_lifecycle_config_version: "1.0"
+scenario_satellite_lifecycle_config_satellite_lifecycle_config_timeout: 1800
 
 # Satellite Connection
-satellite_url: "https://scenario_satellite.example.com"
-satellite_username: "admin"
+scenario_satellite_lifecycle_config_satellite_url: "https://scenario_satellite.example.com"
+scenario_satellite_lifecycle_config_satellite_username: "admin"
 # satellite_password: use vault!
-satellite_validate_ssl: true
-satellite_organization: "Default Organization"
+scenario_satellite_lifecycle_config_satellite_validate_ssl: true
+scenario_satellite_lifecycle_config_satellite_organization: "Default Organization"
 
 # Feature toggles
-create_lifecycle_environments: true
-create_content_views: true
-create_filters: false
-publish_content_views: false
-promote_content_views: false
+scenario_satellite_lifecycle_config_create_lifecycle_environments: true
+scenario_satellite_lifecycle_config_create_content_views: true
+scenario_satellite_lifecycle_config_create_filters: false
+scenario_satellite_lifecycle_config_publish_content_views: false
+scenario_satellite_lifecycle_config_promote_content_views: false
 
 # Lifecycle Environments
-lifecycle_environments:
+scenario_satellite_lifecycle_config_lifecycle_environments:
   - name: "Development"
     description: "Development environment"
     prior: "Library"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
     tags: ["rhis", "development"]
 
   - name: "Staging"
     description: "Staging/QA environment"
     prior: "Development"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
     tags: ["rhis", "staging"]
 
   - name: "Production"
     description: "Production environment"
     prior: "Staging"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
     tags: ["rhis", "production"]
 
 # Content Views
-content_views:
+scenario_satellite_lifecycle_config_content_views:
   - name: "RHIS_BaseOS"
     description: "RHIS Base OS Content View"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
     repositories:
       - "RHEL 9 BaseOS"
       - "RHEL 9 AppStream"
@@ -50,24 +50,24 @@ content_views:
 
   - name: "RHIS_AppStack"
     description: "RHIS Application Stack Content View"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
     repositories:
       - "RHEL 9 AppStream"
     tags: ["rhis", "appstack"]
 
   - name: "RHIS_RHEL10_BaseOS"
     description: "RHIS RHEL 10 Base OS Content View"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
     repositories:
       - "RHEL 10 BaseOS"
       - "RHEL 10 AppStream"
     tags: ["rhis", "rhel10", "baseos"]
 
 # Content View Filters
-content_view_filters:
+scenario_satellite_lifecycle_config_content_view_filters:
   - name: "Security_Errata"
     content_view: "RHIS_BaseOS"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
     description: "Filter for security errata only"
     filter_type: "erratum"
     inclusion: true
@@ -75,17 +75,17 @@ content_view_filters:
 
   - name: "Exclude_Deprecated"
     content_view: "RHIS_AppStack"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
     description: "Exclude deprecated packages"
     filter_type: "package"
     inclusion: false
     tags: ["rhis", "filter"]
 
 # Composite Content Views
-composite_content_views:
+scenario_satellite_lifecycle_config_composite_content_views:
   - name: "RHIS_Complete_Stack"
     description: "Complete RHIS content stack"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
     auto_publish: true
     components:
       - name: "RHIS_BaseOS"
@@ -95,14 +95,14 @@ composite_content_views:
     tags: ["rhis", "composite"]
 
 # Content View Versions to Promote
-promote_versions:
+scenario_satellite_lifecycle_config_promote_versions:
   - content_view: "RHIS_BaseOS"
     version: 1
     promote_to:
       - "Development"
       - "Staging"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_lifecycle_config_satellite_organization }}"
 
 # Validation
-satellite_lifecycle_validate_connectivity: true
-satellite_lifecycle_test_promotion: false
+scenario_satellite_lifecycle_config_satellite_lifecycle_validate_connectivity: true
+scenario_satellite_lifecycle_config_satellite_lifecycle_test_promotion: false

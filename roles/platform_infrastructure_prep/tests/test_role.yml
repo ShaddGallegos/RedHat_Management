@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    infrastructure_prep_enabled: true
+    platform_infrastructure_prep_infrastructure_prep_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - infrastructure_prep_enabled is defined
+          - platform_infrastructure_prep_infrastructure_prep_enabled is defined

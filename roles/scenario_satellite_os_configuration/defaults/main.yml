@@ -1,30 +1,30 @@
 ---
 # Default variables for scenario_satellite_os_configuration role
-satellite_os_config_enabled: true
-satellite_os_config_version: "1.0"
-satellite_os_config_timeout: 1800
+scenario_satellite_os_configuration_satellite_os_config_enabled: true
+scenario_satellite_os_configuration_satellite_os_config_version: "1.0"
+scenario_satellite_os_configuration_satellite_os_config_timeout: 1800
 
 # Satellite Connection
-satellite_url: "https://scenario_satellite.example.com"
-satellite_username: "admin"
+scenario_satellite_os_configuration_satellite_url: "https://scenario_satellite.example.com"
+scenario_satellite_os_configuration_satellite_username: "admin"
 # satellite_password: use vault!
-satellite_validate_ssl: true
-satellite_organization: "Default Organization"
+scenario_satellite_os_configuration_satellite_validate_ssl: true
+scenario_satellite_os_configuration_satellite_organization: "Default Organization"
 
 # Feature toggles
-create_operatingsystems: true
-create_install_media: true
-create_kickstart_repo: true
-configure_sync_job: true
+scenario_satellite_os_configuration_create_operatingsystems: true
+scenario_satellite_os_configuration_create_install_media: true
+scenario_satellite_os_configuration_create_kickstart_repo: true
+scenario_satellite_os_configuration_configure_sync_job: true
 
 # Operating Systems Configuration
-operatingsystems:
+scenario_satellite_os_configuration_operatingsystems:
   - name: "RHEL 9"
     major: 9
     minor: 0
     family: "Redhat"
     password_hash: "SHA512"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_os_configuration_satellite_organization }}"
     tags: ["rhis", "rhel9", "production"]
 
   - name: "RHEL 10"
@@ -32,29 +32,29 @@ operatingsystems:
     minor: 0
     family: "Redhat"
     password_hash: "SHA512"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_os_configuration_satellite_organization }}"
     tags: ["rhis", "rhel10", "production"]
 
 # Install Media Configuration
-install_media:
+scenario_satellite_os_configuration_install_media:
   - name: "RHEL 9 BaseOS Installation Media"
     os_generic: "RHEL 9"
     path: "http://cdn.redhat.com/content/dist/rhel/rhel-9/rhel-9-x86_64/baseos/os_generic"
     media_type: "BaseOS"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_os_configuration_satellite_organization }}"
     tags: ["rhis", "rhel9", "baseos", "installation"]
 
   - name: "RHEL 10 BaseOS Installation Media"
     os_generic: "RHEL 10"
     path: "http://cdn.redhat.com/content/dist/rhel/rhel-10/rhel-10-x86_64/baseos/os_generic"
     media_type: "BaseOS"
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_os_configuration_satellite_organization }}"
     tags: ["rhis", "rhel10", "baseos", "installation"]
 
 # Kickstart Repository Configuration
-kickstart_repository:
+scenario_satellite_os_configuration_kickstart_repository:
   name: "Kickstart Files Repository"
-  organization: "{{ satellite_organization }}"
+  organization: "{{ scenario_satellite_os_configuration_satellite_organization }}"
   product: "RHIS Infrastructure"
   content_type: "file"
   description: "Repository for RHEL 9 and RHEL 10 kickstart files"
@@ -63,7 +63,7 @@ kickstart_repository:
   tags: ["rhis", "kickstart", "platform_provisioning"]
 
 # Sync Jobs Configuration
-sync_jobs:
+scenario_satellite_os_configuration_sync_jobs:
   - name: "Kickstart Repository Weekly Sync"
     repository: "Kickstart Files Repository"
     product: "RHIS Infrastructure"
@@ -71,11 +71,11 @@ sync_jobs:
     interval: "weekly"
     day_of_week: 0  # Sunday
     enabled: true
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_os_configuration_satellite_organization }}"
     tags: ["rhis", "sync", "kickstart"]
 
 # Partition Tables Configuration
-partition_tables:
+scenario_satellite_os_configuration_partition_tables:
   - name: "RHEL 9/10 LVM Standard"
     os_family: "Redhat"
     layout: |
@@ -98,12 +98,12 @@ partition_tables:
       logvol /var --vgname=vg_rhel --size=5120 --name=lv_var --fstype=xfs
       logvol /var/log --vgname=vg_rhel --size=2048 --name=lv_var_log --fstype=xfs
       logvol /var/log/audit --vgname=vg_rhel --size=1024 --name=lv_audit --fstype=xfs
-    organization: "{{ satellite_organization }}"
+    organization: "{{ scenario_satellite_os_configuration_satellite_organization }}"
     tags: ["rhis", "partitioning", "lvm"]
 
 # Bootdisk Configuration
-bootdisk_iso:
+scenario_satellite_os_configuration_bootdisk_iso:
   enabled: true
   include_kickstart: true
   include_customization: false
-  organization: "{{ satellite_organization }}"
+  organization: "{{ scenario_satellite_os_configuration_satellite_organization }}"

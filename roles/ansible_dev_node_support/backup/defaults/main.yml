@@ -2,7 +2,7 @@
 # Backup role defaults
 
 backup_base_dir: "/var/backups"
-backup_retention_days: 30
+ansible_dev_node_support_backup_retention_days: 30
 backup_compression: "gz"
 backup_verify: true
 backup_pre_backup_tasks: []

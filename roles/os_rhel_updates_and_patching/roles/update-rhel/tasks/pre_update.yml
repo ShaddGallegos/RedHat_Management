@@ -1,8 +1,6 @@
 ---
-# Pre-update preparation tasks
-
 - name: Gather package facts before update
-  package_facts:
+  ansible.builtin.package_facts: {}
   register: update_rhel_packages_pre
 
 - name: Store pre-update package count
@@ -16,31 +14,34 @@
 
 - name: Install delta RPM package for RHEL 7
   ansible.builtin.package:
-- name: deltarpm
+    name: deltarpm
     state: present
   when: update_rhel_os_info.major_version == 7
-  ignore_errors: true
+  register: update_rhel_install_deltarpm_result
+  failed_when: false
 
 - name: Install delta RPM package for RHEL 8+
   ansible.builtin.package:
-- name: drpm
+    name: drpm
     state: present
   when: update_rhel_os_info.major_version >= 8
-  ignore_errors: true
+  register: update_rhel_install_drpm_result
+  failed_when: false
 
 - name: Clean package manager cache
-  ansible.builtin.shell: "{{ update_rhel_os_info.package_manager }} clean all"
+  ansible.builtin.command:
+    cmd: "{{ update_rhel_os_info.package_manager }} clean all"
   changed_when: true
   when: update_rhel_clean_cache | default(true)
 
 - name: Check available updates (RHEL 7)
-  yum:
+  ansible.builtin.yum:
     list: updates
   register: update_rhel_available_updates
   when: update_rhel_os_info.major_version == 7
 
 - name: Check available updates (RHEL 8+)
-  dnf:
+  ansible.builtin.dnf:
     list: updates
   register: update_rhel_available_updates
   when: update_rhel_os_info.major_version >= 8
@@ -65,7 +66,7 @@
   when: update_rhel_verbose | default(true)
 
 - name: Skip updates if none available
-  meta: end_host
+  ansible.builtin.meta: end_host
   when:
     - update_rhel_updates_available == 0
     - not update_rhel_force_run | default(false)

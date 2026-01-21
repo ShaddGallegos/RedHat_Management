@@ -2,21 +2,21 @@
 # Default variables for integration_inventory_rhis role
 
 # RHIS templates location
-rhis_templates_dir: "{{ playbook_dir | dirname }}/templates"
-rhis_files_dir: "{{ playbook_dir | dirname }}/files"
+integration_inventory_rhis_rhis_templates_dir: "{{ playbook_dir | dirname }}/templates"
+integration_inventory_rhis_rhis_files_dir: "{{ playbook_dir | dirname }}/files"
 
 # Template categories
-rhis_provisioning_templates_dir: "{{ rhis_templates_dir }}/platform_provisioning"
-rhis_config_templates_dir: "{{ rhis_templates_dir }}/configs"
-rhis_inventory_templates_dir: "{{ rhis_templates_dir }}/inventory"
-rhis_execution_env_templates_dir: "{{ rhis_templates_dir }}/execution-env"
+integration_inventory_rhis_rhis_provisioning_templates_dir: "{{ integration_inventory_rhis_rhis_templates_dir }}/platform_provisioning"
+integration_inventory_rhis_rhis_config_templates_dir: "{{ integration_inventory_rhis_rhis_templates_dir }}/configs"
+integration_inventory_rhis_rhis_inventory_templates_dir: "{{ integration_inventory_rhis_rhis_templates_dir }}/inventory"
+integration_inventory_rhis_rhis_execution_env_templates_dir: "{{ integration_inventory_rhis_rhis_templates_dir }}/execution-env"
 
 # Files directories
-rhis_openscan_files_dir: "{{ rhis_files_dir }}"
-rhis_scripts_dir: "{{ rhis_files_dir }}"
+integration_inventory_rhis_rhis_openscan_files_dir: "{{ integration_inventory_rhis_rhis_files_dir }}"
+integration_inventory_rhis_rhis_scripts_dir: "{{ integration_inventory_rhis_rhis_files_dir }}"
 
 # Example inventory location
-rhis_example_inventory_dir: "{{ playbook_dir | dirname }}/inventory/examples"
+integration_inventory_rhis_rhis_example_inventory_dir: "{{ playbook_dir | dirname }}/inventory/examples"
 
 # Use custom external tasks
-rhis_use_custom_tasks: true
+integration_inventory_rhis_rhis_use_custom_tasks: true

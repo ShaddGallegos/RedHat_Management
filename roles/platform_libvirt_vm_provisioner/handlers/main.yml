@@ -12,20 +12,20 @@
 
 - name: Clean up temp directory
   ansible.builtin.file:
-    path: "{{ libvirt_kickstart_http_dir }}"
+    path: "{{ platform_libvirt_vm_provisioner_libvirt_kickstart_http_dir }}"
     state: absent
   ignore_errors: yes
 
 - name: Destroy VM on failure
   virt:
-    name: "{{ libvirt_vm_name }}"
+    name: "{{ platform_libvirt_vm_provisioner_libvirt_vm_name }}"
     state: destroyed
   ignore_errors: yes
   become: yes
 
 - name: Undefine VM on failure
   virt:
-    name: "{{ libvirt_vm_name }}"
+    name: "{{ platform_libvirt_vm_provisioner_libvirt_vm_name }}"
     ansible.builtin.command: undefine
   ignore_errors: yes
   become: yes

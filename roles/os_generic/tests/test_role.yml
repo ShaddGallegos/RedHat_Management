@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    os_enabled: true
+    os_generic_os_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - os_enabled is defined
+          - os_generic_os_enabled is defined

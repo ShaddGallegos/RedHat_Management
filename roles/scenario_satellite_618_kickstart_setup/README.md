@@ -30,19 +30,19 @@ The `satellite_kickstart_config` role configures Satellite 6.18 platform_provisi
 ## Required Variables
 
 ```yaml
-satellite_url: "https://scenario_satellite.example.com"
-satellite_username: "admin"
+scenario_satellite_618_kickstart_setup_satellite_url: "https://scenario_satellite.example.com"
+scenario_satellite_618_kickstart_setup_satellite_username: "admin"
 satellite_password: "{{ vault_satellite_admin_pwd }}"
 ```
 
 ## Optional Variables
 
 ```yaml
-satellite_organization: "Default Organization"
-create_provisioning_templates: true
-upload_kickstart_files: true
-kickstart_files_path: "/var/lib/foreman/public/kickstarts"
-kickstart_web_url: "{{ satellite_url }}/pub/kickstarts"
+scenario_satellite_618_kickstart_setup_satellite_organization: "Default Organization"
+scenario_satellite_618_kickstart_setup_create_provisioning_templates: true
+scenario_satellite_618_kickstart_setup_upload_kickstart_files: true
+scenario_satellite_618_kickstart_setup_kickstart_files_path: "/var/lib/foreman/public/kickstarts"
+scenario_satellite_618_kickstart_setup_kickstart_web_url: "{{ scenario_satellite_618_kickstart_setup_satellite_url }}/pub/kickstarts"
 ```
 
 ## Kickstart Templates Provided
@@ -50,7 +50,7 @@ kickstart_web_url: "{{ satellite_url }}/pub/kickstarts"
 ### 1. RHEL 9 BaseOS Minimal
 
 ```yaml
-kickstart_templates:
+scenario_satellite_618_kickstart_setup_kickstart_templates:
   - name: "RHEL 9 BaseOS Kickstart (Minimal)"
     description: "RHEL 9 BaseOS minimal installation template for RHIS"
     os_generic: "RHEL 9"
@@ -70,7 +70,7 @@ kickstart_templates:
 ### 2. RHEL 10 BaseOS Minimal
 
 ```yaml
-kickstart_templates:
+scenario_satellite_618_kickstart_setup_kickstart_templates:
   - name: "RHEL 10 BaseOS Kickstart (Minimal)"
     description: "RHEL 10 BaseOS minimal installation template for RHIS"
     os_generic: "RHEL 10"
@@ -212,9 +212,9 @@ swap               4 GB
   roles:
     - role: satellite_kickstart_config
       vars:
-        create_provisioning_templates: true
-        upload_kickstart_files: true
-        satellite_organization: "Default Organization"
+        scenario_satellite_618_kickstart_setup_create_provisioning_templates: true
+        scenario_satellite_618_kickstart_setup_upload_kickstart_files: true
+        scenario_satellite_618_kickstart_setup_satellite_organization: "Default Organization"
 ```
 
 ### Disable Kickstart File Upload
@@ -222,7 +222,7 @@ swap               4 GB
 ```yaml
 - role: satellite_kickstart_config
   vars:
-    upload_kickstart_files: false
+    scenario_satellite_618_kickstart_setup_upload_kickstart_files: false
     # Only create template metadata
 ```
 
@@ -283,7 +283,7 @@ https://scenario_satellite.example.com/pub/kickstarts/rhel10-fullstack.ks
 Edit `defaults/main.yml` and adjust partition sizes:
 
 ```yaml
-rhel9_baseos_minimal_ks: |
+scenario_satellite_618_kickstart_setup_rhel9_baseos_minimal_ks: |
   # Change swap size to 8 GB
   logvol swap --vgname=vg_rhel --size=8192 --name=lv_swap
   

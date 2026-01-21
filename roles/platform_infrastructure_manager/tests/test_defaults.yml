@@ -9,4 +9,4 @@
     - name: Verify defaults loaded
       ansible.builtin.assert:
         that:
-          - infrastructure_manager_enabled is defined
+          - platform_infrastructure_manager_infrastructure_manager_enabled is defined

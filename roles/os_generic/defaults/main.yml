@@ -1,12 +1,12 @@
 ---
 # Default variables for os_generic role
-os_enabled: true
-os_version: "1.0"
+os_generic_os_enabled: true
+os_generic_os_version: "1.0"
 
 # OS configuration
-configure_firewall: true
-enable_selinux: true
-configure_network: true
+os_generic_configure_firewall: true
+os_generic_enable_selinux: true
+os_generic_configure_network: true
 
 # Package management
-install_required_packages: true
+os_generic_install_required_packages: true

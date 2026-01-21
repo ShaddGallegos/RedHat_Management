@@ -25,15 +25,15 @@ The `scenario_satellite_lifecycle_config` role configures Satellite 6.18 content
 ## Required Variables
 
 ```yaml
-satellite_url: "https://scenario_satellite.example.com"
-satellite_username: "admin"
+scenario_satellite_lifecycle_config_satellite_url: "https://scenario_satellite.example.com"
+scenario_satellite_lifecycle_config_satellite_username: "admin"
 satellite_password: "{{ vault_satellite_admin_pwd }}"
 ```
 
 ## Lifecycle Environments
 
 ```yaml
-lifecycle_environments:
+scenario_satellite_lifecycle_config_lifecycle_environments:
   - name: "Development"
     prior: "Library"
     description: "Development environment"
@@ -48,7 +48,7 @@ lifecycle_environments:
 ## Content Views
 
 ```yaml
-content_views:
+scenario_satellite_lifecycle_config_content_views:
   - name: "RHIS_BaseOS"
     description: "Base OS content"
     repositories:
@@ -59,7 +59,7 @@ content_views:
 ## Content View Filters
 
 ```yaml
-content_view_filters:
+scenario_satellite_lifecycle_config_content_view_filters:
   - name: "Security_Errata"
     content_view: "RHIS_BaseOS"
     filter_type: "erratum"
@@ -75,17 +75,17 @@ content_view_filters:
   roles:
     - role: scenario_satellite_lifecycle_config
       vars:
-        create_lifecycle_environments: true
-        create_content_views: true
+        scenario_satellite_lifecycle_config_create_lifecycle_environments: true
+        scenario_satellite_lifecycle_config_create_content_views: true
 ```
 
 ### Configure and Publish
 ```yaml
 - role: scenario_satellite_lifecycle_config
   vars:
-    create_content_views: true
-    publish_content_views: true
-    promote_content_views: true
+    scenario_satellite_lifecycle_config_create_content_views: true
+    scenario_satellite_lifecycle_config_publish_content_views: true
+    scenario_satellite_lifecycle_config_promote_content_views: true
 ```
 
 ## Output

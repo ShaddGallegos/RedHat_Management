@@ -18,7 +18,7 @@ Updates OS packages and handles repository caching.
 
 **Variables:**
 ```yaml
-update_strategy: "latest"  # latest or security
+ansible_dev_node_common_tasks_update_strategy: "latest"  # latest or security
 ```
 
 **Tags:** `system`, `updates`
@@ -34,7 +34,7 @@ Installs and configures time synchronization via Chrony.
 
 **Variables:**
 ```yaml
-ntp_servers:
+ansible_dev_node_common_tasks_ntp_servers:
   - "0.rhel.pool.ntp.org"
   - "1.rhel.pool.ntp.org"
 ```
@@ -46,52 +46,52 @@ ntp_servers:
 - name: Configure time synchronization
   ansible.builtin.import_tasks: roles/ansible_dev_node_common_tasks/tasks/time_sync.yml
   vars:
-    ntp_servers:
+    ansible_dev_node_common_tasks_ntp_servers:
       - "ntp.example.com"
       - "ntp2.example.com"
 ```
 
-### repositories.yml
+### ansible_dev_node_common_tasks_repositories.yml
 Enables subscriptions and repository management.
 
 **Variables:**
 ```yaml
-repositories: []          # List of repos to enable
-scap_file: null          # SCAP file for compliance
-scap_profile: "xccdf_org.ssgproject.content_profile_cis"
+ansible_dev_node_common_tasks_repositories: []          # List of repos to enable
+ansible_dev_node_common_tasks_scap_file: null          # SCAP file for compliance
+ansible_dev_node_common_tasks_scap_profile: "xccdf_org.ssgproject.content_profile_cis"
 ```
 
-**Tags:** `repositories`, `subscriptions`, `compliance`, `scap`
+**Tags:** `ansible_dev_node_common_tasks_repositories`, `subscriptions`, `compliance`, `scap`
 
 **Usage:**
 ```yaml
-- name: Configure repositories
-  ansible.builtin.import_tasks: roles/ansible_dev_node_common_tasks/tasks/repositories.yml
+- name: Configure ansible_dev_node_common_tasks_repositories
+  ansible.builtin.import_tasks: roles/ansible_dev_node_common_tasks/tasks/ansible_dev_node_common_tasks_repositories.yml
   vars:
-    repositories:
+    ansible_dev_node_common_tasks_repositories:
       - name: "rhel-9-appstream-rpms"
       - name: "rhel-9-baseos-rpms"
 ```
 
 ### configuration.yml
-Applies global configuration parameters and environment settings.
+Applies global configuration parameters and ansible_dev_node_common_tasks_environment settings.
 
 **Variables:**
 ```yaml
-environment: "development"           # development or production
-mandatory_global_parameters: []      # Global config parameters
-mandatory_os_config: []              # OS-specific config
+ansible_dev_node_common_tasks_environment: "development"           # development or production
+ansible_dev_node_common_tasks_mandatory_global_parameters: []      # Global config parameters
+ansible_dev_node_common_tasks_mandatory_os_config: []              # OS-specific config
 ```
 
-**Tags:** `configuration`, `parameters`, `environment`
+**Tags:** `configuration`, `parameters`, `ansible_dev_node_common_tasks_environment`
 
 **Usage:**
 ```yaml
-- name: Configure environment
+- name: Configure ansible_dev_node_common_tasks_environment
   ansible.builtin.import_tasks: roles/ansible_dev_node_common_tasks/tasks/configuration.yml
   vars:
-    environment: "production"
-    mandatory_global_parameters:
+    ansible_dev_node_common_tasks_environment: "production"
+    ansible_dev_node_common_tasks_mandatory_global_parameters:
       - key: "timeout"
         value: 300
 ```
@@ -120,10 +120,10 @@ mandatory_os_config: []              # OS-specific config
     - name: Configure time
       ansible.builtin.import_tasks: roles/ansible_dev_node_common_tasks/tasks/time_sync.yml
 
-    - name: Configure repositories
-      ansible.builtin.import_tasks: roles/ansible_dev_node_common_tasks/tasks/repositories.yml
+    - name: Configure ansible_dev_node_common_tasks_repositories
+      ansible.builtin.import_tasks: roles/ansible_dev_node_common_tasks/tasks/ansible_dev_node_common_tasks_repositories.yml
       vars:
-        repositories:
+        ansible_dev_node_common_tasks_repositories:
           - name: "rhel-9-appstream-rpms"
           - name: "rhel-9-baseos-rpms"
 ```

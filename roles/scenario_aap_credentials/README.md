@@ -33,20 +33,20 @@ The `scenario_aap_credentials` role configures credentials in Ansible Automation
 ## Required Variables
 
 ```yaml
-aap_url: "https://aap.example.com"
-aap_username: "admin"
+scenario_aap_credentials_aap_url: "https://aap.example.com"
+scenario_aap_credentials_aap_username: "admin"
 aap_password: "{{ vault_aap_admin_pwd }}"
 ```
 
 ## Optional Variables
 
 ```yaml
-aap_credentials_organization: "Default"
-create_machine_credentials: true
-create_vault_credentials: true
-create_registry_credentials: true
-create_satellite_credentials: true
-aap_credentials_test_connections: true
+scenario_aap_credentials_aap_credentials_organization: "Default"
+scenario_aap_credentials_create_machine_credentials: true
+scenario_aap_credentials_create_vault_credentials: true
+scenario_aap_credentials_create_registry_credentials: true
+scenario_aap_credentials_create_satellite_credentials: true
+scenario_aap_credentials_aap_credentials_test_connections: true
 ```
 
 ## Credential Types Supported
@@ -54,7 +54,7 @@ aap_credentials_test_connections: true
 ### Machine Credentials
 SSH keys for host management
 ```yaml
-machine_credentials:
+scenario_aap_credentials_machine_credentials:
   - name: "RHIS_SSH_Key"
     username: "ansible"
     ssh_key_data: "~/.ssh/id_rsa"
@@ -64,7 +64,7 @@ machine_credentials:
 ### Vault Credentials
 Ansible vault passwords
 ```yaml
-vault_credentials:
+scenario_aap_credentials_vault_credentials:
   - name: "RHIS_Vault"
     vault_password: "{{ vault_password }}"
 ```
@@ -72,7 +72,7 @@ vault_credentials:
 ### Registry Credentials
 Container registry access
 ```yaml
-registry_credentials:
+scenario_aap_credentials_registry_credentials:
   - name: "RedHat_Registry"
     host: "registry.redhat.io"
     username: "{{ rhel_user }}"
@@ -82,7 +82,7 @@ registry_credentials:
 ### Satellite Credentials
 Satellite API access
 ```yaml
-satellite_credentials:
+scenario_aap_credentials_satellite_credentials:
   - name: "Satellite_API"
     host: "scenario_satellite.example.com"
     username: "admin"
@@ -98,22 +98,22 @@ satellite_credentials:
   roles:
     - role: scenario_aap_credentials
       vars:
-        aap_url: "https://aap.prod.spg"
-        aap_username: "admin"
+        scenario_aap_credentials_aap_url: "https://aap.prod.spg"
+        scenario_aap_credentials_aap_username: "admin"
         aap_password: "{{ vault_aap_admin_pwd }}"
-        create_machine_credentials: true
-        create_vault_credentials: true
-        create_registry_credentials: true
+        scenario_aap_credentials_create_machine_credentials: true
+        scenario_aap_credentials_create_vault_credentials: true
+        scenario_aap_credentials_create_registry_credentials: true
 ```
 
 ### Configure Specific Credential Type
 ```yaml
 - role: scenario_aap_credentials
   vars:
-    create_machine_credentials: true
-    create_vault_credentials: false
-    create_registry_credentials: false
-    create_satellite_credentials: false
+    scenario_aap_credentials_create_machine_credentials: true
+    scenario_aap_credentials_create_vault_credentials: false
+    scenario_aap_credentials_create_registry_credentials: false
+    scenario_aap_credentials_create_satellite_credentials: false
 ```
 
 ## Output
@@ -127,7 +127,7 @@ satellite_credentials:
 
 ### Issue: "Invalid API token"
 **Cause**: AAP credentials incorrect
-**Resolution**: Verify aap_username and aap_password
+**Resolution**: Verify scenario_aap_credentials_aap_username and aap_password
 
 ### Issue: "SSH key not found"
 **Cause**: SSH key path incorrect

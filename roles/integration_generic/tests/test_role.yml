@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    integration_enabled: true
+    integration_generic_integration_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - integration_enabled is defined
+          - integration_generic_integration_enabled is defined

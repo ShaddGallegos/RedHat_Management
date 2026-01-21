@@ -1,9 +1,9 @@
 ---
 # Default variables for disk integration_generic
 
-target_disk: "/dev/sdb"
-vg_name: "data_vg"
-lv_name: "data_lv"
-lv_size: "100%FREE"
-mount_point: "/data"
-fs_type: "xfs"
+integration_disk_integration_target_disk: "/dev/sdb"
+integration_disk_integration_vg_name: "data_vg"
+integration_disk_integration_lv_name: "data_lv"
+integration_disk_integration_lv_size: "100%FREE"
+integration_disk_integration_mount_point: "/data"
+integration_disk_integration_fs_type: "xfs"

@@ -1,15 +1,15 @@
 ---
 # Default variables for integration_generic role
-integration_enabled: true
-integration_version: "1.0"
-integration_timeout: 600
+integration_generic_integration_enabled: true
+integration_generic_integration_version: "1.0"
+integration_generic_integration_timeout: 600
 
 # Integration controls
-configure_satellite_aap_integration: false
-configure_satellite_idm_integration: false
-configure_aap_idm_integration: false
-configure_satellite_insights_integration: false
+integration_generic_configure_satellite_aap_integration: false
+integration_generic_configure_satellite_idm_integration: false
+integration_generic_configure_aap_idm_integration: false
+integration_generic_configure_satellite_insights_integration: false
 
 # Feature toggles
-integration_validate_connectivity: true
-integration_test_integration: true
+integration_generic_integration_validate_connectivity: true
+integration_generic_integration_test_integration: true

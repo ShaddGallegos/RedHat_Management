@@ -13,9 +13,7 @@ galaxy_info:
         - "8"
         - "9"
   galaxy_tags:
-    - scenario_openshift
+    - scenario-openshift
     - kubernetes
     - containers
     - deployment
-
-dependencies: []

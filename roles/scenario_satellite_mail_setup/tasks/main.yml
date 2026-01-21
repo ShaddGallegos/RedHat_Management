@@ -16,7 +16,7 @@
 
 - name: Determine install targets from defaults or overrides
   ansible.builtin.set_fact:
-    sms_selected_targets: "{{ satellite_mail_targets | default(['scenario_satellite','aap','scenario_openshift']) }}"
+    sms_selected_targets: "{{ scenario_satellite_mail_setup_satellite_mail_targets | default(['scenario_satellite', 'aap', 'scenario_openshift']) }}"
 
 - name: Validate required secrets are provided
   ansible.builtin.include_tasks: validate.yml
@@ -24,7 +24,7 @@
 - name: Render master variables file for stack
   ansible.builtin.template:
     src: master_vars.yml.j2
-    dest: "{{ satellite_mail_master_vars_dest | default('./master_vars.yml') }}"
+    dest: "{{ scenario_satellite_mail_setup_satellite_mail_master_vars_dest | default('./master_vars.yml') }}"
     mode: '0640'
   delegate_to: localhost
   run_once: true
@@ -33,7 +33,7 @@
 - name: Render installer inventory for selected targets
   ansible.builtin.template:
     src: generated_inventory.yml.j2
-    dest: "{{ satellite_mail_inventory_dest | default('./installer_inventory.yml') }}"
+    dest: "{{ scenario_satellite_mail_setup_satellite_mail_inventory_dest | default('./installer_inventory.yml') }}"
     mode: '0640'
   delegate_to: localhost
   run_once: true

@@ -4,10 +4,10 @@
   hosts: localhost
   gather_facts: false
   vars:
-    orchestration_master_enabled: true
+    ansible_dev_node_orchestration_master_orchestration_master_enabled: true
   tasks:
     - name: Verify role dependencies
       ansible.builtin.assert:
         that:
-          - orchestration_master_enabled is defined
+          - ansible_dev_node_orchestration_master_orchestration_master_enabled is defined
         fail_msg: "Role integration_generic failed"

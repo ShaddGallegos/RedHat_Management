@@ -1,16 +1,21 @@
 ---
 - name: Updates and patching role main dispatcher
+  - name: include install.yml
   ansible.builtin.import_tasks: install.yml
   tags: [install]
 
+- name: include configure.yml
 - ansible.builtin.import_tasks: configure.yml
   tags: [configure]
 
+- name: include test.yml
 - ansible.builtin.import_tasks: test.yml
   tags: [test]
 
+- name: include backup.yml
 - ansible.builtin.import_tasks: backup.yml
   tags: [backup]
 
+- name: include restore.yml
 - ansible.builtin.import_tasks: restore.yml
   tags: [restore]

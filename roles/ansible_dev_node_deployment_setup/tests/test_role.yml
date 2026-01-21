@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    deployment_setup_enabled: true
+    ansible_dev_node_deployment_setup_deployment_setup_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - deployment_setup_enabled is defined
+          - ansible_dev_node_deployment_setup_deployment_setup_enabled is defined

@@ -55,14 +55,20 @@
       private: false
       default: "admin@{{ ansible_domain | default('example.com') }}"
 
+    - name: system_admin_user
+      prompt: "Default system admin username for Satellite/Ansible/IdM/OpenShift/ansible-cmdb"
+      private: false
+      default: "admin"
+
     - name: satellite_admin_user
       prompt: "Satellite admin username"
       private: false
-      default: "admin"
+      default: "{{ system_admin_user }}"
 
     - name: satellite_admin_password
       prompt: "Satellite admin password"
       private: true
+      default: "r3dh4t7!"
 
     - name: satellite_mail_relay
       prompt: "Satellite SMTP relay host:port (leave blank to skip)"
@@ -78,11 +84,12 @@
     - name: aap_admin_user
       prompt: "AAP admin user"
       private: false
-      default: "admin"
+      default: "{{ system_admin_user }}"
 
     - name: aap_admin_password
       prompt: "AAP admin password"
       private: true
+      default: "r3dh4t7!"
 
     - name: automation_hub_token
       prompt: "Ansible Automation Hub token (leave blank if not needed)"
@@ -103,10 +110,12 @@
     - name: idm_admin_password
       prompt: "IdM admin password"
       private: true
+      default: "r3dh4t7!"
 
     - name: idm_directory_manager_password
       prompt: "IdM Directory Manager password"
       private: true
+      default: "r3dh4t7!"
 
     # Insights
     - name: insights_account
@@ -188,11 +197,12 @@
     - name: inventory_admin_user
       prompt: "Default inventory admin username"
       private: false
-      default: "admin"
+      default: "{{ system_admin_user }}"
 
     - name: inventory_admin_password
       prompt: "Default inventory admin password"
       private: true
+      default: "r3dh4t7!"
 
   tasks:
     - name: Build variable set from prompted values only

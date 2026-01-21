@@ -4,7 +4,7 @@
   hosts: localhost
   gather_facts: true
   vars:
-    satellite_os_config_enabled: true
+    scenario_satellite_os_configuration_satellite_os_config_enabled: true
 
   tasks:
     - name: Run scenario_satellite_os_configuration role

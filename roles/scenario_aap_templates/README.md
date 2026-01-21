@@ -25,18 +25,18 @@ The `scenario_aap_templates` role configures job templates and workflow template
 ## Required Variables
 
 ```yaml
-aap_url: "https://aap.example.com"
-aap_username: "admin"
+scenario_aap_templates_aap_url: "https://aap.example.com"
+scenario_aap_templates_aap_username: "admin"
 aap_password: "{{ vault_aap_admin_pwd }}"
 ```
 
 ## Optional Variables
 
 ```yaml
-aap_templates_organization: "Default"
-create_job_templates: true
-create_workflow_templates: true
-aap_templates_ask_variables: false
+scenario_aap_templates_aap_templates_organization: "Default"
+scenario_aap_templates_create_job_templates: true
+scenario_aap_templates_create_workflow_templates: true
+scenario_aap_templates_aap_templates_ask_variables: false
 ```
 
 ## Template Types
@@ -44,7 +44,7 @@ aap_templates_ask_variables: false
 ### Job Templates
 Single playbook execution
 ```yaml
-job_templates:
+scenario_aap_templates_job_templates:
   - name: "RHIS_Deploy_Infrastructure"
     inventory: "RHIS_Infrastructure"
     project: "RHIS_Playbooks"
@@ -57,7 +57,7 @@ job_templates:
 ### Workflow Templates
 Multi-step ansible_dev_node_orchestration
 ```yaml
-workflow_templates:
+scenario_aap_templates_workflow_templates:
   - name: "RHIS_Complete_Deployment"
     description: "Complete RHIS workflow"
     organization: "Default"
@@ -72,15 +72,15 @@ workflow_templates:
   roles:
     - role: scenario_aap_templates
       vars:
-        create_job_templates: true
-        create_workflow_templates: true
+        scenario_aap_templates_create_job_templates: true
+        scenario_aap_templates_create_workflow_templates: true
 ```
 
 ### Configure with Prompts
 ```yaml
 - role: scenario_aap_templates
   vars:
-    job_templates:
+    scenario_aap_templates_job_templates:
       - name: "RHIS_Deploy"
         ask_inventory: true
         ask_variables: true

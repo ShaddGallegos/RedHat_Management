@@ -41,3 +41,4 @@ archived/
 *.backup
 *.trunk
 trunk/
+*.bak.*

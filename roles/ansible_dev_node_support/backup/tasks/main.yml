@@ -30,9 +30,9 @@
   tags: ["backup"]
 
 - name: "Backup | Clean old backups"
-  find:
+  ansible.builtin.find:
     path: "{{ backup_base_dir }}"
-    age: "{{ backup_retention_days }}d"
+    age: "{{ ansible_dev_node_support_backup_retention_days }}d"
     recurse: no
   register: old_backups
   tags: ["maintenance"]

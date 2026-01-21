@@ -3,13 +3,13 @@
 
 - name: Check ISO file exists
   ansible.builtin.stat:
-    path: "{{ libvirt_iso_file }}"
+    path: "{{ platform_libvirt_vm_provisioner_libvirt_iso_file }}"
   register: iso_stat
   failed_when: not iso_stat.stat.exists
 
 - name: Check kickstart file exists
   ansible.builtin.stat:
-    path: "{{ libvirt_kickstart_file }}"
+    path: "{{ platform_libvirt_vm_provisioner_libvirt_kickstart_file }}"
   register: ks_stat
   failed_when: not ks_stat.stat.exists
 
@@ -21,7 +21,7 @@
 
 - name: Check if VM already exists
   virt:
-    name: "{{ libvirt_vm_name }}"
+    name: "{{ platform_libvirt_vm_provisioner_libvirt_vm_name }}"
     ansible.builtin.command: getattr
     attribute: name
   register: existing_vm
@@ -30,12 +30,12 @@
 
 - name: Fail if VM already exists
   ansible.builtin.fail:
-    msg: "VM '{{ libvirt_vm_name }}' already exists"
+    msg: "VM '{{ platform_libvirt_vm_provisioner_libvirt_vm_name }}' already exists"
   when: existing_vm.rc == 0
 
 - name: Verify libvirt network exists
   community.libvirt.virt_net:
-    name: "{{ libvirt_vm_network }}"
+    name: "{{ platform_libvirt_vm_provisioner_libvirt_vm_network }}"
     ansible.builtin.command: info
   become: true
   changed_when: false

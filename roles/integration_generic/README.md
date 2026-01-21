@@ -63,10 +63,10 @@ deployment_scenario: "satellite_aap"  # Must include products to integrate
 
 ```yaml
 # Integration controls
-configure_satellite_aap_integration: true
-configure_satellite_idm_integration: true
-configure_satellite_insights_integration: true
-configure_aap_idm_integration: true
+integration_generic_configure_satellite_aap_integration: true
+integration_generic_configure_satellite_idm_integration: true
+integration_generic_configure_satellite_insights_integration: true
+integration_generic_configure_aap_idm_integration: true
 
 # API endpoints
 satellite_url: "https://scenario_satellite.example.com"

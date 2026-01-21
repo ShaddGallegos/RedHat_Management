@@ -56,13 +56,13 @@
   ignore_errors: true
 
 - name: Check for available updates (RHEL 7)
-  yum:
+  ansible.builtin.yum:
     list: updates
   register: available_updates
   when: ansible_distribution_major_version|int == 7
 
 - name: Check for available updates (RHEL 8+)
-  dnf:
+  ansible.builtin.dnf:
     list: updates
   register: available_updates
   when: ansible_distribution_major_version|int >= 8
@@ -85,7 +85,7 @@
     - update_rhel_verbose | default(true)
 
 - name: Update packages (RHEL 7)
-  yum:
+  ansible.builtin.yum:
     name: "{{ update_distro_packages | default('*') }}"
     exclude: "{{ update_distro_packages_excludes | join(',') if update_distro_packages_excludes else omit }}"
     state: latest
@@ -98,7 +98,7 @@
   ignore_errors: "{{ update_rhel_ignore_errors | default(false) }}"
 
 - name: Update packages (RHEL 8+)
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ update_distro_packages | default('*') }}"
     exclude: "{{ update_distro_packages_excludes | join(',') if update_distro_packages_excludes else omit }}"
     state: latest
@@ -130,19 +130,19 @@
     - update_rhel_verbose | default(true)
 
 - name: Check for post-update available updates (RHEL 7)
-  yum:
+  ansible.builtin.yum:
     list: updates
   register: post_update_available_updates
   when: ansible_distribution_major_version|int == 7
 
 - name: Check for post-update available updates (RHEL 8+)
-  dnf:
+  ansible.builtin.dnf:
     list: updates
   register: post_update_available_updates
   when: ansible_distribution_major_version|int >= 8
 
 - name: Gather package facts after update
-  package_facts:
+  ansible.builtin.package_facts:
   register: packages_list_post_update
 
 - name: Determine latest installed kernel version
@@ -199,13 +199,13 @@
         msg: "Rebooting system due to kernel or system updates..."
 
     - name: Reboot the system
-      reboot:
+      ansible.builtin.reboot:
         reboot_timeout: "{{ reboot_timeout | default(600) }}"
         pre_reboot_delay: "{{ update_rhel_pre_reboot_delay | default(10) }}"
         post_reboot_delay: "{{ update_rhel_post_reboot_delay | default(30) }}"
 
     - name: Gather facts after reboot
-      setup:
+      ansible.builtin.setup:
         filter: ansible_distribution*
 
     - name: Set post-reboot OS information

@@ -14,15 +14,15 @@ This role bootstraps a POC stack on a single RHEL9 VM (libvirt) with Satellite, 
 Secrets and ansible_dev_node_prompts:
 
 - Secrets (passwords, relay creds) are not defaulted; provide via vars_prompt or a vaulted file at `~/.ansible/conf/env.yml` (referenced by `satellite_mail_vault_file`).
-- Required secrets: `satellite_admin_password`, `aap_admin_password`, `insights_password`.
+- Required secrets: `scenario_satellite_mail_setup_satellite_admin_password`, `scenario_satellite_mail_setup_aap_admin_password`, `scenario_satellite_mail_setup_insights_password`.
 
 ## Key vars (defaults/main.yml)
 
-- `satellite_mail_targets`: [scenario_satellite, aap, scenario_openshift]
-- `libvirt_host`: kaso.prod.spg (10.168.0.1), `satellite_vm_*` sizing, keys, network.
-- `satellite_fqdn`, org/location, admin creds, mail relay info.
+- `scenario_satellite_mail_setup_satellite_mail_targets`: [scenario_satellite, aap, scenario_openshift]
+- `scenario_satellite_mail_setup_libvirt_host`: kaso.prod.spg (10.168.0.1), `satellite_vm_*` sizing, keys, network.
+- `scenario_satellite_mail_setup_satellite_fqdn`, org/location, admin creds, mail relay info.
 - Network ansible_dev_node_prompts (overrideable in `env.yml`): `satellite_domain`, `satellite_primary_interface`, optional `satellite_fqdn_ip`, `satellite_gateway`, `satellite_nameserver`, `satellite_dhcp_range_start`/`satellite_dhcp_range_end`, `satellite_pxeserver`.
-- `aap_admin_password`, Insights credentials placeholders.
+- `scenario_satellite_mail_setup_aap_admin_password`, Insights credentials placeholders.
 
 ## Usage (example)
 
@@ -31,10 +31,10 @@ Secrets and ansible_dev_node_prompts:
   roles:
     - role: scenario_satellite_mail_setup
       vars:
-        satellite_mail_targets: ['scenario_satellite','aap']
-        satellite_fqdn: scenario_satellite.poc.example.com
-        satellite_mail_relay: smtp.example.com:587
-        satellite_mail_relay_credentials: "[smtp.example.com]:587 user:pass"
+        scenario_satellite_mail_setup_satellite_mail_targets: ['scenario_satellite','aap']
+        scenario_satellite_mail_setup_satellite_fqdn: scenario_satellite.poc.example.com
+        scenario_satellite_mail_setup_satellite_mail_relay: smtp.example.com:587
+        scenario_satellite_mail_setup_satellite_mail_relay_credentials: "[smtp.example.com]:587 user:pass"
 ```
 
 Outputs:

@@ -2,7 +2,7 @@
 # Network defaults for `platform_libvirt_setup` (merged from
 # `ansible_dev_node_env_config/network_defaults.j2`)
 # These variables are intended to be set per-host or via group_vars.
-external_device: ""
-external_type: ""
-internal_device: ""
-internal_subnet: ""
+platform_libvirt_setup_external_device: ""
+platform_libvirt_setup_external_type: ""
+platform_libvirt_setup_internal_device: ""
+platform_libvirt_setup_internal_subnet: ""

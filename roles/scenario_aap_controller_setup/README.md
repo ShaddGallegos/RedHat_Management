@@ -20,16 +20,16 @@ This role sets up an AAP controller instance for RHIS environments with:
 
 ### Required Variables
 ```yaml
-aap_controller_host: "controller.example.com"
-aap_controller_username: "admin"
-aap_controller_password: "{{ aap_admin_password }}"
+scenario_aap_controller_setup_aap_controller_host: "controller.example.com"
+scenario_aap_controller_setup_aap_controller_username: "admin"
+scenario_aap_controller_setup_aap_controller_password: "{{ aap_admin_password }}"
 ```
 
 ### Optional Variables
 ```yaml
-aap_manifest_source_path: "/tmp/rhis_aap_manifest.zip"
-aap_manifest_force: true
-aap_controller_validate_certs: false
+scenario_aap_controller_setup_aap_manifest_source_path: "/tmp/rhis_aap_manifest.zip"
+scenario_aap_controller_setup_aap_manifest_force: true
+scenario_aap_controller_setup_aap_controller_validate_certs: false
 ```
 
 ## Example Usage
@@ -39,8 +39,8 @@ aap_controller_validate_certs: false
   roles:
     - role: scenario_aap_controller_setup
       vars:
-        aap_controller_host: "aap-controller.prod.spg"
-        aap_manifest_source_path: "/opt/manifests/aap.zip"
+        scenario_aap_controller_setup_aap_controller_host: "aap-controller.prod.spg"
+        scenario_aap_controller_setup_aap_manifest_source_path: "/opt/manifests/aap.zip"
 ```
 
 ## Tags

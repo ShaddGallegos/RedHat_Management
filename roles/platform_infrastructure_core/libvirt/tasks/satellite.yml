@@ -25,4 +25,3 @@
     satellite_org: "{{ satellite_org | default('Default_Org') }}"
     satellite_admin_user: "{{ satellite_admin_user | default('admin') }}"
     satellite_admin_password: "{{ satellite_admin_password | default('') }}"
-

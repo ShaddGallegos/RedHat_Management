@@ -43,12 +43,12 @@
 
     - name: Copy ISO files from files/ to TFTP directory
       ansible.builtin.shell: |
-        if [ -d "{{ project_root }}/files" ] && [ -f "{{ project_root }}/files"/*.iso ]; then
-          cp -v "{{ project_root }}/files"/*.iso /var/lib/tftpboot/iso/
+        if [ -d "{{ platform_tftp_boot_server_project_root }}/files" ] && [ -f "{{ platform_tftp_boot_server_project_root }}/files"/*.iso ]; then
+          cp -v "{{ platform_tftp_boot_server_project_root }}/files"/*.iso /var/lib/tftpboot/iso/
           chmod 644 /var/lib/tftpboot/iso/*.iso
           echo "ISO files copied successfully"
         else
-          echo "No ISO files found in {{ project_root }}/files/"
+          echo "No ISO files found in {{ platform_tftp_boot_server_project_root }}/files/"
         fi
       register: iso_copy_result
       become: yes
@@ -56,12 +56,12 @@
 
     - name: Copy OEMDRV files from files/ to TFTP directory
       ansible.builtin.shell: |
-        if [ -d "{{ project_root }}/files" ] && [ -f "{{ project_root }}/files"/OEMDRV* ]; then
-          cp -v "{{ project_root }}/files"/OEMDRV* /var/lib/tftpboot/
+        if [ -d "{{ platform_tftp_boot_server_project_root }}/files" ] && [ -f "{{ platform_tftp_boot_server_project_root }}/files"/OEMDRV* ]; then
+          cp -v "{{ platform_tftp_boot_server_project_root }}/files"/OEMDRV* /var/lib/tftpboot/
           chmod 644 /var/lib/tftpboot/OEMDRV*
           echo "OEMDRV files copied successfully"
         else
-          echo "No OEMDRV files found in {{ project_root }}/files/"
+          echo "No OEMDRV files found in {{ platform_tftp_boot_server_project_root }}/files/"
         fi
       register: oemdrv_copy_result
       become: yes
@@ -69,7 +69,7 @@
 
     - name: Create symlink from files to TFTP for dynamic access
       ansible.builtin.file:
-        src: "{{ project_root }}/files"
+        src: "{{ platform_tftp_boot_server_project_root }}/files"
         dest: /var/lib/tftpboot/project-files
         state: link
       become: yes
@@ -98,7 +98,7 @@
       become: yes
       when:
         - ansible_os_family == "RedHat"
-        - tftp_enable_firewall | default(true)
+        - platform_tftp_boot_server_tftp_enable_firewall | default(true)
       ignore_errors: yes
 
 - name: Create TFTP Boot Configuration Files
@@ -110,8 +110,8 @@
         mode: '0644'
       become: yes
       vars:
-        tftp_server_ip: "{{ tftp_server_ip | default(ansible_default_ipv4.address) }}"
-        iso_list: "{{ lookup('fileglob', project_root + '/files/*.iso', wantlist=True) | map('basename') | list }}"
+        platform_tftp_boot_server_tftp_server_ip: "{{ platform_tftp_boot_server_tftp_server_ip | default(ansible_default_ipv4.address) }}"
+        iso_list: "{{ lookup('fileglob', platform_tftp_boot_server_project_root + '/files/*.iso', wantlist=True) | map('basename') | list }}"
 
     - name: Create boot menu HTML for web access
       ansible.builtin.template:
@@ -120,7 +120,7 @@
         mode: '0644'
       become: yes
       vars:
-        iso_list: "{{ lookup('fileglob', project_root + '/files/*.iso', wantlist=True) | map('basename') | list }}"
+        iso_list: "{{ lookup('fileglob', platform_tftp_boot_server_project_root + '/files/*.iso', wantlist=True) | map('basename') | list }}"
 
 - name: Display TFTP Server Information
   block:
@@ -131,7 +131,7 @@
       register: host_ips
 
     - name: Get TFTP root contents
-      find:
+      ansible.builtin.find:
         paths: /var/lib/tftpboot
         recurse: yes
         file_type: file
@@ -159,7 +159,7 @@
             - /var/lib/tftpboot/pxelinux.cfg (PXE boot configs)
 
           Symbolic Links:
-            - /var/lib/tftpboot/project-files -> {{ project_root }}/files
+            - /var/lib/tftpboot/project-files -> {{ platform_tftp_boot_server_project_root }}/files
 
           Available Files in TFTP ({{ tftp_files.matched }} files):
           {% for file in tftp_files.files %}
@@ -177,7 +177,7 @@
              > get iso/RHEL-10-x86_64-dvd.iso
 
           3. FROM FILES DIRECTORY:
-             Any ISO or OEMDRV file in {{ project_root }}/files/
+             Any ISO or OEMDRV file in {{ platform_tftp_boot_server_project_root }}/files/
              will be automatically available via TFTP at:
              tftp://{{ host_ips.stdout_lines[0].split()[0] | default('SERVER_IP') }}/iso/filename.iso
              tftp://{{ host_ips.stdout_lines[0].split()[0] | default('SERVER_IP') }}/OEMDRV
@@ -218,7 +218,7 @@
       #!/bin/bash
       # Sync ISO and OEMDRV files from project files/ to TFTP
 
-      PROJECT_ROOT="${1:-{{ project_root }}}"
+      PROJECT_ROOT="${1:-{{ platform_tftp_boot_server_project_root }}}"
       TFTP_ROOT="/var/lib/tftpboot"
 
       if [ ! -d "$PROJECT_ROOT/files" ]; then

@@ -5,17 +5,17 @@
   block:
     - name: Create backup directory for configurations
       ansible.builtin.file:
-        path: "{{ backup_directory }}"
+        path: "{{ platform_services_provisioning_stack_backup_directory }}"
         state: directory
         mode: "0755"
-      when: backup_enabled
+      when: platform_services_provisioning_stack_backup_enabled
 
 - name: Configure Primary Network Interface (External Network - libvirt NAT)
   block:
-    - name: "Configure primary ethernet interface ({{ provisioning_primary_interface }})"
+    - name: "Configure primary ethernet interface ({{ platform_services_provisioning_stack_provisioning_primary_interface }})"
       community.general.nmcli:
-        conn_name: "{{ provisioning_primary_interface }}"
-        ifname: "{{ provisioning_primary_interface }}"
+        conn_name: "{{ platform_services_provisioning_stack_provisioning_primary_interface }}"
+        ifname: "{{ platform_services_provisioning_stack_provisioning_primary_interface }}"
         type: ethernet
         method4: auto
         autoconnect: true
@@ -23,11 +23,11 @@
       notify: restart network service
 
     - name: Bring up primary interface
-      ansible.builtin.command: "nmcli connection up {{ provisioning_primary_interface }}"
+      ansible.builtin.command: "nmcli connection up {{ platform_services_provisioning_stack_provisioning_primary_interface }}"
       changed_when: false
 
     - name: Display primary interface configuration
-      ansible.builtin.command: "ip addr show {{ provisioning_primary_interface }}"
+      ansible.builtin.command: "ip addr show {{ platform_services_provisioning_stack_provisioning_primary_interface }}"
       register: primary_interface_config
       changed_when: false
 
@@ -39,24 +39,24 @@
 
 - name: Configure Secondary Network Interface (Private Network - 10.168.0.0/16)
   block:
-    - name: "Configure secondary ethernet interface ({{ provisioning_secondary_interface }})"
+    - name: "Configure secondary ethernet interface ({{ platform_services_provisioning_stack_provisioning_secondary_interface }})"
       community.general.nmcli:
-        conn_name: "{{ provisioning_secondary_interface }}"
-        ifname: "{{ provisioning_secondary_interface }}"
+        conn_name: "{{ platform_services_provisioning_stack_provisioning_secondary_interface }}"
+        ifname: "{{ platform_services_provisioning_stack_provisioning_secondary_interface }}"
         type: ethernet
-        ip4: "{{ provisioning_interface_ip }}/16"
-        gw4: "{{ provisioning_interface_gateway }}"
+        ip4: "{{ platform_services_provisioning_stack_provisioning_interface_ip }}/16"
+        gw4: "{{ platform_services_provisioning_stack_provisioning_interface_gateway }}"
         method4: manual
         autoconnect: true
         state: present
       notify: restart network service
 
     - name: Bring up secondary interface
-      ansible.builtin.command: "nmcli connection up {{ provisioning_secondary_interface }}"
+      ansible.builtin.command: "nmcli connection up {{ platform_services_provisioning_stack_provisioning_secondary_interface }}"
       changed_when: false
 
     - name: Display secondary interface configuration
-      ansible.builtin.command: "ip addr show {{ provisioning_secondary_interface }}"
+      ansible.builtin.command: "ip addr show {{ platform_services_provisioning_stack_provisioning_secondary_interface }}"
       register: secondary_interface_config
       changed_when: false
 
@@ -70,15 +70,15 @@
   block:
     - name: Backup original resolv.conf
       ansible.builtin.copy:
-        src: "{{ resolv_conf_path }}"
-        dest: "{{ resolv_conf_path }}.bak.{{ ansible_date_time.iso8601_basic }}"
+        src: "{{ platform_services_provisioning_stack_resolv_conf_path }}"
+        dest: "{{ platform_services_provisioning_stack_resolv_conf_path }}.bak.{{ ansible_date_time.iso8601_basic }}"
         remote_src: true
-      when: backup_enabled
+      when: platform_services_provisioning_stack_backup_enabled
       ignore_errors: true
 
     - name: Configure resolv.conf with nameserver and options
       ansible.builtin.lineinfile:
-        path: "{{ resolv_conf_path }}"
+        path: "{{ platform_services_provisioning_stack_resolv_conf_path }}"
         create: true
         state: present
         line: "{{ item }}"
@@ -90,7 +90,7 @@
       notify: update resolv.conf
 
     - name: Verify resolv.conf contents
-      ansible.builtin.command: "cat {{ resolv_conf_path }}"
+      ansible.builtin.command: "cat {{ platform_services_provisioning_stack_resolv_conf_path }}"
       register: resolv_conf_contents
       changed_when: false
 
@@ -102,13 +102,13 @@
   block:
     - name: Install DHCP server package
       ansible.builtin.package:
-        name: "{{ dhcp_package }}"
+        name: "{{ platform_services_provisioning_stack_dhcp_package }}"
         state: present
 
     - name: Create DHCP configuration
       ansible.builtin.template:
         src: dhcpd.conf.j2
-        dest: "{{ dhcp_config_file }}"
+        dest: "{{ platform_services_provisioning_stack_dhcp_config_file }}"
         backup: true
         owner: root
         group: root
@@ -118,7 +118,7 @@
 
     - name: Initialize DHCP leases file
       ansible.builtin.file:
-        path: "{{ dhcp_leases_file }}"
+        path: "{{ platform_services_provisioning_stack_dhcp_leases_file }}"
         state: touch
         owner: dhcpd
         group: dhcpd
@@ -126,27 +126,27 @@
 
     - name: Enable DHCP service on boot
       ansible.builtin.systemd:
-        name: "{{ dhcp_service }}"
+        name: "{{ platform_services_provisioning_stack_dhcp_service }}"
         enabled: true
         daemon_reload: true
-      when: service_enable_on_boot
+      when: platform_services_provisioning_stack_service_enable_on_boot
 
     - name: Start DHCP service
       ansible.builtin.systemd:
-        name: "{{ dhcp_service }}"
+        name: "{{ platform_services_provisioning_stack_dhcp_service }}"
         state: started
-      when: service_restart_enabled
+      when: platform_services_provisioning_stack_service_restart_enabled
 
 - name: Install and Configure DNS Server
   block:
     - name: Install BIND DNS package
       ansible.builtin.package:
-        name: "{{ dns_package }}"
+        name: "{{ platform_services_provisioning_stack_dns_package }}"
         state: present
 
     - name: Create DNS zones directory
       ansible.builtin.file:
-        path: "{{ dns_zones_dir }}"
+        path: "{{ platform_services_provisioning_stack_dns_zones_dir }}"
         state: directory
         owner: named
         group: named
@@ -155,7 +155,7 @@
     - name: Create BIND configuration
       ansible.builtin.template:
         src: named.conf.j2
-        dest: "{{ dns_config_file }}"
+        dest: "{{ platform_services_provisioning_stack_dns_config_file }}"
         backup: true
         owner: root
         group: named
@@ -165,7 +165,7 @@
     - name: Create zone configuration
       ansible.builtin.template:
         src: named.zones.j2
-        dest: "{{ dns_zones_dir }}/named.zones"
+        dest: "{{ platform_services_provisioning_stack_dns_zones_dir }}/named.zones"
         owner: named
         group: named
         mode: "0644"
@@ -174,7 +174,7 @@
     - name: Create DNS zone files
       ansible.builtin.template:
         src: "{{ item }}.j2"
-        dest: "{{ dns_zones_dir }}/{{ item }}"
+        dest: "{{ platform_services_provisioning_stack_dns_zones_dir }}/{{ item }}"
         owner: named
         group: named
         mode: "0644"
@@ -185,19 +185,19 @@
 
     - name: Enable DNS service on boot
       ansible.builtin.systemd:
-        name: "{{ dns_service }}"
+        name: "{{ platform_services_provisioning_stack_dns_service }}"
         enabled: true
         daemon_reload: true
-      when: service_enable_on_boot
+      when: platform_services_provisioning_stack_service_enable_on_boot
 
     - name: Start DNS service
       ansible.builtin.systemd:
-        name: "{{ dns_service }}"
+        name: "{{ platform_services_provisioning_stack_dns_service }}"
         state: started
-      when: service_restart_enabled
+      when: platform_services_provisioning_stack_service_restart_enabled
 
     - name: Validate BIND configuration
-      ansible.builtin.command: "named-checkconf {{ dns_config_file }}"
+      ansible.builtin.command: "named-checkconf {{ platform_services_provisioning_stack_dns_config_file }}"
       changed_when: false
       register: bind_check
       failed_when: bind_check.rc != 0
@@ -207,17 +207,17 @@
     - name: Install TFTP server packages
       ansible.builtin.package:
         name:
-          - "{{ tftp_package }}"
+          - "{{ platform_services_provisioning_stack_tftp_package }}"
           - "xinetd"
         state: present
 
     - name: Create TFTP root directory
       ansible.builtin.file:
-        path: "{{ tftp_root }}"
+        path: "{{ platform_services_provisioning_stack_tftp_root }}"
         state: directory
-        owner: "{{ tftp_user }}"
-        group: "{{ tftp_group }}"
-        mode: "{{ tftp_permissions }}"
+        owner: "{{ platform_services_provisioning_stack_tftp_user }}"
+        group: "{{ platform_services_provisioning_stack_tftp_group }}"
+        mode: "{{ platform_services_provisioning_stack_tftp_permissions }}"
 
     - name: Download PXE bootloader
       block:
@@ -228,29 +228,29 @@
 
         - name: Copy PXE bootloader to TFTP root
           ansible.builtin.copy:
-            src: "/tftpboot/{{ pxe_bootloader }}"
-            dest: "{{ tftp_root }}/{{ pxe_bootloader }}"
-            owner: "{{ tftp_user }}"
-            group: "{{ tftp_group }}"
-            mode: "{{ tftp_file_permissions }}"
+            src: "/tftpboot/{{ platform_services_provisioning_stack_pxe_bootloader }}"
+            dest: "{{ platform_services_provisioning_stack_tftp_root }}/{{ platform_services_provisioning_stack_pxe_bootloader }}"
+            owner: "{{ platform_services_provisioning_stack_tftp_user }}"
+            group: "{{ platform_services_provisioning_stack_tftp_group }}"
+            mode: "{{ platform_services_provisioning_stack_tftp_file_permissions }}"
             remote_src: true
           ignore_errors: true
 
     - name: Create PXE menu directory
       ansible.builtin.file:
-        path: "{{ tftp_root }}/pxelinux.cfg"
+        path: "{{ platform_services_provisioning_stack_tftp_root }}/pxelinux.cfg"
         state: directory
-        owner: "{{ tftp_user }}"
-        group: "{{ tftp_group }}"
-        mode: "{{ tftp_permissions }}"
+        owner: "{{ platform_services_provisioning_stack_tftp_user }}"
+        group: "{{ platform_services_provisioning_stack_tftp_group }}"
+        mode: "{{ platform_services_provisioning_stack_tftp_permissions }}"
 
     - name: Create PXE boot menu
       ansible.builtin.template:
         src: pxelinux.cfg.default.j2
-        dest: "{{ tftp_root }}/pxelinux.cfg/default"
-        owner: "{{ tftp_user }}"
-        group: "{{ tftp_group }}"
-        mode: "{{ tftp_file_permissions }}"
+        dest: "{{ platform_services_provisioning_stack_tftp_root }}/pxelinux.cfg/default"
+        owner: "{{ platform_services_provisioning_stack_tftp_user }}"
+        group: "{{ platform_services_provisioning_stack_tftp_group }}"
+        mode: "{{ platform_services_provisioning_stack_tftp_file_permissions }}"
 
     - name: Configure TFTP via xinetd
       ansible.builtin.template:
@@ -266,13 +266,13 @@
         name: xinetd
         enabled: true
         daemon_reload: true
-      when: service_enable_on_boot
+      when: platform_services_provisioning_stack_service_enable_on_boot
 
     - name: Start xinetd service
       ansible.builtin.systemd:
         name: xinetd
         state: started
-      when: service_restart_enabled
+      when: platform_services_provisioning_stack_service_restart_enabled
 
 - name: Configure Firewall Rules
   block:
@@ -293,7 +293,7 @@
         permanent: true
         state: enabled
         immediate: true
-      when: firewall_enabled and dhcp_enabled
+      when: platform_services_provisioning_stack_firewall_enabled and platform_services_provisioning_stack_dhcp_enabled
 
     - name: Configure firewall for DNS
       ansible.posix.firewalld:
@@ -301,7 +301,7 @@
         permanent: true
         state: enabled
         immediate: true
-      when: firewall_enabled and dns_enabled
+      when: platform_services_provisioning_stack_firewall_enabled and platform_services_provisioning_stack_dns_enabled
 
     - name: Configure firewall for TFTP
       ansible.posix.firewalld:
@@ -309,7 +309,7 @@
         permanent: true
         state: enabled
         immediate: true
-      when: firewall_enabled and tftp_enabled
+      when: platform_services_provisioning_stack_firewall_enabled and platform_services_provisioning_stack_tftp_enabled
 
     - name: Configure firewall for PXE boot
       ansible.posix.firewalld:
@@ -317,36 +317,36 @@
         permanent: true
         state: enabled
         immediate: true
-      when: firewall_enabled and pxe_enabled
+      when: platform_services_provisioning_stack_firewall_enabled and platform_services_provisioning_stack_pxe_enabled
 
 - name: Validate Provisioning Services
   block:
     - name: Verify secondary interface is up
-      ansible.builtin.command: "ip addr show {{ provisioning_secondary_interface }}"
+      ansible.builtin.command: "ip addr show {{ platform_services_provisioning_stack_provisioning_secondary_interface }}"
       register: interface_check
       changed_when: false
-      failed_when: "provisioning_interface_ip not in interface_check.stdout"
+      failed_when: "platform_services_provisioning_stack_provisioning_interface_ip not in interface_check.stdout"
 
     - name: Verify DHCP service is running
       ansible.builtin.systemd:
-        name: "{{ dhcp_service }}"
+        name: "{{ platform_services_provisioning_stack_dhcp_service }}"
         state: started
       register: dhcp_status
-      when: dhcp_enabled
+      when: platform_services_provisioning_stack_dhcp_enabled
 
     - name: Verify DNS service is running
       ansible.builtin.systemd:
-        name: "{{ dns_service }}"
+        name: "{{ platform_services_provisioning_stack_dns_service }}"
         state: started
       register: dns_status
-      when: dns_enabled
+      when: platform_services_provisioning_stack_dns_enabled
 
     - name: Verify xinetd service is running
       ansible.builtin.systemd:
         name: xinetd
         state: started
       register: tftp_status
-      when: tftp_enabled
+      when: platform_services_provisioning_stack_tftp_enabled
 
     - name: Test DNS resolution
       ansible.builtin.command: "dig @10.168.0.1 scenario_satellite.prod.spg"

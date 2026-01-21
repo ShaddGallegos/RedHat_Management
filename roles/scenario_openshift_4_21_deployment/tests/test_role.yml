@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    openshift_4_21_deployment_enabled: true
+    scenario_openshift_4_21_deployment_openshift_4_21_deployment_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - openshift_4_21_deployment_enabled is defined
+          - scenario_openshift_4_21_deployment_openshift_4_21_deployment_enabled is defined

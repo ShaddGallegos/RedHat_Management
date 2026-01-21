@@ -33,8 +33,8 @@ This role automates the complete process of creating and configuring RHEL 10 vir
 
 ### Files Required
 
-1. **RHEL 10 ISO** - Place in path specified by `libvirt_iso_file`
-2. **Kickstart File** - Place in path specified by `libvirt_kickstart_file`
+1. **RHEL 10 ISO** - Place in path specified by `platform_libvirt_vm_provisioner_libvirt_iso_file`
+2. **Kickstart File** - Place in path specified by `platform_libvirt_vm_provisioner_libvirt_kickstart_file`
 
 ### Permissions
 
@@ -45,32 +45,32 @@ This role requires `become: yes` for some tasks. Ensure your Ansible user can us
 ### Essential Variables
 
 ```yaml
-libvirt_vm_name: "rhel10-vm"           # VM name
-libvirt_vm_cpus: 2                      # vCPU count
-libvirt_vm_memory: 2048                 # RAM in MB
-libvirt_vm_disk: 50                     # Disk size in GB
-libvirt_iso_file: "files/rhel-10.iso"  # ISO file path
-libvirt_kickstart_file: "files/oem.cfg" # Kickstart file path
-libvirt_vm_network: "default"           # Libvirt network
+platform_libvirt_vm_provisioner_libvirt_vm_name: "rhel10-vm"           # VM name
+platform_libvirt_vm_provisioner_libvirt_vm_cpus: 2                      # vCPU count
+platform_libvirt_vm_provisioner_libvirt_vm_memory: 2048                 # RAM in MB
+platform_libvirt_vm_provisioner_libvirt_vm_disk: 50                     # Disk size in GB
+platform_libvirt_vm_provisioner_libvirt_iso_file: "files/rhel-10.iso"  # ISO file path
+platform_libvirt_vm_provisioner_libvirt_kickstart_file: "files/oem.cfg" # Kickstart file path
+platform_libvirt_vm_provisioner_libvirt_vm_network: "default"           # Libvirt network
 ```
 
 ### Optional Network Variables
 
 ```yaml
-libvirt_bridge_device: null             # Bridge device (optional)
-libvirt_mac_address: null               # MAC address (optional)
-libvirt_static_ip: null                 # Static IP (optional)
-libvirt_gateway: null                   # Gateway (optional)
-libvirt_nameserver: null                # Nameserver (optional)
+platform_libvirt_vm_provisioner_libvirt_bridge_device: null             # Bridge device (optional)
+platform_libvirt_vm_provisioner_libvirt_mac_address: null               # MAC address (optional)
+platform_libvirt_vm_provisioner_libvirt_static_ip: null                 # Static IP (optional)
+platform_libvirt_vm_provisioner_libvirt_gateway: null                   # Gateway (optional)
+platform_libvirt_vm_provisioner_libvirt_nameserver: null                # Nameserver (optional)
 ```
 
 ### Kickstart Variables
 
 ```yaml
-libvirt_root_password: "..."            # Root password hash (CHANGE THIS!)
-libvirt_ansible_user: "ansible"         # Ansible user to create
-libvirt_install_ansible: true           # Install Ansible user
-libvirt_packages:                        # Packages to install
+platform_libvirt_vm_provisioner_libvirt_root_password: "..."            # Root password hash (CHANGE THIS!)
+platform_libvirt_vm_provisioner_libvirt_ansible_user: "ansible"         # Ansible user to create
+platform_libvirt_vm_provisioner_libvirt_install_ansible: true           # Install Ansible user
+platform_libvirt_vm_provisioner_libvirt_packages:                        # Packages to install
   - "@core"
   - "@standard"
   - "vim"
@@ -80,39 +80,39 @@ libvirt_packages:                        # Packages to install
 ### Security Variables
 
 ```yaml
-libvirt_enable_selinux: true            # Enable SELinux
-libvirt_enable_firewall: true           # Enable firewall
-libvirt_firewall_services:              # Allowed services
+platform_libvirt_vm_provisioner_libvirt_enable_selinux: true            # Enable SELinux
+platform_libvirt_vm_provisioner_libvirt_enable_firewall: true           # Enable firewall
+platform_libvirt_vm_provisioner_libvirt_firewall_services:              # Allowed services
   - "ssh"
 ```
 
 ### HTTP Server Variables
 
 ```yaml
-libvirt_kickstart_port: 8888            # HTTP server port
-libvirt_kickstart_http_dir: "/tmp/..."  # HTTP directory
+platform_libvirt_vm_provisioner_libvirt_kickstart_port: 8888            # HTTP server port
+platform_libvirt_vm_provisioner_libvirt_kickstart_http_dir: "/tmp/..."  # HTTP directory
 ```
 
 ### Monitoring Variables
 
 ```yaml
-libvirt_monitor_timeout: 300            # Timeout in seconds
-libvirt_monitor_interval: 5             # Check interval
+platform_libvirt_vm_provisioner_libvirt_monitor_timeout: 300            # Timeout in seconds
+platform_libvirt_vm_provisioner_libvirt_monitor_interval: 5             # Check interval
 ```
 
 ### Logging Variables
 
 ```yaml
-libvirt_save_logs: true                 # Save logs
-libvirt_logs_dir: "/tmp/libvirt-..."    # Log directory
-libvirt_log_level: "info"               # Log level
+platform_libvirt_vm_provisioner_libvirt_save_logs: true                 # Save logs
+platform_libvirt_vm_provisioner_libvirt_logs_dir: "/tmp/libvirt-..."    # Log directory
+platform_libvirt_vm_provisioner_libvirt_log_level: "info"               # Log level
 ```
 
 ### Cleanup Variables
 
 ```yaml
-libvirt_cleanup_http_server: true       # Cleanup HTTP server
-libvirt_cleanup_temp_files: true        # Cleanup temp files
+platform_libvirt_vm_provisioner_libvirt_cleanup_http_server: true       # Cleanup HTTP server
+platform_libvirt_vm_provisioner_libvirt_cleanup_temp_files: true        # Cleanup temp files
 ```
 
 See [defaults/main.yml](defaults/main.yml) for complete list.
@@ -140,13 +140,13 @@ See [defaults/main.yml](defaults/main.yml) for complete list.
   roles:
     - role: platform_libvirt_vm_provisioner
       vars:
-        libvirt_vm_name: "prod-web-01"
-        libvirt_vm_cpus: 8
-        libvirt_vm_memory: 16384
-        libvirt_vm_disk: 200
-        libvirt_static_ip: "192.168.1.100"
-        libvirt_gateway: "192.168.1.1"
-        libvirt_nameserver: "8.8.8.8"
+        platform_libvirt_vm_provisioner_libvirt_vm_name: "prod-web-01"
+        platform_libvirt_vm_provisioner_libvirt_vm_cpus: 8
+        platform_libvirt_vm_provisioner_libvirt_vm_memory: 16384
+        platform_libvirt_vm_provisioner_libvirt_vm_disk: 200
+        platform_libvirt_vm_provisioner_libvirt_static_ip: "192.168.1.100"
+        platform_libvirt_vm_provisioner_libvirt_gateway: "192.168.1.1"
+        platform_libvirt_vm_provisioner_libvirt_nameserver: "8.8.8.8"
 ```
 
 ### Via Include
@@ -161,17 +161,17 @@ See [defaults/main.yml](defaults/main.yml) for complete list.
       include_role:
         name: platform_libvirt_vm_provisioner
       vars:
-        libvirt_vm_name: "app-server-01"
-        libvirt_vm_cpus: 4
-        libvirt_vm_memory: 8192
+        platform_libvirt_vm_provisioner_libvirt_vm_name: "app-server-01"
+        platform_libvirt_vm_provisioner_libvirt_vm_cpus: 4
+        platform_libvirt_vm_provisioner_libvirt_vm_memory: 8192
 
     - name: Provision VM 2
       include_role:
         name: platform_libvirt_vm_provisioner
       vars:
-        libvirt_vm_name: "app-server-02"
-        libvirt_vm_cpus: 4
-        libvirt_vm_memory: 8192
+        platform_libvirt_vm_provisioner_libvirt_vm_name: "app-server-02"
+        platform_libvirt_vm_provisioner_libvirt_vm_cpus: 4
+        platform_libvirt_vm_provisioner_libvirt_vm_memory: 8192
 ```
 
 ### With Custom Inventory
@@ -186,9 +186,9 @@ See [defaults/main.yml](defaults/main.yml) for complete list.
       include_role:
         name: platform_libvirt_vm_provisioner
       vars:
-        libvirt_vm_name: "new-host"
-        libvirt_vm_cpus: 4
-        libvirt_vm_memory: 8192
+        platform_libvirt_vm_provisioner_libvirt_vm_name: "new-host"
+        platform_libvirt_vm_provisioner_libvirt_vm_cpus: 4
+        platform_libvirt_vm_provisioner_libvirt_vm_memory: 8192
 
     - name: Add to inventory
       add_host:
@@ -243,9 +243,9 @@ platform_libvirt_vm_provisioner/
 libvirt_local_ip              # Local IP for HTTP server
 libvirt_http_server_pid       # PID of HTTP server
 libvirt_kickstart_url         # URL to kickstart file
-libvirt_vm_created            # Boolean: VM created
-libvirt_installation_complete # Boolean: Installation done
-libvirt_provisioning_success  # Boolean: Success
+platform_libvirt_vm_provisioner_libvirt_vm_created            # Boolean: VM created
+platform_libvirt_vm_provisioner_libvirt_installation_complete # Boolean: Installation done
+platform_libvirt_vm_provisioner_libvirt_provisioning_success  # Boolean: Success
 libvirt_vm_ip                 # VM's IP address
 ```
 
@@ -256,7 +256,7 @@ The role uses a Jinja2 template for the kickstart file at [templates/kickstart.j
 ### Add Packages
 
 ```yaml
-libvirt_packages:
+platform_libvirt_vm_provisioner_libvirt_packages:
   - "@core"
   - "@standard"
   - "vim"
@@ -274,15 +274,15 @@ echo 'YourPassword' | openssl passwd -stdin -crypt
 
 Then:
 ```yaml
-libvirt_root_password: "$1$salt$YourHashHere"
+platform_libvirt_vm_provisioner_libvirt_root_password: "$1$salt$YourHashHere"
 ```
 
 ### Configure Static Networking
 
 ```yaml
-libvirt_static_ip: "192.168.1.100"
-libvirt_gateway: "192.168.1.1"
-libvirt_nameserver: "8.8.8.8"
+platform_libvirt_vm_provisioner_libvirt_static_ip: "192.168.1.100"
+platform_libvirt_vm_provisioner_libvirt_gateway: "192.168.1.1"
+platform_libvirt_vm_provisioner_libvirt_nameserver: "8.8.8.8"
 ```
 
 ### Customize Post-Installation
@@ -366,7 +366,7 @@ sudo virsh net-start default
   post_tasks:
     - name: Add VM to inventory
       add_host:
-        name: "{{ libvirt_vm_name }}"
+        name: "{{ platform_libvirt_vm_provisioner_libvirt_vm_name }}"
         ansible_host: "{{ libvirt_vm_ip }}"
         ansible_user: root
         groups: rhel10_vms
@@ -385,13 +385,13 @@ sudo virsh net-start default
       include_role:
         name: platform_libvirt_vm_provisioner
       vars:
-        libvirt_vm_name: "app-server"
+        platform_libvirt_vm_provisioner_libvirt_vm_name: "app-server"
     
     - name: Configure VM
       include_role:
         name: app_server_setup
       vars:
-        target_host: "{{ libvirt_vm_name }}"
+        target_host: "{{ platform_libvirt_vm_provisioner_libvirt_vm_name }}"
 ```
 
 ## Performance Tuning

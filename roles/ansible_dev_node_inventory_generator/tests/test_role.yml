@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    inventory_generator_enabled: true
+    ansible_dev_node_inventory_generator_inventory_generator_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - inventory_generator_enabled is defined
+          - ansible_dev_node_inventory_generator_inventory_generator_enabled is defined

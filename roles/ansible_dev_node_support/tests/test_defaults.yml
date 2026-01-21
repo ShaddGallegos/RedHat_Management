@@ -9,4 +9,4 @@
     - name: Verify defaults loaded
       ansible.builtin.assert:
         that:
-          - support_enabled is defined
+          - ansible_dev_node_support_support_enabled is defined

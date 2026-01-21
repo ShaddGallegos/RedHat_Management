@@ -34,13 +34,13 @@
 
     - name: Set platform_infrastructure_core type
       ansible.builtin.set_fact:
-        infrastructure_type: "{{ infra_type_input.user_input | int }}"
+        ansible_dev_node_prompts_infrastructure_type: "{{ infra_type_input.user_input | int }}"
 
     - name: Validate platform_infrastructure_core type
       ansible.builtin.assert:
         that:
-          - infrastructure_type | int >= 1
-          - infrastructure_type | int <= 6
+          - ansible_dev_node_prompts_infrastructure_type | int >= 1
+          - ansible_dev_node_prompts_infrastructure_type | int <= 6
         fail_msg: "Invalid platform_infrastructure_core type. Must be 1-6"
 
 - name: Libvirt-Specific Configuration
@@ -54,7 +54,7 @@
 
     - name: Set libvirt host variables
       ansible.builtin.set_fact:
-        libvirt_host_short_name: "{{ libvirt_host_input.user_input | lower | replace(' ', '') }}"
+        ansible_dev_node_prompts_libvirt_host_short_name: "{{ libvirt_host_input.user_input | lower | replace(' ', '') }}"
 
     - name: Prompt for Libvirt networks
       ansible.builtin.pause:
@@ -77,9 +77,9 @@
 
     - name: Set libvirt network variables
       ansible.builtin.set_fact:
-        libvirt_internal_network: "{{ libvirt_internal_net_input.user_input | default('10.168.0') }}"
-        libvirt_internal_network_subnet: "{{ libvirt_internal_net_input.user_input | default('10.168.0') }}.0/16"
-        libvirt_internal_network_gw: "{{ libvirt_internal_net_input.user_input | default('10.168.0') }}.1"
+        ansible_dev_node_prompts_libvirt_internal_network: "{{ libvirt_internal_net_input.user_input | default('10.168.0') }}"
+        ansible_dev_node_prompts_libvirt_internal_network_subnet: "{{ libvirt_internal_net_input.user_input | default('10.168.0') }}.0/16"
+        ansible_dev_node_prompts_libvirt_internal_network_gw: "{{ libvirt_internal_net_input.user_input | default('10.168.0') }}.1"
 
     - name: Prompt for service node IPs
       ansible.builtin.pause:
@@ -87,20 +87,20 @@
 
           Configure Service Nodes (10.168.0.0/16):
 
-          Gateway/Installer: 10.168.0.1 (installer.{{ ansible_domain }})
-          AAP:               10.168.0.26 (aap.{{ ansible_domain }})
-          Satellite:         10.168.0.27 (scenario_satellite.{{ ansible_domain }})
-          IdM:               10.168.0.28 (idm.{{ ansible_domain }})
+          Gateway/Installer: 10.168.0.1 (installer.{{ ansible_dev_node_prompts_ansible_domain }})
+          AAP:               10.168.0.26 (aap.{{ ansible_dev_node_prompts_ansible_domain }})
+          Satellite:         10.168.0.27 (scenario_satellite.{{ ansible_dev_node_prompts_ansible_domain }})
+          IdM:               10.168.0.28 (idm.{{ ansible_dev_node_prompts_ansible_domain }})
 
           Enter Satellite IP (or press Enter for 10.168.0.27):
       register: libvirt_satellite_ip_input
 
     - name: Set service node IPs
       ansible.builtin.set_fact:
-        libvirt_installer_node_ip: "{{ libvirt_internal_network }}.1"  # Gateway
-        libvirt_aap_ip: "{{ libvirt_internal_network }}.26"
-        libvirt_satellite_ip: "{{ libvirt_satellite_ip_input.user_input | default(libvirt_internal_network + '.27') }}"
-        libvirt_idm_ip: "{{ libvirt_internal_network }}.28"
+        ansible_dev_node_prompts_libvirt_installer_node_ip: "{{ ansible_dev_node_prompts_libvirt_internal_network }}.1"  # Gateway
+        ansible_dev_node_prompts_libvirt_aap_ip: "{{ ansible_dev_node_prompts_libvirt_internal_network }}.26"
+        ansible_dev_node_prompts_libvirt_satellite_ip: "{{ libvirt_satellite_ip_input.user_input | default(ansible_dev_node_prompts_libvirt_internal_network + '.27') }}"
+        ansible_dev_node_prompts_libvirt_idm_ip: "{{ ansible_dev_node_prompts_libvirt_internal_network }}.28"
 
     - name: Display Libvirt Configuration Summary
       ansible.builtin.debug:
@@ -110,24 +110,24 @@
                     LIBVIRT CONFIGURATION SUMMARY
           ============================================================
 
-          Host Short Name:         {{ libvirt_host_short_name }}
-          Ansible Domain:          {{ ansible_domain }}
+          Host Short Name:         {{ ansible_dev_node_prompts_libvirt_host_short_name }}
+          Ansible Domain:          {{ ansible_dev_node_prompts_ansible_domain }}
 
           External Network:        192.168.0.0/24 (NAT/eth0)
 
-          Internal Network:        {{ libvirt_internal_network_subnet }}
-          Gateway:                 {{ libvirt_internal_network_gw }}
+          Internal Network:        {{ ansible_dev_node_prompts_libvirt_internal_network_subnet }}
+          Gateway:                 {{ ansible_dev_node_prompts_libvirt_internal_network_gw }}
 
           Service Nodes (eth1):
-            Installer/Control:    {{ libvirt_installer_node_ip }} installer.{{ ansible_domain }}
-            AAP:                  {{ libvirt_aap_ip }} aap.{{ ansible_domain }}
-            Satellite:            {{ libvirt_satellite_ip }} scenario_satellite.{{ ansible_domain }}
-            IdM Directory:        {{ libvirt_idm_ip }} idm.{{ ansible_domain }}
+            Installer/Control:    {{ ansible_dev_node_prompts_libvirt_installer_node_ip }} installer.{{ ansible_dev_node_prompts_ansible_domain }}
+            AAP:                  {{ ansible_dev_node_prompts_libvirt_aap_ip }} aap.{{ ansible_dev_node_prompts_ansible_domain }}
+            Satellite:            {{ ansible_dev_node_prompts_libvirt_satellite_ip }} scenario_satellite.{{ ansible_dev_node_prompts_ansible_domain }}
+            IdM Directory:        {{ ansible_dev_node_prompts_libvirt_idm_ip }} idm.{{ ansible_dev_node_prompts_ansible_domain }}
 
           ============================================================
 
 
-  when: infrastructure_type | int == 1
+  when: ansible_dev_node_prompts_infrastructure_type | int == 1
 
 - name: Gather Ansible Domain Information
   block:
@@ -148,7 +148,7 @@
 
     - name: Set ansible domain
       ansible.builtin.set_fact:
-        ansible_domain: "{{ ansible_domain_input.user_input | lower | default('example.com') }}"
+        ansible_dev_node_prompts_ansible_domain: "{{ ansible_domain_input.user_input | lower | default('example.com') }}"
 
 - name: Save Infrastructure Configuration
   block:
@@ -165,30 +165,30 @@
           # Infrastructure Configuration
           # Generated: {{ ansible_date_time.iso8601 }}
 
-          infrastructure_type: {{ infrastructure_type }}
+          ansible_dev_node_prompts_infrastructure_type: {{ ansible_dev_node_prompts_infrastructure_type }}
 
-          {% if infrastructure_type | int == 1 %}
+          {% if ansible_dev_node_prompts_infrastructure_type | int == 1 %}
           # Libvirt Configuration
-          libvirt_host_short_name: {{ libvirt_host_short_name }}
-          libvirt_internal_network: {{ libvirt_internal_network }}
-          libvirt_internal_network_subnet: {{ libvirt_internal_network_subnet }}
-          libvirt_internal_network_gw: {{ libvirt_internal_network_gw }}
+          ansible_dev_node_prompts_libvirt_host_short_name: {{ ansible_dev_node_prompts_libvirt_host_short_name }}
+          ansible_dev_node_prompts_libvirt_internal_network: {{ ansible_dev_node_prompts_libvirt_internal_network }}
+          ansible_dev_node_prompts_libvirt_internal_network_subnet: {{ ansible_dev_node_prompts_libvirt_internal_network_subnet }}
+          ansible_dev_node_prompts_libvirt_internal_network_gw: {{ ansible_dev_node_prompts_libvirt_internal_network_gw }}
 
           # Ansible Domain
-          ansible_domain: {{ ansible_domain }}
+          ansible_dev_node_prompts_ansible_domain: {{ ansible_dev_node_prompts_ansible_domain }}
 
           # Service Node IPs and FQDNs
-          libvirt_installer_node_ip: {{ libvirt_installer_node_ip }}
-          libvirt_installer_node_fqdn: installer.{{ ansible_domain }}
+          ansible_dev_node_prompts_libvirt_installer_node_ip: {{ ansible_dev_node_prompts_libvirt_installer_node_ip }}
+          libvirt_installer_node_fqdn: installer.{{ ansible_dev_node_prompts_ansible_domain }}
 
-          libvirt_aap_ip: {{ libvirt_aap_ip }}
-          libvirt_aap_fqdn: aap.{{ ansible_domain }}
+          ansible_dev_node_prompts_libvirt_aap_ip: {{ ansible_dev_node_prompts_libvirt_aap_ip }}
+          libvirt_aap_fqdn: aap.{{ ansible_dev_node_prompts_ansible_domain }}
 
-          libvirt_satellite_ip: {{ libvirt_satellite_ip }}
-          libvirt_satellite_fqdn: scenario_satellite.{{ ansible_domain }}
+          ansible_dev_node_prompts_libvirt_satellite_ip: {{ ansible_dev_node_prompts_libvirt_satellite_ip }}
+          libvirt_satellite_fqdn: scenario_satellite.{{ ansible_dev_node_prompts_ansible_domain }}
 
-          libvirt_idm_ip: {{ libvirt_idm_ip }}
-          libvirt_idm_fqdn: idm.{{ ansible_domain }}
+          ansible_dev_node_prompts_libvirt_idm_ip: {{ ansible_dev_node_prompts_libvirt_idm_ip }}
+          libvirt_idm_fqdn: idm.{{ ansible_dev_node_prompts_ansible_domain }}
           {% endif %}
         dest: "{{ playbook_dir }}/.infrastructure_config/platform_infrastructure_core.yml"
         mode: '0600'
@@ -211,4 +211,3 @@
           3. Group and host variables will be created
 
           ============================================================
-

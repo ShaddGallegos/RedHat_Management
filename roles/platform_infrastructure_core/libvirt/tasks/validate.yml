@@ -18,4 +18,3 @@
 - name: Validate network configurations
   ansible.builtin.command: "virsh net-list --all"
   changed_when: false
-

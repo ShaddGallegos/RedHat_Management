@@ -15,7 +15,7 @@
 - block:
   - name: "Check if hosts exist in Satellite"
     ansible.builtin.include_tasks: check_for_host.yml
-    loop: "{{ provisioning_hosts | default([]) }}"
+    loop: "{{ platform_host_provisioning_provisioning_hosts | default([]) }}"
     loop_control:
       loop_var: host
     tags:
@@ -24,7 +24,7 @@
 
   - name: "Create hosts in Satellite"
     ansible.builtin.include_tasks: create_host.yml
-    loop: "{{ provisioning_hosts | default([]) }}"
+    loop: "{{ platform_host_provisioning_provisioning_hosts | default([]) }}"
     loop_control:
       loop_var: host
     tags:
@@ -33,7 +33,7 @@
 
   - name: "Create hosts from hostgroup"
     ansible.builtin.include_tasks: create_host_from_hostgroup.yml
-    loop: "{{ provisioning_hosts | default([]) }}"
+    loop: "{{ platform_host_provisioning_provisioning_hosts | default([]) }}"
     loop_control:
       loop_var: host
     tags:
@@ -42,7 +42,7 @@
 
   - name: "Add provisioned hosts to inventory"
     ansible.builtin.include_tasks: add_host_to_inventory.yml
-    loop: "{{ provisioning_hosts | default([]) }}"
+    loop: "{{ platform_host_provisioning_provisioning_hosts | default([]) }}"
     loop_control:
       loop_var: host
     tags:

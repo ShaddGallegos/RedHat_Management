@@ -12,7 +12,7 @@ service tftp
     wait				= yes
     user				= tftp
     server				= /usr/sbin/in.tftpd
-    server_args			= -s {{ tftp_root }} -m /etc/tftpd.rules -v -v -v
+    server_args			= -s {{ platform_services_provisioning_stack_tftp_root }} -m /etc/tftpd.rules -v -v -v
     disable				= no
     per_source			= 11
     cps				= 100 2

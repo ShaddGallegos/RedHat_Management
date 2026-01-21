@@ -14,7 +14,7 @@
       - Web dashboard on port {{ cmdb_port | default('8081') }}
 
 - name: "Ensure dependencies are installed on target host"
-  dnf:
+  ansible.builtin.dnf:
     name:
       - python3-pip
       - git

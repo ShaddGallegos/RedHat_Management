@@ -9,10 +9,8 @@ galaxy_info:
     - network
     - dhcp
     - dns
-    - platform_provisioning
-    - platform_infrastructure_core
+    - platform-provisioning
+    - platform-infrastructure-core
     - libvirt
     - kvm
     - automation
-
-dependencies: []

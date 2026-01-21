@@ -18,4 +18,3 @@
         state: latest
       when: yum_check_update.rc != 0
       tags: [rhel, patch]
-

@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    baremetal_provisioner_enabled: true
+    platform_baremetal_provisioner_baremetal_provisioner_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - baremetal_provisioner_enabled is defined
+          - platform_baremetal_provisioner_baremetal_provisioner_enabled is defined

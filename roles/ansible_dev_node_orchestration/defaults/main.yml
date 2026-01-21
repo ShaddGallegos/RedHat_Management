@@ -1,11 +1,11 @@
 ---
 # Default variables for ansible_dev_node_orchestration role
-orchestration_enabled: true
-orchestration_version: "1.0"
+ansible_dev_node_orchestration_orchestration_enabled: true
+ansible_dev_node_orchestration_orchestration_version: "1.0"
 
 # Orchestration configuration
-orchestration_dry_run: false
-orchestration_verbose: false
+ansible_dev_node_orchestration_orchestration_dry_run: false
+ansible_dev_node_orchestration_orchestration_verbose: false
 
 # Feature toggles
-orchestration_validate_dependencies: true
+ansible_dev_node_orchestration_orchestration_validate_dependencies: true

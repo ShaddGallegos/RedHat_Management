@@ -15,4 +15,3 @@
 
 - name: Include restore tasks
   ansible.builtin.include_tasks: restore.yml
-

@@ -5,9 +5,9 @@
   hosts: localhost
   gather_facts: true
   vars:
-    provisioning_host: "scenario_satellite.prod.spg"
-    provisioning_secondary_interface: "eth1"
-    provisioning_interface_ip: "10.168.0.1"
+    platform_services_provisioning_stack_provisioning_host: "scenario_satellite.prod.spg"
+    platform_services_provisioning_stack_provisioning_secondary_interface: "eth1"
+    platform_services_provisioning_stack_provisioning_interface_ip: "10.168.0.1"
 
   tasks:
     - name: Verify platform_provisioning role variables
@@ -15,18 +15,18 @@
         msg: |
           Testing platform_services_provisioning_stack role
           ==========================================
-          Provisioning Host: {{ provisioning_host }}
-          Secondary Interface: {{ provisioning_secondary_interface }}
-          Interface IP: {{ provisioning_interface_ip }}
-          DHCP Enabled: {{ dhcp_enabled }}
-          DNS Enabled: {{ dns_enabled }}
-          TFTP Enabled: {{ tftp_enabled }}
-          PXE Enabled: {{ pxe_enabled }}
+          Provisioning Host: {{ platform_services_provisioning_stack_provisioning_host }}
+          Secondary Interface: {{ platform_services_provisioning_stack_provisioning_secondary_interface }}
+          Interface IP: {{ platform_services_provisioning_stack_provisioning_interface_ip }}
+          DHCP Enabled: {{ platform_services_provisioning_stack_dhcp_enabled }}
+          DNS Enabled: {{ platform_services_provisioning_stack_dns_enabled }}
+          TFTP Enabled: {{ platform_services_provisioning_stack_tftp_enabled }}
+          PXE Enabled: {{ platform_services_provisioning_stack_pxe_enabled }}
 
     - name: Test required variables exist
       ansible.builtin.assert:
         that:
-          - provisioning_host is defined
-          - provisioning_secondary_interface is defined
-          - provisioning_interface_ip is defined
+          - platform_services_provisioning_stack_provisioning_host is defined
+          - platform_services_provisioning_stack_provisioning_secondary_interface is defined
+          - platform_services_provisioning_stack_provisioning_interface_ip is defined
         fail_msg: "Required platform_provisioning variables not defined"

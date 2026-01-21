@@ -1,17 +1,17 @@
 # RHIS Playbooks Directory
 
-This directory contains the main ansible_dev_node_orchestration playbooks for Red Hat Infrastructure Standard deployments.
+This directory contains the main `ansible_dev_node_orchestration` playbooks for Red Hat Infrastructure Standard deployments.
 
 ## Playbooks
 
 ### site.yml (MAIN ENTRY POINT)
-Primary ansible_dev_node_orchestration playbook for RHIS deployments.
+Primary `ansible_dev_node_orchestration` playbook for RHIS deployments.
 
 **Features:**
 - Interactive scenario and platform selection
 - Support for all 15 deployment scenarios
 - Support for all 7 cloud platforms
-- 7-phase ansible_dev_node_orchestration
+- 7-phase `ansible_dev_node_orchestration`
 - Comprehensive logging and reporting
 
 **Usage:**

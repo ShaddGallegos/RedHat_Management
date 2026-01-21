@@ -24,19 +24,19 @@ The `scenario_aap_inventories` role configures inventories in Ansible Automation
 ## Required Variables
 
 ```yaml
-aap_url: "https://aap.example.com"
-aap_username: "admin"
+scenario_aap_inventories_aap_url: "https://aap.example.com"
+scenario_aap_inventories_aap_username: "admin"
 aap_password: "{{ vault_aap_admin_pwd }}"
 ```
 
 ## Optional Variables
 
 ```yaml
-aap_inventories_organization: "Default"
-create_static_inventories: true
-create_dynamic_inventories: true
-create_inventory_sources: true
-aap_inventories_test_imports: true
+scenario_aap_inventories_aap_inventories_organization: "Default"
+scenario_aap_inventories_create_static_inventories: true
+scenario_aap_inventories_create_dynamic_inventories: true
+scenario_aap_inventories_create_inventory_sources: true
+scenario_aap_inventories_aap_inventories_test_imports: true
 ```
 
 ## Inventory Types
@@ -44,7 +44,7 @@ aap_inventories_test_imports: true
 ### Static Inventories
 Manual host/group definitions
 ```yaml
-static_inventories:
+scenario_aap_inventories_static_inventories:
   - name: "RHIS_Infrastructure"
     description: "RHIS hosts"
     variables:
@@ -54,7 +54,7 @@ static_inventories:
 ### Dynamic Inventories
 Auto-populated from external sources
 ```yaml
-dynamic_inventories:
+scenario_aap_inventories_dynamic_inventories:
   - name: "Satellite_Sync"
     source: "scenario_satellite"
     source_vars:
@@ -64,7 +64,7 @@ dynamic_inventories:
 ### Inventory Sources
 Define sync sources
 ```yaml
-inventory_sources:
+scenario_aap_inventories_inventory_sources:
   - name: "RHIS_Project_Sync"
     inventory: "RHIS_Infrastructure"
     source: "project"
@@ -80,9 +80,9 @@ inventory_sources:
   roles:
     - role: scenario_aap_inventories
       vars:
-        create_static_inventories: true
-        create_dynamic_inventories: true
-        create_inventory_sources: true
+        scenario_aap_inventories_create_static_inventories: true
+        scenario_aap_inventories_create_dynamic_inventories: true
+        scenario_aap_inventories_create_inventory_sources: true
 ```
 
 ## Dependencies

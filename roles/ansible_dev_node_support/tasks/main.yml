@@ -18,7 +18,7 @@
     tasks_from: "preflight_tests/main.yml"
     apply:
       tags: ["ansible_dev_node_support", "preflight"]
-  when: run_preflight_checks | default(true)
+  when: ansible_dev_node_support_run_preflight_checks | default(true)
   tags: ["ansible_dev_node_support", "preflight"]
 
 - name: "Execute ansible-scenario_ansible_cmdb_core setup (if needed)"
@@ -27,7 +27,7 @@
     tasks_from: "scenario_ansible_cmdb_setup/main.yml"
     apply:
       tags: ["ansible_dev_node_support", "scenario_ansible_cmdb_core"]
-  when: configure_cmdb | default(false)
+  when: ansible_dev_node_support_configure_cmdb | default(false)
   tags: ["ansible_dev_node_support"]
 
 - name: "Execute backup and restore procedures (if needed)"
@@ -36,7 +36,7 @@
     tasks_from: "backup_restore/main.yml"
     apply:
       tags: ["ansible_dev_node_support", "backup"]
-  when: backup_and_restore | default(false)
+  when: ansible_dev_node_support_backup_and_restore | default(false)
   tags: ["ansible_dev_node_support"]
 
 - name: "Execute testing tasks (if needed)"
@@ -45,7 +45,7 @@
     tasks_from: "testing/main.yml"
     apply:
       tags: ["ansible_dev_node_support", "testing"]
-  when: run_tests | default(false)
+  when: ansible_dev_node_support_run_tests | default(false)
   tags: ["ansible_dev_node_support"]
 
 - name: "Support tasks completed"

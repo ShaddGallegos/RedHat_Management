@@ -4,11 +4,11 @@
   block:
     - name: Authenticate with AAP
       ansible.builtin.uri:
-        url: "{{ aap_url }}/api/v2/auth/token/"
+        url: "{{ scenario_aap_templates_aap_url }}/api/v2/auth/token/"
         method: POST
-        user: "{{ aap_username }}"
+        user: "{{ scenario_aap_templates_aap_username }}"
         password: "{{ aap_password }}"
-        validate_certs: "{{ aap_verify_ssl }}"
+        validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
       register: aap_auth
       no_log: true
 
@@ -17,16 +17,16 @@
         aap_token: "{{ aap_auth.json.token }}"
       no_log: true
 
-  when: aap_templates_config_enabled
+  when: scenario_aap_templates_aap_templates_config_enabled
   tags: ["aap_templates", "validation"]
 
 - name: Get Organization ID
   ansible.builtin.uri:
-    url: "{{ aap_url }}/api/v2/organizations/?name={{ aap_templates_organization }}"
+    url: "{{ scenario_aap_templates_aap_url }}/api/v2/organizations/?name={{ scenario_aap_templates_aap_templates_organization }}"
     method: GET
     headers:
       Authorization: "Bearer {{ aap_token }}"
-    validate_certs: "{{ aap_verify_ssl }}"
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
   register: org_response
   no_log: true
 
@@ -40,47 +40,47 @@
   block:
     - name: Get Inventory IDs
       ansible.builtin.uri:
-        url: "{{ aap_url }}/api/v2/inventories/?name={{ item.inventory }}&organization={{ aap_organization_id }}"
+        url: "{{ scenario_aap_templates_aap_url }}/api/v2/inventories/?name={{ item.inventory }}&organization={{ aap_organization_id }}"
         method: GET
         headers:
           Authorization: "Bearer {{ aap_token }}"
-        validate_certs: "{{ aap_verify_ssl }}"
+        validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
       register: inv_lookup
-      loop: "{{ job_templates }}"
+      loop: "{{ scenario_aap_templates_job_templates }}"
       no_log: true
-      when: create_job_templates
+      when: scenario_aap_templates_create_job_templates
 
     - name: Get Project IDs
       ansible.builtin.uri:
-        url: "{{ aap_url }}/api/v2/projects/?name={{ item.project }}&organization={{ aap_organization_id }}"
+        url: "{{ scenario_aap_templates_aap_url }}/api/v2/projects/?name={{ item.project }}&organization={{ aap_organization_id }}"
         method: GET
         headers:
           Authorization: "Bearer {{ aap_token }}"
-        validate_certs: "{{ aap_verify_ssl }}"
+        validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
       register: proj_lookup
-      loop: "{{ job_templates }}"
+      loop: "{{ scenario_aap_templates_job_templates }}"
       no_log: true
-      when: create_job_templates
+      when: scenario_aap_templates_create_job_templates
 
     - name: Get Credential IDs
       ansible.builtin.uri:
-        url: "{{ aap_url }}/api/v2/credentials/?name={{ item.credential }}&organization={{ aap_organization_id }}"
+        url: "{{ scenario_aap_templates_aap_url }}/api/v2/credentials/?name={{ item.credential }}&organization={{ aap_organization_id }}"
         method: GET
         headers:
           Authorization: "Bearer {{ aap_token }}"
-        validate_certs: "{{ aap_verify_ssl }}"
+        validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
       register: cred_lookup
-      loop: "{{ job_templates }}"
+      loop: "{{ scenario_aap_templates_job_templates }}"
       no_log: true
-      when: create_job_templates
+      when: scenario_aap_templates_create_job_templates
 
     - name: Create Job Templates
       ansible.builtin.uri:
-        url: "{{ aap_url }}/api/v2/job_templates/"
+        url: "{{ scenario_aap_templates_aap_url }}/api/v2/scenario_aap_templates_job_templates/"
         method: POST
         headers:
           Authorization: "Bearer {{ aap_token }}"
-        validate_certs: "{{ aap_verify_ssl }}"
+        validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
         body_format: json
         body:
           name: "{{ item.name }}"
@@ -98,66 +98,66 @@
           ask_variables_on_launch: "{{ item.ask_variables | default(false) }}"
           extra_vars: "{{ item.extra_vars | default({}) | to_nice_json }}"
       register: job_template_results
-      loop: "{{ job_templates }}"
+      loop: "{{ scenario_aap_templates_job_templates }}"
       no_log: true
-      when: create_job_templates
+      when: scenario_aap_templates_create_job_templates
 
     - name: Display Job Templates Created
       ansible.builtin.debug:
         msg: "Created job template: {{ item.item.name }}"
       loop: "{{ job_template_results.results }}"
-      when: create_job_templates and job_template_results.results is defined
+      when: scenario_aap_templates_create_job_templates and job_template_results.results is defined
 
-  when: aap_templates_config_enabled
+  when: scenario_aap_templates_aap_templates_config_enabled
   tags: ["aap_templates", "job"]
 
 - name: Configure Workflow Templates
   block:
     - name: Create Workflow Templates
       ansible.builtin.uri:
-        url: "{{ aap_url }}/api/v2/workflow_job_templates/"
+        url: "{{ scenario_aap_templates_aap_url }}/api/v2/workflow_job_templates/"
         method: POST
         headers:
           Authorization: "Bearer {{ aap_token }}"
-        validate_certs: "{{ aap_verify_ssl }}"
+        validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
         body_format: json
         body:
           name: "{{ item.name }}"
           description: "{{ item.description | default('') }}"
           organization: "{{ aap_organization_id }}"
       register: workflow_template_results
-      loop: "{{ workflow_templates }}"
+      loop: "{{ scenario_aap_templates_workflow_templates }}"
       no_log: true
-      when: create_workflow_templates
+      when: scenario_aap_templates_create_workflow_templates
 
     - name: Display Workflow Templates Created
       ansible.builtin.debug:
         msg: "Created workflow template: {{ item.item.name }}"
       loop: "{{ workflow_template_results.results }}"
-      when: create_workflow_templates and workflow_template_results.results is defined
+      when: scenario_aap_templates_create_workflow_templates and workflow_template_results.results is defined
 
-  when: aap_templates_config_enabled
+  when: scenario_aap_templates_aap_templates_config_enabled
   tags: ["aap_templates", "workflow"]
 
 - name: Test Templates
   block:
     - name: Retrieve All Job Templates
       ansible.builtin.uri:
-        url: "{{ aap_url }}/api/v2/job_templates/?organization={{ aap_organization_id }}"
+        url: "{{ scenario_aap_templates_aap_url }}/api/v2/scenario_aap_templates_job_templates/?organization={{ aap_organization_id }}"
         method: GET
         headers:
           Authorization: "Bearer {{ aap_token }}"
-        validate_certs: "{{ aap_verify_ssl }}"
+        validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
       register: all_job_templates
       no_log: true
 
     - name: Retrieve All Workflow Templates
       ansible.builtin.uri:
-        url: "{{ aap_url }}/api/v2/workflow_job_templates/?organization={{ aap_organization_id }}"
+        url: "{{ scenario_aap_templates_aap_url }}/api/v2/workflow_job_templates/?organization={{ aap_organization_id }}"
         method: GET
         headers:
           Authorization: "Bearer {{ aap_token }}"
-        validate_certs: "{{ aap_verify_ssl }}"
+        validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
       register: all_workflow_templates
       no_log: true
 
@@ -177,5 +177,5 @@
           - {{ tmpl.name }}
           {% endfor %}
 
-  when: aap_templates_config_enabled and aap_templates_test_validation
+  when: scenario_aap_templates_aap_templates_config_enabled and scenario_aap_templates_aap_templates_test_validation
   tags: ["aap_templates", "test"]

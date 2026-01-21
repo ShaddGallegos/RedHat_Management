@@ -1,21 +1,21 @@
 ---
 # Default variables for scenario_aap_inventories role
-aap_inventories_config_enabled: true
-aap_inventories_config_version: "1.0"
-aap_inventories_config_timeout: 600
+scenario_aap_inventories_aap_inventories_config_enabled: true
+scenario_aap_inventories_aap_inventories_config_version: "1.0"
+scenario_aap_inventories_aap_inventories_config_timeout: 600
 
 # AAP Connection
-aap_url: "https://aap.example.com"
-aap_username: "admin"
+scenario_aap_inventories_aap_url: "https://aap.example.com"
+scenario_aap_inventories_aap_username: "admin"
 # aap_password: use vault!
-aap_verify_ssl: true
+scenario_aap_inventories_aap_verify_ssl: true
 
 # Inventories Organization
-aap_inventories_organization: "Default"
+scenario_aap_inventories_aap_inventories_organization: "Default"
 
 # Static Inventories
-create_static_inventories: true
-static_inventories:
+scenario_aap_inventories_create_static_inventories: true
+scenario_aap_inventories_static_inventories:
   - name: "RHIS_Infrastructure"
     description: "RHIS platform_infrastructure_core hosts"
     variables:
@@ -36,8 +36,8 @@ static_inventories:
     tags: ["rhis", "aap"]
 
 # Dynamic Inventories
-create_dynamic_inventories: true
-dynamic_inventories:
+scenario_aap_inventories_create_dynamic_inventories: true
+scenario_aap_inventories_dynamic_inventories:
   - name: "Satellite_Sync"
     description: "Satellite dynamic inventory"
     source: "scenario_satellite"
@@ -58,8 +58,8 @@ dynamic_inventories:
     tags: ["rhis", "aws", "dynamic"]
 
 # Inventory Sources
-create_inventory_sources: true
-inventory_sources:
+scenario_aap_inventories_create_inventory_sources: true
+scenario_aap_inventories_inventory_sources:
   - name: "RHIS_Project_Sync"
     description: "Sync from RHIS project"
     inventory: "RHIS_Infrastructure"
@@ -69,5 +69,5 @@ inventory_sources:
     tags: ["rhis", "source"]
 
 # Feature toggles
-aap_inventories_validate_connectivity: true
-aap_inventories_test_imports: true
+scenario_aap_inventories_aap_inventories_validate_connectivity: true
+scenario_aap_inventories_aap_inventories_test_imports: true

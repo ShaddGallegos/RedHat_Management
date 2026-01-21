@@ -100,13 +100,13 @@ See `defaults/main.yml` for all configuration variables including:
   roles:
     - role: platform_services_provisioning_stack
       vars:
-        provisioning_host: "scenario_satellite.prod.spg"
-        provisioning_primary_interface: "eth0"
-        provisioning_secondary_interface: "eth1"
-        provisioning_interface_ip: "10.168.0.1"
-        dhcp_enabled: true
-        dns_enabled: true
-        tftp_enabled: true
+        platform_services_provisioning_stack_provisioning_host: "scenario_satellite.prod.spg"
+        platform_services_provisioning_stack_provisioning_primary_interface: "eth0"
+        platform_services_provisioning_stack_provisioning_secondary_interface: "eth1"
+        platform_services_provisioning_stack_provisioning_interface_ip: "10.168.0.1"
+        platform_services_provisioning_stack_dhcp_enabled: true
+        platform_services_provisioning_stack_dns_enabled: true
+        platform_services_provisioning_stack_tftp_enabled: true
 ```
 
 ## Files Created

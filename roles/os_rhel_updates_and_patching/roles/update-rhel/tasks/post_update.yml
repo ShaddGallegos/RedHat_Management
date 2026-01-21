@@ -2,23 +2,38 @@
 # Post-update analysis and reboot detection
 
 - name: Gather package facts after update
-  package_facts:
+  ansible.builtin.package_facts:
+    manager: auto
   register: update_rhel_packages_post
 
 - name: Store post-update package count
   ansible.builtin.set_fact:
     update_rhel_post_package_count: "{{ update_rhel_packages_post.ansible_facts.packages.keys() | length }}"
 
-- name: Determine latest installed kernel version
+- name: Determine latest installed kernel attributes
   ansible.builtin.set_fact:
-    update_rhel_latest_kernel: "{{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].version }}-{{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].release }}.{{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].arch }}"
+    update_rhel_latest_kernel_version: >-
+      {{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].version }}
+    update_rhel_latest_kernel_release: >-
+      {{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].release }}
+    update_rhel_latest_kernel_arch: >-
+      {{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].arch }}
   when:
     - update_rhel_packages_post.ansible_facts.packages.kernel is defined
     - update_rhel_packages_post.ansible_facts.packages.kernel | length > 0
 
+- name: Build latest installed kernel version string
+  ansible.builtin.set_fact:
+    update_rhel_latest_kernel: "{{ update_rhel_latest_kernel_version }}-{{ update_rhel_latest_kernel_release }}.{{ update_rhel_latest_kernel_arch }}"
+  when:
+    - update_rhel_latest_kernel_version is defined
+    - update_rhel_latest_kernel_release is defined
+    - update_rhel_latest_kernel_arch is defined
+
 - name: Check if kernel update requires reboot
   ansible.builtin.set_fact:
-    update_rhel_kernel_reboot_needed: "{{ update_rhel_latest_kernel is defined and update_rhel_os_info.kernel != update_rhel_latest_kernel }}"
+    update_rhel_kernel_reboot_needed: >-
+      {{ (update_rhel_latest_kernel is defined) and (update_rhel_os_info.kernel != update_rhel_latest_kernel) }}
 
 - name: Check for system reboot indicators (RHEL 8+)
   ansible.builtin.stat:
@@ -26,11 +41,24 @@
   register: update_rhel_reboot_file
   when: update_rhel_os_info.major_version >= 8
 
-- name: Check for systemd reboot indicators
-  ansible.builtin.command: systemctl is-system-running
-  register: update_rhel_system_status
+- name: Collect service facts (avoid using systemctl directly)
+  ansible.builtin.service_facts:
+
+- name: Reload systemd daemon (use systemd module instead of systemctl)
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: update_rhel_systemd_reload | default(false) | bool
+
+- name: Register collected service facts for later checks
+  ansible.builtin.set_fact:
+    update_rhel_service_facts: "{{ ansible_facts.services | default({}) }}"
   failed_when: false
   changed_when: false
+
+- name: Example determine if sshd is running using service_facts (do not use systemctl)
+  ansible.builtin.set_fact:
+    update_rhel_sshd_running: "{{ (update_rhel_service_facts['sshd'].state == 'running') | default(false) }}"
+  when: "update_rhel_service_facts is defined and 'sshd' in update_rhel_service_facts"
 
 - name: Determine overall reboot requirement
   ansible.builtin.set_fact:

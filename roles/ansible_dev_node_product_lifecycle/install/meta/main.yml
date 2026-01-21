@@ -8,6 +8,4 @@ galaxy_info:
   galaxy_tags:
     - installation
     - lifecycle
-    - ansible_dev_node_orchestration
-
-dependencies: []
+    - ansible-dev-node-orchestration

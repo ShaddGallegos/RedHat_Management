@@ -33,7 +33,7 @@
         firewall_ports_unique: "{{ firewall_services_to_apply | map(attribute='ports') | sum(start=[]) | unique }}"
 
     - name: Allow services
-      ansible.builtin.firewalld:
+      ansible.posix.firewalld:
         ansible.builtin.service: "{{ item }}"
         permanent: true
         immediate: true
@@ -44,7 +44,7 @@
       become: true
 
     - name: Allow ports
-      ansible.builtin.firewalld:
+      ansible.posix.firewalld:
         port: "{{ item }}"
         permanent: true
         immediate: true

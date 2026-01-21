@@ -1,12 +1,12 @@
 ---
 # Default variables for platform_infrastructure_core role
-infrastructure_enabled: true
-infrastructure_version: "1.0"
-infrastructure_timeout: 1800
+platform_infrastructure_core_infrastructure_enabled: true
+platform_infrastructure_core_infrastructure_version: "1.0"
+platform_infrastructure_core_infrastructure_timeout: 1800
 
 # Infrastructure components
-configure_networking: true
-configure_storage: true
+platform_infrastructure_core_configure_networking: true
+platform_infrastructure_core_configure_storage: true
 
 # Feature toggles
-infrastructure_validate_resources: true
+platform_infrastructure_core_infrastructure_validate_resources: true

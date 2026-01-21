@@ -1,5 +1,5 @@
 options rotate timeout:2 attempts:1
-search {{ satellite_search_domain | default('prod.spg') }}
-{% for ns in satellite_nameservers %}
+search {{ scenario_satellite_mail_setup_satellite_search_domain | default('prod.spg') }}
+{% for ns in scenario_satellite_mail_setup_satellite_nameservers %}
 nameserver {{ ns }}
 {% endfor %}

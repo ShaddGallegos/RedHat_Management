@@ -50,15 +50,15 @@ install_method: "oemdrv"                   # Optional: Default 'oemdrv'
 
 ```yaml
 # Control which phases execute
-deploy_infrastructure: true                # Execute platform_infrastructure_core phase
-configure_os: true                         # Execute OS configuration
-deploy_products: true                      # Deploy products
-run_tests: true                            # Run post-deployment tests
+ansible_dev_node_orchestration_master_deploy_infrastructure: true                # Execute platform_infrastructure_core phase
+ansible_dev_node_orchestration_master_configure_os: true                         # Execute OS configuration
+ansible_dev_node_orchestration_master_deploy_products: true                      # Deploy products
+ansible_dev_node_orchestration_master_run_tests: true                            # Run post-deployment tests
 
 # Product-specific controls
-configure_satellite_api: true              # Configure Satellite API
-configure_aap_rbac: true                   # Configure AAP RBAC
-deploy_idm_replicas: false                 # Deploy IdM replicas
+ansible_dev_node_orchestration_master_configure_satellite_api: true              # Configure Satellite API
+ansible_dev_node_orchestration_master_configure_aap_rbac: true                   # Configure AAP RBAC
+ansible_dev_node_orchestration_master_deploy_idm_replicas: false                 # Deploy IdM replicas
 deploy_satellite_reporting: true           # Deploy reporting
 
 # Timing controls
@@ -111,7 +111,7 @@ The role provides:
         deployment_scenario: "satellite_aap"
         deployment_platform: "baremetal"
         deployment_os: "rhel-9"
-        configure_aap_rbac: true
+        ansible_dev_node_orchestration_master_configure_aap_rbac: true
         deploy_satellite_reporting: true
         deployment_timeout: 7200
 ```

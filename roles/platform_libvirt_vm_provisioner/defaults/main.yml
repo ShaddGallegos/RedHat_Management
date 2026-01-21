@@ -2,35 +2,35 @@
 # Libvirt VM Provisioner - Default Variables
 
 # VM Configuration
-libvirt_vm_name: "rhel10-vm"
-libvirt_vm_cpus: 2
-libvirt_vm_memory: 2048  # MB
-libvirt_vm_disk: 50      # GB
-libvirt_vm_network: "default"
+platform_libvirt_vm_provisioner_libvirt_vm_name: "rhel10-vm"
+platform_libvirt_vm_provisioner_libvirt_vm_cpus: 2
+platform_libvirt_vm_provisioner_libvirt_vm_memory: 2048  # MB
+platform_libvirt_vm_provisioner_libvirt_vm_disk: 50      # GB
+platform_libvirt_vm_provisioner_libvirt_vm_network: "default"
 
 # File Paths
-libvirt_iso_file: "files/rhel-10.iso"
-libvirt_kickstart_file: "files/oem.cfg"
+platform_libvirt_vm_provisioner_libvirt_iso_file: "files/rhel-10.iso"
+platform_libvirt_vm_provisioner_libvirt_kickstart_file: "files/oem.cfg"
 
 # HTTP Server Configuration
-libvirt_kickstart_port: 8888
-libvirt_kickstart_http_dir: "/tmp/rhel-kickstart-{{ ansible_date_time.iso8601_basic_short }}"
+platform_libvirt_vm_provisioner_libvirt_kickstart_port: 8888
+platform_libvirt_vm_provisioner_libvirt_kickstart_http_dir: "/tmp/rhel-kickstart-{{ ansible_date_time.iso8601_basic_short }}"
 
 # Installation Monitoring
-libvirt_monitor_timeout: 300  # seconds
-libvirt_monitor_interval: 5   # seconds
+platform_libvirt_vm_provisioner_libvirt_monitor_timeout: 300  # seconds
+platform_libvirt_vm_provisioner_libvirt_monitor_interval: 5   # seconds
 
 # Optional Network Configuration
-libvirt_bridge_device: null
-libvirt_mac_address: null
-libvirt_static_ip: null
-libvirt_gateway: null
-libvirt_nameserver: null
+platform_libvirt_vm_provisioner_libvirt_bridge_device: null
+platform_libvirt_vm_provisioner_libvirt_mac_address: null
+platform_libvirt_vm_provisioner_libvirt_static_ip: null
+platform_libvirt_vm_provisioner_libvirt_gateway: null
+platform_libvirt_vm_provisioner_libvirt_nameserver: null
 
 # Kickstart Template Variables
-libvirt_root_password: "$1$salt$N6vxIwfYxSXXPw8jg2Qz5/"  # Change this!
-libvirt_ansible_user: "ansible"
-libvirt_packages:
+platform_libvirt_vm_provisioner_libvirt_root_password: "$1$salt$N6vxIwfYxSXXPw8jg2Qz5/"  # Change this!
+platform_libvirt_vm_provisioner_libvirt_ansible_user: "ansible"
+platform_libvirt_vm_provisioner_libvirt_packages:
   - "@core"
   - "@standard"
   - "vim"
@@ -41,25 +41,25 @@ libvirt_packages:
   - "python3-devel"
 
 # Post-Installation Tasks
-libvirt_install_ansible: true
-libvirt_enable_selinux: true
-libvirt_enable_firewall: true
-libvirt_firewall_services:
+platform_libvirt_vm_provisioner_libvirt_install_ansible: true
+platform_libvirt_vm_provisioner_libvirt_enable_selinux: true
+platform_libvirt_vm_provisioner_libvirt_enable_firewall: true
+platform_libvirt_vm_provisioner_libvirt_firewall_services:
   - "ssh"
 
 # Cleanup Options
-libvirt_cleanup_http_server: true
-libvirt_cleanup_temp_files: true
+platform_libvirt_vm_provisioner_libvirt_cleanup_http_server: true
+platform_libvirt_vm_provisioner_libvirt_cleanup_temp_files: true
 
 # Logging
-libvirt_log_level: "info"  # debug, info, warning, error
-libvirt_save_logs: true
-libvirt_logs_dir: "/tmp/libvirt-provisioner-logs"
+platform_libvirt_vm_provisioner_libvirt_log_level: "info"  # debug, info, warning, error
+platform_libvirt_vm_provisioner_libvirt_save_logs: true
+platform_libvirt_vm_provisioner_libvirt_logs_dir: "/tmp/libvirt-provisioner-logs"
 
 # Cloud-init and seed options
-use_cloud_init_iso: true
-use_cloud_init_disk: false
-cloud_init_allow_password_auth: false
-seed_disk_size_mb: 64
+platform_libvirt_vm_provisioner_use_cloud_init_iso: true
+platform_libvirt_vm_provisioner_use_cloud_init_disk: false
+platform_libvirt_vm_provisioner_cloud_init_allow_password_auth: false
+platform_libvirt_vm_provisioner_seed_disk_size_mb: 64
 # Optional SSH public key to inject into provisioned VMs
-ssh_public_key: ""
+platform_libvirt_vm_provisioner_ssh_public_key: ""

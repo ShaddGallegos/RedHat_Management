@@ -16,8 +16,8 @@ The `scenario_satellite_os_configuration` role configures Satellite 6.18 with RH
 ## Required Variables
 
 ```yaml
-satellite_url: "https://scenario_satellite.example.com"
-satellite_username: "admin"
+scenario_satellite_os_configuration_satellite_url: "https://scenario_satellite.example.com"
+scenario_satellite_os_configuration_satellite_username: "admin"
 satellite_password: "{{ vault_satellite_admin_pwd }}"
 ```
 
@@ -26,8 +26,8 @@ satellite_password: "{{ vault_satellite_admin_pwd }}"
 ```yaml
 - role: scenario_satellite_os_configuration
   vars:
-    create_operatingsystems: true
-    create_install_media: true
-    create_kickstart_repo: true
-    configure_sync_job: true
+    scenario_satellite_os_configuration_create_operatingsystems: true
+    scenario_satellite_os_configuration_create_install_media: true
+    scenario_satellite_os_configuration_create_kickstart_repo: true
+    scenario_satellite_os_configuration_configure_sync_job: true
 ```

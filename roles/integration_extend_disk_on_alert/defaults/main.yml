@@ -1,7 +1,7 @@
 ---
 # Default variables for extending disks on alert
 
-vg_name: "vg_data"
-lv_name: "lv_data"
-disk_img_path: "/var/lib/libvirt/images/extra_disk.img"
-disk_device: "/dev/vdb"
+integration_extend_disk_on_alert_vg_name: "vg_data"
+integration_extend_disk_on_alert_lv_name: "lv_data"
+integration_extend_disk_on_alert_disk_img_path: "/var/lib/libvirt/images/extra_disk.img"
+integration_extend_disk_on_alert_disk_device: "/dev/vdb"

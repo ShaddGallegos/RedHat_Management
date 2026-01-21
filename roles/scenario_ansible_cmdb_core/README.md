@@ -29,7 +29,7 @@ The `scenario_ansible_cmdb_core` role manages the Configuration Management Datab
   roles:
     - role: scenario_ansible_cmdb_core
       vars:
-        cmdb_enabled: true
+        scenario_ansible_cmdb_core_cmdb_enabled: true
 ```
 
 ## Support & Documentation

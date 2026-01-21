@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    provisioning_enabled: true
+    platform_provisioning_provisioning_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - provisioning_enabled is defined
+          - platform_provisioning_provisioning_enabled is defined

@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    satellite_6_18_deployment_enabled: true
+    scenario_satellite_618_install_satellite_6_18_deployment_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - satellite_6_18_deployment_enabled is defined
+          - scenario_satellite_618_install_satellite_6_18_deployment_enabled is defined

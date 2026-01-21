@@ -9,26 +9,26 @@
       Pre-reboot delay: {{ update_rhel_pre_reboot_delay | default(10) }} seconds
 
 - name: Wait before reboot (allow time for message display)
-  pause:
+  ansible.builtin.pause:
     seconds: "{{ update_rhel_pre_reboot_delay | default(10) }}"
   when: update_rhel_pre_reboot_delay | default(10) > 0
 
 - name: Reboot the system
-  reboot:
+  ansible.builtin.reboot:
     reboot_timeout: "{{ reboot_timeout | default(600) }}"
     connect_timeout: "{{ update_rhel_connect_timeout | default(10) }}"
     test_command: "{{ update_rhel_test_command | default('whoami') }}"
-    pre_reboot_delay: 0 # We handled delay above
+    pre_reboot_delay: 0
     post_reboot_delay: "{{ update_rhel_post_reboot_delay | default(30) }}"
   register: update_rhel_reboot_result
 
 - name: Wait for system to be fully ready
-  pause:
+  ansible.builtin.pause:
     seconds: "{{ update_rhel_post_reboot_delay | default(30) }}"
   when: update_rhel_post_reboot_delay | default(30) > 0
 
 - name: Gather facts after reboot
-  setup:
+  ansible.builtin.setup:
     filter: ansible_distribution*
   register: update_rhel_post_reboot_facts
 
@@ -36,7 +36,7 @@
   ansible.builtin.set_fact:
     update_rhel_os_info_post_reboot:
       distribution: "{{ ansible_distribution }}"
-      major_version: "{{ ansible_distribution_major_version|int }}"
+      major_version: "{{ ansible_distribution_major_version | int }}"
       version: "{{ ansible_distribution_version }}"
       kernel: "{{ ansible_kernel }}"
 
@@ -67,8 +67,11 @@
 - name: Run post-reboot validation commands
   ansible.builtin.command: "{{ item }}"
   loop: "{{ update_rhel_post_reboot_commands | default([]) }}"
-  register: update_rhel_post_reboot_validation
+  loop_control:
+    label: "{{ item }}"
   failed_when: false
+  changed_when: false
+  register: update_rhel_post_reboot_validation
   when: update_rhel_post_reboot_commands is defined
 
 - name: Display post-reboot validation results

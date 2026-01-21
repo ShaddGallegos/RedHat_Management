@@ -81,11 +81,10 @@
       tags: ["always"]
       ansible.builtin.debug:
         msg: |
-          
-             RHIS Orchestration - Red Hat Infrastructure Standard 
-             Version: {{ deployment_version }}                           
-             Timestamp: {{ deployment_timestamp }}               
-          
+
+          RHIS Orchestration - Red Hat Infrastructure Standard
+          Version: {{ deployment_version }}
+          Timestamp: {{ deployment_timestamp }}
 
           Deployment Configuration:
             Scenario: {{ deployment_scenario }}
@@ -217,8 +216,8 @@
             name: "ansible_dev_node_inventory_generator"
             tasks_from: "main"
           vars:
-            inventory_generator_scenario: "{{ deployment_scenario }}"
-            inventory_generator_platform: "{{ deployment_platform }}"
+            ansible_dev_node_inventory_generator_scenario: "{{ deployment_scenario }}"
+            ansible_dev_node_inventory_generator_platform: "{{ deployment_platform }}"
           tags: ["phase3", "inventory", "configure"]
 
         - name: "Validate generated inventory"
@@ -450,9 +449,7 @@
       tags: ["always"]
       ansible.builtin.debug:
         msg: |
-          
-                           DEPLOYMENT COMPLETE                     
-          
+          DEPLOYMENT COMPLETE
 
           Scenario: {{ deployment_scenario }}
           Platform: {{ deployment_platform }}

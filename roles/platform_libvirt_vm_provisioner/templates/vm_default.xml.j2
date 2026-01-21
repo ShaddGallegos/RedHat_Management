@@ -12,7 +12,7 @@
       <source file='{{ item.disk }}'/>
       <target dev='vda' bus='virtio'/>
     </disk>
-    {% if use_cloud_init_disk | default(false) %}
+    {% if platform_libvirt_vm_provisioner_use_cloud_init_disk | default(false) %}
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>
       <source file='/var/lib/libvirt/images/{{ item.name }}-seed.img'/>
@@ -27,7 +27,7 @@
       <model type='virtio'/>
     </interface>
     <graphics type='vnc' port='-1' autoport='yes'/>
-    {% if use_cloud_init_iso | default(true) | bool %}
+    {% if platform_libvirt_vm_provisioner_use_cloud_init_iso | default(true) | bool %}
     <disk type='file' device='cdrom'>
       <driver name='qemu' type='raw'/>
       <source file='/var/lib/libvirt/images/{{ item.name }}-seed.iso'/>

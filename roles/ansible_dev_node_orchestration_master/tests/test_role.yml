@@ -4,14 +4,14 @@
   hosts: localhost
   gather_facts: false
   vars:
-    orchestration_master_enabled: true
+    ansible_dev_node_orchestration_master_orchestration_master_enabled: true
     deployment_scenario: "satellite_aap"
     deployment_platform: "libvirt"
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - orchestration_master_enabled is defined
+          - ansible_dev_node_orchestration_master_orchestration_master_enabled is defined
           - deployment_scenario is defined
           - deployment_platform is defined
         fail_msg: "Required variables not defined"

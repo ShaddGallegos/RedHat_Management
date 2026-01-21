@@ -1,10 +1,13 @@
 ---
 - name: Skip firewall configuration when disabled
   ansible.builtin.debug:
-    msg: "firewall_services_enabled is false; skipping"
-  when: not firewall_services_enabled | bool
+    msg: "platform_firewall_services_firewall_services_enabled is false; skipping"
+  when: not platform_firewall_services_firewall_services_enabled | bool
 
 - block:
+    tags:
+      - platformfirewall
+      - firewall
     - name: Ensure firewalld is installed
       ansible.builtin.package:
         name: firewalld
@@ -21,8 +24,8 @@
     - name: Build merged service/port list
       ansible.builtin.set_fact:
         firewall_services_to_apply: >-
-          {{ firewall_services_profiles_enabled
-             | map('extract', firewall_services_definitions)
+          {{ platform_firewall_services_firewall_services_profiles_enabled
+             | map('extract', platform_firewall_services_firewall_services_definitions)
              | list
              | select('defined')
              | list }}
@@ -33,25 +36,29 @@
         firewall_ports_unique: "{{ firewall_services_to_apply | map(attribute='ports') | sum(start=[]) | unique }}"
 
     - name: Allow services
-      ansible.builtin.firewalld:
+      ansible.posix.firewalld:
         ansible.builtin.service: "{{ item }}"
         permanent: true
         immediate: true
         state: enabled
-        zone: "{{ firewall_zone }}"
+        zone: "{{ platform_firewall_services_firewall_zone }}"
       loop: "{{ firewall_services_unique }}"
       when: firewall_services_unique | length > 0
+      tags:
+        - firewallservices
       become: true
 
     - name: Allow ports
-      ansible.builtin.firewalld:
+      ansible.posix.firewalld:
         port: "{{ item }}"
         permanent: true
         immediate: true
         state: enabled
-        zone: "{{ firewall_zone }}"
+        zone: "{{ platform_firewall_services_firewall_zone }}"
       loop: "{{ firewall_ports_unique }}"
       when: firewall_ports_unique | length > 0
+      tags:
+        - firewallports
       become: true
 
-  when: firewall_services_enabled | bool
+  when: platform_firewall_services_firewall_services_enabled | bool

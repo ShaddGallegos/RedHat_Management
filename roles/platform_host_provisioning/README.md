@@ -21,7 +21,7 @@ This role handles host platform_provisioning workflow:
 
 ### Required Variables
 ```yaml
-provisioning_hosts:
+platform_host_provisioning_provisioning_hosts:
   - fqdn: "controller1.example.com"
     organization: "example"
     hostgroup: "baseRHEL8/Controller"
@@ -32,9 +32,9 @@ provisioning_hosts:
 
 ### Optional Variables
 ```yaml
-satellite_host: "scenario_satellite.example.com"
-host_wait_timeout: 7200
-host_wait_sleep: 60
+platform_host_provisioning_satellite_host: "scenario_satellite.example.com"
+platform_host_provisioning_host_wait_timeout: 7200
+platform_host_provisioning_host_wait_sleep: 60
 ```
 
 ## Example Usage
@@ -44,7 +44,7 @@ host_wait_sleep: 60
   roles:
     - role: platform_host_provisioning
       vars:
-        provisioning_hosts:
+        platform_host_provisioning_provisioning_hosts:
           - fqdn: "controller1.prod.spg"
             hostgroup: "baseRHEL8/Controller"
             compute_resource: "VMware_Lab"

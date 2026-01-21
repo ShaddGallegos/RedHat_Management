@@ -4,9 +4,9 @@
   hosts: localhost
   gather_facts: false
   vars:
-    cmdb_enabled: true
+    scenario_ansible_cmdb_core_cmdb_enabled: true
   tasks:
     - name: Verify role variables
       ansible.builtin.assert:
         that:
-          - cmdb_enabled is defined
+          - scenario_ansible_cmdb_core_cmdb_enabled is defined

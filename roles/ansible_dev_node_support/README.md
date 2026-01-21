@@ -34,10 +34,10 @@ The `ansible_dev_node_support` role orchestrates post-deployment validation, tes
 
 ```yaml
 # Validation controls
-run_preflight_checks: true
-run_tests: false
-backup_and_restore: false
-configure_cmdb: true
+ansible_dev_node_support_run_preflight_checks: true
+ansible_dev_node_support_run_tests: false
+ansible_dev_node_support_backup_and_restore: false
+ansible_dev_node_support_configure_cmdb: true
 
 # Test types
 test_types:
@@ -47,8 +47,8 @@ test_types:
   - integration_generic
 
 # Backup settings
-backup_destination: "/backup"
-backup_retention_days: 30
+ansible_dev_node_support_backup_destination: "/backup"
+ansible_dev_node_support_backup_retention_days: 30
 backup_schedule: "daily"  # daily, weekly, monthly
 
 # CMDB settings
@@ -65,7 +65,7 @@ cmdb_update_frequency: 86400  # seconds
   roles:
     - role: ansible_dev_node_support
       vars:
-        run_preflight_checks: true
+        ansible_dev_node_support_run_preflight_checks: true
 ```
 
 ### Run Complete Tests
@@ -75,7 +75,7 @@ cmdb_update_frequency: 86400  # seconds
   roles:
     - role: ansible_dev_node_support
       vars:
-        run_tests: true
+        ansible_dev_node_support_run_tests: true
         test_types:
           - connectivity
           - services
@@ -89,8 +89,8 @@ cmdb_update_frequency: 86400  # seconds
   roles:
     - role: ansible_dev_node_support
       vars:
-        backup_and_restore: true
-        backup_destination: "/mnt/backup"
+        ansible_dev_node_support_backup_and_restore: true
+        ansible_dev_node_support_backup_destination: "/mnt/backup"
 ```
 
 ## Preflight Checks

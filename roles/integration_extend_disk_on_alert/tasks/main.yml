@@ -26,9 +26,9 @@
 
 - name: Create new disk image for libvirt
   ansible.builtin.shell: |
-    dd if=/dev/zero of={{ disk_img_path }} bs=1G count={{ extend_size_gb }}
+    dd if=/dev/zero of={{ integration_extend_disk_on_alert_disk_img_path }} bs=1G count={{ extend_size_gb }}
   args:
-    creates: "{{ disk_img_path }}"
+    creates: "{{ integration_extend_disk_on_alert_disk_img_path }}"
 
 - name: Attach new disk to VM
   community.libvirt.virt:
@@ -37,35 +37,35 @@
     xml: |
       <disk type='file' device='disk'>
         <driver name='qemu' type='qcow2'/>
-        <source file='{{ disk_img_path }}'/>
-        <target dev='{{ disk_device | basename }}' bus='virtio'/>
+        <source file='{{ integration_extend_disk_on_alert_disk_img_path }}'/>
+        <target dev='{{ integration_extend_disk_on_alert_disk_device | basename }}' bus='virtio'/>
       </disk>
 
 - name: Wait for new disk device to appear
   ansible.builtin.wait_for:
-    path: "{{ disk_device }}"
+    path: "{{ integration_extend_disk_on_alert_disk_device }}"
     timeout: 60
 
 - name: Create physical volume on new disk
-  ansible.builtin.command: pvcreate "{{ disk_device }}"
+  ansible.builtin.command: pvcreate "{{ integration_extend_disk_on_alert_disk_device }}"
   register: pvcreate_result
   changed_when: "'successfully created' in pvcreate_result.stdout"
 
 - name: Extend volume group with new PV
-  ansible.builtin.command: vgextend "{{ vg_name }}" "{{ disk_device }}"
+  ansible.builtin.command: vgextend "{{ integration_extend_disk_on_alert_vg_name }}" "{{ integration_extend_disk_on_alert_disk_device }}"
   register: vgextend_result
   changed_when: "'successfully extended' in vgextend_result.stdout"
 
 - name: Extend logical volume with all available extents
-  ansible.builtin.command: lvextend -l +100%FREE "/dev/{{ vg_name }}/{{ lv_name }}"
+  ansible.builtin.command: lvextend -l +100%FREE "/dev/{{ integration_extend_disk_on_alert_vg_name }}/{{ integration_extend_disk_on_alert_lv_name }}"
   register: lvextend_result
   changed_when: "'successfully resized' in lvextend_result.stdout"
 
 - name: Resize filesystem
-  ansible.builtin.command: resize2fs "/dev/{{ vg_name }}/{{ lv_name }}"
+  ansible.builtin.command: resize2fs "/dev/{{ integration_extend_disk_on_alert_vg_name }}/{{ integration_extend_disk_on_alert_lv_name }}"
 
 - name: Tune filesystem after resize
-  ansible.builtin.command: tune2fs -l "/dev/{{ vg_name }}/{{ lv_name }}"
+  ansible.builtin.command: tune2fs -l "/dev/{{ integration_extend_disk_on_alert_vg_name }}/{{ integration_extend_disk_on_alert_lv_name }}"
   register: tune2fs_result
 
 - name: Show tune2fs output

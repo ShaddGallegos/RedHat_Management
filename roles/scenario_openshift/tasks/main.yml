@@ -1,6 +1,11 @@
 ---
-- import_tasks: install.yml
-- import_tasks: configure.yml
-- import_tasks: test.yml
-- import_tasks: backup.yml
-- import_tasks: restore.yml
+- name: include install.yml
+- ansible.builtin.import_tasks: install.yml
+- name: include configure.yml
+- ansible.builtin.import_tasks: configure.yml
+- name: include test.yml
+- ansible.builtin.import_tasks: test.yml
+- name: include backup.yml
+- ansible.builtin.import_tasks: backup.yml
+- name: include restore.yml
+- ansible.builtin.import_tasks: restore.yml

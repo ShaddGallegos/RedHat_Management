@@ -35,8 +35,8 @@ The `os_generic` role handles operating system configuration including package i
   roles:
     - role: os_generic
       vars:
-        configure_firewall: true
-        enable_selinux: true
+        os_generic_configure_firewall: true
+        os_generic_enable_selinux: true
 ```
 
 ## Support & Documentation

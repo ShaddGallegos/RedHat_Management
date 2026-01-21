@@ -9,7 +9,7 @@
   tags: ["report"]
 
 - name: "Report | Collect system facts"
-  setup:
+  ansible.builtin.setup:
     gather_subset: "all"
   tags: ["report", "facts"]
 

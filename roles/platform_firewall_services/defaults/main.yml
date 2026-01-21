@@ -1,6 +1,6 @@
 ---
-firewall_services_enabled: true
-firewall_services_profiles_enabled:
+platform_firewall_services_firewall_services_enabled: true
+platform_firewall_services_firewall_services_profiles_enabled:
   - scenario_satellite
   - aap
   - eda
@@ -9,7 +9,7 @@ firewall_services_profiles_enabled:
   - rhc
   - ansible_cmdb
 
-firewall_services_definitions:
+platform_firewall_services_firewall_services_definitions:
   scenario_satellite:
     services:
       - dhcp
@@ -69,4 +69,4 @@ firewall_services_definitions:
     ports: []
 
 # Optional zone override (default: public)
-firewall_zone: public
+platform_firewall_services_firewall_zone: public

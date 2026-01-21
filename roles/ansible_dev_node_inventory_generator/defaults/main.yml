@@ -1,11 +1,11 @@
 ---
 # Default variables for ansible_dev_node_inventory_generator role
-inventory_generator_enabled: true
-inventory_generator_version: "1.0"
+ansible_dev_node_inventory_generator_inventory_generator_enabled: true
+ansible_dev_node_inventory_generator_inventory_generator_version: "1.0"
 
 # Inventory configuration
-inventory_generator_format: "ini"
-inventory_generator_output: "/opt/inventory/hosts.generated"
+ansible_dev_node_inventory_generator_inventory_generator_format: "ini"
+ansible_dev_node_inventory_generator_inventory_generator_output: "/opt/inventory/hosts.generated"
 
 # Feature toggles
-inventory_generator_validate_syntax: true
+ansible_dev_node_inventory_generator_inventory_generator_validate_syntax: true

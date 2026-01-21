@@ -11,9 +11,7 @@ galaxy_info:
         - 8
         - 9
         - 10
-  categories:
+  galaxy_tags:
     - networking
     - system
-    - platform_provisioning
-
-dependencies: []
+    - platform-provisioning

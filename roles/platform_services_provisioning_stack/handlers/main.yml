@@ -9,13 +9,13 @@
 
 - name: Restart dhcp service
   ansible.builtin.systemd:
-    name: "{{ dhcp_service }}"
+    name: "{{ platform_services_provisioning_stack_dhcp_service }}"
     state: restarted
   listen: Restart dhcp service
 
 - name: Restart dns service
   ansible.builtin.systemd:
-    name: "{{ dns_service }}"
+    name: "{{ platform_services_provisioning_stack_dns_service }}"
     state: restarted
   listen: Restart dns service
 
@@ -27,7 +27,7 @@
 
 - name: Update resolv.conf
   ansible.builtin.file:
-    path: "{{ resolv_conf_path }}"
+    path: "{{ platform_services_provisioning_stack_resolv_conf_path }}"
     state: file
     mode: "0644"
   listen: Update resolv.conf

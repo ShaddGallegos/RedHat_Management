@@ -1,12 +1,15 @@
+- name: include ensure_repositories.yml
 - ansible.builtin.import_tasks: ensure_repositories.yml
   tags:
     - mandatory
 
+- name: include ensure_chronyd.yml
 - ansible.builtin.import_tasks: ensure_chronyd.yml
   tags:
     - mandatory
     - time
 
+- name: include ensure_idm_registered.yml
 - ansible.builtin.import_tasks: ensure_idm_registered.yml
   tags:
     - mandatory

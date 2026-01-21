@@ -37,30 +37,35 @@
 # - add admin users - cloud connector, ansible
 
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_hammer.yml"
   tags:
     - tags_mandatory
     - tags_basic_config
     - tags_configure_hammer
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/create_manifest.yml"
   tags:
     - tags_mandatory
     - tags_basic_config
     - tags_manifest
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/fetch_manifest.yml"
   tags:
     - tags_mandatory
     - tags_basic_config
     - tags_manifest
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/upload_manifest.yml"
   tags:
     - tags_mandatory
     - tags_basic_config
     - tags_manifest
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_repositories.yml"
   tags:
     - tags_mandatory
@@ -68,6 +73,7 @@
     - tags_redhat_repos
     - tags_repositories
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_repositories.yml"
   tags:
     - tags_optional
@@ -75,6 +81,7 @@
     - tags_redhat_repos
     - tags_repositories
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_custom_products.yml"
   tags:
     - tags_mandatory
@@ -82,120 +89,140 @@
     - custom_repos
     - tags_repositories
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/start_synchronization.yml"
   tags:
     - tags_mandatory
     - tags_content_config
     - tags_sync
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_lifecycle_environments.yml"
   tags:
     - tags_mandatory
     - tags_content_config
     - tags_lifecycle_environments
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_sync_plans.yml"
   tags:
     - tags_mandatory
     - tags_content_config
     - sync_plans
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_sync_plans.yml"
   tags:
     - tags_optional
     - tags_content_config
     - tags_sync_plans
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/attach_sync_plans.yml"
   tags:
     - tags_mandatory
     - tags_content_config
     - tags_sync_plans
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_cvs.yml"
   tags:
     - tags_mandatory
     - tags_content_config
     - tags_content_views
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_cvs.yml"
   tags:
     - tags_optional
     - tags_content_config
     - tags_content_views
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_ccvs.yml"
   tags:
     - tags_mandatory
     - tags_content_config
     - tags_composite_content_views
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_ccvs.yml"
   tags:
     - tags_optional
     - tags_content_config
     - tags_composite_content_views
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_media.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_media
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_media.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_media
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_ptables.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_ptables
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_ptables.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_ptables
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_prov_templates.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_prov_templates
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_prov_templates.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_prov_templates
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_oss.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_os
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_oss.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_os
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_aks.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_activation_keys
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_aks.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_activation_keys
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_domains.yml"
   tags:
     - tags_mandatory
@@ -203,6 +230,7 @@
     - tags_network
     - tags_domains
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_domains.yml"
   tags:
     - tags_optional
@@ -210,6 +238,7 @@
     - tags_network
     - tags_domains
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_realms.yml"
   tags:
     - tags_mandatory
@@ -217,6 +246,7 @@
     - tags_network
     - tags_realms
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_realms.yml"
   tags:
     - tags_optional
@@ -224,6 +254,7 @@
     - tags_network
     - tags_realms
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_subnets.yml"
   tags:
     - tags_mandatory
@@ -231,6 +262,7 @@
     - tags_network
     - tags_subnets
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_subnets.yml"
   tags:
     - tags_optional
@@ -238,132 +270,154 @@
     - tags_network
     - tags_subnets
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/build_pxe_defaults.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_discovery
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_compute_resources.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_compute_resources
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_compute_resources.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_compute_resources
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_compute_profiles.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_compute_profiles
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_compute_profiles.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_compute_profiles
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_virtwho.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_virt_who
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_git_repos.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_clone_git_repos
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_git_repos.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_clone_git_repos
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/ensure_import_roles.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_ansible_import_roles
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_scap_content.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_scap_contents
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_scap_content.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_scap_contents
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_scap_tailoring_files.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_scap_tailoring_files
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_scap_tailoring_files.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_scap_tailoring_files
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_hostgroups.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_host_groups
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_hostgroups.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_host_groups
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_scap_policies.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_scap_policies
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_scap_policies.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_scap_policies
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_discovery_rules.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_discovery_rules
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_discovery_rules.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_discovery_rules
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_mandatory_global_parameters.yml"
   tags:
     - tags_mandatory
     - tags_provisioning_config
     - tags_global_parameters
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_optional_global_parameters.yml"
   tags:
     - tags_optional
     - tags_provisioning_config
     - tags_global_parameters
 
+- name: include "{{
 - ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_general_settings.yml"
   tags:
     - tags_general_settings

@@ -34,10 +34,10 @@ The `platform_baremetal_provisioner` role handles platform_provisioning of bare 
 ```yaml
 # Provisioning controls
 provision_baremetal: true
-pxe_boot_enabled: true
-dhcp_range_start: "192.168.1.100"
-dhcp_range_end: "192.168.1.200"
-tftp_root: "/var/lib/tftpboot"
+platform_baremetal_provisioner_pxe_boot_enabled: true
+platform_baremetal_provisioner_dhcp_range_start: "192.168.1.100"
+platform_baremetal_provisioner_dhcp_range_end: "192.168.1.200"
+platform_baremetal_provisioner_tftp_root: "/var/lib/tftpboot"
 ```
 
 ## Usage Examples

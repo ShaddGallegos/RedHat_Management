@@ -1,12 +1,12 @@
 ---
 # Default variables for scenario_ansible_cmdb_core role
-cmdb_enabled: true
-cmdb_version: "1.0"
-cmdb_timeout: 300
+scenario_ansible_cmdb_core_cmdb_enabled: true
+scenario_ansible_cmdb_core_cmdb_version: "1.0"
+scenario_ansible_cmdb_core_cmdb_timeout: 300
 
 # CMDB configuration
-cmdb_database: "scenario_ansible_cmdb_core"
-cmdb_update_frequency: 86400
+scenario_ansible_cmdb_core_cmdb_database: "scenario_ansible_cmdb_core"
+scenario_ansible_cmdb_core_cmdb_update_frequency: 86400
 
 # Feature toggles
-cmdb_enable_tracking: true
+scenario_ansible_cmdb_core_cmdb_enable_tracking: true

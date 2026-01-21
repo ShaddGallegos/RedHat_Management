@@ -43,7 +43,7 @@ deployment_platform: "libvirt"  # Required: Platform type
 
 ```yaml
 # Infrastructure controls
-deploy_infrastructure: true
+platform_infrastructure_manager_deploy_infrastructure: true
 infrastructure_timeout: 1800
 
 # Platform-specific

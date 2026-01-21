@@ -26,15 +26,15 @@ The `scenario_satellite_activation_config` role configures Satellite 6.18 activa
 ## Required Variables
 
 ```yaml
-satellite_url: "https://scenario_satellite.example.com"
-satellite_username: "admin"
+scenario_satellite_activation_config_satellite_url: "https://scenario_satellite.example.com"
+scenario_satellite_activation_config_satellite_username: "admin"
 satellite_password: "{{ vault_satellite_admin_pwd }}"
 ```
 
 ## Activation Keys
 
 ```yaml
-activation_keys:
+scenario_satellite_activation_config_activation_keys:
   - name: "RHEL9_BaseOS"
     lifecycle_environment: "Library"
     content_view: "RHIS_BaseOS"
@@ -46,7 +46,7 @@ activation_keys:
 ## Host Collections
 
 ```yaml
-host_collections:
+scenario_satellite_activation_config_host_collections:
   - name: "RHIS_Production"
     description: "Production hosts"
     organization: "Default Organization"
@@ -55,7 +55,7 @@ host_collections:
 ## Subscription Attachments
 
 ```yaml
-subscription_attachments:
+scenario_satellite_activation_config_subscription_attachments:
   - activation_key: "RHEL9_BaseOS"
     subscription: "Red Hat Enterprise Linux Server"
     quantity: 100
@@ -70,16 +70,16 @@ subscription_attachments:
   roles:
     - role: scenario_satellite_activation_config
       vars:
-        create_activation_keys: true
-        attach_subscriptions: true
+        scenario_satellite_activation_config_create_activation_keys: true
+        scenario_satellite_activation_config_attach_subscriptions: true
 ```
 
 ### Configure with Host Collections
 ```yaml
 - role: scenario_satellite_activation_config
   vars:
-    configure_host_collections: true
-    create_activation_keys: true
+    scenario_satellite_activation_config_configure_host_collections: true
+    scenario_satellite_activation_config_create_activation_keys: true
 ```
 
 ## Output

@@ -1,21 +1,21 @@
 ---
 # Default variables for scenario_aap_credentials role
-aap_credentials_config_enabled: true
-aap_credentials_config_version: "1.0"
-aap_credentials_config_timeout: 600
+scenario_aap_credentials_aap_credentials_config_enabled: true
+scenario_aap_credentials_aap_credentials_config_version: "1.0"
+scenario_aap_credentials_aap_credentials_config_timeout: 600
 
 # AAP Connection
-aap_url: "https://aap.example.com"
-aap_username: "admin"
+scenario_aap_credentials_aap_url: "https://aap.example.com"
+scenario_aap_credentials_aap_username: "admin"
 # aap_password: use vault!
-aap_verify_ssl: true
+scenario_aap_credentials_aap_verify_ssl: true
 
 # Credentials Organization
-aap_credentials_organization: "Default"
+scenario_aap_credentials_aap_credentials_organization: "Default"
 
 # Machine Credentials
-create_machine_credentials: true
-machine_credentials:
+scenario_aap_credentials_create_machine_credentials: true
+scenario_aap_credentials_machine_credentials:
   - name: "RHIS_SSH_Key"
     description: "SSH key for RHIS deployments"
     username: "ansible"
@@ -30,24 +30,24 @@ machine_credentials:
     tags: ["rhis", "machine", "root"]
 
 # Cloud Credentials
-create_cloud_credentials: false
-cloud_credentials: []
+scenario_aap_credentials_create_cloud_credentials: false
+scenario_aap_credentials_cloud_credentials: []
 
 # Network Credentials
-create_network_credentials: false
-network_credentials: []
+scenario_aap_credentials_create_network_credentials: false
+scenario_aap_credentials_network_credentials: []
 
 # Vault Credentials
-create_vault_credentials: true
-vault_credentials:
+scenario_aap_credentials_create_vault_credentials: true
+scenario_aap_credentials_vault_credentials:
   - name: "RHIS_Vault"
     description: "Vault for RHIS sensitive data"
     vault_password: "{{ vault_aap_vault_password }}"
     tags: ["rhis", "vault"]
 
 # Registry Credentials
-create_registry_credentials: true
-registry_credentials:
+scenario_aap_credentials_create_registry_credentials: true
+scenario_aap_credentials_registry_credentials:
   - name: "RedHat_Registry"
     description: "Red Hat container registry"
     host: "registry.redhat.io"
@@ -56,8 +56,8 @@ registry_credentials:
     tags: ["rhis", "registry"]
 
 # Satellite Credentials
-create_satellite_credentials: true
-satellite_credentials:
+scenario_aap_credentials_create_satellite_credentials: true
+scenario_aap_credentials_satellite_credentials:
   - name: "Satellite_API"
     description: "Satellite API credentials"
     host: "scenario_satellite.example.com"
@@ -66,9 +66,9 @@ satellite_credentials:
     tags: ["rhis", "scenario_satellite"]
 
 # IdM Credentials
-create_idm_credentials: false
-idm_credentials: []
+scenario_aap_credentials_create_idm_credentials: false
+scenario_aap_credentials_idm_credentials: []
 
 # Feature toggles
-aap_credentials_validate_connectivity: true
-aap_credentials_test_connections: true
+scenario_aap_credentials_aap_credentials_validate_connectivity: true
+scenario_aap_credentials_aap_credentials_test_connections: true

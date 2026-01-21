@@ -21,17 +21,17 @@ This role handles the complete AAP deployment workflow:
 
 ### Required Variables
 ```yaml
-controllers:
+scenario_aap_deployment_controllers:
   - name: controller1
     fqdn: "controller1.example.com"
-aap_installer_bundle_dir: "/opt/aap-installer"
+scenario_aap_deployment_aap_installer_bundle_dir: "/opt/aap-installer"
 ```
 
 ### Optional Variables
 ```yaml
-aap_installer_version: "2.6"
-aap_content_source_path: "/opt/aap-content"
-builder_key_file: "~/.ssh/id_rsa"
+scenario_aap_deployment_aap_installer_version: "2.6"
+scenario_aap_deployment_aap_content_source_path: "/opt/aap-content"
+scenario_aap_deployment_builder_key_file: "~/.ssh/id_rsa"
 ```
 
 ## Example Usage
@@ -41,8 +41,8 @@ builder_key_file: "~/.ssh/id_rsa"
   roles:
     - role: scenario_aap_deployment
       vars:
-        aap_installer_bundle_dir: "/opt/aap-2.6"
-        controllers:
+        scenario_aap_deployment_aap_installer_bundle_dir: "/opt/aap-2.6"
+        scenario_aap_deployment_controllers:
           - name: controller1
             fqdn: "aap-controller.prod.spg"
 ```

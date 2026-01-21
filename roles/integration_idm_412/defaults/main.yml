@@ -1,12 +1,12 @@
 ---
 # Default variables for idm_integration role
-idm_integration_enabled: false
-idm_integration_version: "1.0"
-idm_integration_timeout: 300
+integration_idm_412_idm_integration_enabled: false
+integration_idm_412_idm_integration_version: "1.0"
+integration_idm_412_idm_integration_timeout: 300
 
 # IdM integration_generic configuration
-configure_ldap: true
-enable_kerberos: false
+integration_idm_412_configure_ldap: true
+integration_idm_412_enable_kerberos: false
 
 # Feature toggles
-idm_integration_validate_connectivity: true
+integration_idm_412_idm_integration_validate_connectivity: true

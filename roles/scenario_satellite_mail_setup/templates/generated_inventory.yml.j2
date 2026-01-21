@@ -1,14 +1,14 @@
 # Generated inventory for installer actions
 
 [libvirt]
-{{ libvirt_host | default('10.168.0.1') }} ansible_user={{ libvirt_user | default('root') }}
+{{ scenario_satellite_mail_setup_libvirt_host | default('10.168.0.1') }} ansible_user={{ scenario_satellite_mail_setup_libvirt_user | default('root') }}
 
 [scenario_satellite]
-{{ satellite_vm_hostname | default('scenario_satellite-poc.example.com') }} ansible_user={{ satellite_admin_user | default('admin') }}
+{{ scenario_satellite_mail_setup_satellite_vm_hostname | default('scenario_satellite-poc.example.com') }} ansible_user={{ scenario_satellite_mail_setup_satellite_admin_user | default('admin') }}
 
 [aap]
 {% if 'aap' in sms_selected_targets %}
-aap.example.com ansible_user={{ aap_admin_user | default('admin') }}
+aap.example.com ansible_user={{ scenario_satellite_mail_setup_aap_admin_user | default('admin') }}
 {% endif %}
 
 [scenario_openshift]
