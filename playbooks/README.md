@@ -1,17 +1,17 @@
 # RHIS Playbooks Directory
 
-This directory contains the main orchestration playbooks for Red Hat Infrastructure Standard deployments.
+This directory contains the main ansible_dev_node_orchestration playbooks for Red Hat Infrastructure Standard deployments.
 
 ## Playbooks
 
 ### site.yml (MAIN ENTRY POINT)
-Primary orchestration playbook for RHIS deployments.
+Primary ansible_dev_node_orchestration playbook for RHIS deployments.
 
 **Features:**
 - Interactive scenario and platform selection
 - Support for all 15 deployment scenarios
 - Support for all 7 cloud platforms
-- 7-phase orchestration
+- 7-phase ansible_dev_node_orchestration
 - Comprehensive logging and reporting
 
 **Usage:**
@@ -29,27 +29,27 @@ ansible-playbook site.yml \
 ansible-playbook site.yml -t phase1,phase2,phase3
 ```
 
-### orchestration.yml
-Alternative entry point for direct orchestration (non-interactive).
+### ansible_dev_node_orchestration.yml
+Alternative entry point for direct ansible_dev_node_orchestration (non-interactive).
 
 **Usage:**
 ```bash
-ansible-playbook orchestration.yml \
+ansible-playbook ansible_dev_node_orchestration.yml \
   -e deployment_scenario=full_stack \
   -e deployment_platform=aws
 ```
 
 ## Architecture
 
-All orchestration logic has been consolidated into roles for better maintainability and reusability:
+All ansible_dev_node_orchestration logic has been consolidated into roles for better maintainability and reusability:
 
-- **orchestration_master** - Main orchestration role (7-phase workflow)
-- **configuration_manager** - Credential and configuration management
-- **redhat_products/*** - Product-specific deployment roles
-- **infrastructure_manager** - Platform provisioning and networking
-- **integration** - Product integration tasks
-- **cmdb** - Ansible-CMDB setup and management
-- **support** - Health checks and validation
+- **ansible_dev_node_orchestration_master** - Main ansible_dev_node_orchestration role (7-phase workflow)
+- **ansible_dev_node_configuration_manager** - Credential and configuration management
+- **ansible_dev_node_redhat_products/*** - Product-specific deployment roles
+- **platform_infrastructure_manager** - Platform platform_provisioning and networking
+- **integration_generic** - Product integration_generic tasks
+- **scenario_ansible_cmdb_core** - Ansible-CMDB setup and management
+- **ansible_dev_node_support** - Health checks and validation
 
 ## Deployment Scenarios (15 Total)
 
@@ -69,7 +69,7 @@ All orchestration logic has been consolidated into roles for better maintainabil
 | satellite_aap_openshift | Sat + AAP + OCP | Hybrid Stack |
 | satellite_idm_openshift | Sat + IdM + OCP | Identity Stack |
 | aap_idm_openshift | AAP + IdM + OCP | Automation Stack |
-| full_stack | All 4 products | Complete integration |
+| full_stack | All 4 products | Complete integration_generic |
 
 ## Supported Platforms (7 Total)
 
@@ -113,7 +113,7 @@ logs/orchestration_TIMESTAMP.log
 
 ## Tags
 
-All playbooks support tag-based execution:
+All playbooks ansible_dev_node_support tag-based execution:
 
 ```bash
 # Phase-based execution
@@ -121,7 +121,7 @@ ansible-playbook site.yml -t phase1
 ansible-playbook site.yml -t phase1,phase2,phase3
 
 # Product-based execution
-ansible-playbook site.yml -t satellite
+ansible-playbook site.yml -t scenario_satellite
 ansible-playbook site.yml -t aap,idm
 
 # Operation-based execution
@@ -152,7 +152,7 @@ These are maintained for reference but should not be used. All logic has been co
 
 ## Support
 
-For troubleshooting and support, see:
+For troubleshooting and ansible_dev_node_support, see:
 - `docs/troubleshooting/` - Troubleshooting guides
 - `roles/*/README.md` - Role-specific documentation
 - `logs/` - Deployment logs

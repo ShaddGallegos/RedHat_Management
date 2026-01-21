@@ -1,16 +1,16 @@
 ---
-# Satellite infrastructure wrapper playbook
+# Satellite platform_infrastructure_core wrapper playbook
 # Delegates work to existing roles; keep variables in group_vars.
 
-- name: "Satellite infrastructure setup"
-  hosts: satellite
+- name: "Satellite platform_infrastructure_core setup"
+  hosts: scenario_satellite
   gather_facts: yes
   vars_files:
     - "group_vars/all.yml"
-    - "group_vars/satellite.yml"
+    - "group_vars/scenario_satellite.yml"
 
   roles:
-    - role: satellite_os_configuration
+    - role: scenario_satellite_os_configuration
       when: (setup_os | default(true)) or (setup_install_media | default(true)) or (setup_kickstart_repo | default(false)) or (setup_sync_jobs | default(false))
       vars:
         satellite_os_config_enabled: "{{ setup_os | default(true) }}"
@@ -19,7 +19,7 @@
         create_kickstart_repo: "{{ setup_kickstart_repo | default(false) }}"
         configure_sync_job: "{{ setup_sync_jobs | default(false) }}"
 
-    - role: network_infrastructure_config
+    - role: platform_network_infrastructure
       when: (setup_network | default(false))
       vars:
         network_config_enabled: "{{ setup_network | default(false) }}"

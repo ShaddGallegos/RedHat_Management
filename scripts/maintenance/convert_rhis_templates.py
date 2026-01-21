@@ -17,7 +17,7 @@ Usage:
 
 """
 import argparse
-import os
+import os_generic
 import re
 import shutil
 import sys
@@ -35,7 +35,7 @@ def convert_erb_to_jinja(text: str) -> str:
 def copy_templates(src_templates: Path, dst_templates: Path, convert: bool) -> int:
     dst_templates.mkdir(parents=True, exist_ok=True)
     copied = 0
-    for root, _, files in os.walk(src_templates):
+    for root, _, files in os_generic.walk(src_templates):
         rel = Path(root).relative_to(src_templates)
         target_dir = dst_templates.joinpath(rel)
         target_dir.mkdir(parents=True, exist_ok=True)

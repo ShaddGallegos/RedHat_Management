@@ -1,0 +1,50 @@
+---
+# Infrastructure Manager Role - Wrapper
+# Orchestrates platform_infrastructure_core platform_provisioning and preparation tasks
+# Routes to appropriate platform-specific tasks
+
+- name: "INFRASTRUCTURE MANAGEMENT - Initialize"
+  ansible.builtin.debug:
+    msg: |
+      Infrastructure Management and Provisioning
+      ============================================
+      Scenario: {{ deployment_scenario | default('undefined') }}
+      Platform: {{ deployment_platform | default('undefined') }}
+  tags: ["platform_infrastructure_core", "always"]
+
+- name: "Validate platform_infrastructure_core configuration"
+  ansible.builtin.assert:
+    that:
+      - deployment_platform is defined
+    fail_msg: "Infrastructure management requires deployment_platform to be defined"
+  tags: ["platform_infrastructure_core", "validate"]
+
+- name: "Route to platform-specific platform_infrastructure_core tasks"
+  block:
+    - name: "Call platform platform_provisioning task"
+      ansible.builtin.debug:
+        msg: |
+          Provisioning for platform: {{ deployment_platform }}
+          Use tasks_from parameter for platform-specific operations:
+          - prepare_libvirt: for KVM/LibVirt environments
+          - prepare_baremetal: for physical servers
+          - prepare_aws: for AWS environments
+          - prepare_azure: for Azure cloud
+          - prepare_gcp: for Google Cloud Platform
+          - prepare_vmware: for VMware environments
+          - prepare_nutanix: for Nutanix HCI
+      tags: ["platform_infrastructure_core", "info"]
+
+  rescue:
+    - name: "Infrastructure platform_provisioning failed"
+      ansible.builtin.fail:
+        msg: |
+          Infrastructure platform_provisioning failed for platform: {{ deployment_platform }}
+          Please verify platform credentials, connectivity, and configuration.
+          See logs above for specific error details.
+  tags: ["platform_infrastructure_core", "platform_provisioning"]
+
+- name: "Infrastructure setup and validation completed"
+  ansible.builtin.debug:
+    msg: "Infrastructure ready for {{ deployment_platform }} platform"
+  tags: ["platform_infrastructure_core", "info"]

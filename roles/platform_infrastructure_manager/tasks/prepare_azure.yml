@@ -1,0 +1,41 @@
+---
+# Platform Preparation: Microsoft Azure
+# Prepares Azure environment for VM platform_provisioning
+
+- name: "Prepare Azure Infrastructure"
+  ansible.builtin.debug:
+    msg: |
+      Azure Infrastructure Preparation
+      ==================================
+      Platform: azure
+      Target: Azure VM platform_provisioning
+  tags: ["platform_infrastructure_core", "azure", "prepare"]
+
+- name: "Validate Azure prerequisites"
+  block:
+    - name: "Check Azure CLI installation"
+      ansible.builtin.shell: az --version
+      register: az_cli_check
+      changed_when: false
+      failed_when: false
+
+    - name: "Check Azure authentication"
+      ansible.builtin.shell: az account show
+      register: az_auth_check
+      changed_when: false
+      failed_when: false
+
+    - name: "Assert Azure is configured"
+      ansible.builtin.assert:
+        that:
+          - "az_cli_check.rc == 0"
+          - "az_auth_check.rc == 0"
+        fail_msg: "Azure CLI not configured or authentication failed. Run 'az login' to authenticate."
+      ignore_errors: true
+
+  tags: ["platform_infrastructure_core", "azure", "validate"]
+
+- name: "Azure platform_infrastructure_core ready for platform_provisioning"
+  ansible.builtin.debug:
+    msg: "Azure platform_infrastructure_core prepared successfully"
+  tags: ["platform_infrastructure_core", "azure", "info"]

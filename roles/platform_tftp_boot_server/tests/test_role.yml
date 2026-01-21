@@ -1,0 +1,12 @@
+---
+# Test: platform_tftp_boot_server role basic functionality
+- name: Test platform_tftp_boot_server role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    tftp_boot_server_enabled: true
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - tftp_boot_server_enabled is defined

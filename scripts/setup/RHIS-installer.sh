@@ -100,7 +100,7 @@ run_script() {
     elif [[ -f "${PROJECT_ROOT}/scripts/validation/${script_name}.sh" ]]; then
         script_path="${PROJECT_ROOT}/scripts/validation/${script_name}.sh"
     elif [[ -f "${PROJECT_ROOT}/scripts/${script_name}.sh" ]]; then
-        # Fallback to root scripts directory for legacy scripts
+        # Fallback to root scripts directory for ansible_dev_node_legacy_archive scripts
         script_path="${PROJECT_ROOT}/scripts/${script_name}.sh"
     fi
     
@@ -189,12 +189,12 @@ configure_local_environment() {
     
     echo "This will configure your complete local environment for RHIS deployments."
     echo "This is a comprehensive setup including:"
-    echo "  • Running initial setup and system prompts"
-    echo "  • Configuring installer variables"
-    echo "  • Selecting deployment scenario"
-    echo "  • Selecting infrastructure platform"
-    echo "  • Configuring integrations"
-    echo "  • Installing dependencies and requirements"
+    echo "   Running initial setup and system ansible_dev_node_prompts"
+    echo "   Configuring installer variables"
+    echo "   Selecting deployment scenario"
+    echo "   Selecting platform_infrastructure_core platform"
+    echo "   Configuring integrations"
+    echo "   Installing dependencies and requirements"
     echo ""
     read -p "Continue with complete environment configuration? (y/n): " continue_setup
     
@@ -217,9 +217,9 @@ configure_local_environment() {
     echo ""
     
     if [ -f "${PROJECT_ROOT}/system_prompts.yml" ]; then
-        print_info "Running system prompts configuration..."
+        print_info "Running system ansible_dev_node_prompts configuration..."
         cd "${PROJECT_ROOT}" && ansible-playbook system_prompts.yml -i localhost,
-        print_success "System prompts completed"
+        print_success "System ansible_dev_node_prompts completed"
     else
         print_error "system_prompts.yml not found (non-critical, continuing...)"
     fi
@@ -345,8 +345,8 @@ configure_local_environment() {
     # Map platform selection
     case "$platform_choice" in
         1) platform_name="libvirt" ;;
-        2) platform_name="nutanix" ;;
-        3) platform_name="vmware" ;;
+        2) platform_name="platform_nutanix" ;;
+        3) platform_name="platform_vmware" ;;
         4) platform_name="aws" ;;
         5) platform_name="gcp" ;;
         6) platform_name="azure" ;;
@@ -361,16 +361,16 @@ configure_local_environment() {
     echo "Select integrations to configure (comma-separated, or leave blank for none):"
     echo ""
     echo "Available integrations:"
-    echo "  servicenow     - ServiceNow integration"
-    echo "  jira           - Atlassian Jira integration"
+    echo "  integration_servicenow     - ServiceNow integration_generic"
+    echo "  jira           - Atlassian Jira integration_generic"
     echo "  splunk         - Splunk logging/analytics"
     echo "  datadog        - Datadog monitoring"
-    echo "  awx            - AWX integration"
-    echo "  controller     - AAP Controller integration"
-    echo "  hub            - Automation Hub integration"
-    echo "  eda            - Event Driven Automation integration"
-    echo "  insights       - Red Hat Insights integration"
-    echo "  satellite      - Satellite integration"
+    echo "  awx            - AWX integration_generic"
+    echo "  controller     - AAP Controller integration_generic"
+    echo "  hub            - Automation Hub integration_generic"
+    echo "  eda            - Event Driven Automation integration_generic"
+    echo "  insights       - Red Hat Insights integration_generic"
+    echo "  scenario_satellite      - Satellite integration_generic"
     echo ""
     read -p "Select integrations (or press Enter for none): " integrations_input
     
@@ -439,7 +439,7 @@ global_admin_user: "admin"
 global_admin_password: "CHANGEME_GLOBAL_ADMIN_PASSWORD"
 
 # Satellite Configuration
-satellite_fqdn: "satellite.example.com"
+satellite_fqdn: "scenario_satellite.example.com"
 satellite_admin_user: "admin"
 satellite_admin_password: "CHANGEME_SATELLITE_PASSWORD"
 satellite_api_user: "api_user"
@@ -546,7 +546,7 @@ EOF
 
 
                     CONFIGURATION SUMMARY                              
-╝
+
 
 INSTALLER:
   Username:              ${installer_user}
@@ -586,7 +586,7 @@ NEXT STEPS:
 4. Deploy using RHIS-Menu or playbooks:
    ${SCRIPT_DIR}/RHIS-Menu.sh
 
-╝
+
 
 EOF
     
@@ -607,10 +607,10 @@ show_setup_menu() {
     echo "1) Configure Local Environment       - Complete setup with Red Hat credentials"
     echo "2) Install Ansible Collections       - Download and install required collections"
     echo "3) Install Collections with Updates  - Install collections and update roles"
-    echo "4) Configure Infrastructure          - Setup infrastructure and generate inventory"
+    echo "4) Configure Infrastructure          - Setup platform_infrastructure_core and generate inventory"
     echo ""
     echo "Recommended: Start with option 1 for complete initial setup"
-    echo "            Then option 4 to configure your infrastructure"
+    echo "            Then option 4 to configure your platform_infrastructure_core"
     echo ""
     echo "0) Back to Main Menu"
     echo ""
@@ -639,7 +639,7 @@ show_setup_menu() {
             ;;
         4)
             print_info "Configuring Infrastructure..."
-            run_playbook "playbooks/infrastructure-setup.yml"
+            run_playbook "playbooks/platform_infrastructure_core-setup.yml"
             print_success "Infrastructure configuration complete"
             pause_menu
             show_setup_menu
@@ -736,8 +736,8 @@ show_scenario_platform_menu() {
     
     case "$platform_choice" in
         1) platform_name="libvirt" ;;
-        2) platform_name="nutanix" ;;
-        3) platform_name="vmware" ;;
+        2) platform_name="platform_nutanix" ;;
+        3) platform_name="platform_vmware" ;;
         4) platform_name="aws" ;;
         5) platform_name="gcp" ;;
         6) platform_name="azure" ;;
@@ -826,17 +826,17 @@ EOF
     print_success "All deployment variables generated successfully!"
     echo ""
     echo "Configuration files created in:"
-    echo "  • ${config_dir}/"
-    echo "  • ${PROJECT_ROOT}/host_vars/"
-    echo "  • ${PROJECT_ROOT}/.ansible/conf/ (env variables)"
-    echo "  • Vault configuration ready"
+    echo "   ${config_dir}/"
+    echo "   ${PROJECT_ROOT}/host_vars/"
+    echo "   ${PROJECT_ROOT}/.ansible/conf/ (env variables)"
+    echo "   Vault configuration ready"
 }
 
 generate_satellite_vars() {
     local platform="$1"
     print_info "Generating Satellite variables..."
     mkdir -p "${PROJECT_ROOT}/host_vars"
-    touch "${PROJECT_ROOT}/host_vars/satellite.yml"
+    touch "${PROJECT_ROOT}/host_vars/scenario_satellite.yml"
     print_success "Satellite variables template created"
 }
 
@@ -893,7 +893,7 @@ global_admin_user: "admin"
 global_admin_password: "{{ vault_global_admin_password }}"
 
 # Satellite Configuration
-satellite_fqdn: "satellite.example.com"
+satellite_fqdn: "scenario_satellite.example.com"
 satellite_admin_user: "admin"
 satellite_admin_password: "{{ vault_satellite_password }}"
 satellite_api_user: "api_user"
@@ -963,20 +963,20 @@ all:
   children:
     products:
       children:
-        satellite:
+        scenario_satellite:
           hosts: {}
         aap:
           hosts: {}
         idm:
           hosts: {}
     
-    infrastructure:
+    platform_infrastructure_core:
       children:
         libvirt:
           hosts: {}
-        nutanix:
+        platform_nutanix:
           hosts: {}
-        vmware:
+        platform_vmware:
           hosts: {}
         cloud:
           hosts: {}
@@ -997,10 +997,10 @@ show_deployment_menu() {
     echo "RHIS Deployment Phases (Execute in Order):"
     echo ""
     echo "1) Deploy Complete RHIS Environment  - Deploy all RHIS phases (6 phases)"
-    echo "2) Phase 1: Infrastructure Init      - Initialize and prepare infrastructure"
+    echo "2) Phase 1: Infrastructure Init      - Initialize and prepare platform_infrastructure_core"
     echo "3) Phase 2: Deploy IDM              - Deploy Identity Management services"
     echo "4) Phase 3: Deploy Satellite        - Deploy Red Hat Satellite"
-    echo "5) Phase 4: Provision Hosts         - Provision infrastructure hosts"
+    echo "5) Phase 4: Provision Hosts         - Provision platform_infrastructure_core hosts"
     echo "6) Phase 5: AAP Controller Setup     - Configure AAP Controller"
     echo "7) Phase 6: AAP Deployment          - Complete AAP deployment"
     echo ""
@@ -1114,72 +1114,72 @@ validate_dhcp_configuration() {
     
     # Test 1: Check if group_vars/all.yml has correct DHCP range start
     if grep -q "satellite_dhcp_range_start: '10.168.0.100'" "${PROJECT_ROOT}/group_vars/all.yml"; then
-        echo "✓ PASS: DHCP range start is 10.168.0.100"
+        echo " PASS: DHCP range start is 10.168.0.100"
         ((pass_count++))
     else
-        echo "✗ FAIL: DHCP range start not correctly set"
+        echo " FAIL: DHCP range start not correctly set"
         ((fail_count++))
     fi
     
     # Test 2: Check if group_vars/all.yml has correct DHCP range end
     if grep -q "satellite_dhcp_range_end: '10.168.0.254'" "${PROJECT_ROOT}/group_vars/all.yml"; then
-        echo "✓ PASS: DHCP range end is 10.168.0.254"
+        echo " PASS: DHCP range end is 10.168.0.254"
         ((pass_count++))
     else
-        echo "✗ FAIL: DHCP range end not correctly set"
+        echo " FAIL: DHCP range end not correctly set"
         ((fail_count++))
     fi
     
     # Test 3: Check if template has correct defaults
     if grep -q "default('10.168.0.100')" "${PROJECT_ROOT}/templates/misc/env.yml.j2"; then
-        echo "✓ PASS: Template DHCP start default is 10.168.0.100"
+        echo " PASS: Template DHCP start default is 10.168.0.100"
         ((pass_count++))
     else
-        echo "✗ FAIL: Template DHCP start default incorrect"
+        echo " FAIL: Template DHCP start default incorrect"
         ((fail_count++))
     fi
     
     if grep -q "default('10.168.0.254')" "${PROJECT_ROOT}/templates/misc/env.yml.j2"; then
-        echo "✓ PASS: Template DHCP end default is 10.168.0.254"
+        echo " PASS: Template DHCP end default is 10.168.0.254"
         ((pass_count++))
     else
-        echo "✗ FAIL: Template DHCP end default incorrect"
+        echo " FAIL: Template DHCP end default incorrect"
         ((fail_count++))
     fi
     
     # Test 4: Check network gateway configuration
     if grep -q "satellite_gateway: 10.168.0.1" "${PROJECT_ROOT}/group_vars/all.yml"; then
-        echo "✓ PASS: Satellite gateway is 10.168.0.1"
+        echo " PASS: Satellite gateway is 10.168.0.1"
         ((pass_count++))
     else
-        echo "✗ FAIL: Satellite gateway not correctly set"
+        echo " FAIL: Satellite gateway not correctly set"
         ((fail_count++))
     fi
     
     # Test 5: Check network subnet configuration
     if grep -q "satellite_dhcp_network: 10.168.0.0" "${PROJECT_ROOT}/group_vars/all.yml"; then
-        echo "✓ PASS: DHCP network is 10.168.0.0"
+        echo " PASS: DHCP network is 10.168.0.0"
         ((pass_count++))
     else
-        echo "✗ FAIL: DHCP network not correctly set"
+        echo " FAIL: DHCP network not correctly set"
         ((fail_count++))
     fi
     
     # Test 6: Check Foreman proxy DHCP variables reference satellites variables
     if grep -q 'start: "{{ satellite_dhcp_range_start }}"' "${PROJECT_ROOT}/group_vars/all.yml"; then
-        echo "✓ PASS: Foreman DHCP range start references satellite_dhcp_range_start"
+        echo " PASS: Foreman DHCP range start references satellite_dhcp_range_start"
         ((pass_count++))
     else
-        echo "✗ FAIL: Foreman DHCP range start configuration issue"
+        echo " FAIL: Foreman DHCP range start configuration issue"
         ((fail_count++))
     fi
     
     echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
     echo "DHCP Configuration Validation Results:"
     echo "  Passed: $pass_count"
     echo "  Failed: $fail_count"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
     
     if [ $fail_count -eq 0 ]; then
         print_success "All DHCP configuration tests passed!"
@@ -1200,128 +1200,128 @@ test_default_scenario() {
     echo ""
     print_menu_header "DEFAULT SCENARIO TEST (Satellite + AAP + IdM)"
     
-    # Test 1: Verify infrastructure setup playbook exists and has valid syntax
-    if [ -f "${PROJECT_ROOT}/playbooks/infrastructure-setup.yml" ]; then
-        echo "✓ PASS: infrastructure-setup.yml exists"
+    # Test 1: Verify platform_infrastructure_core setup playbook exists and has valid syntax
+    if [ -f "${PROJECT_ROOT}/playbooks/platform_infrastructure_core-setup.yml" ]; then
+        echo " PASS: platform_infrastructure_core-setup.yml exists"
         ((pass_count++))
         
-        if cd "${PROJECT_ROOT}" && ansible-playbook --syntax-check playbooks/infrastructure-setup.yml &>/dev/null; then
-            echo "✓ PASS: infrastructure-setup.yml syntax is valid"
+        if cd "${PROJECT_ROOT}" && ansible-playbook --syntax-check playbooks/platform_infrastructure_core-setup.yml &>/dev/null; then
+            echo " PASS: platform_infrastructure_core-setup.yml syntax is valid"
             ((pass_count++))
         else
-            echo "✗ FAIL: infrastructure-setup.yml has syntax errors"
+            echo " FAIL: platform_infrastructure_core-setup.yml has syntax errors"
             ((fail_count++))
         fi
     else
-        echo "✗ FAIL: infrastructure-setup.yml does not exist"
+        echo " FAIL: platform_infrastructure_core-setup.yml does not exist"
         ((fail_count++))
     fi
     
     # Test 2: Verify deploy_components playbook exists
     if [ -f "${PROJECT_ROOT}/playbooks/deploy_components-site.yml" ]; then
-        echo "✓ PASS: deploy_components-site.yml exists"
+        echo " PASS: deploy_components-site.yml exists"
         ((pass_count++))
         
         if cd "${PROJECT_ROOT}" && ansible-playbook --syntax-check playbooks/deploy_components-site.yml &>/dev/null; then
-            echo "✓ PASS: deploy_components-site.yml syntax is valid"
+            echo " PASS: deploy_components-site.yml syntax is valid"
             ((pass_count++))
         else
-            echo "✗ FAIL: deploy_components-site.yml has syntax errors"
+            echo " FAIL: deploy_components-site.yml has syntax errors"
             ((fail_count++))
         fi
     else
-        echo "✗ FAIL: deploy_components-site.yml does not exist"
+        echo " FAIL: deploy_components-site.yml does not exist"
         ((fail_count++))
     fi
     
     # Test 3: Verify required roles exist
-    local required_roles=("infrastructure_prep" "libvirt_vm_provisioner" "satellite_6_18_deployment" "aap_2_6_setup" "idm_3_0_setup")
+    local required_roles=("platform_infrastructure_prep" "platform_libvirt_vm_provisioner" "satellite_6_18_deployment" "scenario_aap_setup" "idm_3_0_setup")
     for role in "${required_roles[@]}"; do
         if [ -d "${PROJECT_ROOT}/roles/${role}" ]; then
-            echo "✓ PASS: Role '$role' exists"
+            echo " PASS: Role '$role' exists"
             ((pass_count++))
         else
-            echo "✗ FAIL: Required role '$role' not found"
+            echo " FAIL: Required role '$role' not found"
             ((fail_count++))
         fi
     done
     
-    # Test 4: Verify satellite variables configured correctly
+    # Test 4: Verify scenario_satellite variables configured correctly
     if [ -f "${PROJECT_ROOT}/group_vars/all.yml" ]; then
-        echo "✓ PASS: group_vars/all.yml exists"
+        echo " PASS: group_vars/all.yml exists"
         ((pass_count++))
         
         if grep -q "satellite_ip: 10.168.0.27" "${PROJECT_ROOT}/group_vars/all.yml"; then
-            echo "✓ PASS: Satellite IP is correctly configured (10.168.0.27)"
+            echo " PASS: Satellite IP is correctly configured (10.168.0.27)"
             ((pass_count++))
         else
-            echo "✗ FAIL: Satellite IP not correctly configured"
+            echo " FAIL: Satellite IP not correctly configured"
             ((fail_count++))
         fi
     else
-        echo "✗ FAIL: group_vars/all.yml does not exist"
+        echo " FAIL: group_vars/all.yml does not exist"
         ((fail_count++))
     fi
     
     # Test 5: Verify AAP variables configured correctly
     if grep -q "aap_host_ip: 10.168.0.26" "${PROJECT_ROOT}/group_vars/all.yml"; then
-        echo "✓ PASS: AAP IP is correctly configured (10.168.0.26)"
+        echo " PASS: AAP IP is correctly configured (10.168.0.26)"
         ((pass_count++))
     else
-        echo "✗ FAIL: AAP IP not correctly configured"
+        echo " FAIL: AAP IP not correctly configured"
         ((fail_count++))
     fi
     
     # Test 6: Verify IdM variables configured correctly
     if grep -q "idm_ip: 10.168.0.28" "${PROJECT_ROOT}/group_vars/all.yml"; then
-        echo "✓ PASS: IdM IP is correctly configured (10.168.0.28)"
+        echo " PASS: IdM IP is correctly configured (10.168.0.28)"
         ((pass_count++))
     else
-        echo "✗ FAIL: IdM IP not correctly configured"
+        echo " FAIL: IdM IP not correctly configured"
         ((fail_count++))
     fi
     
     # Test 7: Verify inventory file exists
     if [ -f "${PROJECT_ROOT}/inventory/hosts" ]; then
-        echo "✓ PASS: inventory/hosts exists"
+        echo " PASS: inventory/hosts exists"
         ((pass_count++))
     else
-        echo "✗ FAIL: inventory/hosts does not exist"
+        echo " FAIL: inventory/hosts does not exist"
         ((fail_count++))
     fi
     
     # Test 8: Verify requirements files exist
     if [ -f "${PROJECT_ROOT}/requirements.yml" ]; then
-        echo "✓ PASS: requirements.yml exists"
+        echo " PASS: requirements.yml exists"
         ((pass_count++))
     else
-        echo "✗ FAIL: requirements.yml does not exist"
+        echo " FAIL: requirements.yml does not exist"
         ((fail_count++))
     fi
     
     # Test 9: Verify collections are listed
     if grep -q "containers.podman" "${PROJECT_ROOT}/requirements.yml"; then
-        echo "✓ PASS: containers.podman collection is configured"
+        echo " PASS: containers.podman collection is configured"
         ((pass_count++))
     else
-        echo "✗ FAIL: containers.podman collection not found"
+        echo " FAIL: containers.podman collection not found"
         ((fail_count++))
     fi
     
     if grep -q "community.libvirt" "${PROJECT_ROOT}/requirements.yml"; then
-        echo "✓ PASS: community.libvirt collection is configured"
+        echo " PASS: community.libvirt collection is configured"
         ((pass_count++))
     else
-        echo "✗ FAIL: community.libvirt collection not found"
+        echo " FAIL: community.libvirt collection not found"
         ((fail_count++))
     fi
     
     echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
     echo "Default Scenario Test Results:"
     echo "  Passed: $pass_count"
     echo "  Failed: $fail_count"
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo ""
     
     if [ $fail_count -eq 0 ]; then
         print_success "All default scenario tests passed!"
@@ -1623,11 +1623,11 @@ show_documentation_menu() {
     
     print_menu_header "DOCUMENTATION"
     
-    echo "1) Display RHIS Integration Summary  - Complete integration overview"
+    echo "1) Display RHIS Integration Summary  - Complete integration_generic overview"
     echo "2) Display RHIS Builder Integration  - Builder component details"
     echo "3) Display RHIS Migration Guide      - Migration instructions"
-    echo "4) Display Inventory Integration     - Inventory integration details"
-    echo "5) Display Inventory Integration Gde - Inventory integration guide"
+    echo "4) Display Inventory Integration     - Inventory integration_generic details"
+    echo "5) Display Inventory Integration Gde - Inventory integration_generic guide"
     echo "6) Display RHIS Quick Reference      - Quick reference guide"
     echo "7) Open Project README               - Main project documentation"
     echo "8) Open Main Documentation          - Primary documentation files"
@@ -1747,7 +1747,7 @@ show_network_boot_menu() {
     case "$network_boot_choice" in
         1) 
             print_info "Setting up TFTP Boot Server..."
-            run_playbook "playbooks/tftp_boot_server-setup.yml"
+            run_playbook "playbooks/platform_tftp_boot_server-setup.yml"
             print_success "TFTP Boot Server setup complete"
             pause_menu
             show_network_boot_menu
@@ -1867,10 +1867,10 @@ initialize_credentials() {
         print_menu_header "RED HAT CREDENTIALS INITIALIZATION"
         echo ""
         echo "First-time setup: Red Hat credentials are required for:"
-        echo "  • Red Hat CDN access (all rhel.com domains)"
-        echo "  • System registration (non-Satellite managed systems)"
-        echo "  • registry.redhat.io access for container images"
-        echo "  • Automation Hub API tokens"
+        echo "   Red Hat CDN access (all rhel.com domains)"
+        echo "   System registration (non-Satellite managed systems)"
+        echo "   registry.redhat.io access for container images"
+        echo "   Automation Hub API tokens"
         echo ""
         echo "Visit https://console.redhat.com/api/automation-hub/token/ for your token"
         echo ""

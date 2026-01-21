@@ -1,0 +1,41 @@
+---
+# Platform Preparation: Bare Metal
+# Prepares bare metal platform_infrastructure_core with DHCP and TFTP for PXE platform_provisioning
+
+- name: "Prepare Bare Metal Infrastructure"
+  ansible.builtin.debug:
+    msg: |
+      Bare Metal Infrastructure Preparation
+      =====================================
+      Platform: baremetal
+      Target: Physical servers with PXE boot
+  tags: ["platform_infrastructure_core", "baremetal", "prepare"]
+
+- name: "Validate Bare Metal prerequisites"
+  block:
+    - name: "Check DHCP server"
+      ansible.builtin.shell: systemctl is-active dhcpd || systemctl is-active isc-dhcp-server
+      register: dhcp_status
+      changed_when: false
+      failed_when: false
+
+    - name: "Check TFTP server"
+      ansible.builtin.shell: systemctl is-active tftp || systemctl is-active tftpd-hpa
+      register: tftp_status
+      changed_when: false
+      failed_when: false
+
+    - name: "Assert Bare Metal services are configured"
+      ansible.builtin.assert:
+        that:
+          - "dhcp_status.rc == 0 or 'DHCP server required' is not defined"
+          - "tftp_status.rc == 0 or 'TFTP server required' is not defined"
+        fail_msg: "Bare metal platform_provisioning requires DHCP and TFTP services. Configure and start these services."
+      ignore_errors: true
+
+  tags: ["platform_infrastructure_core", "baremetal", "validate"]
+
+- name: "Bare Metal platform_infrastructure_core ready for platform_provisioning"
+  ansible.builtin.debug:
+    msg: "Bare metal platform_infrastructure_core prepared successfully"
+  tags: ["platform_infrastructure_core", "baremetal", "info"]

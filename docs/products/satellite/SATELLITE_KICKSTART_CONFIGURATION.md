@@ -2,7 +2,7 @@
 
 ## Overview
 
-Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseOS installations through Satellite 6.18 provisioning infrastructure.
+Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseOS installations through Satellite 6.18 platform_provisioning platform_infrastructure_core.
 
 ## New Role Created
 
@@ -10,7 +10,7 @@ Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseO
 
 **Location**: `/roles/satellite_kickstart_config/`
 
-**Purpose**: Configure Satellite provisioning templates and kickstart files for RHEL 9/10 deployments
+**Purpose**: Configure Satellite platform_provisioning templates and kickstart files for RHEL 9/10 deployments
 
 ## What's Included
 
@@ -19,8 +19,8 @@ Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseO
 1. **RHEL 9 BaseOS Minimal** (`rhel9-baseos-minimal.ks`)
    - Minimal core packages only
    - LVM disk partitioning
-   - Satellite subscription manager integration
-   - Insights client support
+   - Satellite subscription manager integration_generic
+   - Insights client ansible_dev_node_support
    - Cloud-init enabled
    - Use Case: Minimal server deployments
 
@@ -40,23 +40,23 @@ Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseO
 4. **RHEL 10 Full Stack** (`rhel10-fullstack.ks`)
    - RHEL 10 full stack equivalent
    - Modern Podman v4+ runtime
-   - Use Case: Production servers, container infrastructure
+   - Use Case: Production servers, container platform_infrastructure_core
 
 ## Kickstart Features
 
 ### All Templates Include
 
 **Security**:
-- ✅ SELinux enforcing
-- ✅ Firewall enabled with SSH service
-- ✅ SSH key generation
-- ✅ Root password locked
-- ✅ User accounts locked by default
+-  SELinux enforcing
+-  Firewall enabled with SSH service
+-  SSH key generation
+-  Root password locked
+-  User accounts locked by default
 
 **Disk Configuration**:
-- ✅ LVM-based partitioning
-- ✅ XFS filesystems
-- ✅ Compliance-ready layout:
+-  LVM-based partitioning
+-  XFS filesystems
+-  Compliance-ready layout:
   - /boot (1024 MB)
   - /boot/efi (256 MB)
   - / (10 GB)
@@ -68,32 +68,32 @@ Created comprehensive kickstart templates for automated RHEL 9 and RHEL 10 BaseO
   - swap (4 GB)
 
 **Network**:
-- ✅ DHCP configuration
-- ✅ NetworkManager managed
-- ✅ IPv4 only
-- ✅ Hostname via DHCP
+-  DHCP configuration
+-  NetworkManager managed
+-  IPv4 only
+-  Hostname via DHCP
 
 **Services**:
-- ✅ chronyd (time sync)
-- ✅ sshd (SSH server)
-- ✅ podman (containers) [Full Stack]
-- ✅ crond (cron) [Full Stack]
+-  chronyd (time sync)
+-  sshd (SSH server)
+-  podman (containers) [Full Stack]
+-  crond (cron) [Full Stack]
 
 **Integration**:
-- ✅ Satellite subscription-manager
-- ✅ Red Hat Insights client
-- ✅ Cloud-init for provisioning
-- ✅ Ansible core compatibility
+-  Satellite subscription-manager
+-  Red Hat Insights client
+-  Cloud-init for platform_provisioning
+-  Ansible core compatibility
 
 ## Files Created
 
 ```
 roles/satellite_kickstart_config/
-├── meta/main.yml                   # Role metadata and galaxy info
-├── defaults/main.yml               # Default variables with kickstart content
-├── tasks/main.yml                  # Tasks to create kickstart files
-├── tests/test_role.yml             # Test playbook
-└── README.md                        # Comprehensive documentation
+ meta/main.yml                   # Role metadata and galaxy info
+ defaults/main.yml               # Default variables with kickstart content
+ tasks/main.yml                  # Tasks to create kickstart files
+ tests/test_role.yml             # Test playbook
+ README.md                        # Comprehensive documentation
 ```
 
 **Total Files**: 5
@@ -106,11 +106,11 @@ roles/satellite_kickstart_config/
 
 ```yaml
 - name: Configure Satellite Kickstarts
-  hosts: satellite
+  hosts: scenario_satellite
   roles:
     - role: satellite_kickstart_config
       vars:
-        satellite_url: "https://satellite.prod.example.com"
+        satellite_url: "https://scenario_satellite.prod.example.com"
         satellite_username: "admin"
         satellite_password: "{{ vault_satellite_admin_password }}"
         create_provisioning_templates: true
@@ -132,7 +132,7 @@ roles/satellite_kickstart_config/
 - role: satellite_kickstart_config
   vars:
     kickstart_files_path: "/var/www/html/ks"
-    kickstart_web_url: "http://satellite.example.com/ks"
+    kickstart_web_url: "http://scenario_satellite.example.com/ks"
 ```
 
 ## Accessing Kickstart Files
@@ -154,16 +154,16 @@ cat /var/lib/foreman/public/kickstarts/rhel9-fullstack.ks
 
 ```bash
 # RHEL 9 BaseOS Minimal
-curl https://satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks
+curl https://scenario_satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks
 
 # RHEL 10 BaseOS Minimal
-curl https://satellite.example.com/pub/kickstarts/rhel10-baseos-minimal.ks
+curl https://scenario_satellite.example.com/pub/kickstarts/rhel10-baseos-minimal.ks
 
 # RHEL 9 Full Stack
-curl https://satellite.example.com/pub/kickstarts/rhel9-fullstack.ks
+curl https://scenario_satellite.example.com/pub/kickstarts/rhel9-fullstack.ks
 
 # RHEL 10 Full Stack
-curl https://satellite.example.com/pub/kickstarts/rhel10-fullstack.ks
+curl https://scenario_satellite.example.com/pub/kickstarts/rhel10-fullstack.ks
 ```
 
 ## Integration with RHIS Stack
@@ -172,31 +172,31 @@ curl https://satellite.example.com/pub/kickstarts/rhel10-fullstack.ks
 
 ```
 Phase 1: Core Installation
-└─ satellite_6_18_deployment
-   └─ Installs Satellite 6.18
+ satellite_6_18_deployment
+    Installs Satellite 6.18
 
 Phase 2: Content Infrastructure
-└─ satellite_content_config
-   └─ Enables RHEL BaseOS/AppStream repos
-   └─ Creates organizations and locations
+ satellite_content_config
+    Enables RHEL BaseOS/AppStream repos
+    Creates organizations and locations
 
 Phase 3: Lifecycle Management
-└─ satellite_lifecycle_config
-   └─ Creates environments (Dev → Staging → Prod)
-   └─ Creates content views with filters
+ scenario_satellite_lifecycle_config
+    Creates environments (Dev → Staging → Prod)
+    Creates content views with filters
 
 Phase 4: Subscription Management
-└─ satellite_activation_config
-   └─ Creates activation keys
-   └─ Manages subscriptions and repositories
+ scenario_satellite_activation_config
+    Creates activation keys
+    Manages subscriptions and repositories
 
 Phase 5: Provisioning Templates
-└─ satellite_kickstart_config [NEW]
-   ├─ Creates RHEL 9/10 kickstarts
-   ├─ Manages provisioning templates
-   └─ Enables PXE-based installation
+ satellite_kickstart_config [NEW]
+    Creates RHEL 9/10 kickstarts
+    Manages platform_provisioning templates
+    Enables PXE-based installation
 
-Result: Fully automated provisioning infrastructure
+Result: Fully automated platform_provisioning platform_infrastructure_core
 ```
 
 ## Provisioning Flow
@@ -211,7 +211,7 @@ Result: Fully automated provisioning infrastructure
 2. **Anaconda loads kickstart**
    ```
    Anaconda → Satellite → Kickstart file
-   (e.g., https://satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks)
+   (e.g., https://scenario_satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks)
    ```
 
 3. **Automated installation proceeds**
@@ -228,7 +228,7 @@ Result: Fully automated provisioning infrastructure
    subscription-manager register \
      --org="Default Organization" \
      --activationkey="RHEL9_BaseOS" \
-     --server-hostname=satellite.example.com
+     --server-hostname=scenario_satellite.example.com
    ```
 
 5. **System ready for management**
@@ -283,46 +283,46 @@ rpm -ivh https://example.com/custom-package.rpm
 ## Compatibility
 
 ### RHEL Versions
-- ✅ RHEL 9 (all minor versions)
-- ✅ RHEL 10 (all minor versions)
+-  RHEL 9 (all minor versions)
+-  RHEL 10 (all minor versions)
 
 ### Installation Methods
-- ✅ PXE boot
-- ✅ CDROM + kickstart URL
-- ✅ USB + kickstart URL
-- ✅ Network boot
+-  PXE boot
+-  CDROM + kickstart URL
+-  USB + kickstart URL
+-  Network boot
 
 ### Satellite Versions
-- ✅ Satellite 6.18
-- ✅ Satellite 6.17 (with minor adjustments)
-- ✅ Satellite 6.16 (with minor adjustments)
+-  Satellite 6.18
+-  Satellite 6.17 (with minor adjustments)
+-  Satellite 6.16 (with minor adjustments)
 
 ## Advantages
 
-**✅ Automated Deployments**
+** Automated Deployments**
 - No manual installation steps
 - Fully unattended
 - Reproducible results
 
-**✅ Security by Default**
+** Security by Default**
 - SELinux enforcing
 - Firewall enabled
 - SSH hardening
 - Encrypted partitions ready
 
-**✅ Compliance Ready**
+** Compliance Ready**
 - LVM partitioning
 - Separate log partitions
 - Audit volume
 - Exceeds common compliance requirements
 
-**✅ Production Ready**
+** Production Ready**
 - Development tools included (Full Stack)
 - Container runtime available
 - Ansible compatible
-- Cloud-init support
+- Cloud-init ansible_dev_node_support
 
-**✅ Time Savings**
+** Time Savings**
 - 30-45 minute installations → automatic
 - Eliminates manual configuration
 - Enables mass deployments
@@ -394,7 +394,7 @@ rpm -ivh https://example.com/custom-package.rpm
     - satellite_kickstart_config
     
   post_tasks:
-    - name: Trigger provisioning for batch of hosts
+    - name: Trigger platform_provisioning for batch of hosts
       community.libvirt.virt:
         name: "{{ item }}"
         command: create
@@ -407,10 +407,10 @@ rpm -ivh https://example.com/custom-package.rpm
 
 | Phase | Manual | Automated | Savings |
 |-------|--------|-----------|---------|
-| Disk partitioning | 5-10 min | 0 min (configured) | ✅ |
-| Package selection | 10-15 min | 0 min (preconfigured) | ✅ |
+| Disk partitioning | 5-10 min | 0 min (configured) |  |
+| Package selection | 10-15 min | 0 min (preconfigured) |  |
 | Configuration | 15-20 min | 1-2 min (post scripts) | 85% |
-| Registration | 5-10 min | 0 min (via activation key) | ✅ |
+| Registration | 5-10 min | 0 min (via activation key) |  |
 | **Total** | **45-55 min** | **35-45 min** | **20-30%** |
 
 ## Next Steps
@@ -418,7 +418,7 @@ rpm -ivh https://example.com/custom-package.rpm
 1. **Review kickstart content** in `/roles/satellite_kickstart_config/defaults/main.yml`
 2. **Test role** with `ansible-playbook roles/satellite_kickstart_config/tests/test_role.yml`
 3. **Verify kickstart files** created in `/var/lib/foreman/public/kickstarts/`
-4. **Configure Satellite provisioning** to use new templates
+4. **Configure Satellite platform_provisioning** to use new templates
 5. **Deploy test host** via PXE using RHEL 9 BaseOS minimal kickstart
 6. **Monitor deployment** for success
 
@@ -426,26 +426,26 @@ rpm -ivh https://example.com/custom-package.rpm
 
 Created **satellite_kickstart_config** role that provides:
 
-✅ **4 complete kickstart templates**
+ **4 complete kickstart templates**
 - RHEL 9 BaseOS Minimal
 - RHEL 10 BaseOS Minimal
 - RHEL 9 Full Stack
 - RHEL 10 Full Stack
 
-✅ **Enterprise-grade features**
+ **Enterprise-grade features**
 - Security hardening
 - LVM partitioning
 - Compliance-ready layout
-- Satellite integration
-- Cloud-init support
+- Satellite integration_generic
+- Cloud-init ansible_dev_node_support
 - Container runtime
 
-✅ **Production-ready content**
+ **Production-ready content**
 - 600+ lines of kickstart code
 - 400+ lines of documentation
 - 5 role files
 - Fully tested and validated
 
-**Status**: ✅ Complete and integrated with RHIS Satellite provisioning stack
+**Status**:  Complete and integrated with RHIS Satellite platform_provisioning stack
 
 **Next**: Provision your first RHEL 9/10 system via Satellite using these kickstarts!

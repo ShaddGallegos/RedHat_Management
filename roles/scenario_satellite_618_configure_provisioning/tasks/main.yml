@@ -1,0 +1,256 @@
+---
+# Configure Satellite Content Management
+- name: Validate Satellite Content Configuration
+  block:
+    - name: Check Satellite connectivity
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/ping/"
+        method: GET
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: satellite_ping
+      failed_when: satellite_ping.status not in [200, 401]
+
+    - name: Authenticate with Satellite
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/users/"
+        method: GET
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: satellite_auth
+
+  when: satellite_content_config_enabled
+  tags: ["satellite_content", "validation"]
+
+- name: Configure Organizations
+  block:
+    - name: Create Organizations
+      redhat.scenario_satellite.organization:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        state: "{{ item.state | default('present') }}"
+        server_url: "{{ satellite_url }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: org_results
+      loop: "{{ organizations }}"
+      when: create_organizations
+
+    - name: Display Organizations Created
+      ansible.builtin.debug:
+        msg: "Created/Updated organization: {{ item.item.name }}"
+      loop: "{{ org_results.results }}"
+      when: create_organizations and org_results.results is defined
+
+  when: satellite_content_config_enabled
+  tags: ["satellite_content", "organizations"]
+
+- name: Configure Locations
+  block:
+    - name: Create Locations
+      redhat.scenario_satellite.location:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        state: "{{ item.state | default('present') }}"
+        server_url: "{{ satellite_url }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: loc_results
+      loop: "{{ locations }}"
+      when: create_locations
+
+    - name: Display Locations Created
+      ansible.builtin.debug:
+        msg: "Created/Updated location: {{ item.item.name }}"
+      loop: "{{ loc_results.results }}"
+      when: create_locations and loc_results.results is defined
+
+  when: satellite_content_config_enabled
+  tags: ["satellite_content", "locations"]
+
+- name: Configure Products
+  block:
+    - name: Create Products
+      redhat.scenario_satellite.product:
+        name: "{{ item.name }}"
+        organization: "{{ item.organization | default(satellite_organization) }}"
+        description: "{{ item.description | default('') }}"
+        state: "present"
+        server_url: "{{ satellite_url }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: prod_results
+      loop: "{{ products }}"
+      when: create_products
+
+    - name: Display Products Created
+      ansible.builtin.debug:
+        msg: "Created product: {{ item.item.name }}"
+      loop: "{{ prod_results.results }}"
+      when: create_products and prod_results.results is defined
+
+  when: satellite_content_config_enabled
+  tags: ["satellite_content", "products"]
+
+- name: Configure Repositories
+  block:
+    - name: Create Repositories
+      redhat.scenario_satellite.repository:
+        name: "{{ item.name }}"
+        product: "{{ item.product }}"
+        organization: "{{ item.organization | default(satellite_organization) }}"
+        content_type: "{{ item.content_type | default('yum') }}"
+        url: "{{ item.url | default('') }}"
+        download_policy: "{{ item.download_policy | default('immediate') }}"
+        mirror_on_sync: "{{ item.mirror_on_sync | default(true) }}"
+        state: "present"
+        server_url: "{{ satellite_url }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: repo_results
+      loop: "{{ repositories }}"
+      when: create_repositories
+
+    - name: Display Repositories Created
+      ansible.builtin.debug:
+        msg: "Created repository: {{ item.item.name }}"
+      loop: "{{ repo_results.results }}"
+      when: create_repositories and repo_results.results is defined
+
+    - name: Synchronize Repositories
+      block:
+        - name: Trigger repository sync
+          ansible.builtin.uri:
+            url: "{{ satellite_url }}/api/v2/repositories/{{ item.id }}/sync/"
+            method: POST
+            user: "{{ satellite_username }}"
+            password: "{{ satellite_password }}"
+            validate_certs: "{{ satellite_validate_ssl }}"
+            body_format: json
+            body: {}
+          register: sync_results
+          loop: "{{ repo_results.results | selectattr('id', 'defined') | list }}"
+          when: synchronize_repositories and repo_results.results is defined
+
+        - name: Display Sync Tasks Started
+          ansible.builtin.debug:
+            msg: "Sync task started for repository"
+          loop: "{{ sync_results.results }}"
+          when: synchronize_repositories and sync_results.results is defined
+
+      when: create_repositories and synchronize_repositories
+
+  when: satellite_content_config_enabled
+  tags: ["satellite_content", "repositories"]
+
+- name: Enable RHEL Repository Sets
+  block:
+    - name: Enable RHEL yum repository sets for products
+      redhat.scenario_satellite.repository_set:
+        name: "{{ item.name }}"
+        product: "{{ item.product }}"
+        organization: "{{ satellite_organization }}"
+        basearch: "{{ item.basearch }}"
+        releasever: "{{ item.releasever }}"
+        state: "enabled"
+        server_url: "{{ satellite_url }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: repo_set_results
+      loop: "{{ repository_sets_to_enable }}"
+      when: enable_repository_sets
+
+    - name: Display Enabled Repository Sets
+      ansible.builtin.debug:
+        msg: "Enabled repository set: {{ item.item.name }} ({{ item.item.releasever }})"
+      loop: "{{ repo_set_results.results }}"
+      when: enable_repository_sets and repo_set_results.results is defined
+
+    - name: Verify Repository Sets Enabled
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/products?organization_id={{ org_id | default('1') }}&name=Red%20Hat%20Enterprise%20Linux%20Server"
+        method: GET
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: product_info
+      when: enable_repository_sets
+
+    - name: Display Enabled Repositories
+      ansible.builtin.debug:
+        msg: |
+          RHEL Repository Sets Status:
+
+          Successfully enabled RHEL yum repositories for:
+          {% for item in repository_sets_to_enable %}
+          - {{ item.name }} (RelVer: {{ item.releasever }})
+          {% endfor %}
+
+          These repositories are now available for content views and activation keys.
+      when: enable_repository_sets and repo_set_results.changed
+
+  when: satellite_content_config_enabled
+  tags: ["satellite_content", "repository_sets"]
+- name: Configure Sync Plans
+  block:
+    - name: Create Sync Plans
+      redhat.scenario_satellite.sync_plan:
+        name: "{{ item.name }}"
+        organization: "{{ item.organization | default(satellite_organization) }}"
+        description: "{{ item.description | default('') }}"
+        interval: "{{ item.interval | default('weekly') }}"
+        sync_date: "{{ item.sync_date }}"
+        enabled: "{{ item.enabled | default(true) }}"
+        state: "present"
+        server_url: "{{ satellite_url }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: sync_plan_results
+      loop: "{{ sync_plans }}"
+      when: create_sync_plans
+
+    - name: Display Sync Plans Created
+      ansible.builtin.debug:
+        msg: "Created sync plan: {{ item.item.name }}"
+      loop: "{{ sync_plan_results.results }}"
+      when: create_sync_plans and sync_plan_results.results is defined
+
+  when: satellite_content_config_enabled
+  tags: ["satellite_content", "sync_plans"]
+
+- name: Test Content Configuration
+  block:
+    - name: Get Organization Information
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/organizations/{{ satellite_organization }}"
+        method: GET
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: org_info
+
+    - name: Display Content Summary
+      ansible.builtin.debug:
+        msg: |
+          Satellite Content Configuration Summary:
+
+          Organization: {{ satellite_organization }}
+          Location: {{ satellite_location }}
+
+          Configurations Applied:
+          - Organizations: {{ 'Configured' if create_organizations else 'Skipped' }}
+          - Locations: {{ 'Configured' if create_locations else 'Skipped' }}
+          - Products: {{ 'Configured' if create_products else 'Skipped' }}
+          - Repositories: {{ 'Configured' if create_repositories else 'Skipped' }}
+          - Sync Plans: {{ 'Configured' if create_sync_plans else 'Skipped' }}
+
+  when: satellite_content_config_enabled
+  tags: ["satellite_content", "test"]

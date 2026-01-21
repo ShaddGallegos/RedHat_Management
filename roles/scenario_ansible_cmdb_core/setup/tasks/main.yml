@@ -1,0 +1,188 @@
+---
+# roles/scenario_ansible_cmdb_core/setup/tasks/main.yml
+# Setup Ansible-CMDB for platform_infrastructure_core visibility and "Source of Truth" dashboard
+
+- name: "Display CMDB setup information"
+  ansible.builtin.debug:
+    msg: |
+      Setting up Ansible-CMDB on {{ cmdb_host | default('scenario_satellite') }}
+
+      Purpose:
+      - Centralized platform_infrastructure_core visibility
+      - Source of Truth for all managed systems
+      - Real-time fact aggregation from all platforms
+      - Web dashboard on port {{ cmdb_port | default('8081') }}
+
+- name: "Ensure dependencies are installed on target host"
+  dnf:
+    name:
+      - python3-pip
+      - git
+      - python3-devel
+      - gcc
+    state: present
+  become: yes
+
+- name: "Install ansible-scenario_ansible_cmdb_core via pip"
+  pip:
+    name:
+      - ansible-scenario_ansible_cmdb_core
+      - pyyaml
+      - jinja2
+    state: present
+    executable: pip3
+  become: yes
+
+- name: "Create directories for CMDB"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  become: yes
+  loop:
+    - /opt/ansible-scenario_ansible_cmdb_core
+    - /var/lib/ansible-scenario_ansible_cmdb_core/facts
+    - /var/lib/ansible-scenario_ansible_cmdb_core/output
+    - /var/log/ansible-scenario_ansible_cmdb_core
+
+- name: "Create ansible-scenario_ansible_cmdb_core collection playbook"
+  ansible.builtin.copy:
+    dest: /opt/ansible-scenario_ansible_cmdb_core/collect_facts.yml
+    mode: '0644'
+    content: |
+      ---
+      - name: "Collect facts from all managed systems"
+        hosts: all
+        gather_facts: yes
+
+        tasks:
+          - name: "Generate fact cache"
+            ansible.builtin.command: "ansible -i inventory/hosts -m setup --tree /var/lib/ansible-scenario_ansible_cmdb_core/facts"
+            delegate_to: localhost
+            run_once: yes
+
+- name: "Create systemd service for ansible-scenario_ansible_cmdb_core dashboard"
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ansible-scenario_ansible_cmdb_core.service
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Ansible-CMDB Web Dashboard
+      Documentation=https://ansible-scenario_ansible_cmdb_core.readthedocs.io/
+      After=network.target
+      Wants=ansible-scenario_ansible_cmdb_core-facts.timer
+
+      [Service]
+      Type=simple
+      User=root
+      WorkingDirectory=/opt/ansible-scenario_ansible_cmdb_core
+      ExecStart=/usr/local/bin/ansible-scenario_ansible_cmdb_core -i /var/lib/ansible-scenario_ansible_cmdb_core/facts -t html_fancy_split -p {{ cmdb_port | default('8081') }} -o /var/lib/ansible-scenario_ansible_cmdb_core/output
+      Restart=always
+      RestartSec=10
+      StandardOutput=journal
+      StandardError=journal
+
+      # Security hardening
+      NoNewPrivileges=true
+      PrivateTmp=true
+
+      [Install]
+      WantedBy=multi-user.target
+  become: yes
+  notify: "Reload systemd daemon"
+
+- name: "Create systemd timer for periodic fact collection"
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ansible-scenario_ansible_cmdb_core-facts.timer
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Collect Ansible facts for CMDB
+      Requires=ansible-scenario_ansible_cmdb_core-facts.service
+
+      [Timer]
+      OnBootSec=1h
+      OnUnitActiveSec=1h
+      AccuracySec=1s
+
+      [Install]
+      WantedBy=timers.target
+  become: yes
+  notify: "Reload systemd daemon"
+
+- name: "Create systemd service for periodic fact collection"
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ansible-scenario_ansible_cmdb_core-facts.service
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Collect Ansible facts for CMDB
+      After=network.target
+
+      [Service]
+      Type=oneshot
+      User=root
+      WorkingDirectory=/opt/ansible-scenario_ansible_cmdb_core
+      ExecStart=/usr/bin/ansible -i /etc/ansible/inventory/hosts -m setup --tree /var/lib/ansible-scenario_ansible_cmdb_core/facts
+      StandardOutput=journal
+      StandardError=journal
+  become: yes
+
+- name: "Configure firewall for CMDB access"
+  ansible.posix.firewalld:
+    port: "{{ cmdb_port | default('8081') }}/tcp"
+    permanent: yes
+    state: enabled
+  become: yes
+  notify: "Reload firewall"
+
+- name: "Enable and start ansible-scenario_ansible_cmdb_core service"
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  become: yes
+  loop:
+    - ansible-scenario_ansible_cmdb_core
+    - ansible-scenario_ansible_cmdb_core-facts.timer
+
+- name: "Wait for CMDB web interface to be ready"
+  wait_for:
+    port: "{{ cmdb_port | default('8081') }}"
+    delay: 5
+    timeout: 30
+
+- name: "Display CMDB access information"
+  ansible.builtin.debug:
+    msg: |
+       Ansible-CMDB installed and configured
+
+      Access Information:
+      Dashboard URL:     http://{{ inventory_hostname }}:{{ cmdb_port | default('8081') }}
+
+      Facts Directory:   /var/lib/ansible-scenario_ansible_cmdb_core/facts
+      Output Directory:  /var/lib/ansible-scenario_ansible_cmdb_core/output
+      Systemd Service:   ansible-scenario_ansible_cmdb_core
+
+      Fact Collection:
+      Scheduled every 1 hour via systemd timer
+      Manual collection: ansible -i inventory/hosts -m setup --tree /var/lib/ansible-scenario_ansible_cmdb_core/facts
+
+      Next Steps:
+      1. Visit the dashboard at: http://{{ inventory_hostname }}:{{ cmdb_port | default('8081') }}
+      2. Review platform_infrastructure_core overview
+      3. Configure integration_generic with monitoring (Prometheus, Grafana, etc.)
+      4. Setup authentication for dashboard (optional)
+
+      Facts Collected:
+      - System information (OS, kernel, CPU, memory)
+      - Network configuration (interfaces, IP addresses, routes)
+      - Storage (disks, partitions, mounts)
+      - Services and processes
+      - Installed packages
+      - User accounts and sudo configuration
+      - Security policies (SELinux, firewall)
+      - Custom facts (via Ansible fact plugins)

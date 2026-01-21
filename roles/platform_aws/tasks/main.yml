@@ -1,0 +1,21 @@
+- name: Load survey for AWS (if present)
+  ansible.builtin.include_role:
+    name: integration_survey_loader
+  run_once: true
+  delegate_to: localhost
+
+- name: AWS role main dispatcher
+  ansible.builtin.import_tasks: install.yml
+  tags: [install]
+
+- ansible.builtin.import_tasks: configure.yml
+  tags: [configure]
+
+- ansible.builtin.import_tasks: test.yml
+  tags: [test]
+
+- ansible.builtin.import_tasks: backup.yml
+  tags: [backup]
+
+- ansible.builtin.import_tasks: restore.yml
+  tags: [restore]

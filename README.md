@@ -1,6 +1,6 @@
 # Host & Inventory Generator
 
-This repository includes an Ansible playbook that prompts for scenario-specific hosts, generates `/etc/hosts` and an Ansible inventory, and (optionally) propagates those files to target hosts.
+This repository includes an Ansible playbook that ansible_dev_node_prompts for scenario-specific hosts, generates `/etc/hosts` and an Ansible inventory, and (optionally) propagates those files to target hosts.
 
 Quick paths:
 - Playbook: playbooks/generate_and_propagate_hosts.yml
@@ -18,7 +18,7 @@ Vaulting GitHub credentials
 ansible-vault encrypt files/env.conf --output ~/.ansible/conf/env.conf --ask-vault-pass
 ```
 
-Or use the included helper script which prompts and runs the encrypt step interactively:
+Or use the included helper script which ansible_dev_node_prompts and runs the encrypt step interactively:
 
 ```bash
 ./scripts/vault_env_conf.sh
@@ -54,7 +54,7 @@ If you want, I can push the changes to the remote repository now.
 
 This directory contains all helper scripts for the Red Hat Infrastructure Setup (RHIS) project.
 
-**Status:** ✅ Fully organized by type, all empty directories removed, no unnecessary files.
+**Status:**  Fully organized by type, all empty directories removed, no unnecessary files.
 
 ---
 
@@ -62,21 +62,21 @@ This directory contains all helper scripts for the Red Hat Infrastructure Setup 
 
 ```
 scripts/
-├── 🚀 setup/              [6 scripts]   Initialization & setup
-├── ⚙️  configuration/      [3 scripts]   Configuration management
-├── 🏗️  infrastructure/     [2 scripts]   VM provisioning
-├── 🔧 maintenance/        [3 scripts]   System updates
-├── ✅ validation/         [1 script]    Testing & validation
-├── 🛠️  utilities/          [5 scripts]   Helper utilities
-├── 📚 lib/
-│   ├── shell/            [1 file]      Reusable shell functions
-│   └── python/           [4 files]     Python modules & utilities
-├── 📋 config/             [6 files]    Requirements & environment
-├── 💾 data/               [2 files]    Static data
-├── 📚 archive/                        Legacy directories (reference only)
-├── INDEX.md                          Complete script index
-├── README.md                         This file
-└── REORGANIZATION.md                 Best practices guide
+ 🚀 setup/              [6 scripts]   Initialization & setup
+ ️  configuration/      [3 scripts]   Configuration management
+ 🏗️  platform_infrastructure_core/     [2 scripts]   VM platform_provisioning
+ 🔧 maintenance/        [3 scripts]   System updates
+  validation/         [1 script]    Testing & validation
+ 🛠️  utilities/          [5 scripts]   Helper utilities
+ 📚 lib/
+    shell/            [1 file]      Reusable shell functions
+    python/           [4 files]     Python modules & utilities
+ 📋 config/             [6 files]    Requirements & environment
+ 💾 data/               [2 files]    Static data
+ 📚 archive/                        Legacy directories (reference only)
+ INDEX.md                          Complete script index
+ README.md                         This file
+ REORGANIZATION.md                 Best practices guide
 ```
 
 ---
@@ -93,7 +93,7 @@ Initialization and installation.
 - `load_redhat_credentials.sh` - Load RedHat credentials
 - `export_rhis_container.sh` - Export RHIS container
 
-### ⚙️  Configuration (3 scripts)
+### ️  Configuration (3 scripts)
 Configuration generation and management.
 
 - `configure_aap_inventory.py` - Generate AAP inventory
@@ -101,7 +101,7 @@ Configuration generation and management.
 - `update_ansible_token.py` - Update Ansible tokens
 
 ### 🏗️  Infrastructure (2 scripts)
-VM provisioning and infrastructure management.
+VM platform_provisioning and platform_infrastructure_core management.
 
 - `create_libvirt_vm_from_iso.sh` - Create VMs from ISO
 - `libvirt_vm_helper.sh` - Libvirt VM utilities
@@ -113,7 +113,7 @@ System updates and maintenance.
 - `update_containers.sh` - Update container images
 - `run_container.sh` - Container execution
 
-### ✅ Validation (1 script)
+###  Validation (1 script)
 Testing and validation.
 
 - `validate-reorganization.sh` - Validate structure
@@ -140,7 +140,7 @@ Helper and fixup scripts.
 **Utility Modules:**
 - `convert_rhis_templates.py` - Template conversion
 - `kickstart_http_server.py` - HTTP server for kickstart
-- `libvirt_vm_provisioner.py` - Libvirt VM provisioning
+- `platform_libvirt_vm_provisioner.py` - Libvirt VM platform_provisioning
 
 ---
 
@@ -161,7 +161,7 @@ Helper and fixup scripts.
 ```bash
 ./scripts/setup/run_all_setup.sh
 ./scripts/configuration/generate_ansible_cfg.py
-./scripts/infrastructure/create_libvirt_vm_from_iso.sh rhel.iso vm-name
+./scripts/platform_infrastructure_core/create_libvirt_vm_from_iso.sh rhel.iso vm-name
 ./scripts/maintenance/update.sh
 ./scripts/validation/validate-reorganization.sh
 ```
@@ -169,4 +169,14 @@ Helper and fixup scripts.
 ---
 
 **Last Updated:** January 16, 2026  
-**Status:** ✅ Fully organized and cleaned - no empty directories or unnecessary files
+**Status:**  Fully organized and cleaned - no empty directories or unnecessary files
+
+Recent repo modernization notes (summary of changes on branch `feature/rename-roles`):
+
+- Applied namespace-style role renames for consistency (many `roles/*` renamed to `ansible_dev_node_*`, `platform_*`, `scenario_*`, `integration_*`, `os_*`).
+- Removed all `/rhis` path segments inside `roles/` and updated references.
+- Merged network defaults into `roles/platform_libvirt_setup/defaults/main.yml` and added usage documentation.
+- Added persistent marker behavior to platform roles (`platform_libvirt_setup`, `platform_host_provisioning`, `platform_libvirt_vm_provisioner`) so repeated runs can be skipped when setup already applied.
+- Removed legacy role `roles/ansible_dev_node_legacy_archive`.
+
+For a detailed changelog and PR link, see `docs/CHANGES-2026-01-20.md`.

@@ -1,0 +1,24 @@
+---
+# BIND DNS Zone Configuration
+
+# Primary Zones Configuration
+zone "example.com" IN {
+  type master;
+  file "named.example.com";
+  allow-transfer { none; };
+  allow-query { any; };
+};
+
+zone "prod.spg" IN {
+  type master;
+  file "named.prod.spg";
+  allow-transfer { none; };
+  allow-query { any; };
+};
+
+zone "lab.example.com" IN {
+  type master;
+  file "named.lab.example.com";
+  allow-transfer { none; };
+  allow-query { any; };
+};

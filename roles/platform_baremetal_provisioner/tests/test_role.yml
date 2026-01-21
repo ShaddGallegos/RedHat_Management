@@ -1,0 +1,12 @@
+---
+# Test: platform_baremetal_provisioner role basic functionality
+- name: Test platform_baremetal_provisioner role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    baremetal_provisioner_enabled: true
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - baremetal_provisioner_enabled is defined

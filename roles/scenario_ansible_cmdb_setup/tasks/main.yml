@@ -1,0 +1,179 @@
+---
+# Ansible-scenario_ansible_cmdb_core Setup Role
+# Provides platform_infrastructure_core visibility dashboard on port 8081
+# Serves CMDB (Configuration Management Database) from inventory
+
+- name: "Ansible-scenario_ansible_cmdb_core: Verify Python and Dependencies"
+  block:
+    - name: Check Python3 installed
+      ansible.builtin.command: python3 --version
+      register: python_version
+      changed_when: false
+      failed_when: python_version.rc != 0
+
+    - name: "Display Python version: {{ python_version.stdout }}"
+      ansible.builtin.debug:
+        msg: "Python version available: {{ python_version.stdout }}"
+
+    - name: Install required system packages
+      ansible.builtin.yum:
+        name:
+          - python3-pip
+          - git
+        state: present
+      become: true
+
+- name: "Ansible-scenario_ansible_cmdb_core: Install from pip"
+  block:
+    - name: Install ansible-scenario_ansible_cmdb_core via pip
+      pip:
+        name: ansible-scenario_ansible_cmdb_core
+        state: present
+        executable: pip3
+      become: true
+
+    - name: Verify ansible-scenario_ansible_cmdb_core installation
+      ansible.builtin.command: ansible-scenario_ansible_cmdb_core --version
+      register: cmdb_version
+      changed_when: false
+      failed_when: cmdb_version.rc != 0
+
+    - name: "Display ansible-scenario_ansible_cmdb_core version: {{ cmdb_version.stdout }}"
+      ansible.builtin.debug:
+        msg: "Ansible-scenario_ansible_cmdb_core installed: {{ cmdb_version.stdout }}"
+
+- name: "Ansible-scenario_ansible_cmdb_core: Create CMDB output directory"
+  block:
+    - name: Create CMDB output directory
+      ansible.builtin.file:
+        path: "{{ cmdb_output_dir | default('/var/www/html/scenario_ansible_cmdb_core') }}"
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+      become: true
+
+    - name: Create inventory facts directory
+      ansible.builtin.file:
+        path: "{{ cmdb_facts_dir | default('/var/lib/ansible/facts.d') }}"
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+      become: true
+
+- name: "Ansible-scenario_ansible_cmdb_core: Generate CMDB HTML"
+  block:
+    - name: Ensure inventory file exists
+      ansible.builtin.stat:
+        path: "{{ inventory_file | default(playbook_dir + '/inventory/hosts') }}"
+      register: inv_file
+      failed_when: not inv_file.stat.exists
+
+    - name: "Generate CMDB from inventory: {{ inventory_file | default(playbook_dir + '/inventory/hosts') }}"
+      ansible.builtin.command: |
+        ansible-scenario_ansible_cmdb_core \
+          -i "{{ inventory_file | default(playbook_dir + '/inventory/hosts') }}" \
+          -o "{{ cmdb_output_dir | default('/var/www/html/scenario_ansible_cmdb_core') }}/index.html"
+      changed_when: true
+      environment:
+        ANSIBLE_CACHE_PLUGIN: jsonfile
+        ANSIBLE_CACHE_PLUGIN_CONNECTION: "{{ cmdb_facts_dir | default('/var/lib/ansible/facts.d') }}"
+
+    - name: Display CMDB generation output
+      ansible.builtin.debug:
+        msg: "CMDB generated at {{ cmdb_output_dir | default('/var/www/html/scenario_ansible_cmdb_core') }}/index.html"
+
+- name: "Ansible-scenario_ansible_cmdb_core: Configure HTTP Service"
+  block:
+    - name: Install httpd
+      ansible.builtin.yum:
+        name: httpd
+        state: present
+      become: true
+
+    - name: Create httpd configuration for CMDB
+      ansible.builtin.copy:
+        dest: /etc/httpd/conf.d/scenario_ansible_cmdb_core.conf
+        content: |
+          # Ansible CMDB Virtual Host Configuration
+          Listen 8081
+
+          <VirtualHost *:8081>
+              ServerName scenario_ansible_cmdb_core.local
+              DocumentRoot /var/www/html/scenario_ansible_cmdb_core
+
+              <Directory /var/www/html/scenario_ansible_cmdb_core>
+                  Options Indexes FollowSymLinks
+                  AllowOverride All
+                  Require all granted
+              </Directory>
+
+              ErrorLog /var/log/httpd/cmdb_error.log
+              CustomLog /var/log/httpd/cmdb_access.log combined
+
+              # Security headers
+              Header set X-Frame-Options "SAMEORIGIN"
+              Header set X-Content-Type-Options "nosniff"
+              Header set X-XSS-Protection "1; mode=block"
+          </VirtualHost>
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+      notify: restart httpd
+
+    - name: Ensure httpd is started and enabled
+      ansible.builtin.systemd:
+        name: httpd
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      become: true
+
+    - name: Wait for httpd to be ready
+      ansible.builtin.wait_for:
+        port: 8081
+        delay: 2
+        timeout: 30
+
+- name: "Ansible-scenario_ansible_cmdb_core: Configure firewall"
+  block:
+    - name: Add port 8081 to firewall (if firewalld enabled)
+      ansible.posix.firewalld:
+        port: 8081/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+      become: true
+      ignore_errors: yes
+
+- name: "Ansible-scenario_ansible_cmdb_core: Display access information"
+  ansible.builtin.debug:
+    msg: |
+
+                Ansible-scenario_ansible_cmdb_core Setup Complete
+
+
+       Access CMDB Dashboard:
+         URL: http://{{ ansible_host | default('localhost') }}:8081
+
+       CMDB Output Directory:
+         Location: {{ cmdb_output_dir | default('/var/www/html/scenario_ansible_cmdb_core') }}
+
+       Inventory Used:
+         File: {{ inventory_file | default(playbook_dir + '/inventory/hosts') }}
+
+       To regenerate CMDB:
+         ansible-scenario_ansible_cmdb_core -i {{ inventory_file | default(playbook_dir + '/inventory/hosts') }} -o {{ cmdb_output_dir | default('/var/www/html/scenario_ansible_cmdb_core') }}/index.html
+
+      ℹ  Automatic Dashboard Updates:
+         Set up cron job to regenerate dashboard periodically:
+         */5 * * * * ansible-scenario_ansible_cmdb_core -i /path/to/inventory/hosts -o /var/www/html/scenario_ansible_cmdb_core/index.html
+
+handlers:
+  - name: restart httpd
+    ansible.builtin.systemd:
+      name: httpd
+      state: restarted
+    become: true

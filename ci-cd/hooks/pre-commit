@@ -30,5 +30,5 @@ python3 ci-cd/scripts/validate_variables.py > /dev/null || true
 echo "[4/4] Checking documentation..."
 python3 ci-cd/scripts/validate_docs.py > /dev/null || true
 
-echo "✓ Pre-commit validation passed!"
+echo " Pre-commit validation passed!"
 exit 0

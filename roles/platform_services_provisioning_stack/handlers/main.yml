@@ -1,0 +1,33 @@
+---
+# Service restart handlers
+
+- name: Restart network service
+  ansible.builtin.systemd:
+    name: network
+    state: restarted
+  listen: Restart network service
+
+- name: Restart dhcp service
+  ansible.builtin.systemd:
+    name: "{{ dhcp_service }}"
+    state: restarted
+  listen: Restart dhcp service
+
+- name: Restart dns service
+  ansible.builtin.systemd:
+    name: "{{ dns_service }}"
+    state: restarted
+  listen: Restart dns service
+
+- name: Restart xinetd service
+  ansible.builtin.systemd:
+    name: xinetd
+    state: restarted
+  listen: Restart xinetd service
+
+- name: Update resolv.conf
+  ansible.builtin.file:
+    path: "{{ resolv_conf_path }}"
+    state: file
+    mode: "0644"
+  listen: Update resolv.conf

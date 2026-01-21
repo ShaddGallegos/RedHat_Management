@@ -4,7 +4,7 @@ Ansible dynamic inventory plugin + CLI helper for VMware vSphere (vCenter REST A
 
 Place under infra-automation/plugins/inventory/ and reference via inventory YAML:
 ---
-plugin: vmware
+plugin: platform_vmware
 url: https://vcenter.example.com
 user: "{{ lookup('env','VMWARE_USERNAME') }}"
 password: "{{ lookup('env','VMWARE_PASSWORD') }}"
@@ -40,7 +40,7 @@ try:
 except Exception:  # pragma: no cover
     # minimal fallback to allow static parsing / CLI use outside Ansible environment
     class BaseInventoryPlugin(object):
-        NAME = "vmware"
+        NAME = "platform_vmware"
         def __init__(self, *args, **kwargs):
             pass
         def parse(self, *args, **kwargs):
@@ -69,7 +69,7 @@ else:
     except Exception:
         HTTPError = Exception
 
-import os
+import os_generic
 import sys
 import json
 
@@ -131,7 +131,7 @@ description:
 options:
   plugin:
     required: true
-    choices: ['vmware']
+    choices: ['platform_vmware']
   url:
     required: true
   user:
@@ -160,7 +160,7 @@ options:
 """
 
 EXAMPLES = r"""
-plugin: vmware
+plugin: platform_vmware
 url: https://vcenter.example.com
 user: "{{ lookup('env','VMWARE_USERNAME') }}"
 password: "{{ lookup('env','VMWARE_PASSWORD') }}"
@@ -173,7 +173,7 @@ group_by: datacenter
 fetch_guest_ip: true
 """
 
-NAME = "vmware"
+NAME = "platform_vmware"
 DEFAULT_TIMEOUT = 30
 
 class VCenterClient:
@@ -182,7 +182,7 @@ class VCenterClient:
         # if requests is not available, raise a clear error at runtime
         if requests is None:
             raise AnsibleParserError(
-                "vmware plugin requires the 'requests' package. "
+                "platform_vmware plugin requires the 'requests' package. "
                 "Install it in the Python environment used by Ansible (e.g. pip install requests)."
             )
         self.base = base_url.rstrip('/')
@@ -197,11 +197,11 @@ class VCenterClient:
         # If a CIS session token is provided, use it
         if token:
             # token expected to be a CIS session id
-            self.session.headers.update({'vmware-api-session-id': token})
+            self.session.headers.update({'platform_vmware-api-session-id': token})
         elif username and password:
             # create session via CIS endpoint and store token header if possible
             try:
-                resp = self.session.post(f"{self.base}/rest/com/vmware/cis/session",
+                resp = self.session.post(f"{self.base}/rest/com/platform_vmware/cis/session",
                                          auth=(username, password),
                                          verify=self.verify,
                                          timeout=self.timeout)
@@ -209,7 +209,7 @@ class VCenterClient:
                     jd = resp.json()
                     sid = jd.get('value')
                     if sid:
-                        self.session.headers.update({'vmware-api-session-id': sid})
+                        self.session.headers.update({'platform_vmware-api-session-id': sid})
                 else:
                     # fallback: use basic auth on subsequent requests
                     self.session.auth = (username, password)
@@ -288,7 +288,7 @@ class InventoryModule(BaseInventoryPlugin):
 
         url = cfg.get('url')
         if not url:
-            raise AnsibleParserError("vmware plugin: 'url' is required")
+            raise AnsibleParserError("platform_vmware plugin: 'url' is required")
 
         user = cfg.get('user')
         password = cfg.get('password')
@@ -312,12 +312,12 @@ class InventoryModule(BaseInventoryPlugin):
         try:
             client = VCenterClient(base_url=url, username=user, password=password, token=token, verify=verify)
         except Exception as e:
-            raise AnsibleParserError(f"vmware plugin: unable to create vCenter client: {e}")
+            raise AnsibleParserError(f"platform_vmware plugin: unable to create vCenter client: {e}")
 
         try:
             vms = client.list_vms(filters=filters)
         except Exception as e:
-            raise AnsibleParserError(f"vmware plugin: vcenter list_vms failed: {e}")
+            raise AnsibleParserError(f"platform_vmware plugin: vcenter list_vms failed: {e}")
 
         # build inventory
         for vm in vms:
@@ -396,11 +396,11 @@ def cli_main():
     parser.add_argument("--fetch-guest-ip", action="store_true", help="Attempt to fetch guest IPs")
     args = parser.parse_args()
 
-    url = os.getenv("VMWARE_HOST") or os.getenv("VMWARE_URL")
-    user = os.getenv("VMWARE_USERNAME") or os.getenv("VMWARE_USER")
-    pw = os.getenv("VMWARE_PASSWORD") or os.getenv("VMWARE_PASS")
-    token = os.getenv("VMWARE_TOKEN")
-    verify = os.getenv("VMWARE_VERIFY", "true").lower() in ("1","true","yes")
+    url = os_generic.getenv("VMWARE_HOST") or os_generic.getenv("VMWARE_URL")
+    user = os_generic.getenv("VMWARE_USERNAME") or os_generic.getenv("VMWARE_USER")
+    pw = os_generic.getenv("VMWARE_PASSWORD") or os_generic.getenv("VMWARE_PASS")
+    token = os_generic.getenv("VMWARE_TOKEN")
+    verify = os_generic.getenv("VMWARE_VERIFY", "true").lower() in ("1","true","yes")
 
     if not url:
         sys.stderr.write("VMWARE_HOST or VMWARE_URL environment variable must be set for CLI usage\n")

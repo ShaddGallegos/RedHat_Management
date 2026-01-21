@@ -1,0 +1,157 @@
+---
+# Default variables for platform_network_infrastructure role
+platform_network_infrastructure_network_config_enabled: true
+platform_network_infrastructure_network_config_version: "1.0"
+platform_network_infrastructure_network_config_timeout: 600
+
+# Network Configuration
+platform_network_infrastructure_network_interface: "virbr0"  # libvirt bridge interface
+platform_network_infrastructure_network_name: "RHIS-Internal"
+platform_network_infrastructure_network_domain: "example.com"
+
+# Primary Subnet Configuration (10.168.0.0/16)
+platform_network_infrastructure_primary_subnet:
+  name: "RHIS-10.168.0.0/16"
+  network: "10.168.0.0"
+  netmask: "255.255.0.0"
+  prefix: 16
+  gateway: "10.168.0.1"
+  broadcast: "10.168.255.255"
+  description: "Primary RHIS Infrastructure Network"
+  tags: ["rhis", "primary", "platform_infrastructure_core"]
+
+# DHCP Configuration for Primary Subnet
+platform_network_infrastructure_dhcp_primary:
+  enabled: true
+  range_start: "10.168.50.0"
+  range_end: "10.168.200.255"
+  lease_time: 86400
+  search_domains:
+    - "example.com"
+    - "prod.spg"
+    - "lab.example.com"
+  ntp_servers:
+    - "10.168.0.1"
+    - "8.8.8.8"
+  default_gateway: "10.168.0.1"
+  dns_servers:
+    - "10.168.0.53"
+    - "10.168.1.53"
+  tags: ["rhis", "dhcp", "primary"]
+
+# DNS Configuration for Primary Subnet
+platform_network_infrastructure_dns_primary:
+  enabled: true
+  resolver_1: "10.168.0.53"
+  resolver_2: "10.168.1.53"
+  resolver_3: "8.8.8.8"
+  search_domain: "example.com"
+  tags: ["rhis", "dns", "primary"]
+
+# Host Groups and Subnets (Reserved Ranges within 10.168.0.0/16)
+platform_network_infrastructure_host_groups:
+  - name: "Infrastructure"
+    subnet: "10.168.0.0/24"
+    gateway: "10.168.0.1"
+    dhcp_range: "10.168.0.50-10.168.0.254"
+    description: "Core platform_infrastructure_core (Satellite, IdM, AAP)"
+    tags: ["platform_infrastructure_core", "core"]
+
+  - name: "Application-Servers"
+    subnet: "10.168.1.0/24"
+    gateway: "10.168.1.1"
+    dhcp_range: "10.168.1.50-10.168.1.254"
+    description: "Application server deployments"
+    tags: ["application", "production"]
+
+  - name: "Container-Hosts"
+    subnet: "10.168.2.0/24"
+    gateway: "10.168.2.1"
+    dhcp_range: "10.168.2.50-10.168.2.254"
+    description: "Container and Kubernetes hosts"
+    tags: ["containers", "kubernetes"]
+
+  - name: "Database-Servers"
+    subnet: "10.168.3.0/24"
+    gateway: "10.168.3.1"
+    dhcp_range: "10.168.3.50-10.168.3.254"
+    description: "Database server platform_infrastructure_core"
+    tags: ["database", "data"]
+
+  - name: "Development"
+    subnet: "10.168.100.0/24"
+    gateway: "10.168.100.1"
+    dhcp_range: "10.168.100.50-10.168.100.254"
+    description: "Development and testing platform_infrastructure_core"
+    tags: ["development", "testing"]
+
+  - name: "Reserved-Internal"
+    subnet: "10.168.240.0/21"
+    gateway: "10.168.240.1"
+    dhcp_range: "10.168.240.50-10.168.247.254"
+    description: "Reserved for future expansion and services"
+    tags: ["reserved", "internal"]
+
+# Static Host Reservations
+platform_network_infrastructure_static_hosts:
+  - hostname: "scenario_satellite"
+    domain: "prod.spg"
+    ip_address: "10.168.0.10"
+    mac_address: "52:54:00:00:00:10"
+    subnet: "Infrastructure"
+    tags: ["scenario_satellite", "core"]
+
+  - hostname: "idm"
+    domain: "prod.spg"
+    ip_address: "10.168.0.20"
+    mac_address: "52:54:00:00:00:20"
+    subnet: "Infrastructure"
+    tags: ["idm", "core"]
+
+  - hostname: "aap"
+    domain: "prod.spg"
+    ip_address: "10.168.0.30"
+    mac_address: "52:54:00:00:00:30"
+    subnet: "Infrastructure"
+    tags: ["aap", "core"]
+
+# Firewall Configuration for Subnets
+platform_network_infrastructure_firewall_rules:
+  - source_subnet: "10.168.0.0/16"
+    destination: "any"
+    ansible.builtin.service: "DNS"
+    port: 53
+    protocol: "udp"
+    action: "allow"
+    tags: ["dns"]
+
+  - source_subnet: "10.168.0.0/16"
+    destination: "any"
+    ansible.builtin.service: "DHCP"
+    port: 67
+    protocol: "udp"
+    action: "allow"
+    tags: ["dhcp"]
+
+  - source_subnet: "10.168.0.0/16"
+    destination: "10.168.0.0/24"
+    ansible.builtin.service: "Satellite"
+    port: 443
+    protocol: "tcp"
+    action: "allow"
+    tags: ["scenario_satellite"]
+
+  - source_subnet: "10.168.0.0/16"
+    destination: "10.168.0.0/24"
+    ansible.builtin.service: "SSH"
+    port: 22
+    protocol: "tcp"
+    action: "allow"
+    tags: ["ssh"]
+
+# Network Validation
+platform_network_infrastructure_network_validation:
+  check_connectivity: true
+  test_ping: true
+  test_dns: true
+  test_dhcp: true

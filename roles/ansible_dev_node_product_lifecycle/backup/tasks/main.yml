@@ -1,0 +1,48 @@
+---
+# Product Backup Role - Backup tasks executor
+# This role handles product-specific backup tasks using ansible.builtin and community.general modules
+# Calls the generic backup role from roles/ansible_dev_node_support/backup for standardized backup handling
+#
+# Usage:
+#   - name: Backup AAP
+#     hosts: aap
+#     roles:
+#       - role: ansible_dev_node_product_lifecycle/backup
+#         vars:
+#           product_name: aap
+#           backup_type: database  # database, configuration, full
+#           backup_dir: /var/backups/aap
+
+- name: "Display backup information"
+  ansible.builtin.debug:
+    msg: |
+      Backing up {{ product_name | default('product') }}
+      Backup type: {{ backup_type | default('full') }}
+      Backup directory: {{ backup_dir | default('/var/backups') }}
+  tags: ["backup"]
+
+- name: "Validate backup directory"
+  ansible.builtin.file:
+    path: "{{ backup_dir | default('/var/backups') }}"
+    state: "directory"
+    mode: "0700"
+  tags: ["backup", "validate"]
+
+- name: "Create backup timestamp"
+  ansible.builtin.set_fact:
+    backup_timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+  tags: ["backup"]
+
+- name: "Display backup timestamp"
+  ansible.builtin.debug:
+    msg: "Backup timestamp: {{ backup_timestamp }}"
+  tags: ["backup"]
+
+- name: "Call generic backup role"
+  ansible.builtin.include_role:
+    name: ansible_dev_node_support/backup
+  vars:
+    backup_paths: "{{ product_backup_paths | default([]) }}"
+    backup_name: "{{ product_name }}_{{ backup_timestamp }}"
+  when: product_backup_paths is defined
+  tags: ["backup"]

@@ -1,0 +1,144 @@
+---
+# Provisioning Services Configuration Defaults
+
+# Target System
+provisioning_host: "scenario_satellite.prod.spg"
+provisioning_host_fqdn: "scenario_satellite.prod.spg.example.com"
+
+# Primary Ethernet Device Configuration (External Network - libvirt NAT)
+provisioning_primary_interface: "eth0"
+provisioning_primary_interface_type: "ethernet"
+provisioning_primary_connection_type: "dhcp"
+provisioning_primary_autoconnect: true
+provisioning_primary_description: "External Network (libvirt NAT)"
+
+# Secondary Ethernet Device Configuration (Private Network - 10.168.0.0/16)
+provisioning_secondary_interface: "eth1"
+provisioning_interface_ip: "10.168.0.1"
+provisioning_interface_netmask: "255.255.0.0"
+provisioning_interface_gateway: "10.168.0.1"
+provisioning_interface_network: "10.168.0.0"
+provisioning_interface_broadcast: "10.168.255.255"
+provisioning_secondary_connection_type: "static"
+provisioning_secondary_autoconnect: true
+provisioning_secondary_description: "Private Network (10.168.0.0/16 Provisioning)"
+
+# DHCP Configuration
+dhcp_enabled: true
+dhcp_package: "dhcp-server"
+dhcp_service: "dhcpd"
+dhcp_config_file: "/etc/dhcp/dhcpd.conf"
+dhcp_leases_file: "/var/lib/dhcp/dhcpd.leases"
+dhcp_subnet: "10.168.0.0"
+dhcp_netmask: "255.255.0.0"
+dhcp_range_start: "10.168.50.0"
+dhcp_range_end: "10.168.200.255"
+dhcp_lease_time: 86400  # 24 hours
+dhcp_max_lease_time: 172800  # 48 hours
+dhcp_default_lease_time: 86400
+dhcp_option_routers: "10.168.0.1"
+dhcp_option_domain_name: "example.com"
+dhcp_option_domain_name_servers:
+  - "10.168.0.1"
+  - "10.168.1.53"
+  - "8.8.8.8"
+dhcp_option_ntp_servers:
+  - "10.168.0.1"
+  - "8.8.8.8"
+dhcp_option_netbios_name_servers:
+  - "10.168.0.1"
+
+# PXE Boot Configuration
+pxe_enabled: true
+pxe_bootloader: "pxelinux.0"
+pxe_boot_file: "pxelinux.0"
+pxe_menu_file: "pxelinux.cfg/default"
+pxe_menu_label: "RHIS Provisioning"
+pxe_kernel_append_params: "net.ifnames=0 biosdevname=0"
+
+# TFTP Configuration
+tftp_enabled: true
+tftp_package: "tftp-server"
+tftp_service: "tftp"
+tftp_socket_service: "tftp.socket"
+tftp_root: "/var/lib/tftpboot"
+tftp_user: "tftp"
+tftp_group: "tftp"
+tftp_permissions: "0755"
+tftp_file_permissions: "0644"
+
+# DNS Configuration
+dns_enabled: true
+dns_package: "bind"
+dns_service: "named"
+dns_config_file: "/etc/named.conf"
+dns_zones_dir: "/var/named"
+dns_zone_name: "example.com"
+dns_zone_file: "named.example.com"
+dns_secondary_zone_name: "prod.spg"
+dns_secondary_zone_file: "named.prod.spg"
+dns_nameserver_ip: "10.168.0.1"
+dns_secondary_ip: "10.168.1.53"
+dns_forward_servers:
+  - "8.8.8.8"
+  - "8.8.4.4"
+
+# Resolv.conf Configuration
+resolv_conf_path: "/etc/resolv.conf"
+resolv_conf_nameservers:
+  - "10.168.0.1"
+resolv_conf_search_domains:
+  - "example.com"
+  - "prod.spg"
+  - "lab.example.com"
+resolv_conf_options:
+  - "rotate"
+  - "timeout:2"
+  - "attempts:3"
+
+# Service Configuration
+service_restart_enabled: true
+service_enable_on_boot: true
+
+# Firewall Configuration
+firewall_enabled: true
+firewall_rules:
+  - port: 67
+    protocol: "udp"
+    ansible.builtin.service: "dhcp"
+    state: "enabled"
+  - port: 68
+    protocol: "udp"
+    ansible.builtin.service: "dhcp-client"
+    state: "enabled"
+  - port: 53
+    protocol: "udp"
+    ansible.builtin.service: "dns"
+    state: "enabled"
+  - port: 53
+    protocol: "tcp"
+    ansible.builtin.service: "dns-tcp"
+    state: "enabled"
+  - port: 69
+    protocol: "udp"
+    ansible.builtin.service: "tftp"
+    state: "enabled"
+  - port: 4011
+    protocol: "udp"
+    ansible.builtin.service: "pxe-dhcp"
+    state: "enabled"
+
+# Logging Configuration
+logging_enabled: true
+log_level: "info"
+dhcp_log_file: "/var/log/dhcpd.log"
+dns_log_file: "/var/log/named.log"
+tftp_log_file: "/var/log/tftp.log"
+
+# Backup Configuration
+backup_enabled: true
+backup_configs:
+  - "{{ dhcp_config_file }}"
+  - "{{ dns_config_file }}"
+  - "{{ resolv_conf_path }}"
+backup_directory: "/var/backups/platform_provisioning-services"

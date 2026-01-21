@@ -16,7 +16,7 @@ ansible-playbook playbooks/generate_and_propagate_hosts.yml \
   -e "github_user=''" -e "github_repo=''" -e "github_pat=''" \
   -e "installer=installer.local:127.0.0.1" \
   -e "scenario=ci" \
-  -e "host_list='sat.example.com:10.168.0.10:satellite,dhcp1.example.com:10.168.0.11:dhcp'"
+  -e "host_list='sat.example.com:10.168.0.10:scenario_satellite,dhcp1.example.com:10.168.0.11:dhcp'"
 
 echo "[ci] Verifying generated files exist"
 [ -f files/generated_hosts ] || (echo "missing files/generated_hosts" && exit 2)

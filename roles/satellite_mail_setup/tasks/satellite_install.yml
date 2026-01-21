@@ -1,4 +1,0 @@
----
-- name: Placeholder Satellite install
-  ansible.builtin.debug:
-    msg: "Install Satellite packages and run satellite-installer with desired params here."

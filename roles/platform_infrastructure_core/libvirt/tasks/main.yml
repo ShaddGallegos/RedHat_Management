@@ -1,0 +1,30 @@
+---
+# Organized OS-level libvirt role (PoC)
+# This file includes the organized libvirt subtasks (local copies)
+- name: Include install tasks
+  ansible.builtin.include_tasks: install.yml
+
+- name: Include network tasks
+  ansible.builtin.include_tasks: network.yml
+
+- name: Include storage tasks
+  ansible.builtin.include_tasks: storage.yml
+
+- name: Include users and polkit tasks
+  ansible.builtin.include_tasks: users.yml
+
+- name: Include firewall tasks
+  ansible.builtin.include_tasks: firewall.yml
+
+- name: Include selinux tasks
+  ansible.builtin.include_tasks: selinux.yml
+
+- name: Include certs tasks
+  ansible.builtin.include_tasks: certs.yml
+
+- name: Run validation
+  ansible.builtin.include_tasks: validate.yml
+
+- name: Include Satellite integration_generic tasks when requested
+  ansible.builtin.include_tasks: scenario_satellite.yml
+  when: libvirt_register_in_satellite | default(false)

@@ -1,0 +1,196 @@
+---
+# Configure Satellite Lifecycle Environments and Content Views
+- name: Validate Satellite Lifecycle Configuration
+  block:
+    - name: Check Satellite connectivity
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/ping/"
+        method: GET
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: satellite_ping
+      failed_when: satellite_ping.status not in [200, 401]
+
+  when: satellite_lifecycle_config_enabled
+  tags: ["satellite_lifecycle", "validation"]
+
+- name: Configure Lifecycle Environments
+  block:
+    - name: Create Lifecycle Environments
+      redhat.scenario_satellite.lifecycle_environment:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        organization: "{{ item.organization | default(satellite_organization) }}"
+        prior: "{{ item.prior | default('Library') }}"
+        state: "present"
+        server_url: "{{ satellite_url }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: env_results
+      loop: "{{ lifecycle_environments }}"
+      when: create_lifecycle_environments
+
+    - name: Display Lifecycle Environments Created
+      ansible.builtin.debug:
+        msg: "Created lifecycle environment: {{ item.item.name }}"
+      loop: "{{ env_results.results }}"
+      when: create_lifecycle_environments and env_results.results is defined
+
+  when: satellite_lifecycle_config_enabled
+  tags: ["satellite_lifecycle", "environments"]
+
+- name: Configure Content Views
+  block:
+    - name: Create Content Views
+      redhat.scenario_satellite.content_view:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        organization: "{{ item.organization | default(satellite_organization) }}"
+        repositories: "{{ item.repositories | default([]) }}"
+        state: "present"
+        server_url: "{{ satellite_url }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: cv_results
+      loop: "{{ content_views }}"
+      when: create_content_views
+
+    - name: Display Content Views Created
+      ansible.builtin.debug:
+        msg: "Created content view: {{ item.item.name }}"
+      loop: "{{ cv_results.results }}"
+      when: create_content_views and cv_results.results is defined
+
+  when: satellite_lifecycle_config_enabled
+  tags: ["satellite_lifecycle", "content_views"]
+
+- name: Configure Content View Filters
+  block:
+    - name: Create Content View Filters
+      redhat.scenario_satellite.content_view_filter:
+        name: "{{ item.name }}"
+        content_view: "{{ item.content_view }}"
+        organization: "{{ item.organization | default(satellite_organization) }}"
+        description: "{{ item.description | default('') }}"
+        filter_type: "{{ item.filter_type | default('package') }}"
+        inclusion: "{{ item.inclusion | default(true) }}"
+        state: "present"
+        server_url: "{{ satellite_url }}"
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+      register: filter_results
+      loop: "{{ content_view_filters }}"
+      when: create_filters
+
+    - name: Display Content View Filters Created
+      ansible.builtin.debug:
+        msg: "Created filter: {{ item.item.name }}"
+      loop: "{{ filter_results.results }}"
+      when: create_filters and filter_results.results is defined
+
+  when: satellite_lifecycle_config_enabled
+  tags: ["satellite_lifecycle", "filters"]
+
+- name: Configure Composite Content Views
+  block:
+    - name: Create Composite Content Views
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/content_views/"
+        method: POST
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          organization_id: 1
+          composite: true
+          auto_publish: "{{ item.auto_publish | default(true) }}"
+      register: composite_results
+      loop: "{{ composite_content_views }}"
+      when: create_content_views and composite_content_views is defined
+
+    - name: Display Composite Content Views Created
+      ansible.builtin.debug:
+        msg: "Created composite content view: {{ item.item.name }}"
+      loop: "{{ composite_results.results }}"
+      when: create_content_views and composite_results.results is defined and item.json is defined
+
+  when: satellite_lifecycle_config_enabled
+  tags: ["satellite_lifecycle", "composite"]
+
+- name: Publish Content Views
+  block:
+    - name: Publish Content Views
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/content_views/{{ item.id }}/publish/"
+        method: POST
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+        body_format: json
+        body:
+          description: "Published by Ansible"
+      register: pub_results
+      loop: "{{ cv_results.results | selectattr('id', 'defined') | list }}"
+      when: publish_content_views and cv_results.results is defined
+
+    - name: Display Publish Tasks Started
+      ansible.builtin.debug:
+        msg: "Publishing content view"
+      loop: "{{ pub_results.results }}"
+      when: publish_content_views and pub_results.results is defined
+
+  when: satellite_lifecycle_config_enabled
+  tags: ["satellite_lifecycle", "publish"]
+
+- name: Promote Content View Versions
+  block:
+    - name: Promote Content View Versions
+      ansible.builtin.uri:
+        url: "{{ satellite_url }}/api/v2/content_view_versions/{{ item.version_id }}/promote/"
+        method: POST
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ satellite_validate_ssl }}"
+        body_format: json
+        body:
+          environment_ids: "{{ item.environment_ids }}"
+          force: false
+      register: promote_results
+      loop: "{{ promote_versions }}"
+      when: promote_content_views and promote_versions is defined
+
+    - name: Display Promote Tasks Started
+      ansible.builtin.debug:
+        msg: "Promoting content view version"
+      loop: "{{ promote_results.results }}"
+      when: promote_content_views and promote_results.results is defined
+
+  when: satellite_lifecycle_config_enabled
+  tags: ["satellite_lifecycle", "promote"]
+
+- name: Test Lifecycle Configuration
+  block:
+    - name: Display Lifecycle Configuration Summary
+      ansible.builtin.debug:
+        msg: |
+          Satellite Lifecycle Configuration Summary:
+
+          Organization: {{ satellite_organization }}
+
+          Configurations Applied:
+          - Lifecycle Environments: {{ 'Configured' if create_lifecycle_environments else 'Skipped' }}
+          - Content Views: {{ 'Configured' if create_content_views else 'Skipped' }}
+          - Filters: {{ 'Configured' if create_filters else 'Skipped' }}
+          - Composite Views: {{ 'Configured' if create_content_views else 'Skipped' }}
+
+          Lifecycle Path: Library → Development → Staging → Production
+
+  when: satellite_lifecycle_config_enabled
+  tags: ["satellite_lifecycle", "test"]

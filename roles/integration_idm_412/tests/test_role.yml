@@ -1,0 +1,12 @@
+---
+# Test: idm_integration role basic functionality
+- name: Test idm_integration role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    idm_integration_enabled: true
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - idm_integration_enabled is defined

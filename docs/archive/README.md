@@ -1,6 +1,6 @@
 # Documentation Archive
 
-This folder contains legacy documentation files that were generated during project development but are no longer actively maintained. These documents represent historical project status, implementation phases, and audit reports.
+This folder contains ansible_dev_node_legacy_archive documentation files that were generated during project development but are no longer actively maintained. These documents represent historical project status, implementation phases, and audit reports.
 
 ## Contents
 
@@ -26,7 +26,7 @@ This folder contains legacy documentation files that were generated during proje
 
 ### Legacy Documentation
 - `DOCUMENTATION.md` - Original documentation index
-- `CONTRIB_SUBMODULES.md` - Contribution guidelines (legacy)
+- `CONTRIB_SUBMODULES.md` - Contribution guidelines (ansible_dev_node_legacy_archive)
 - `INDEX_legacy.md` - Original index
 - `README_legacy.md` - Original README
 
@@ -42,8 +42,8 @@ This folder contains legacy documentation files that were generated during proje
 For current documentation, refer to the main `docs/` folder:
 
 - **DOCS_INDEX.md** - Start here for navigation
-- **PROVISIONING_QUICK_REFERENCE.md** - Quick reference for provisioning services
-- **PROVISIONING_SERVICES_CONFIGURATION.md** - Complete provisioning configuration guide
+- **PROVISIONING_QUICK_REFERENCE.md** - Quick reference for platform_provisioning services
+- **PROVISIONING_SERVICES_CONFIGURATION.md** - Complete platform_provisioning configuration guide
 - **SATELLITE_CONFIG_QUICK_REFERENCE.md** - Satellite quick reference
 - **NETWORK_INTERFACE_CONFIGURATION.md** - Network setup guide
 - **DUAL_NETWORK_UPDATE.md** - Dual network implementation details

@@ -154,7 +154,7 @@ Set up Kerberos for services:
 ipa service-add HTTP/aap.example.com@EXAMPLE.COM
 
 # Create service principal for Satellite
-ipa service-add HTTP/satellite.example.com@EXAMPLE.COM
+ipa service-add HTTP/scenario_satellite.example.com@EXAMPLE.COM
 ```
 
 ### 2. Generate Keytabs
@@ -169,8 +169,8 @@ ipa-getkeytab \
 # For Satellite
 ipa-getkeytab \
   -s idm.example.com \
-  -p HTTP/satellite.example.com \
-  -k /etc/satellite/satellite.keytab
+  -p HTTP/scenario_satellite.example.com \
+  -k /etc/scenario_satellite/scenario_satellite.keytab
 ```
 
 ## LDAP Configuration

@@ -1,4 +1,4 @@
-# satellite-answers.yaml Jinja2 template for Satellite installer
+# scenario_satellite-answers.yaml Jinja2 template for Satellite installer
 # Secrets (passwords/keys) are expected to come from vaulted vars (e.g., ~/.ansible/conf/env.yml)
 {% set _detected_domain = satellite_domain | default(ansible_domain, true) | default(lookup('pipe', 'hostname -d'), true) %}
 {% set system_domain = (_detected_domain | trim | default(lookup('pipe', 'hostname -d'), true) | default('localdomain', true)) %}
@@ -177,7 +177,7 @@ foreman::compute::libvirt:
   version: {{ satellite_compute_libvirt_version | default('installed') }}
 foreman::compute::openstack:
   version: {{ satellite_compute_openstack_version | default('installed') }}
-foreman::compute::vmware:
+foreman::compute::platform_vmware:
   version: {{ satellite_compute_vmware_version | default('installed') }}
 foreman::plugin::ansible: {{ satellite_plugin_ansible | default({}) }}
 foreman::plugin::azure: {{ satellite_plugin_azure | default({}) }}
@@ -390,7 +390,7 @@ foreman_proxy::plugin::ansible:
   - "/usr/share/ansible/roles"
   ssh_args: "-C -o ControlMaster=auto -o ControlPersist=60s -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
   install_runner: true
-  callback: redhat.satellite.foreman
+  callback: redhat.scenario_satellite.foreman
   runner_package_name: ansible-runner
   collections_paths:
   - "/etc/ansible/collections"

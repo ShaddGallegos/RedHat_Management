@@ -1,0 +1,74 @@
+---
+# Default variables for scenario_aap_credentials role
+aap_credentials_config_enabled: true
+aap_credentials_config_version: "1.0"
+aap_credentials_config_timeout: 600
+
+# AAP Connection
+aap_url: "https://aap.example.com"
+aap_username: "admin"
+# aap_password: use vault!
+aap_verify_ssl: true
+
+# Credentials Organization
+aap_credentials_organization: "Default"
+
+# Machine Credentials
+create_machine_credentials: true
+machine_credentials:
+  - name: "RHIS_SSH_Key"
+    description: "SSH key for RHIS deployments"
+    username: "ansible"
+    ssh_key_data: "~/.ssh/id_rsa"
+    become_method: "sudo"
+    tags: ["rhis", "machine"]
+
+  - name: "RHIS_Root_SSH"
+    description: "Root SSH key for privileged operations"
+    username: "root"
+    ssh_key_data: "~/.ssh/id_rsa"
+    tags: ["rhis", "machine", "root"]
+
+# Cloud Credentials
+create_cloud_credentials: false
+cloud_credentials: []
+
+# Network Credentials
+create_network_credentials: false
+network_credentials: []
+
+# Vault Credentials
+create_vault_credentials: true
+vault_credentials:
+  - name: "RHIS_Vault"
+    description: "Vault for RHIS sensitive data"
+    vault_password: "{{ vault_aap_vault_password }}"
+    tags: ["rhis", "vault"]
+
+# Registry Credentials
+create_registry_credentials: true
+registry_credentials:
+  - name: "RedHat_Registry"
+    description: "Red Hat container registry"
+    host: "registry.redhat.io"
+    username: "{{ rhel_subscription_username }}"
+    password: "{{ vault_rhel_subscription_password }}"
+    tags: ["rhis", "registry"]
+
+# Satellite Credentials
+create_satellite_credentials: true
+satellite_credentials:
+  - name: "Satellite_API"
+    description: "Satellite API credentials"
+    host: "scenario_satellite.example.com"
+    username: "admin"
+    password: "{{ vault_satellite_api_password }}"
+    tags: ["rhis", "scenario_satellite"]
+
+# IdM Credentials
+create_idm_credentials: false
+idm_credentials: []
+
+# Feature toggles
+aap_credentials_validate_connectivity: true
+aap_credentials_test_connections: true

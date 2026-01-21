@@ -1,0 +1,44 @@
+---
+# Generic reporting tasks
+
+- name: "Report | Create report directory"
+  ansible.builtin.file:
+    path: "{{ report_dir }}"
+    state: "directory"
+    mode: "0755"
+  tags: ["report"]
+
+- name: "Report | Collect system facts"
+  setup:
+    gather_subset: "all"
+  tags: ["report", "facts"]
+
+- name: "Report | Generate HTML report"
+  ansible.builtin.template:
+    src: "{{ report_template }}"
+    dest: "{{ report_dir }}/report_{{ ansible_date_time.date }}.html"
+  when: "'html' in report_types"
+  tags: ["report"]
+
+- name: "Report | Generate JSON report"
+  ansible.builtin.copy:
+    content: "{{ hostvars | to_nice_json }}"
+    dest: "{{ report_dir }}/report_{{ ansible_date_time.date }}.json"
+  when: "'json' in report_types"
+  tags: ["report"]
+
+- name: "Report | Generate ansible-scenario_ansible_cmdb_core documentation"
+  ansible.builtin.shell: |
+    ansible-scenario_ansible_cmdb_core -t html_fancy -i {{ playbook_dir }}/inventory \
+    {{ playbook_dir }}/hosts > {{ report_dir }}/cmdb_{{ ansible_date_time.date }}.html
+  when: report_include_cmdb | bool
+  ignore_errors: yes
+  tags: ["report", "scenario_ansible_cmdb_core"]
+
+- name: "Report | Report generation complete"
+  ansible.builtin.debug:
+    msg: |
+      Reports generated in: {{ report_dir }}
+      - HTML Report: report_{{ ansible_date_time.date }}.html
+      - JSON Report: report_{{ ansible_date_time.date }}.json
+      - CMDB Report: cmdb_{{ ansible_date_time.date }}.html

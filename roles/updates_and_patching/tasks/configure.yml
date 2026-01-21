@@ -1,8 +1,0 @@
-- name: Updates and patching configure placeholder
-  ansible.builtin.debug:
-    msg: "Implement configuration for patching policies, windows, and notification settings here."
-
-- name: Run RHEL update workflow
-  ansible.builtin.import_role:
-    name: update-rhel
-  tags: [rhel, patch]

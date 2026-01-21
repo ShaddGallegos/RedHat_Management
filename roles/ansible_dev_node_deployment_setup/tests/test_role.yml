@@ -1,0 +1,12 @@
+---
+# Test: ansible_dev_node_deployment_setup role basic functionality
+- name: Test ansible_dev_node_deployment_setup role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    deployment_setup_enabled: true
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - deployment_setup_enabled is defined

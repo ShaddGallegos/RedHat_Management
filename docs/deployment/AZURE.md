@@ -116,13 +116,13 @@ az vm create \
   --nsg rhis-nsg \
   --subnet management \
   --vnet-name rhis-vnet \
-  --os-disk-size-gb 100 \
-  --os-disk-name aap-controller-os
+  --os_generic-disk-size-gb 100 \
+  --os_generic-disk-name aap-controller-os_generic
 
 # Create Satellite VM
 az vm create \
   --resource-group rhis-rg \
-  --name satellite \
+  --name scenario_satellite \
   --image RedHat:RHEL:9:9.1 \
   --size Standard_D16s_v3 \
   --admin-username redhat \
@@ -130,8 +130,8 @@ az vm create \
   --nsg rhis-nsg \
   --subnet management \
   --vnet-name rhis-vnet \
-  --os-disk-size-gb 500 \
-  --os-disk-name satellite-os
+  --os_generic-disk-size-gb 500 \
+  --os_generic-disk-name scenario_satellite-os_generic
 
 # Create IdM VM
 az vm create \
@@ -144,8 +144,8 @@ az vm create \
   --nsg rhis-nsg \
   --subnet management \
   --vnet-name rhis-vnet \
-  --os-disk-size-gb 50 \
-  --os-disk-name idm-os
+  --os_generic-disk-size-gb 50 \
+  --os_generic-disk-name idm-os_generic
 ```
 
 ### VM Size Recommendations
@@ -174,15 +174,15 @@ IdM:
 # Create disk for Satellite repos
 az disk create \
   --resource-group rhis-rg \
-  --name satellite-repos-disk \
+  --name scenario_satellite-repos-disk \
   --size-gb 1000 \
   --sku Premium_LRS
 
 # Attach to Satellite VM
 az vm disk attach \
   --resource-group rhis-rg \
-  --vm-name satellite \
-  --disk satellite-repos-disk
+  --vm-name scenario_satellite \
+  --disk scenario_satellite-repos-disk
 
 # Create disk for AAP data
 az disk create \

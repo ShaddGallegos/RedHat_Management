@@ -2,34 +2,18 @@
 # Collections that require Red Hat Automation Hub access (subscription token)
 # Install with: ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN=<token> ansible-galaxy collection install -r requirements_hub.yml
 collections:
-  - name: redhat.satellite
-    version: ">=4.8.0"
   - name: redhat.satellite_operations
     version: ">=1.3.0"
   - name: redhat.rhel_system_roles
     version: ">=1.22.0"
   - name: infra.aap_configuration
     version: ">=2.6.0"
-  # redhat.aap removed due to hub dependency resolution issues
-  # redhat.idm removed due to hub dependency resolution issues
   - name: redhat.insights
     version: ">=1.3.0"
-  # redhat.libvirt removed due to hub dependency resolution issues
-  # redhat.virtualization removed due to hub dependency resolution issues
-  # redhat.migration removed due to hub dependency resolution issues
-  # redhat.cloudforms removed due to hub dependency resolution issues
-  # redhat.certificates removed due to hub dependency resolution issues
-  # redhat.firewall removed due to hub dependency resolution issues
-  # redhat.logging removed due to hub dependency resolution issues
-  # redhat.monitoring removed due to hub dependency resolution issues
-  # redhat.network_insights removed due to hub dependency resolution issues
-  # redhat.storage removed due to hub dependency resolution issues
-  # redhat.system_roles removed due to hub dependency resolution issues
-  # redhat.users removed due to hub dependency resolution issues
-  # redhat.workloads removed due to hub dependency resolution issues
+  # The following community/ansible entries are placed here when pinned
+  # to specific versions intended for Automation Hub installs only.
   - name: ansible.utils
     version: ">=2.11.0"
-  # ansible.builtin removed from requirements (builtin collection)
   - name: community.general
     version: ">=6.0.0"
   - name: ansible.posix
@@ -38,24 +22,16 @@ collections:
     version: ">=4.0.0"
   - name: community.crypto
     version: ">=3.0.0"
-  - name: community.windows
+  - name: community.os_windows
     version: ">=2.0.0"
-  - name: community.vmware  
+  - name: community.platform_vmware
     version: ">=3.0.0"
   - name: community.docker
     version: ">=2.0.0"
   - name: community.kubernetes
     version: ">=2.0.0"
-  - name: community.hashivault
+  - name: community.hashi_vault
     version: ">=3.0.0"
-  # ansible.kubernetes removed from hub requirements
-  # ansible.vmware removed from hub requirements
-  # ansible.docker removed from hub requirements
-  # ansible.hashivault removed from hub requirements
-  # redhat.libvirt removed due to hub dependency resolution issues
-  # redhat.virtualization removed due to hub dependency resolution issues
-  # redhat.migration removed due to hub dependency resolution issues
-  # redhat.cloudforms removed due to hub dependency resolution issues
   - name: redhat.certificates 
     version: ">=2.5.0"
   - name: redhat.firewall
@@ -74,32 +50,12 @@ collections:
     version: ">=2.5.0"
   - name: redhat.workloads
     version: ">=2.5.0"
-  - name: ansible.utils
-    version: ">=2.11.0"
-  # ansible.builtin removed from requirements (builtin collection)
-  - name: community.general
-    version: ">=6.0.0"
-  - name: ansible.posix
-    version: ">=2.0.0"
-  - name: ansible.netcommon
-    version: ">=4.0.0"
-  - name: community.crypto
-    version: ">=3.0.0"
-  - name: community.windows
-    version: ">=2.0.0"
-  - name: community.vmware  
-    version: ">=3.0.0"
-  - name: community.docker
-    version: ">=2.0.0"
-  - name: community.kubernetes
-    version: ">=2.0.0"
-  - name: community.hashivault
-    version: ">=3.0.0"
   - name: ansible.kubernetes
     version: ">=2.0.0"
-  - name: ansible.vmware 
+  - name: ansible.platform_vmware
     version: ">=2.0.0"
   - name: ansible.docker
     version: ">=2.0.0"
-  - name: ansible.hashivault
+  - name: ansible.hashi_vault
     version: ">=2.0.0"
+roles: []

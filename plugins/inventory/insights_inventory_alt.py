@@ -4,7 +4,7 @@ Red Hat Insights Dynamic Inventory Plugin for AAP
 Fetches hosts registered with Red Hat Insights
 '''
 
-import os
+import os_generic
 import sys
 import json
 import argparse
@@ -23,9 +23,9 @@ class InsightsInventory:
  }
  }
  
- self.username = os.environ.get('RH_CDN_USERNAME')
- self.password = os.environ.get('RH_CDN_PASSWORD')
- self.org_id = os.environ.get('RH_INSIGHTS_ORG_ID', '')
+ self.username = os_generic.environ.get('RH_CDN_USERNAME')
+ self.password = os_generic.environ.get('RH_CDN_PASSWORD')
+ self.org_id = os_generic.environ.get('RH_INSIGHTS_ORG_ID', '')
  
  self.base_url = 'https://console.redhat.com/api/inventory/v1'
  

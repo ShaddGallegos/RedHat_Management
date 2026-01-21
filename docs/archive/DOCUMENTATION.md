@@ -14,7 +14,7 @@ Complete documentation for RHIS (Red Hat Infrastructure Standard) deployment and
 - **[AWS.md](deployment/AWS.md)** - Amazon Web Services deployment
 - **[AZURE.md](deployment/AZURE.md)** - Microsoft Azure deployment
 - **[GCP.md](deployment/GCP.md)** - Google Cloud Platform deployment
-- **[VMWARE.md](deployment/VMWARE.md)** - VMware deployment (legacy)
+- **[VMWARE.md](deployment/VMWARE.md)** - VMware deployment (ansible_dev_node_legacy_archive)
 - **[BAREMETAL.md](deployment/BAREMETAL.md)** - Bare metal deployment
 
 ### Products
@@ -23,13 +23,13 @@ Complete documentation for RHIS (Red Hat Infrastructure Standard) deployment and
   - [README.md](products/aap/README.md) - AAP 2.6 overview
   - [DEPLOYMENT.md](products/aap/DEPLOYMENT.md) - AAP deployment guide
 - **Satellite/**
-  - [README.md](products/satellite/README.md) - Satellite 6.18 overview
-  - [DEPLOYMENT.md](products/satellite/DEPLOYMENT.md) - Satellite deployment guide
+  - [README.md](products/scenario_satellite/README.md) - Satellite 6.18 overview
+  - [DEPLOYMENT.md](products/scenario_satellite/DEPLOYMENT.md) - Satellite deployment guide
 - **IdM/**
   - [README.md](products/idm/README.md) - IdM 3.0 overview
   - [DEPLOYMENT.md](products/idm/DEPLOYMENT.md) - IdM deployment guide
 - **OpenShift/**
-  - [README.md](products/openshift/README.md) - OpenShift 4.21 overview
+  - [README.md](products/scenario_openshift/README.md) - OpenShift 4.21 overview
 
 ### Operations
 - **[README.md](operations/README.md)** - Operations guide overview
@@ -43,9 +43,9 @@ Complete documentation for RHIS (Red Hat Infrastructure Standard) deployment and
 - **[SUPPORT.md](troubleshooting/SUPPORT.md)** - Support and escalation
 
 ### Infrastructure
-- **[README.md](infrastructure/README.md)** - Infrastructure overview
-- **[LIBVIRT.md](infrastructure/LIBVIRT.md)** - LibVirt platform guide
-- **[AWS.md](infrastructure/AWS.md)** - AWS infrastructure (legacy)
+- **[README.md](platform_infrastructure_core/README.md)** - Infrastructure overview
+- **[LIBVIRT.md](platform_infrastructure_core/LIBVIRT.md)** - LibVirt platform guide
+- **[AWS.md](platform_infrastructure_core/AWS.md)** - AWS platform_infrastructure_core (ansible_dev_node_legacy_archive)
 
 ### Architecture
 - **[OVERVIEW.md](architecture/OVERVIEW.md)** - System architecture overview
@@ -58,7 +58,7 @@ Complete documentation for RHIS (Red Hat Infrastructure Standard) deployment and
 
 ## Documentation Coverage
 
-### Complete (✅)
+### Complete ()
 - Getting Started (Quick Start, Concepts, Prerequisites)
 - Deployment (Overview, AWS, Azure, GCP)
 - Products (AAP, Satellite, IdM deployment guides)
@@ -115,8 +115,8 @@ Glossary with 80+ terms
 - References in [Troubleshooting](troubleshooting/COMMON_ISSUES.md)
 
 **Satellite (Systems Management)**
-- [Overview](products/satellite/README.md)
-- [Deployment](products/satellite/DEPLOYMENT.md)
+- [Overview](products/scenario_satellite/README.md)
+- [Deployment](products/scenario_satellite/DEPLOYMENT.md)
 - References in [Troubleshooting](troubleshooting/COMMON_ISSUES.md)
 
 **IdM (Identity Management)**
@@ -134,7 +134,7 @@ Glossary with 80+ terms
 **On-Premises**
 - [Bare Metal](deployment/BAREMETAL.md)
 - [VMware](deployment/VMWARE.md)
-- [LibVirt](infrastructure/LIBVIRT.md)
+- [LibVirt](platform_infrastructure_core/LIBVIRT.md)
 
 ### By Task
 
@@ -179,7 +179,7 @@ Glossary with 80+ terms
 |------|----------|
 | "How do I get started?" | [QUICK_START.md](getting-started/QUICK_START.md) |
 | "How do I deploy on AWS?" | [AWS.md](deployment/AWS.md) |
-| "How do I deploy Satellite?" | [Satellite DEPLOYMENT.md](products/satellite/DEPLOYMENT.md) |
+| "How do I deploy Satellite?" | [Satellite DEPLOYMENT.md](products/scenario_satellite/DEPLOYMENT.md) |
 | "How do I backup?" | [BACKUP_RECOVERY.md](operations/BACKUP_RECOVERY.md) |
 | "What's wrong with X?" | [COMMON_ISSUES.md](troubleshooting/COMMON_ISSUES.md) |
 | "What does X mean?" | [GLOSSARY.md](reference/GLOSSARY.md) |

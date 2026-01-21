@@ -81,32 +81,32 @@ Specific reference documents and standards:
 
 ```
 docs/
-├── README (this file for root)
-├── ✅ Active Documentation (11 files)
-│   ├── DOCS_INDEX.md                          (Navigation guide)
-│   ├── Quick References (2)
-│   │   ├── PROVISIONING_QUICK_REFERENCE.md
-│   │   └── SATELLITE_CONFIG_QUICK_REFERENCE.md
-│   ├── Provisioning Guides (3)
-│   │   ├── PROVISIONING_SERVICES_CONFIGURATION.md
-│   │   ├── NETWORK_INTERFACE_CONFIGURATION.md
-│   │   └── DUAL_NETWORK_UPDATE.md
-│   ├── Satellite Guides (3)
-│   │   ├── SATELLITE_KICKSTART_CONFIGURATION.md
-│   │   ├── SATELLITE_OS_NETWORK_CONFIGURATION.md
-│   │   └── RHEL_YUM_REPOSITORIES_ENABLEMENT.md
-│   └── Reference (2)
-│       ├── VARIABLE_NAMING_CONVENTION.md
-│       └── FILE_INDEX.md
-│
-└── archive/                          (Legacy documentation - 18 files)
-    ├── README.md                     (Archive guide)
-    ├── Status reports (6 files)
-    ├── Implementation docs (2 files)
-    ├── Audit reports (5 files)
-    ├── Quality analysis (2 files)
-    ├── Legacy docs (3 files)
-    └── [Other legacy documentation]
+ README (this file for root)
+  Active Documentation (11 files)
+    DOCS_INDEX.md                          (Navigation guide)
+    Quick References (2)
+       PROVISIONING_QUICK_REFERENCE.md
+       SATELLITE_CONFIG_QUICK_REFERENCE.md
+    Provisioning Guides (3)
+       PROVISIONING_SERVICES_CONFIGURATION.md
+       NETWORK_INTERFACE_CONFIGURATION.md
+       DUAL_NETWORK_UPDATE.md
+    Satellite Guides (3)
+       SATELLITE_KICKSTART_CONFIGURATION.md
+       SATELLITE_OS_NETWORK_CONFIGURATION.md
+       RHEL_YUM_REPOSITORIES_ENABLEMENT.md
+    Reference (2)
+        VARIABLE_NAMING_CONVENTION.md
+        FILE_INDEX.md
+
+ archive/                          (Legacy documentation - 18 files)
+     README.md                     (Archive guide)
+     Status reports (6 files)
+     Implementation docs (2 files)
+     Audit reports (5 files)
+     Quality analysis (2 files)
+     Legacy docs (3 files)
+     [Other ansible_dev_node_legacy_archive documentation]
 ```
 
 ---
@@ -135,7 +135,7 @@ docs/
 1. Check: Relevant Quick Reference
 2. Review: Configuration guide troubleshooting section
 3. Search: `grep -r "error message" docs/`
-4. Archive: Check legacy docs if needed: `grep -r "topic" docs/archive/`
+4. Archive: Check ansible_dev_node_legacy_archive docs if needed: `grep -r "topic" docs/archive/`
 
 ---
 
@@ -174,7 +174,7 @@ grep -n "DHCP" docs/PROVISIONING_SERVICES_CONFIGURATION.md
 grep -B2 -A2 "error" docs/*.md
 
 # Search in archive
-grep -r "legacy topic" docs/archive/
+grep -r "ansible_dev_node_legacy_archive topic" docs/archive/
 ```
 
 ---
@@ -202,7 +202,7 @@ grep -r "legacy topic" docs/archive/
 
 ---
 
-## ✅ Checklist for New Users
+##  Checklist for New Users
 
 - [ ] Read [PROVISIONING_QUICK_REFERENCE.md](PROVISIONING_QUICK_REFERENCE.md) (5 min)
 - [ ] Review [NETWORK_INTERFACE_CONFIGURATION.md](NETWORK_INTERFACE_CONFIGURATION.md) (15 min)
@@ -223,7 +223,7 @@ grep -r "legacy topic" docs/archive/
 4. Update FILE_INDEX.md if needed
 
 **Archiving Documents**
-1. Move to `archive/` when superseded or legacy
+1. Move to `archive/` when superseded or ansible_dev_node_legacy_archive
 2. Update ARCHIVE_INDEX.md
 3. Remove from main DOCS_INDEX.md
 4. Notify team of archive status

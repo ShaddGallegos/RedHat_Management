@@ -5,33 +5,33 @@ High-level architecture and design of RHIS.
 ## System Components
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Red Hat Management Stack                 │
-├─────────────────────────────────────────────────────────────┤
-│                                                               │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │     AAP      │  │  Satellite   │  │     IdM      │      │
-│  │   2.6       │  │    6.18      │  │    3.0       │      │
-│  └──────────────┘  └──────────────┘  └──────────────┘      │
-│         │                 │                 │               │
-│         └─────────────────┼─────────────────┘               │
-│                           │                                  │
-│                  ┌────────▼────────┐                        │
-│                  │   Integration   │                        │
-│                  │   Layer (APIs)  │                        │
-│                  └────────┬────────┘                        │
-│                           │                                  │
-│  ┌────────────────────────┼────────────────────────┐       │
-│  │                        │                        │       │
-│  ▼                        ▼                        ▼       │
-│ OpenShift            Monitoring                  CMDB      │
-│  4.21               & Logging               (ansible-cmdb) │
-│                                                             │
-├─────────────────────────────────────────────────────────────┤
-│           Infrastructure Layer (libvirt, cloud, etc.)      │
-├─────────────────────────────────────────────────────────────┤
-│                      Networking & Storage                   │
-└─────────────────────────────────────────────────────────────┘
+
+                    Red Hat Management Stack                 
+
+                                                               
+            
+       AAP          Satellite          IdM            
+     2.6             6.18            3.0             
+            
+                                                          
+                        
+                                                             
+                                          
+                     Integration                           
+                     Layer (APIs)                          
+                                          
+                                                             
+         
+                                                         
+                                                         
+ OpenShift            Monitoring                  CMDB      
+  4.21               & Logging               (ansible-scenario_ansible_cmdb_core) 
+                                                             
+
+           Infrastructure Layer (libvirt, cloud, etc.)      
+
+                      Networking & Storage                   
+
 ```
 
 ## Product Interactions
@@ -64,13 +64,13 @@ High-level architecture and design of RHIS.
 
 ### Satellite-Only
 - Single-product deployment
-- Systems management and provisioning
+- Systems management and platform_provisioning
 - Minimal resource requirements
 
 ### AAP-Only
 - Automation platform only
-- Task automation and orchestration  
-- Scalable to any infrastructure
+- Task automation and ansible_dev_node_orchestration  
+- Scalable to any platform_infrastructure_core
 
 ### Full Stack
 - All 4 products deployed
@@ -80,13 +80,13 @@ High-level architecture and design of RHIS.
 ## High-Availability Design
 
 ```
-┌─────────────────────────────────┐
-│      Load Balancer              │
-├─────────────────────────────────┤
-│                                  │
-├──────────────┬──────────────────┤
-│              │                   │
-▼              ▼                   ▼
+
+      Load Balancer              
+
+                                  
+
+                                 
+                                 
 Node-1        Node-2            Node-3
 - AAP         - AAP              - AAP
 - Satellite   - Satellite        - Satellite

@@ -46,7 +46,7 @@ repository_sets_to_enable:
 Added new task block "Enable RHEL Repository Sets" that:
 
 1. **Enables official RHEL repository sets** for each product
-   - Uses `redhat.satellite.repository_set` module
+   - Uses `redhat.scenario_satellite.repository_set` module
    - Automatically enables RHEL 9 and RHEL 10 repository sets
    - Configures basearch (x86_64) and release versions
 
@@ -77,12 +77,12 @@ Enhanced documentation with:
 By default, the role now enables:
 
 ### RHEL 9 Repositories
-- ✅ Red Hat Enterprise Linux Server (v. 9 for x86_64) - **BaseOS**
-- ✅ Red Hat Enterprise Linux AppStream (v. 9 for x86_64) - **Applications**
+-  Red Hat Enterprise Linux Server (v. 9 for x86_64) - **BaseOS**
+-  Red Hat Enterprise Linux AppStream (v. 9 for x86_64) - **Applications**
 
 ### RHEL 10 Repositories
-- ✅ Red Hat Enterprise Linux Server (v. 10 for x86_64) - **BaseOS**
-- ✅ Red Hat Enterprise Linux AppStream (v. 10 for x86_64) - **Applications**
+-  Red Hat Enterprise Linux Server (v. 10 for x86_64) - **BaseOS**
+-  Red Hat Enterprise Linux AppStream (v. 10 for x86_64) - **Applications**
 
 ## How It Works
 
@@ -104,8 +104,8 @@ Repositories configured (if enabled)
 Sync Plans configured (if enabled)
         ↓
 RHEL yum repos available for:
-  - Content Views (satellite_lifecycle_config)
-  - Activation Keys (satellite_activation_config)
+  - Content Views (scenario_satellite_lifecycle_config)
+  - Activation Keys (scenario_satellite_activation_config)
   - Host registration and updates
 ```
 
@@ -136,7 +136,7 @@ RHEL yum repos available for:
 
 ```yaml
 - name: Configure Satellite Content with RHEL Repositories
-  hosts: satellite
+  hosts: scenario_satellite
   roles:
     - role: satellite_content_config
       vars:
@@ -175,25 +175,25 @@ RHEL yum repos available for:
    ↓ (Deploys Satellite 6.18)
    
 2. satellite_content_config [UPDATED]
-   ├─ Creates organizations
-   ├─ Creates locations
-   ├─ Configures products
-   ├─ Configures repositories
-   └─ [NEW] Enables RHEL yum repository sets ✓
+    Creates organizations
+    Creates locations
+    Configures products
+    Configures repositories
+    [NEW] Enables RHEL yum repository sets 
    ↓
    
-3. satellite_lifecycle_config
-   ├─ Creates lifecycle environments (Dev → Staging → Prod)
-   ├─ Creates content views
-   ├─ Filters content (uses RHEL repos ✓)
-   └─ Promotes content across environments
+3. scenario_satellite_lifecycle_config
+    Creates lifecycle environments (Dev → Staging → Prod)
+    Creates content views
+    Filters content (uses RHEL repos )
+    Promotes content across environments
    ↓
    
-4. satellite_activation_config
-   ├─ Creates host collections
-   ├─ Creates activation keys
-   ├─ Attaches subscriptions (uses RHEL repos ✓)
-   └─ Enables repository sets per key
+4. scenario_satellite_activation_config
+    Creates host collections
+    Creates activation keys
+    Attaches subscriptions (uses RHEL repos )
+    Enables repository sets per key
    ↓
    
 5. Hosts register with activation key
@@ -204,22 +204,22 @@ RHEL yum repos available for:
 
 ## Benefits
 
-✅ **Automated RHEL Repository Setup**
+ **Automated RHEL Repository Setup**
 - No manual repository enablement required
 - Reduces human error and setup time
 - Ensures consistency across environments
 
-✅ **Full RHEL 9 & RHEL 10 Support**
+ **Full RHEL 9 & RHEL 10 Support**
 - BaseOS repositories enabled for both versions
 - AppStream repositories enabled for both versions
 - Multi-version deployments fully supported
 
-✅ **Seamless Content Lifecycle Integration**
+ **Seamless Content Lifecycle Integration**
 - Enabled repos automatically available in content views
 - Content can be filtered and promoted
 - Activation keys automatically have access
 
-✅ **Time Savings**
+ **Time Savings**
 - Eliminates manual repository set enablement steps
 - Reduces deployment time
 - Fewer configuration errors
@@ -230,7 +230,7 @@ RHEL yum repos available for:
 
 ```yaml
 - name: Enable RHEL yum repository sets for products
-  redhat.satellite.repository_set:
+  redhat.scenario_satellite.repository_set:
     name: "{{ item.name }}"                    # Official repo set name
     product: "{{ item.product }}"              # Product name (Red Hat Enterprise Linux Server)
     organization: "{{ satellite_organization }}" # Organization
@@ -262,7 +262,7 @@ RHEL yum repos available for:
 
 ```bash
 curl -k -u admin:password \
-  https://satellite.example.com/api/v2/repository_sets \
+  https://scenario_satellite.example.com/api/v2/repository_sets \
   | jq '.results[] | select(.product.name == "Red Hat Enterprise Linux Server")'
 ```
 
@@ -291,7 +291,7 @@ curl -k -u admin:password \
 ### Issue: RHEL 10 repos not enabling
 
 **Solution**: Verify:
-- RHEL 10 support enabled in Satellite configuration
+- RHEL 10 ansible_dev_node_support enabled in Satellite configuration
 - Proper repository set name for RHEL 10
 - Subscription includes RHEL 10 access
 
@@ -304,8 +304,8 @@ curl -k -u admin:password \
 ## Related Roles
 
 - **satellite_6_18_deployment**: Core Satellite installation
-- **satellite_lifecycle_config**: Content views and lifecycle management
-- **satellite_activation_config**: Activation keys and host subscriptions
+- **scenario_satellite_lifecycle_config**: Content views and lifecycle management
+- **scenario_satellite_activation_config**: Activation keys and host subscriptions
 
 ## Next Steps
 
@@ -313,11 +313,11 @@ curl -k -u admin:password \
 2. Set `enable_repository_sets: true` in your deployment variables
 3. Run satellite_content_config role
 4. Verify RHEL repositories are enabled in Satellite UI
-5. Use repositories in content views via satellite_lifecycle_config
-6. Create activation keys via satellite_activation_config with RHEL repos attached
+5. Use repositories in content views via scenario_satellite_lifecycle_config
+6. Create activation keys via scenario_satellite_activation_config with RHEL repos attached
 
 ## Summary
 
 The `satellite_content_config` role now automatically enables RHEL yum repositories for all configured products, ensuring RHEL BaseOS and AppStream repositories are available for content views, lifecycle environments, and host registrations. This eliminates manual repository enablement steps and streamlines the Satellite 6.18 configuration process.
 
-**Status**: ✅ Complete and integrated with RHIS stack
+**Status**:  Complete and integrated with RHIS stack

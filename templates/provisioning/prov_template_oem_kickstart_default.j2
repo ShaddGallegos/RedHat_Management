@@ -19,7 +19,7 @@ test_on:
 - rocky8_dhcp
 - rocky9_dhcp
 description: |
-  The provisioning template for kickstart based distributions. The output is fetched by Anaconda installer during
+  The platform_provisioning template for kickstart based distributions. The output is fetched by Anaconda installer during
   the network based installation. To customize the installation, modify the host parameters.
 
   This template accepts the following parameters:
@@ -61,7 +61,7 @@ description: |
   os_major = @host.operatingsystem.major.to_i
   os_minor = @host.operatingsystem.minor.to_i
   realm_compatible = (@host.operatingsystem.name == 'Fedora' && os_major >= 20) || (rhel_compatible && os_major >= 7)
-  # safemode renderer does not support unary negation
+  # safemode renderer does not ansible_dev_node_support unary negation
   proxy_uri = host_param('http-proxy') ? "http://#{host_param('http-proxy')}:#{host_param('http-proxy-port')}" : nil
   proxy_string = proxy_uri ? " --proxy=#{proxy_uri}" : ''
   puppet_enabled = !host_param_true?('skip-puppet-setup') && (host_puppet_server.present? || host_param_true?('force-puppet'))
@@ -73,7 +73,7 @@ description: |
   appstream_present = false
   use_rhsm = (@host.operatingsystem.name == 'RedHat' || @host.operatingsystem.name == 'RHEL') && os_major >= 9
 -%>
-# This kickstart file was rendered from the Foreman provisioning template "<%= @template_name %>".
+# This kickstart file was rendered from the Foreman platform_provisioning template "<%= @template_name %>".
 # for <%= @host %> running <%= @host.operatingsystem.name %> <%= os_major %> <%= @arch %>
 # Organization: <%= @host.organization %>
 # Location: <%= @host.location %>
@@ -114,7 +114,7 @@ selinux --<%= host_param('selinux-mode') || host_param('selinux') || 'enforcing'
 keyboard <%= host_param('keyboard') || 'us' %>
 
 <%
-# start with provisioning interface, then other non-bond non-bridge interfaces and the bonds + bridges at the end
+# start with platform_provisioning interface, then other non-bond non-bridge interfaces and the bonds + bridges at the end
 @host.interfaces.reject{ |iface| iface.bmc? }.sort_by { |iface| (iface.bond? || iface.bridge?) ? 0 : iface.provision? ? 20 : 10 }.each do |iface|
 -%>
 <%= snippet(

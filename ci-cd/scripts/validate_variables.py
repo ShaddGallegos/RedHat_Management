@@ -50,17 +50,17 @@ def validate_variable_naming():
     total_vars = valid_vars + invalid_vars
     coverage = (valid_vars / total_vars * 100) if total_vars > 0 else 0
     
-    print(f"✓ Variable naming coverage: {coverage:.1f}% ({valid_vars}/{total_vars} variables)")
+    print(f" Variable naming coverage: {coverage:.1f}% ({valid_vars}/{total_vars} variables)")
     
     if issues:
-        print(f"\n⚠ Issues found ({len(issues)}):")
+        print(f"\n Issues found ({len(issues)}):")
         for issue in issues[:5]:
             print(f"  - {issue}")
         if len(issues) > 5:
             print(f"  ... and {len(issues) - 5} more")
         return 1 if invalid_vars > 10 else 0
     
-    print("\n✓ Variable naming convention valid!")
+    print("\n Variable naming convention valid!")
     return 0
 
 if __name__ == "__main__":

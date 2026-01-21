@@ -1,0 +1,26 @@
+---
+# CMDB (Configuration Management Database) Role
+# Wrapper that orchestrates all CMDB-related tasks
+# Consolidates ansible-scenario_ansible_cmdb_core setup and configuration
+
+- name: "CMDB Setup and Configuration"
+  ansible.builtin.debug:
+    msg: |
+      CMDB (Configuration Management Database)
+      ==========================================
+      Primary task: Installing and configuring ansible-scenario_ansible_cmdb_core
+      Target platforms: {{ deployment_platform | default('all') }}
+  tags: ["scenario_ansible_cmdb_core", "configuration"]
+
+- name: "Execute CMDB setup subrole"
+  ansible.builtin.include_role:
+    name: "scenario_ansible_cmdb_core"
+    tasks_from: "setup/main.yml"
+    apply:
+      tags: ["scenario_ansible_cmdb_core", "setup"]
+  tags: ["scenario_ansible_cmdb_core"]
+
+- name: "CMDB setup completed"
+  ansible.builtin.debug:
+    msg: "CMDB configuration complete. Configuration database ready for use."
+  tags: ["scenario_ansible_cmdb_core", "info"]

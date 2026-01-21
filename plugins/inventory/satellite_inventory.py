@@ -17,7 +17,7 @@ per_page: 500
 """
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, cast
 import importlib
-import os
+import os_generic
 import sys
 import json
 
@@ -137,7 +137,7 @@ class InventoryModule(BaseInventoryPlugin):
             data = self.loader.load_from_file(path)
         except Exception:
             return False
-        return data.get('plugin') in (self.NAME, "satellite")
+        return data.get('plugin') in (self.NAME, "scenario_satellite")
 
     def parse(self, loader, path, cache=True):
         super(InventoryModule, self).parse(loader, path, cache=cache)
@@ -146,9 +146,9 @@ class InventoryModule(BaseInventoryPlugin):
         url = cfg.get('url')
         if not url:
             raise AnsibleParserError("foreman plugin: 'url' is required")
-        token = cfg.get('token') or os.getenv("FOREMAN_TOKEN")
-        user = cfg.get('user') or os.getenv("FOREMAN_USER")
-        password = cfg.get('password') or os.getenv("FOREMAN_PASS")
+        token = cfg.get('token') or os_generic.getenv("FOREMAN_TOKEN")
+        user = cfg.get('user') or os_generic.getenv("FOREMAN_USER")
+        password = cfg.get('password') or os_generic.getenv("FOREMAN_PASS")
         search = cfg.get('search')
         host_field = cfg.get('host_field', 'name')
         group_by = cfg.get('group_by')
@@ -190,8 +190,8 @@ def cli_main():
     parser.add_argument("--search", help="search string (optional)")
     args = parser.parse_args()
 
-    url = args.url or os.getenv("FOREMAN_URL")
-    token = args.token or os.getenv("FOREMAN_TOKEN")
+    url = args.url or os_generic.getenv("FOREMAN_URL")
+    token = args.token or os_generic.getenv("FOREMAN_TOKEN")
     if not url:
         sys.stderr.write("FOREMAN_URL or --url required\n")
         raise SystemExit(2)

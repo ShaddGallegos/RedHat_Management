@@ -1,0 +1,15 @@
+---
+# Test: scenario_aap_inventories role
+- name: Test scenario_aap_inventories role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    aap_inventories_config_enabled: true
+    aap_url: "https://aap.example.com"
+    aap_username: "admin"
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - aap_inventories_config_enabled is defined
+          - aap_url is defined

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import yaml
 import re
-import os
+import os_generic
 
 # Path to your token YAML file and ansible.cfg
-YAML_PATH = os.path.expanduser("~/.ansible/conf/test-env.yml")
-CFG_PATH = os.path.join(os.path.dirname(__file__), "ansible.cfg")
+YAML_PATH = os_generic.path.expanduser("~/.ansible/conf/test-env.yml")
+CFG_PATH = os_generic.path.join(os_generic.path.dirname(__file__), "ansible.cfg")
 
 def get_token():
     with open(YAML_PATH, 'r') as f:
@@ -17,8 +17,8 @@ def get_token():
     for key in ("rh_credentials_token", "automation_hub_token", "token"):
         if key in data:
             return data[key]
-        if "satellite" in data and key in data["satellite"]:
-            return data["satellite"][key]
+        if "scenario_satellite" in data and key in data["scenario_satellite"]:
+            return data["scenario_satellite"][key]
     raise KeyError("No token found in YAML file.")
 
 def update_cfg(token):

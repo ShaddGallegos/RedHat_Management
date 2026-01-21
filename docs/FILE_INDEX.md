@@ -3,7 +3,7 @@
 **Created**: January 16, 2026  
 **Total Files**: 23  
 **Total Lines**: 2,500+  
-**Status**: ✅ Production Ready
+**Status**:  Production Ready
 
 ---
 
@@ -11,37 +11,37 @@
 
 ```
 RedHat_Management/
-├── roles/
-│   └── services_provisioning_stack/          [13 files]
-│       ├── meta/
-│       │   └── main.yml
-│       ├── defaults/
-│       │   └── main.yml
-│       ├── tasks/
-│       │   └── main.yml
-│       ├── handlers/
-│       │   └── main.yml
-│       ├── templates/                        [7 templates]
-│       │   ├── dhcpd.conf.j2
-│       │   ├── named.conf.j2
-│       │   ├── named.zones.j2
-│       │   ├── named.example.com.j2
-│       │   ├── named.prod.example.com.j2
-│       │   ├── pxelinux.cfg.default.j2
-│       │   └── xinetd.tftp.j2
-│       ├── tests/
-│       │   └── test.yml
-│       └── README.md
-├── playbooks/                                [4 playbooks]
-│   ├── provisioning_services_setup.yml
-│   ├── provisioning_dhcp_setup.yml
-│   ├── provisioning_dns_setup.yml
-│   └── provisioning_tftp_pxe_setup.yml
-└── docs/                                     [4 documentation]
-    ├── PROVISIONING_SERVICES_CONFIGURATION.md
-    ├── PROVISIONING_SERVICES_SUMMARY.md
-    ├── PROVISIONING_QUICK_REFERENCE.md
-    └── PROVISIONING_SERVICES_IMPLEMENTATION.md
+ roles/
+    platform_services_provisioning_stack/          [13 files]
+        meta/
+           main.yml
+        defaults/
+           main.yml
+        tasks/
+           main.yml
+        handlers/
+           main.yml
+        templates/                        [7 templates]
+           dhcpd.conf.j2
+           named.conf.j2
+           named.zones.j2
+           named.example.com.j2
+           named.prod.example.com.j2
+           pxelinux.cfg.default.j2
+           xinetd.tftp.j2
+        tests/
+           test.yml
+        README.md
+ playbooks/                                [4 playbooks]
+    provisioning_services_setup.yml
+    provisioning_dhcp_setup.yml
+    provisioning_dns_setup.yml
+    provisioning_tftp_pxe_setup.yml
+ docs/                                     [4 documentation]
+     PROVISIONING_SERVICES_CONFIGURATION.md
+     PROVISIONING_SERVICES_SUMMARY.md
+     PROVISIONING_QUICK_REFERENCE.md
+     PROVISIONING_SERVICES_IMPLEMENTATION.md
 ```
 
 ---
@@ -50,13 +50,13 @@ RedHat_Management/
 
 ### Role Files: 13 Total
 
-#### 1. roles/services_provisioning_stack/meta/main.yml
+#### 1. roles/platform_services_provisioning_stack/meta/main.yml
 - **Purpose**: Role metadata and dependencies
 - **Type**: YAML
 - **Size**: 30 lines
 - **Contains**: Namespace, name, version, description, license
 
-#### 2. roles/services_provisioning_stack/defaults/main.yml
+#### 2. roles/platform_services_provisioning_stack/defaults/main.yml
 - **Purpose**: Default configuration variables
 - **Type**: YAML
 - **Size**: 130+ lines
@@ -72,7 +72,7 @@ RedHat_Management/
   - Logging configuration
   - Backup settings
 
-#### 3. roles/services_provisioning_stack/tasks/main.yml
+#### 3. roles/platform_services_provisioning_stack/tasks/main.yml
 - **Purpose**: Main task execution
 - **Type**: YAML
 - **Size**: 250+ lines
@@ -87,7 +87,7 @@ RedHat_Management/
   - Service validation and health checks
   - Handler inclusion
 
-#### 4. roles/services_provisioning_stack/handlers/main.yml
+#### 4. roles/platform_services_provisioning_stack/handlers/main.yml
 - **Purpose**: Service restart and event handlers
 - **Type**: YAML
 - **Size**: 25 lines
@@ -98,7 +98,7 @@ RedHat_Management/
   - restart xinetd service
   - update resolv.conf
 
-#### 5. roles/services_provisioning_stack/README.md
+#### 5. roles/platform_services_provisioning_stack/README.md
 - **Purpose**: Role documentation
 - **Type**: Markdown
 - **Size**: 80+ lines
@@ -112,7 +112,7 @@ RedHat_Management/
   - Firewall rules table
   - Validation procedures
 
-#### 6-12. roles/services_provisioning_stack/templates/ (7 files)
+#### 6-12. roles/platform_services_provisioning_stack/templates/ (7 files)
 
 ##### 6. templates/dhcpd.conf.j2
 - **Purpose**: DHCP server configuration template
@@ -124,7 +124,7 @@ RedHat_Management/
   - NTP servers
   - Main subnet (10.168.0.0/16)
   - DHCP range and PXE options
-  - Static host reservations (satellite, idm, aap)
+  - Static host reservations (scenario_satellite, idm, aap)
   - Host group classes
 
 ##### 7. templates/named.conf.j2
@@ -153,7 +153,7 @@ RedHat_Management/
 - **Contains**:
   - SOA record
   - NS record
-  - A records (satellite, idm, aap)
+  - A records (scenario_satellite, idm, aap)
   - CNAME records
   - MX record
   - Service records (_xmpp)
@@ -164,7 +164,7 @@ RedHat_Management/
 - **Contains**:
   - SOA record
   - NS record
-  - A records for production hosts (infrastructure, app, containers, database)
+  - A records for production hosts (platform_infrastructure_core, app, containers, database)
   - Service records (_ldap, _kerberos)
   - CNAME records
 
@@ -196,7 +196,7 @@ RedHat_Management/
   - Connection limits
   - Logging settings
 
-#### 13. roles/services_provisioning_stack/tests/test.yml
+#### 13. roles/platform_services_provisioning_stack/tests/test.yml
 - **Purpose**: Role testing
 - **Type**: YAML
 - **Size**: 25 lines
@@ -209,12 +209,12 @@ RedHat_Management/
 ### Playbook Files: 4 Total
 
 #### 1. playbooks/provisioning_services_setup.yml
-- **Purpose**: Complete provisioning services stack deployment
+- **Purpose**: Complete platform_provisioning services stack deployment
 - **Type**: Ansible Playbook
 - **Size**: 100+ lines
-- **Target**: satellite (with become)
+- **Target**: scenario_satellite (with become)
 - **Includes**:
-  - services_provisioning_stack role
+  - platform_services_provisioning_stack role
   - Post-task with deployment summary
   - Service status verification
   - Deployment completion message
@@ -223,7 +223,7 @@ RedHat_Management/
 - **Purpose**: DHCP server only setup
 - **Type**: Ansible Playbook
 - **Size**: 45 lines
-- **Target**: satellite
+- **Target**: scenario_satellite
 - **Includes**:
   - DHCP configuration
   - DHCP service status verification
@@ -233,7 +233,7 @@ RedHat_Management/
 - **Purpose**: DNS server only setup
 - **Type**: Ansible Playbook
 - **Size**: 50 lines
-- **Target**: satellite
+- **Target**: scenario_satellite
 - **Includes**:
   - DNS configuration
   - BIND configuration validation
@@ -244,7 +244,7 @@ RedHat_Management/
 - **Purpose**: TFTP and PXE boot only setup
 - **Type**: Ansible Playbook
 - **Size**: 50 lines
-- **Target**: satellite
+- **Target**: scenario_satellite
 - **Includes**:
   - TFTP and PXE configuration
   - Service status verification
@@ -263,7 +263,7 @@ RedHat_Management/
   - Overview and architecture
   - Secondary interface configuration (30 lines)
   - DHCP server configuration (50 lines)
-    - Package details, range, leases, DNS options, static hosts, PXE integration
+    - Package details, range, leases, DNS options, static hosts, PXE integration_generic
   - DNS server configuration (60 lines)
     - Zones, forward/reverse, SOA, NS, A, CNAME, SRV records
   - Resolv.conf configuration (25 lines)
@@ -271,7 +271,7 @@ RedHat_Management/
   - TFTP server configuration (35 lines)
     - Package, boot files, PXE bootloader
   - PXE boot configuration (50 lines)
-    - Menu structure, kernel parameters, kickstart integration
+    - Menu structure, kernel parameters, kickstart integration_generic
   - Firewall configuration (30 lines)
   - Provisioning workflow (30 lines)
   - Deployment commands (20 lines)
@@ -348,7 +348,7 @@ RedHat_Management/
 - **Configuration**: dhcpd.conf.j2 (85 lines)
 - **Range**: 10.168.50.0 - 10.168.200.255 (38,401 IPs)
 - **Nameservers**: 10.168.0.1, 10.168.1.53, 8.8.8.8
-- **Static Hosts**: 3 (satellite, idm, aap)
+- **Static Hosts**: 3 (scenario_satellite, idm, aap)
 - **PXE Integration**: Yes (next-server, filename)
 
 ### DNS Server (named/BIND)
@@ -386,16 +386,16 @@ RedHat_Management/
 - PROVISIONING_SERVICES_IMPLEMENTATION.md: 280 lines
 
 ### Coverage Topics
-- ✅ Architecture and design
-- ✅ Service configuration
-- ✅ Deployment procedures
-- ✅ Verification and testing
-- ✅ Integration points
-- ✅ Security considerations
-- ✅ Troubleshooting guides
-- ✅ Performance tuning
-- ✅ Quick reference
-- ✅ Implementation checklist
+-  Architecture and design
+-  Service configuration
+-  Deployment procedures
+-  Verification and testing
+-  Integration points
+-  Security considerations
+-  Troubleshooting guides
+-  Performance tuning
+-  Quick reference
+-  Implementation checklist
 
 ---
 
@@ -444,7 +444,7 @@ cat docs/PROVISIONING_SERVICES_IMPLEMENTATION.md           # Checklist
 ```bash
 systemctl status dhcpd named xinetd
 cat /etc/resolv.conf
-dig @10.168.0.1 satellite.prod.spg.example.com
+dig @10.168.0.1 scenario_satellite.prod.spg.example.com
 ```
 
 ---
@@ -465,17 +465,17 @@ dig @10.168.0.1 satellite.prod.spg.example.com
 ### RHIS Stack
 - satellite_6_18_deployment
 - satellite_content_config
-- satellite_lifecycle_config
-- network_infrastructure_config
+- scenario_satellite_lifecycle_config
+- platform_network_infrastructure
 
 ---
 
 ## Status
 
-✅ **All files created and verified**  
-✅ **All services configured**  
-✅ **All documentation complete**  
-✅ **Ready for deployment**  
+ **All files created and verified**  
+ **All services configured**  
+ **All documentation complete**  
+ **Ready for deployment**  
 
 **Date**: January 16, 2026  
 **Version**: 1.0.0  

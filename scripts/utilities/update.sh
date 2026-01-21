@@ -1,6 +1,6 @@
 #!/bin/bash
 # migrate-poc-roles.sh
-# Migrate libvirt_host and satellite roles to organized structure with local task files
+# Migrate libvirt_host and scenario_satellite roles to organized structure with local task files
 
 set -euo pipefail
 
@@ -10,7 +10,7 @@ LIBVIRT_ORGANIZED="${ORGANIZED_DIR}/os_libvirt/tasks"
 SATELLITE_ORGANIZED="${ORGANIZED_DIR}/product_satellite/tasks"
 
 echo "=== PoC Role Migration Script ==="
-echo "Migrating libvirt_host and satellite roles to organized structure..."
+echo "Migrating libvirt_host and scenario_satellite roles to organized structure..."
 echo ""
 
 # Helper function to create files
@@ -139,7 +139,7 @@ create_file "${LIBVIRT_ORGANIZED}/validate.yml" '---
   changed_when: false
 '
 
-create_file "${LIBVIRT_ORGANIZED}/satellite.yml" '---
+create_file "${LIBVIRT_ORGANIZED}/scenario_satellite.yml" '---
 # Register libvirt host in Satellite when requested
 - name: Register libvirt host in Satellite
   block:
@@ -162,18 +162,18 @@ create_file "${LIBVIRT_ORGANIZED}/satellite.yml" '---
 
   when: libvirt_register_in_satellite | default(false)
   vars:
-    satellite_fqdn: "{{ satellite_fqdn | default('"'"'satellite.example.com'"'"') }}"
+    satellite_fqdn: "{{ satellite_fqdn | default('"'"'scenario_satellite.example.com'"'"') }}"
     satellite_org: "{{ satellite_org | default('"'"'Default_Org'"'"') }}"
     satellite_admin_user: "{{ satellite_admin_user | default('"'"'admin'"'"') }}"
     satellite_admin_password: "{{ satellite_admin_password | default('"'"''"'"') }}"
 '
 
 # ============================================================================
-# 2. Copy satellite task files to organized/product_satellite/tasks/
+# 2. Copy scenario_satellite task files to organized/product_satellite/tasks/
 # ============================================================================
 
 echo ""
-echo "--- Migrating satellite task files ---"
+echo "--- Migrating scenario_satellite task files ---"
 
 create_file "${SATELLITE_ORGANIZED}/install.yml" '---
 - name: Satellite install placeholder
@@ -214,7 +214,7 @@ echo "--- Updating product_satellite main.yml ---"
 
 create_file "${SATELLITE_ORGANIZED}/main.yml" '---
 # Organized Product-level Satellite role (PoC)
-# This file includes organized satellite subtasks (local copies)
+# This file includes organized scenario_satellite subtasks (local copies)
 - name: Include install tasks
   ansible.builtin.include_tasks: install.yml
 
@@ -238,9 +238,9 @@ create_file "${SATELLITE_ORGANIZED}/main.yml" '---
 echo ""
 echo "--- Creating backups of original files ---"
 
-if [ -f "${ROLES_DIR}/satellite/tasks/main.yml" ]; then
-    cp "${ROLES_DIR}/satellite/tasks/main.yml" "${ROLES_DIR}/satellite/tasks/main.yml.backup.$(date +%Y%m%d_%H%M%S)"
-    echo " Backed up: satellite/tasks/main.yml"
+if [ -f "${ROLES_DIR}/scenario_satellite/tasks/main.yml" ]; then
+    cp "${ROLES_DIR}/scenario_satellite/tasks/main.yml" "${ROLES_DIR}/scenario_satellite/tasks/main.yml.backup.$(date +%Y%m%d_%H%M%S)"
+    echo " Backed up: scenario_satellite/tasks/main.yml"
 fi
 
 # ============================================================================

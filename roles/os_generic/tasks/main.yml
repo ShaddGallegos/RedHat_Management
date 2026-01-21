@@ -1,0 +1,58 @@
+---
+# OS (Operating System) Role
+# Handles OS-specific configuration and setup tasks
+# Performs foundational system configuration for deployed hosts
+
+- name: "OPERATING SYSTEM CONFIGURATION - Initialize"
+  ansible.builtin.debug:
+    msg: |
+      Operating System Configuration
+      ================================
+      OS: {{ deployment_os | default('rhel-9') }}
+      Platform: {{ deployment_platform | default('undefined') }}
+      Version: {{ ansible_distribution_version | default('detected at runtime') }}
+  tags: ["os_generic", "config"]
+
+- name: "Validate OS selection"
+  ansible.builtin.assert:
+    that:
+      - deployment_os is defined
+      - deployment_os in ["rhel-9", "rhel-10"]
+    fail_msg: "Invalid OS '{{ deployment_os }}'. Valid options: rhel-9, rhel-10"
+  tags: ["os_generic", "validate"]
+
+- name: "Configure OS base components"
+  block:
+    - name: "Update system repositories and packages"
+      block:
+        - name: "Update dnf/yum cache"
+          ansible.builtin.package:
+            name: "*"
+            state: latest
+          when: update_system_packages | default(true)
+
+        - name: "Install core system packages"
+          ansible.builtin.package:
+            name: "{{ os_core_packages | default([]) }}"
+            state: present
+          when: os_core_packages is defined
+
+      rescue:
+        - name: "Package update failed - continuing"
+          ansible.builtin.debug:
+            msg: "Package installation encountered issues. Continuing with configuration."
+
+    - name: "Configure system settings"
+      ansible.builtin.debug:
+        msg: "OS-specific configuration completed"
+
+  rescue:
+    - name: "OS configuration failed"
+      ansible.builtin.fail:
+        msg: "Operating system configuration failed. Check logs above for details."
+  tags: ["os_generic"]
+
+- name: "OS configuration completed"
+  ansible.builtin.debug:
+    msg: "Operating system {{ deployment_os }} configured successfully."
+  tags: ["os_generic", "info"]

@@ -1,6 +1,6 @@
 # Example URLs
 aap_url: "https://{{ aap.aap_hostname }}"
-satellite_url: "https://{{ satellite.satellite_hostname }}"
+satellite_url: "https://{{ scenario_satellite.satellite_hostname }}"
 # AAP installer bundle (path on installer host)
 aap_installer_inventory: "{{ aap.aap_path_to_local_tar_gz_installer | default('inventory/generated_inventory.ini') }}"
 aap_bundle_filename: "{{ aap.aap_path_to_local_tar_gz_installer | default('ansible-automation-platform-containerized-setup-bundle-2.6-4-x86_64.tar.gz') }}"
@@ -8,7 +8,7 @@ aap_admin_user: "{{ aap.aap_admin_username }}"
 aap_admin_password: "{{ vault_admin_password | default('') }}"
 
 # Satellite admin for API/module actions
-satellite_admin_user: "{{ satellite.satellite_admin_username }}"
+satellite_admin_user: "{{ scenario_satellite.satellite_admin_username }}"
 satellite_admin_password: "{{ vault_satellite_admin_password | default('') }}"
 
 # IDM admin
@@ -16,7 +16,7 @@ idm_admin_password: "{{ vault_admin_password | default('') }}"
 idm_directory_manager_password: "{{ idm.idm_directory_manager_password }}"
 # Product-specific firewall and SELinux settings
 firewall_product_rules:
-  satellite:
+  scenario_satellite:
     services:
       - https
       - http
@@ -91,7 +91,7 @@ private_cidr: "10.168.0.0/16"
 
 # Integration toggles
 selected_integrations:
-  - satellite
+  - scenario_satellite
   - patching_merged
   - firewall
 
@@ -186,14 +186,14 @@ idm:
     - 10.168.0.1
 
 # Satellite
-satellite:
+scenario_satellite:
   satellite_ip: 10.168.151.127
   satellite_admin_username: admin
   satellite_admin_password: "{{ vault_satellite_admin_password | default('') }}"
   rhel_versions: [8, 9, 10]
   satellite_version: "6.18"
   satellite_domain: prod.spg
-  satellite_hostname: satellite.prod.spg
+  satellite_hostname: scenario_satellite.prod.spg
   satellite_subnet_mask_bits: 16
   satellite_gateway: 10.168.0.1
   satellite_primary_interface: enp2s0
@@ -214,7 +214,7 @@ satellite:
   create_activation_keys: true
   foreman_admin_username: admin
   foreman_admin_password: "{{ vault_admin_password | default('') }}"
-  scenario: satellite
+  scenario: scenario_satellite
   reset_foreman_proxy_dns_forwarders: true
   foreman_initial_organization: "DefaultOrg"
   foreman_initial_location: "DefaultLoc"
@@ -272,7 +272,7 @@ aap:
   aap_password: "{{ aap_admin_password }}"
 
 # Global settings provided by user
-global:
+globals:
   project_name: test-lab
   domain: prod.spg
   aap_password: "REMOVED_AAP_PASSWORD"

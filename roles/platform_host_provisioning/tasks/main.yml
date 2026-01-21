@@ -1,0 +1,76 @@
+---
+# Role: platform_host_provisioning
+# Purpose: Provision and bootstrap AAP platform_infrastructure_core hosts
+# This role handles host creation from Satellite hostgroups and inventory management
+
+- name: Check for persistent marker for platform_host_provisioning
+  ansible.builtin.stat:
+    path: /var/lib/rhm/platform_host_provisioning_done
+  register: phm_marker_stat
+
+- name: Set platform_host_provisioning_done fact
+  ansible.builtin.set_fact:
+    platform_host_provisioning_done: "{{ phm_marker_stat.stat.exists | default(false) }}"
+
+- block:
+  - name: "Check if hosts exist in Satellite"
+    ansible.builtin.include_tasks: check_for_host.yml
+    loop: "{{ provisioning_hosts | default([]) }}"
+    loop_control:
+      loop_var: host
+    tags:
+      - rhis_host_check
+      - rhis_host_provision
+
+  - name: "Create hosts in Satellite"
+    ansible.builtin.include_tasks: create_host.yml
+    loop: "{{ provisioning_hosts | default([]) }}"
+    loop_control:
+      loop_var: host
+    tags:
+      - rhis_host_create
+      - rhis_host_provision
+
+  - name: "Create hosts from hostgroup"
+    ansible.builtin.include_tasks: create_host_from_hostgroup.yml
+    loop: "{{ provisioning_hosts | default([]) }}"
+    loop_control:
+      loop_var: host
+    tags:
+      - rhis_host_from_hostgroup
+      - rhis_host_provision
+
+  - name: "Add provisioned hosts to inventory"
+    ansible.builtin.include_tasks: add_host_to_inventory.yml
+    loop: "{{ provisioning_hosts | default([]) }}"
+    loop_control:
+      loop_var: host
+    tags:
+      - rhis_host_inventory
+      - rhis_host_provision
+
+  - name: Create marker directory
+    ansible.builtin.file:
+      path: /var/lib/rhm
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
+    become: true
+
+  - name: Touch platform_host_provisioning marker
+    ansible.builtin.file:
+      path: /var/lib/rhm/platform_host_provisioning_done
+      state: touch
+      owner: root
+      group: root
+      mode: '0644'
+    become: true
+
+  - name: Write ansible facts file for platform_host_provisioning
+    ansible.builtin.copy:
+      dest: /etc/ansible/facts.d/rhm_host_provisioning.fact
+      content: '{"platform_host_provisioning_done": true}'
+      mode: '0644'
+    become: true
+  when: not (platform_host_provisioning_done | default(false))

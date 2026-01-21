@@ -1,0 +1,13 @@
+---
+# Test: ansible_dev_node_orchestration_master role variable defaults
+- name: Test ansible_dev_node_orchestration_master defaults
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - ansible_dev_node_orchestration_master
+  tasks:
+    - name: Verify defaults loaded
+      ansible.builtin.assert:
+        that:
+          - orchestration_master_enabled is defined
+        fail_msg: "Defaults not loaded"

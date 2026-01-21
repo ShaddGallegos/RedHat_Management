@@ -886,7 +886,7 @@ org_result:
 organization_id: ""
 organization_name: ""
 organizations: ""
-os:
+os_generic:
   Id: ""
   Title: ""
   default_templates: ""

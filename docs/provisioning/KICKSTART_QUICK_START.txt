@@ -5,7 +5,7 @@ Satellite 6.18 Provisioning Infrastructure
 
 Created: January 16, 2026
 Role: satellite_kickstart_config
-Status: ✅ Complete
+Status:  Complete
 
 ================================================================================
 WHAT WAS CREATED
@@ -24,26 +24,26 @@ WHAT WAS CREATED
 2. FOUR KICKSTART TEMPLATES:
 
    RHEL 9 BaseOS Minimal
-   └─ Minimal core installation
-   └─ LVM partitioning (compliance-ready)
-   └─ Satellite integration
-   └─ Insights support
+    Minimal core installation
+    LVM partitioning (compliance-ready)
+    Satellite integration_generic
+    Insights ansible_dev_node_support
 
    RHEL 10 BaseOS Minimal
-   └─ Minimal core installation
-   └─ RHEL 10 optimized
-   └─ Same features as RHEL 9 minimal
+    Minimal core installation
+    RHEL 10 optimized
+    Same features as RHEL 9 minimal
 
    RHEL 9 Full Stack
-   └─ BaseOS + AppStream packages
-   └─ Development tools (gcc, make, kernel-devel)
-   └─ Container runtime (Podman, Buildah, Skopeo)
-   └─ Ansible and automation tools
+    BaseOS + AppStream packages
+    Development tools (gcc, make, kernel-devel)
+    Container runtime (Podman, Buildah, Skopeo)
+    Ansible and automation tools
 
    RHEL 10 Full Stack
-   └─ BaseOS + AppStream packages
-   └─ Modern Podman v4+ runtime
-   └─ Full development environment
+    BaseOS + AppStream packages
+    Modern Podman v4+ runtime
+    Full development environment
 
 3. DOCUMENTATION:
    - SATELLITE_KICKSTART_CONFIGURATION.md (500+ lines)
@@ -54,31 +54,31 @@ KEY FEATURES - ALL KICKSTARTS
 ================================================================================
 
 Security:
-✅ SELinux enforcing
-✅ Firewall enabled
-✅ SSH hardening
-✅ Root password locked
-✅ SSH key generation
+ SELinux enforcing
+ Firewall enabled
+ SSH hardening
+ Root password locked
+ SSH key generation
 
 Disk Configuration:
-✅ LVM partitioning
-✅ XFS filesystems
-✅ /boot (1024 MB)
-✅ /boot/efi (256 MB)
-✅ / (10 GB)
-✅ /home (2 GB)
-✅ /tmp (2 GB)
-✅ /var (5-8 GB)
-✅ /var/log (2 GB)
-✅ /var/log/audit (1 GB)
-✅ swap (4 GB)
+ LVM partitioning
+ XFS filesystems
+ /boot (1024 MB)
+ /boot/efi (256 MB)
+ / (10 GB)
+ /home (2 GB)
+ /tmp (2 GB)
+ /var (5-8 GB)
+ /var/log (2 GB)
+ /var/log/audit (1 GB)
+ swap (4 GB)
 
 Integration:
-✅ Satellite subscription-manager
-✅ Red Hat Insights client
-✅ Cloud-init for provisioning
-✅ Ansible compatibility
-✅ Container runtime (Podman on Full Stack)
+ Satellite subscription-manager
+ Red Hat Insights client
+ Cloud-init for platform_provisioning
+ Ansible compatibility
+ Container runtime (Podman on Full Stack)
 
 ================================================================================
 KICKSTART FILE LOCATIONS
@@ -91,10 +91,10 @@ On Satellite Server:
 /var/lib/foreman/public/kickstarts/rhel10-fullstack.ks
 
 Web Accessible URLs:
-https://satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks
-https://satellite.example.com/pub/kickstarts/rhel10-baseos-minimal.ks
-https://satellite.example.com/pub/kickstarts/rhel9-fullstack.ks
-https://satellite.example.com/pub/kickstarts/rhel10-fullstack.ks
+https://scenario_satellite.example.com/pub/kickstarts/rhel9-baseos-minimal.ks
+https://scenario_satellite.example.com/pub/kickstarts/rhel10-baseos-minimal.ks
+https://scenario_satellite.example.com/pub/kickstarts/rhel9-fullstack.ks
+https://scenario_satellite.example.com/pub/kickstarts/rhel10-fullstack.ks
 
 ================================================================================
 HOW TO USE
@@ -106,11 +106,11 @@ Add to your Satellite deployment playbook:
 
 ---
 - name: Deploy Satellite Kickstarts
-  hosts: satellite
+  hosts: scenario_satellite
   roles:
     - role: satellite_kickstart_config
       vars:
-        satellite_url: "https://satellite.prod.example.com"
+        satellite_url: "https://scenario_satellite.prod.example.com"
         satellite_username: "admin"
         satellite_password: "{{ vault_satellite_admin_password }}"
         create_provisioning_templates: true
@@ -131,7 +131,7 @@ grep "RHEL 9 BaseOS Minimal" /var/lib/foreman/public/kickstarts/rhel9-baseos-min
 4. USE IN SATELLITE PROVISIONING
 
 - Navigate to: Hosts → Provisioning Templates
-- Create provisioning host entry
+- Create platform_provisioning host entry
 - Select Operating System (RHEL 9 or RHEL 10)
 - Assign appropriate template
 - Configure network and activation key
@@ -265,25 +265,25 @@ INTEGRATION WITH RHIS STACK
 Complete Satellite Configuration Workflow:
 
 1. satellite_6_18_deployment
-   └─ Installs Satellite 6.18 core
+    Installs Satellite 6.18 core
 
 2. satellite_content_config
-   └─ Enables RHEL BaseOS/AppStream repositories
-   └─ Creates organizations/locations
+    Enables RHEL BaseOS/AppStream repositories
+    Creates organizations/locations
 
-3. satellite_lifecycle_config
-   └─ Creates environments (Dev → Staging → Prod)
-   └─ Creates content views with filters
+3. scenario_satellite_lifecycle_config
+    Creates environments (Dev → Staging → Prod)
+    Creates content views with filters
 
-4. satellite_activation_config
-   └─ Creates activation keys
-   └─ Manages subscriptions
+4. scenario_satellite_activation_config
+    Creates activation keys
+    Manages subscriptions
 
 5. satellite_kickstart_config [NEW]
-   └─ Creates RHEL 9/10 kickstarts
-   └─ Enables PXE-based provisioning
+    Creates RHEL 9/10 kickstarts
+    Enables PXE-based platform_provisioning
 
-RESULT: Fully automated infrastructure provisioning
+RESULT: Fully automated platform_infrastructure_core platform_provisioning
 
 ================================================================================
 PERFORMANCE METRICS
@@ -292,11 +292,11 @@ PERFORMANCE METRICS
 Deployment Time:
 
                     Manual          Automated       Savings
-Partitioning        5-10 min        0 min           ✅
-Package Selection   10-15 min       0 min           ✅
+Partitioning        5-10 min        0 min           
+Package Selection   10-15 min       0 min           
 Configuration       15-20 min       1-2 min         85%
-Registration        5-10 min        0 min           ✅
-────────────────────────────────────────────────────────
+Registration        5-10 min        0 min           
+
 TOTAL               45-55 min       35-45 min       20-30%
 
 Scaling Benefits:
@@ -310,15 +310,15 @@ FILES CREATED
 ================================================================================
 
 Role Files:
-✅ meta/main.yml (22 lines)
-✅ defaults/main.yml (659 lines - all kickstart content)
-✅ tasks/main.yml (177 lines - task execution)
-✅ tests/test_role.yml (25 lines - test playbook)
-✅ README.md (359 lines - documentation)
+ meta/main.yml (22 lines)
+ defaults/main.yml (659 lines - all kickstart content)
+ tasks/main.yml (177 lines - task execution)
+ tests/test_role.yml (25 lines - test playbook)
+ README.md (359 lines - documentation)
 
 Documentation:
-✅ SATELLITE_KICKSTART_CONFIGURATION.md (600+ lines)
-✅ KICKSTART_QUICK_START.txt (this file)
+ SATELLITE_KICKSTART_CONFIGURATION.md (600+ lines)
+ KICKSTART_QUICK_START.txt (this file)
 
 Total: 7 files, 1,800+ lines of code and documentation
 
@@ -337,17 +337,17 @@ NEXT STEPS
    ansible-playbook redhat_management-site.yml -e "satellite_kickstart_config_enabled=true"
 
 4. Verify on Satellite:
-   ssh satellite.example.com
+   ssh scenario_satellite.example.com
    ls -la /var/lib/foreman/public/kickstarts/
 
-5. Test provisioning:
+5. Test platform_provisioning:
    - Boot test system via PXE
    - Select "RHEL 9 BaseOS Minimal" option
    - Watch automated installation
    - Verify system registers with Satellite
 
 6. Monitor in Satellite UI:
-   https://satellite.example.com
+   https://scenario_satellite.example.com
    → Infrastructure → Hosts
    → Watch new host appear and register
 
@@ -373,14 +373,14 @@ Red Hat Resources:
 SUMMARY
 ================================================================================
 
-✅ Created satellite_kickstart_config role
-✅ 4 production-ready kickstart templates
-✅ RHEL 9 and RHEL 10 BaseOS support
-✅ Minimal and Full Stack variants
-✅ LVM partitioning (compliance-ready)
-✅ Security hardening included
-✅ Satellite integration built-in
-✅ 1,800+ lines of code/docs
+ Created satellite_kickstart_config role
+ 4 production-ready kickstart templates
+ RHEL 9 and RHEL 10 BaseOS ansible_dev_node_support
+ Minimal and Full Stack variants
+ LVM partitioning (compliance-ready)
+ Security hardening included
+ Satellite integration_generic built-in
+ 1,800+ lines of code/docs
 
 STATUS: Complete and ready for production deployment
 

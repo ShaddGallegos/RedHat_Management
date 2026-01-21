@@ -17,10 +17,10 @@ pysnow>=0.7.17
 
 # Red Hat APIs
 insights-client>=3.1.0
-python-redhat-satellite>=0.1.0
+python-redhat-scenario_satellite>=0.1.0
 
 # Nutanix
-nutanix-api>=0.1.0
+platform_nutanix-api>=0.1.0
 prism-api>=1.0.0
 
 # JSON/Data Processing
@@ -122,7 +122,7 @@ dnspython>=2.0.0
 apache-libcloud>=3.3.1
 psycopg2-binary>=2.8.6
 kubernetes>=12.0.1
-openshift>=0.11.2
+scenario_openshift>=0.11.2
 pywinrm>=0.4.2
 msrest>=0.6.21
 azure-mgmt-compute>=20.0.0

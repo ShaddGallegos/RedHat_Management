@@ -3,16 +3,16 @@
 ## New Roles Added
 
 ### 1. satellite_content_config
-**Configure content infrastructure and synchronization**
+**Configure content platform_infrastructure_core and synchronization**
 
 | Feature | Supported | Details |
 |---------|-----------|---------|
-| Organizations | ✅ | Create and manage |
-| Locations | ✅ | Geographic/logical grouping |
-| Products | ✅ | Custom product management |
-| Repositories | ✅ | 5+ default repos configured |
-| Sync Plans | ✅ | Daily/Weekly scheduling |
-| Mirroring | ✅ | On-demand/immediate policies |
+| Organizations |  | Create and manage |
+| Locations |  | Geographic/logical grouping |
+| Products |  | Custom product management |
+| Repositories |  | 5+ default repos configured |
+| Sync Plans |  | Daily/Weekly scheduling |
+| Mirroring |  | On-demand/immediate policies |
 
 **Quick Start**:
 ```yaml
@@ -25,20 +25,20 @@
 
 ---
 
-### 2. satellite_lifecycle_config
+### 2. scenario_satellite_lifecycle_config
 **Configure lifecycle environments and content views**
 
 | Feature | Supported | Details |
 |---------|-----------|---------|
-| Lifecycle Envs | ✅ | Library→Dev→Stage→Prod |
-| Content Views | ✅ | Single & composite |
-| Filters | ✅ | Errata, packages, modules |
-| Publishing | ✅ | Automated versioning |
-| Promotion | ✅ | Multi-environment paths |
+| Lifecycle Envs |  | Library→Dev→Stage→Prod |
+| Content Views |  | Single & composite |
+| Filters |  | Errata, packages, modules |
+| Publishing |  | Automated versioning |
+| Promotion |  | Multi-environment paths |
 
 **Quick Start**:
 ```yaml
-- role: satellite_lifecycle_config
+- role: scenario_satellite_lifecycle_config
   vars:
     create_lifecycle_environments: true
     create_content_views: true
@@ -47,20 +47,20 @@
 
 ---
 
-### 3. satellite_activation_config
+### 3. scenario_satellite_activation_config
 **Configure activation keys and subscriptions**
 
 | Feature | Supported | Details |
 |---------|-----------|---------|
-| Activation Keys | ✅ | 5 default keys |
-| Host Collections | ✅ | Production/Dev/All |
-| Subscriptions | ✅ | Auto-attach support |
-| Repository Sets | ✅ | RHEL 9 & 10 |
-| Usage Limits | ✅ | Per-key management |
+| Activation Keys |  | 5 default keys |
+| Host Collections |  | Production/Dev/All |
+| Subscriptions |  | Auto-attach ansible_dev_node_support |
+| Repository Sets |  | RHEL 9 & 10 |
+| Usage Limits |  | Per-key management |
 
 **Quick Start**:
 ```yaml
-- role: satellite_activation_config
+- role: scenario_satellite_activation_config
   vars:
     create_activation_keys: true
     attach_subscriptions: true
@@ -75,9 +75,9 @@ satellite_6_18_deployment         ← Core installation
         ↓
 satellite_content_config          ← Organizations, repos, sync
         ↓
-satellite_lifecycle_config        ← Environments, content views
+scenario_satellite_lifecycle_config        ← Environments, content views
         ↓
-satellite_activation_config       ← Keys, subscriptions, hosts
+scenario_satellite_activation_config       ← Keys, subscriptions, hosts
 ```
 
 ---
@@ -125,7 +125,7 @@ satellite_activation_config       ← Keys, subscriptions, hosts
 ```yaml
 ---
 - name: Deploy Satellite 6.18 for RHIS
-  hosts: satellite
+  hosts: scenario_satellite
   roles:
     - name: Core Installation
       role: satellite_6_18_deployment
@@ -139,7 +139,7 @@ satellite_activation_config       ← Keys, subscriptions, hosts
         synchronize_repositories: true
 
     - name: Lifecycle Management
-      role: satellite_lifecycle_config
+      role: scenario_satellite_lifecycle_config
       vars:
         create_lifecycle_environments: true
         create_content_views: true
@@ -148,7 +148,7 @@ satellite_activation_config       ← Keys, subscriptions, hosts
         promote_content_views: true
 
     - name: Subscription Management
-      role: satellite_activation_config
+      role: scenario_satellite_activation_config
       vars:
         configure_host_collections: true
         create_activation_keys: true
@@ -159,7 +159,7 @@ satellite_activation_config       ← Keys, subscriptions, hosts
 
 ## Feature Coverage
 
-### Content Management: 100% ✅
+### Content Management: 100% 
 - [x] Organizations
 - [x] Locations
 - [x] Products
@@ -168,7 +168,7 @@ satellite_activation_config       ← Keys, subscriptions, hosts
 - [x] Download Policies
 - [x] Mirroring
 
-### Lifecycle Management: 100% ✅
+### Lifecycle Management: 100% 
 - [x] Lifecycle Environments
 - [x] Content Views
 - [x] Composite Views
@@ -176,7 +176,7 @@ satellite_activation_config       ← Keys, subscriptions, hosts
 - [x] Publishing
 - [x] Promotion
 
-### Subscription Management: 100% ✅
+### Subscription Management: 100% 
 - [x] Activation Keys
 - [x] Host Collections
 - [x] Subscriptions
@@ -194,14 +194,14 @@ Key Options: organizations, locations, products,
              repositories, sync_plans
 ```
 
-### satellite_lifecycle_config
+### scenario_satellite_lifecycle_config
 ```
 Total Variables: 30
 Key Options: lifecycle_environments, content_views,
              content_view_filters, promote_versions
 ```
 
-### satellite_activation_config
+### scenario_satellite_activation_config
 ```
 Total Variables: 25
 Key Options: host_collections, activation_keys,
@@ -232,12 +232,12 @@ Key Options: host_collections, activation_keys,
    - Configure repositories
    - Setup sync schedules
 
-3. **satellite_lifecycle_config** (2-5 min)
+3. **scenario_satellite_lifecycle_config** (2-5 min)
    - Create environments
    - Setup content views
    - Apply filters
 
-4. **satellite_activation_config** (2-5 min)
+4. **scenario_satellite_activation_config** (2-5 min)
    - Create activation keys
    - Setup host collections
    - Attach subscriptions
@@ -254,7 +254,7 @@ After configuration, register hosts:
 subscription-manager register \
   --org="Default Organization" \
   --activationkey="RHEL9_BaseOS" \
-  --server-hostname=satellite.example.com
+  --server-hostname=scenario_satellite.example.com
 ```
 
 ---
@@ -346,12 +346,12 @@ A: Check environment prior/next relationships
 
 ## Next Steps
 
-1. ✅ Review all three role README files
-2. ✅ Customize variables for your environment
-3. ✅ Update vault with admin credentials
-4. ✅ Test in development environment
-5. ✅ Deploy to staging/production
-6. ✅ Validate in Satellite UI
+1.  Review all three role README files
+2.  Customize variables for your environment
+3.  Update vault with admin credentials
+4.  Test in development environment
+5.  Deploy to staging/production
+6.  Validate in Satellite UI
 
 ---
 
@@ -359,24 +359,24 @@ A: Check environment prior/next relationships
 
 ```
 roles/
-├── satellite_content_config/
-│   ├── meta/main.yml
-│   ├── defaults/main.yml
-│   ├── tasks/main.yml
-│   ├── README.md
-│   └── tests/test_role.yml
-├── satellite_lifecycle_config/
-│   ├── meta/main.yml
-│   ├── defaults/main.yml
-│   ├── tasks/main.yml
-│   ├── README.md
-│   └── tests/test_role.yml
-└── satellite_activation_config/
-    ├── meta/main.yml
-    ├── defaults/main.yml
-    ├── tasks/main.yml
-    ├── README.md
-    └── tests/test_role.yml
+ satellite_content_config/
+    meta/main.yml
+    defaults/main.yml
+    tasks/main.yml
+    README.md
+    tests/test_role.yml
+ scenario_satellite_lifecycle_config/
+    meta/main.yml
+    defaults/main.yml
+    tasks/main.yml
+    README.md
+    tests/test_role.yml
+ scenario_satellite_activation_config/
+     meta/main.yml
+     defaults/main.yml
+     tasks/main.yml
+     README.md
+     tests/test_role.yml
 ```
 
 ---
@@ -391,12 +391,12 @@ For detailed documentation, see:
 
 ## Summary
 
-✅ **Complete Satellite 6.18 configuration automation**
-✅ **25+ features implemented**
-✅ **3 production-ready roles**
-✅ **15 configuration files**
-✅ **900+ lines of code**
-✅ **Fully documented**
-✅ **Tested and verified**
+ **Complete Satellite 6.18 configuration automation**
+ **25+ features implemented**
+ **3 production-ready roles**
+ **15 configuration files**
+ **900+ lines of code**
+ **Fully documented**
+ **Tested and verified**
 
 All missing Satellite 6.18 features for RHIS have been implemented!

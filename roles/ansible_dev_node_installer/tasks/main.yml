@@ -1,0 +1,46 @@
+---
+- name: Create scenario admin user (do not fail this task)
+  ansible.builtin.user:
+    name: "{{ scenario_user }}"
+    password: "{{ scenario_pass_hash }}"
+    ansible.builtin.shell: /bin/bash
+    groups: wheel
+    state: present
+  failed_when: false
+
+- name: Ensure .ssh exists for user
+  ansible.builtin.file:
+    path: "/home/{{ scenario_user }}/.ssh"
+    owner: "{{ scenario_user }}"
+    group: "{{ scenario_user }}"
+    mode: '0700'
+    state: directory
+  failed_when: false
+
+- name: Install basic packages on installer (do not fail this task)
+  ansible.builtin.package:
+    name:
+      - git
+      - python3
+      - python3-pip
+      - openssh-clients
+      - sshpass
+    state: present
+  failed_when: false
+
+- name: Install pip requirements (if file exists) (do not fail this task)
+  ansible.builtin.pip:
+    requirements: "{{ playbook_dir }}/../python/requirements.txt"
+  failed_when: false
+
+- name: Authorize controller public key for scenario user
+  ansible.posix.authorized_key:
+    user: "{{ scenario_user }}"
+    key: "{{ controller_pubkey }}"
+  failed_when: false
+
+- name: Also ensure controller key is in root authorized_keys (so root can ssh to nodes)
+  ansible.posix.authorized_key:
+    user: root
+    key: "{{ controller_pubkey }}"
+  failed_when: false

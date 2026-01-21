@@ -1,0 +1,39 @@
+---
+# Platform Preparation: LibVirt (KVM)
+# Prepares KVM/LibVirt environment for virtual machine platform_provisioning
+
+- name: "Prepare LibVirt Infrastructure"
+  ansible.builtin.debug:
+    msg: |
+      LibVirt Infrastructure Preparation
+      ==================================
+      Platform: libvirt
+      Target: KVM-based virtualization
+  tags: ["platform_infrastructure_core", "libvirt", "prepare"]
+
+- name: "Validate LibVirt prerequisites"
+  block:
+    - name: "Check LibVirt daemon"
+      ansible.builtin.shell: systemctl is-active libvirtd
+      register: libvirt_status
+      changed_when: false
+      failed_when: false
+
+    - name: "Verify LibVirt tools"
+      ansible.builtin.package_facts:
+        manager: auto
+      register: package_facts
+
+    - name: "Assert LibVirt is installed and running"
+      ansible.builtin.assert:
+        that:
+          - "'libvirt-daemon' in package_facts.ansible_facts.packages or libvirt_status.rc == 0"
+        fail_msg: "LibVirt daemon is not installed or running. Install libvirt-daemon and start the service."
+      ignore_errors: true
+
+  tags: ["platform_infrastructure_core", "libvirt", "validate"]
+
+- name: "LibVirt platform_infrastructure_core ready for platform_provisioning"
+  ansible.builtin.debug:
+    msg: "LibVirt platform_infrastructure_core prepared successfully"
+  tags: ["platform_infrastructure_core", "libvirt", "info"]

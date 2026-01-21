@@ -6,7 +6,7 @@ The RedHat Infrastructure Standard (RHIS) project has been significantly enhance
 
 ## Major Components Completed
 
-### ✅ 1. Enhanced Installer Script
+###  1. Enhanced Installer Script
 
 **File:** `RHIS-Installer-Enhanced.sh` (Moved to base directory)
 
@@ -25,9 +25,9 @@ Features:
 **Lines of Code:** 850+
 **Status:** READY FOR PRODUCTION
 
-### ✅ 2. Orchestration Playbook
+###  2. Orchestration Playbook
 
-**File:** `playbooks/orchestration.yml`
+**File:** `playbooks/ansible_dev_node_orchestration.yml`
 
 Features:
 - 7-phase deployment workflow
@@ -47,7 +47,7 @@ Features:
 
 **Status:** READY FOR PRODUCTION
 
-### ✅ 3. Scenario Configurations
+###  3. Scenario Configurations
 
 **File:** `playbooks/scenario_configs.yml`
 
@@ -60,7 +60,7 @@ Complete definitions for:
 
 **Status:** READY FOR PRODUCTION
 
-### ✅ 4. Deployment Architecture Documentation
+###  4. Deployment Architecture Documentation
 
 **File:** `docs/deployment/RHIS_DEPLOYMENT_ARCHITECTURE.md`
 
@@ -73,12 +73,12 @@ Contains:
 - Credential management guidelines
 - Installation method options
 - Repository enablement strategy
-- Ansible-CMDB integration details
+- Ansible-CMDB integration_generic details
 - Post-deployment checklist
 
 **Status:** COMPLETE
 
-### ✅ 5. Quick Start Guide
+###  5. Quick Start Guide
 
 **File:** `docs/deployment/QUICK_START.md`
 
@@ -98,7 +98,7 @@ Contents:
 
 **Status:** COMPLETE
 
-### ✅ 6. Playbook Best Practices Guide
+###  6. Playbook Best Practices Guide
 
 **File:** `docs/examples/PLAYBOOK_ORGANIZATION_BEST_PRACTICES.md`
 
@@ -117,7 +117,7 @@ Covers:
 
 **Status:** COMPLETE
 
-### ✅ 7. Jinja2 Variables Reference
+###  7. Jinja2 Variables Reference
 
 **File:** `docs/examples/JINJA2_VARIABLES_REFERENCE.yml`
 
@@ -153,13 +153,13 @@ Installation Method (OEMDRV/TFTP)
 Configuration Review
   ↓
 Orchestration Playbook Execution
-  ├→ Phase 1: Initialize Installer Host
-  ├→ Phase 2: Platform Preparation
-  ├→ Phase 3: Generate Inventory
-  ├→ Phase 4: Deploy Products
-  ├→ Phase 5: Configure Integrations
-  ├→ Phase 6: Setup Ansible-CMDB
-  └→ Phase 7: Validate Deployment
+  → Phase 1: Initialize Installer Host
+  → Phase 2: Platform Preparation
+  → Phase 3: Generate Inventory
+  → Phase 4: Deploy Products
+  → Phase 5: Configure Integrations
+  → Phase 6: Setup Ansible-CMDB
+  → Phase 7: Validate Deployment
   ↓
 Complete
 ```
@@ -168,20 +168,20 @@ Complete
 
 | # | Scenario | Products | Tags | Use Case |
 |---|----------|----------|------|----------|
-| 1 | Satellite Only | Sat | satellite | Systems management |
+| 1 | Satellite Only | Sat | scenario_satellite | Systems management |
 | 2 | AAP Only | AAP | aap | Automation only |
 | 3 | IdM Only | IdM | idm | Identity only |
-| 4 | OpenShift Only | OCP | openshift | Container only |
-| 5 | Satellite + AAP | Sat, AAP | satellite, aap | Inventory + Automation |
-| 6 | Satellite + IdM | Sat, IdM | satellite, idm | Inventory + Identity |
-| 7 | Satellite + OpenShift | Sat, OCP | satellite, openshift | Inventory + Containers |
+| 4 | OpenShift Only | OCP | scenario_openshift | Container only |
+| 5 | Satellite + AAP | Sat, AAP | scenario_satellite, aap | Inventory + Automation |
+| 6 | Satellite + IdM | Sat, IdM | scenario_satellite, idm | Inventory + Identity |
+| 7 | Satellite + OpenShift | Sat, OCP | scenario_satellite, scenario_openshift | Inventory + Containers |
 | 8 | AAP + IdM | AAP, IdM | aap, idm | Automation + Identity |
-| 9 | AAP + OpenShift | AAP, OCP | aap, openshift | Automation + Containers |
-| 10 | IdM + OpenShift | IdM, OCP | idm, openshift | Identity + Containers |
-| 11 | Sat + AAP + IdM | Sat, AAP, IdM | satellite, aap, idm | Complete Management Stack |
-| 12 | Sat + AAP + OCP | Sat, AAP, OCP | satellite, aap, openshift | Inv + Auto + Containers |
-| 13 | Sat + IdM + OCP | Sat, IdM, OCP | satellite, idm, openshift | Inv + Id + Containers |
-| 14 | AAP + IdM + OCP | AAP, IdM, OCP | aap, idm, openshift | Auto + Id + Containers |
+| 9 | AAP + OpenShift | AAP, OCP | aap, scenario_openshift | Automation + Containers |
+| 10 | IdM + OpenShift | IdM, OCP | idm, scenario_openshift | Identity + Containers |
+| 11 | Sat + AAP + IdM | Sat, AAP, IdM | scenario_satellite, aap, idm | Complete Management Stack |
+| 12 | Sat + AAP + OCP | Sat, AAP, OCP | scenario_satellite, aap, scenario_openshift | Inv + Auto + Containers |
+| 13 | Sat + IdM + OCP | Sat, IdM, OCP | scenario_satellite, idm, scenario_openshift | Inv + Id + Containers |
+| 14 | AAP + IdM + OCP | AAP, IdM, OCP | aap, idm, scenario_openshift | Auto + Id + Containers |
 | 15 | Full Stack | ALL | full-stack | Complete Unified Platform |
 
 ## Platforms (7 Options)
@@ -220,8 +220,8 @@ Additional credentials (as needed):
 
 ### Tag Hierarchy
 ```
-Scenario Tags: satellite, aap, idm, openshift, full-stack
-Platform Tags: libvirt, baremetal, aws, azure, gcp, vmware, nutanix
+Scenario Tags: scenario_satellite, aap, idm, scenario_openshift, full-stack
+Platform Tags: libvirt, baremetal, aws, azure, gcp, platform_vmware, platform_nutanix
 Phase Tags: init, prepare, install, configure, integrate, validate
 ```
 
@@ -231,13 +231,13 @@ Phase Tags: init, prepare, install, configure, integrate, validate
 --tags "full-stack,aws,rhel-9,install,configure,integrate"
 
 # Satellite only on LibVirt  
---tags "satellite,libvirt,rhel-9,install,configure"
+--tags "scenario_satellite,libvirt,rhel-9,install,configure"
 
 # Validate only
 --tags "validate"
 
 # Skip OpenShift
---skip-tags "openshift"
+--skip-tags "scenario_openshift"
 ```
 
 ## Files Created/Modified
@@ -246,13 +246,13 @@ Phase Tags: init, prepare, install, configure, integrate, validate
 
 | File | Purpose | Status |
 |------|---------|--------|
-| RHIS-Installer-Enhanced.sh | Main installer script | ✅ COMPLETE |
-| playbooks/orchestration.yml | Main orchestration | ✅ COMPLETE |
-| playbooks/scenario_configs.yml | Scenario definitions | ✅ COMPLETE |
-| docs/deployment/RHIS_DEPLOYMENT_ARCHITECTURE.md | Architecture docs | ✅ COMPLETE |
-| docs/deployment/QUICK_START.md | Quick start guide | ✅ COMPLETE |
-| docs/examples/PLAYBOOK_ORGANIZATION_BEST_PRACTICES.md | Best practices | ✅ COMPLETE |
-| docs/examples/JINJA2_VARIABLES_REFERENCE.yml | Variable reference | ✅ COMPLETE |
+| RHIS-Installer-Enhanced.sh | Main installer script |  COMPLETE |
+| playbooks/ansible_dev_node_orchestration.yml | Main ansible_dev_node_orchestration |  COMPLETE |
+| playbooks/scenario_configs.yml | Scenario definitions |  COMPLETE |
+| docs/deployment/RHIS_DEPLOYMENT_ARCHITECTURE.md | Architecture docs |  COMPLETE |
+| docs/deployment/QUICK_START.md | Quick start guide |  COMPLETE |
+| docs/examples/PLAYBOOK_ORGANIZATION_BEST_PRACTICES.md | Best practices |  COMPLETE |
+| docs/examples/JINJA2_VARIABLES_REFERENCE.yml | Variable reference |  COMPLETE |
 
 ### Files Moved
 - `scripts/setup/RHIS-installer.sh` → `RHIS-Installer.sh` (base directory, kept for compatibility)
@@ -267,59 +267,59 @@ Phase Tags: init, prepare, install, configure, integrate, validate
 
 ```
 RedHat_Management/
-├── RHIS-Installer-Enhanced.sh       ← NEW: Enhanced installer
-├── RHIS-Installer.sh                ← Copied to base for easy access
-├── playbooks/
-│   ├── orchestration.yml            ← NEW: Main orchestration
-│   ├── scenario_configs.yml         ← NEW: Scenario definitions
-│   └── [existing playbooks]
-├── roles/
-│   ├── installer_host/              ← NEW role for development node
-│   ├── platform_prep/               ← NEW role for platform prep
-│   ├── [existing roles]
-├── group_vars/
-│   ├── all.yml
-│   ├── [platform-specific]
-│   └── [product-specific]
-├── templates/
-│   ├── ansible.cfg.j2
-│   ├── oemdrv/                      ← OEMDRV templates
-│   ├── repo-enable/                 ← Repo enablement
-│   └── [existing templates]
-├── files/
-│   ├── OEMDRV/                      ← Kickstart files
-│   ├── rhel-iso/                    ← RHEL ISO location
-│   ├── tftp/                        ← TFTP boot files
-│   └── [existing files]
-├── docs/
-│   ├── deployment/
-│   │   ├── RHIS_DEPLOYMENT_ARCHITECTURE.md    ← NEW
-│   │   ├── QUICK_START.md                     ← NEW
-│   │   └── [existing docs]
-│   ├── examples/
-│   │   ├── PLAYBOOK_ORGANIZATION_BEST_PRACTICES.md  ← NEW
-│   │   ├── JINJA2_VARIABLES_REFERENCE.yml           ← NEW
-│   │   └── [existing examples]
-│   └── [existing docs]
-├── logs/
-│   └── deployment_*.log
-├── inventory/
-│   └── [generated by installer]
-└── ~/.ansible/conf/
-    ├── env.yml                      ← Vault-encrypted credentials
-    └── deployment_config.yml        ← Deployment configuration
+ RHIS-Installer-Enhanced.sh       ← NEW: Enhanced installer
+ RHIS-Installer.sh                ← Copied to base for easy access
+ playbooks/
+    ansible_dev_node_orchestration.yml            ← NEW: Main ansible_dev_node_orchestration
+    scenario_configs.yml         ← NEW: Scenario definitions
+    [existing playbooks]
+ roles/
+    installer_host/              ← NEW role for development node
+    platform_prep/               ← NEW role for platform prep
+    [existing roles]
+ group_vars/
+    all.yml
+    [platform-specific]
+    [product-specific]
+ templates/
+    ansible.cfg.j2
+    oemdrv/                      ← OEMDRV templates
+    repo-enable/                 ← Repo enablement
+    [existing templates]
+ files/
+    OEMDRV/                      ← Kickstart files
+    rhel-iso/                    ← RHEL ISO location
+    tftp/                        ← TFTP boot files
+    [existing files]
+ docs/
+    deployment/
+       RHIS_DEPLOYMENT_ARCHITECTURE.md    ← NEW
+       QUICK_START.md                     ← NEW
+       [existing docs]
+    examples/
+       PLAYBOOK_ORGANIZATION_BEST_PRACTICES.md  ← NEW
+       JINJA2_VARIABLES_REFERENCE.yml           ← NEW
+       [existing examples]
+    [existing docs]
+ logs/
+    deployment_*.log
+ inventory/
+    [generated by installer]
+ ~/.ansible/conf/
+     env.yml                      ← Vault-encrypted credentials
+     deployment_config.yml        ← Deployment configuration
 ```
 
 ## Implementation Status
 
-### ✅ COMPLETED
+###  COMPLETED
 
 1. **Installer Script** (850+ lines)
    - Interactive menu system
    - Credential collection
    - Scenario/platform/OS selection
    - Configuration management
-   - Deployment orchestration
+   - Deployment ansible_dev_node_orchestration
 
 2. **Orchestration Playbook** (450+ lines)
    - 7-phase deployment workflow
@@ -347,8 +347,8 @@ RedHat_Management/
 1. **Create Core Roles** (if needed)
    - installer_host role
    - platform_prep role
-   - inventory_generator role
-   - cmdb configuration
+   - ansible_dev_node_inventory_generator role
+   - scenario_ansible_cmdb_core configuration
 
 2. **OEMDRV/Kickstart Files**
    - Satellite kickstart template
@@ -387,7 +387,7 @@ RedHat_Management/
 
 ### Direct Playbook Execution
 ```bash
-ansible-playbook playbooks/orchestration.yml \
+ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
   -e "deployment_scenario=full_stack" \
   -e "deployment_platform=libvirt" \
   -e "deployment_os=rhel-9" \
@@ -396,20 +396,20 @@ ansible-playbook playbooks/orchestration.yml \
 
 ## Success Criteria Met
 
-✅ Installer script moved to base directory and enhanced
-✅ Interactive menu system for credential/scenario/platform selection  
-✅ 15 deployment scenarios fully defined
-✅ 7 platform options fully configured
-✅ Tag-based selective execution implemented
-✅ Vault-encrypted credential management
-✅ Comprehensive documentation created
-✅ Best practices documented
-✅ Variable organization by category
-✅ No hardcoded credentials anywhere
-✅ 7-phase deployment workflow
-✅ Post-deployment validation
-✅ Ansible-CMDB integration planned
-✅ Quick start guide provided
+ Installer script moved to base directory and enhanced
+ Interactive menu system for credential/scenario/platform selection  
+ 15 deployment scenarios fully defined
+ 7 platform options fully configured
+ Tag-based selective execution implemented
+ Vault-encrypted credential management
+ Comprehensive documentation created
+ Best practices documented
+ Variable organization by category
+ No hardcoded credentials anywhere
+ 7-phase deployment workflow
+ Post-deployment validation
+ Ansible-CMDB integration_generic planned
+ Quick start guide provided
 
 ## Next Steps
 
@@ -425,7 +425,7 @@ ansible-playbook playbooks/orchestration.yml \
 ## File Locations
 
 - **Installer:** `/home/sgallego/Downloads/RedHat_Management/RHIS-Installer-Enhanced.sh`
-- **Orchestration:** `/home/sgallego/Downloads/RedHat_Management/playbooks/orchestration.yml`
+- **Orchestration:** `/home/sgallego/Downloads/RedHat_Management/playbooks/ansible_dev_node_orchestration.yml`
 - **Configs:** `/home/sgallego/Downloads/RedHat_Management/playbooks/scenario_configs.yml`
 - **Docs:** `/home/sgallego/Downloads/RedHat_Management/docs/deployment/`
 - **Credentials:** `~/.ansible/conf/env.yml` (created at first run)
@@ -441,7 +441,7 @@ For questions or issues:
 
 ---
 
-**Project Status:** MAJOR MILESTONE ACHIEVED ✅  
+**Project Status:** MAJOR MILESTONE ACHIEVED   
 **Date:** January 16, 2026  
 **Version:** 1.0.0  
 **Ready for:** Testing & Production Deployment

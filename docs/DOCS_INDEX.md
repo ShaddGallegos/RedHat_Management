@@ -18,7 +18,7 @@
 
 ## Provisioning Services Stack
 
-Complete documentation for DHCP, DNS, TFTP, PXE, and network infrastructure.
+Complete documentation for DHCP, DNS, TFTP, PXE, and network platform_infrastructure_core.
 
 ### Main Guides
 - [Provisioning Services Configuration](PROVISIONING_SERVICES_CONFIGURATION.md) - Complete technical reference (600+ lines)
@@ -79,33 +79,33 @@ Historical project status and audit documents are available but primarily for re
 
 ```
 docs/
-├── README.md                                    [Main entry point]
-├── DOCS_INDEX.md                               [This file]
-│
-├── PROVISIONING/
-│   ├── PROVISIONING_SERVICES_CONFIGURATION.md
-│   ├── NETWORK_INTERFACE_CONFIGURATION.md
-│   ├── DUAL_NETWORK_UPDATE.md
-│   ├── PROVISIONING_SERVICES_IMPLEMENTATION.md
-│   ├── PROVISIONING_SERVICES_SUMMARY.md
-│   ├── PROVISIONING_QUICK_REFERENCE.md
-│   └── SATELLITE_OS_NETWORK_CONFIGURATION.md
-│
-├── SATELLITE/
-│   ├── SATELLITE_KICKSTART_CONFIGURATION.md
-│   ├── SATELLITE_6_18_FEATURE_COMPLETION.md
-│   └── SATELLITE_CONFIG_QUICK_REFERENCE.md
-│
-├── REFERENCE/
-│   ├── FILE_INDEX.md
-│   ├── VARIABLE_NAMING_CONVENTION.md
-│   ├── RHEL_YUM_REPOSITORIES_ENABLEMENT.md
-│   └── AAP_CONFIGURATION_ROLES_SUMMARY.md
-│
-└── ARCHIVE/
-    ├── PROJECT_STATUS_JAN_16_2026.md
-    ├── AUDIT_COMPLETE_STATUS.md
-    └── [Other historical docs...]
+ README.md                                    [Main entry point]
+ DOCS_INDEX.md                               [This file]
+
+ PROVISIONING/
+    PROVISIONING_SERVICES_CONFIGURATION.md
+    NETWORK_INTERFACE_CONFIGURATION.md
+    DUAL_NETWORK_UPDATE.md
+    PROVISIONING_SERVICES_IMPLEMENTATION.md
+    PROVISIONING_SERVICES_SUMMARY.md
+    PROVISIONING_QUICK_REFERENCE.md
+    SATELLITE_OS_NETWORK_CONFIGURATION.md
+
+ SATELLITE/
+    SATELLITE_KICKSTART_CONFIGURATION.md
+    SATELLITE_6_18_FEATURE_COMPLETION.md
+    SATELLITE_CONFIG_QUICK_REFERENCE.md
+
+ REFERENCE/
+    FILE_INDEX.md
+    VARIABLE_NAMING_CONVENTION.md
+    RHEL_YUM_REPOSITORIES_ENABLEMENT.md
+    AAP_CONFIGURATION_ROLES_SUMMARY.md
+
+ ARCHIVE/
+     PROJECT_STATUS_JAN_16_2026.md
+     AUDIT_COMPLETE_STATUS.md
+     [Other historical docs...]
 ```
 
 ---
@@ -114,13 +114,13 @@ docs/
 
 ### I want to...
 
-**Deploy provisioning services**
+**Deploy platform_provisioning services**
 → [Provisioning Services Configuration](PROVISIONING_SERVICES_CONFIGURATION.md)
 
 **Set up network interfaces**
 → [Network Interface Configuration](NETWORK_INTERFACE_CONFIGURATION.md)
 
-**Quick lookup for provisioning**
+**Quick lookup for platform_provisioning**
 → [Provisioning Quick Reference](PROVISIONING_QUICK_REFERENCE.md)
 
 **Configure Satellite**
@@ -133,15 +133,15 @@ docs/
 
 ## Key Features Documented
 
-- ✅ Dual network configuration (eth0 external, eth1 private)
-- ✅ DHCP, DNS, TFTP, PXE services
-- ✅ Satellite 6.18 integration
-- ✅ Resolv.conf configuration
-- ✅ Firewall rules
-- ✅ Network isolation and security
-- ✅ Provisioning workflows
-- ✅ Verification procedures
-- ✅ Troubleshooting guides
+-  Dual network configuration (eth0 external, eth1 private)
+-  DHCP, DNS, TFTP, PXE services
+-  Satellite 6.18 integration_generic
+-  Resolv.conf configuration
+-  Firewall rules
+-  Network isolation and security
+-  Provisioning workflows
+-  Verification procedures
+-  Troubleshooting guides
 
 ---
 
@@ -149,13 +149,13 @@ docs/
 
 | Document | Status | Type |
 |----------|--------|------|
-| Provisioning Services Configuration | ✅ Current | Reference |
-| Network Interface Configuration | ✅ Current | Guide |
-| Dual Network Update | ✅ Current | Summary |
-| Satellite Config Quick Reference | ✅ Current | Quick Ref |
-| Provisioning Quick Reference | ✅ Current | Quick Ref |
-| Satellite Kickstart Configuration | ✅ Current | Guide |
-| File Index | ✅ Current | Reference |
+| Provisioning Services Configuration |  Current | Reference |
+| Network Interface Configuration |  Current | Guide |
+| Dual Network Update |  Current | Summary |
+| Satellite Config Quick Reference |  Current | Quick Ref |
+| Provisioning Quick Reference |  Current | Quick Ref |
+| Satellite Kickstart Configuration |  Current | Guide |
+| File Index |  Current | Reference |
 
 ---
 

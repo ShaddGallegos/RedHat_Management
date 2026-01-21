@@ -1,0 +1,52 @@
+---
+# Bare Metal Provisioner Role
+# Handles PXE boot, DHCP, and physical server platform_provisioning
+# This role orchestrates bare metal platform_infrastructure_core deployment
+
+- name: "BAREMETAL PROVISIONING - Initialize"
+  ansible.builtin.debug:
+    msg: |
+      Bare Metal Provisioner
+      =====================
+      Platform: {{ deployment_platform | default('baremetal') }}
+      Deployment: {{ deployment_scenario | default('undefined') }}
+
+  tags: ["baremetal", "platform_provisioning"]
+
+- name: Load survey for baremetal platform_provisioning (if present)
+  ansible.builtin.include_role:
+    name: integration_survey_loader
+  run_once: true
+  delegate_to: localhost
+  tags: ["baremetal", "platform_provisioning"]
+
+- name: "Validate baremetal platform configuration"
+  ansible.builtin.assert:
+    that:
+      - deployment_platform is defined
+      - deployment_platform == "baremetal"
+    fail_msg: "Baremetal provisioner requires deployment_platform to be 'baremetal'"
+  tags: ["baremetal", "validate"]
+
+- name: "Baremetal platform_provisioning workflow"
+  block:
+    - name: "Check platform_infrastructure_manager for platform_provisioning capability"
+      ansible.builtin.debug:
+        msg: "Delegating baremetal platform_provisioning to platform_infrastructure_manager role"
+      tags: ["platform_provisioning"]
+
+    - name: "Call platform_infrastructure_manager for baremetal platform_infrastructure_core setup"
+      ansible.builtin.include_role:
+        name: "platform_infrastructure_manager"
+        tasks_from: "prepare_baremetal"
+      when: deploy_infrastructure | default(true)
+      tags: ["platform_provisioning", "platform_infrastructure_core"]
+
+  rescue:
+    - name: "Baremetal platform_provisioning failed"
+      ansible.builtin.fail:
+        msg: |
+          Baremetal platform_provisioning failed for {{ deployment_scenario }}.
+          Ensure DHCP and TFTP services are configured on platform_infrastructure_core host.
+          See logs above for details.
+  tags: ["baremetal"]

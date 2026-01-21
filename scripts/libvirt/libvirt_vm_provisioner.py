@@ -2,18 +2,18 @@
 """
 Libvirt VM Provisioner from ISO and Kickstart
 
-This tool automates the creation and provisioning of RHEL VMs using
+This tool automates the creation and platform_provisioning of RHEL VMs using
 Libvirt, an ISO image, and a Kickstart file.
 
 Usage:
-    python3 libvirt_vm_provisioner.py --name vm-name --cpus 4 --memory 8192 --disk 50
-    python3 libvirt_vm_provisioner.py --config vm-config.json
+    python3 platform_libvirt_vm_provisioner.py --name vm-name --cpus 4 --memory 8192 --disk 50
+    python3 platform_libvirt_vm_provisioner.py --config vm-config.json
 """
 
 import argparse
 import json
 import logging
-import os
+import os_generic
 import signal
 import socket
 import subprocess
@@ -57,12 +57,12 @@ class KickstartHTTPServer:
         self.temp_dir = tempfile.mkdtemp(prefix='rhel-ks-')
         
         # Copy kickstart to temp directory
-        ks_dest = os.path.join(self.temp_dir, 'oem.cfg')
+        ks_dest = os_generic.path.join(self.temp_dir, 'oem.cfg')
         subprocess.run(['cp', kickstart_file, ks_dest], check=True)
         
         # Change to temp directory
-        original_cwd = os.getcwd()
-        os.chdir(self.temp_dir)
+        original_cwd = os_generic.getcwd()
+        os_generic.chdir(self.temp_dir)
         
         # Start HTTP server
         handler = SimpleHTTPRequestHandler
@@ -71,7 +71,7 @@ class KickstartHTTPServer:
         self.thread = Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         
-        os.chdir(original_cwd)
+        os_generic.chdir(original_cwd)
         
         kickstart_url = f"http://{local_ip}:{self.port}/oem.cfg"
         logger.info(f"{Colors.GREEN}[SUCCESS] HTTP Server started on port {self.port}{Colors.END}")
@@ -84,7 +84,7 @@ class KickstartHTTPServer:
         if self.server:
             self.server.shutdown()
         
-        if self.temp_dir and os.path.exists(self.temp_dir):
+        if self.temp_dir and os_generic.path.exists(self.temp_dir):
             subprocess.run(['rm', '-rf', self.temp_dir])
             logger.info("HTTP server stopped and cleaned up")
 
@@ -104,11 +104,11 @@ class LibvirtVMProvisioner:
         logger.info("Validating prerequisites...")
         
         # Check ISO exists
-        if not os.path.exists(self.iso_file):
+        if not os_generic.path.exists(self.iso_file):
             raise FileNotFoundError(f"ISO file not found: {self.iso_file}")
         
         # Check kickstart exists
-        if not os.path.exists(self.kickstart_file):
+        if not os_generic.path.exists(self.kickstart_file):
             raise FileNotFoundError(f"Kickstart file not found: {self.kickstart_file}")
         
         # Check libvirtd is running
@@ -157,7 +157,7 @@ class LibvirtVMProvisioner:
         """Create VM using virt-install"""
         logger.info(f"Creating VM: {self.vm_name}")
         
-        iso_path = os.path.abspath(self.iso_file)
+        iso_path = os_generic.path.abspath(self.iso_file)
         
         cmd = [
             'virt-install',
@@ -213,9 +213,9 @@ class LibvirtVMProvisioner:
     def display_vm_info(self):
         """Display VM information and management commands"""
         print(f"\n{Colors.GREEN}")
-        print("╔════════════════════════════════════════╗")
-        print("║  VM Created Successfully!              ║")
-        print("╚════════════════════════════════════════╝")
+        print("")
+        print("  VM Created Successfully!              ")
+        print("")
         print(f"{Colors.END}")
         
         print(f"\n{Colors.BLUE}VM Details:{Colors.END}")
@@ -233,7 +233,7 @@ class LibvirtVMProvisioner:
         print()
     
     def provision(self):
-        """Run full provisioning workflow"""
+        """Run full platform_provisioning workflow"""
         try:
             # Validate
             self.validate_prerequisites()
@@ -307,9 +307,9 @@ def main():
     
     # Display configuration
     print(f"\n{Colors.GREEN}")
-    print("╔════════════════════════════════════════╗")
-    print("║  Libvirt VM Provisioner                ║")
-    print("╚════════════════════════════════════════╝")
+    print("")
+    print("  Libvirt VM Provisioner                ")
+    print("")
     print(f"{Colors.END}")
     
     print(f"\n{Colors.BLUE}Configuration:{Colors.END}")

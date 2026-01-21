@@ -1,0 +1,12 @@
+---
+# Test: ansible_dev_node_support defaults
+- name: Test ansible_dev_node_support defaults
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - ansible_dev_node_support
+  tasks:
+    - name: Verify defaults loaded
+      ansible.builtin.assert:
+        that:
+          - support_enabled is defined

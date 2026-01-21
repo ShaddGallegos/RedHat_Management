@@ -1,0 +1,47 @@
+---
+# Validate prerequisites
+
+- name: Check ISO file exists
+  ansible.builtin.stat:
+    path: "{{ libvirt_iso_file }}"
+  register: iso_stat
+  failed_when: not iso_stat.stat.exists
+
+- name: Check kickstart file exists
+  ansible.builtin.stat:
+    path: "{{ libvirt_kickstart_file }}"
+  register: ks_stat
+  failed_when: not ks_stat.stat.exists
+
+- name: Verify libvirtd is running
+  ansible.builtin.systemd:
+    name: libvirtd
+    state: started
+  become: true
+
+- name: Check if VM already exists
+  virt:
+    name: "{{ libvirt_vm_name }}"
+    ansible.builtin.command: getattr
+    attribute: name
+  register: existing_vm
+  ignore_errors: true
+  become: true
+
+- name: Fail if VM already exists
+  ansible.builtin.fail:
+    msg: "VM '{{ libvirt_vm_name }}' already exists"
+  when: existing_vm.rc == 0
+
+- name: Verify libvirt network exists
+  community.libvirt.virt_net:
+    name: "{{ libvirt_vm_network }}"
+    ansible.builtin.command: info
+  become: true
+  changed_when: false
+  register: network_check
+  failed_when: network_check is failed
+
+- name: Display validation success
+  ansible.builtin.debug:
+    msg: "[SUCCESS] All prerequisites validated"

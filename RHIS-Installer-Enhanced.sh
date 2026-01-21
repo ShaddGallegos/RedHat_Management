@@ -3,9 +3,9 @@
 # RHIS-Installer-Enhanced.sh
 # Main entry point for Red Hat Infrastructure Standard (RHIS) deployment
 # Orchestrates complete deployment lifecycle from credential collection to
-# final integration testing
+# final integration_generic testing
 #
-# Usage: ./RHIS-Installer-Enhanced.sh [--scenario] [--platform] [--os] [--skip-prompts]
+# Usage: ./RHIS-Installer-Enhanced.sh [--scenario] [--platform] [--os_generic] [--skip-ansible_dev_node_prompts]
 ################################################################################
 
 set -euo pipefail
@@ -65,8 +65,8 @@ declare -A PLATFORMS=(
     ["3"]="aws"
     ["4"]="azure"
     ["5"]="gcp"
-    ["6"]="vmware"
-    ["7"]="nutanix"
+    ["6"]="platform_vmware"
+    ["7"]="platform_nutanix"
 )
 
 # OS options
@@ -104,10 +104,10 @@ fi
 # Print styled header
 print_header() {
     clear
-    echo -e "${CYAN}╔════════════════════════════════════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}  ${MAGENTA}Red Hat Infrastructure Standard (RHIS) - Deployment Installer${NC}"
-    echo -e "${CYAN}║${NC}  Version: ${RHIS_VERSION}  |  Installer: ${INSTALLER_VERSION}"
-    echo -e "${CYAN}╚════════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${CYAN}${NC}"
+    echo -e "${CYAN}${NC}  ${MAGENTA}Red Hat Infrastructure Standard (RHIS) - Deployment Installer${NC}"
+    echo -e "${CYAN}${NC}  Version: ${RHIS_VERSION}  |  Installer: ${INSTALLER_VERSION}"
+    echo -e "${CYAN}${NC}"
     echo ""
     echo -e "Project Root: ${BLUE}${PROJECT_ROOT}${NC}"
     echo ""
@@ -117,9 +117,9 @@ print_header() {
 print_section() {
     local title="$1"
     echo ""
-    echo -e "${BLUE}┌─────────────────────────────────────────────────────────────────────────────┐${NC}"
-    echo -e "${BLUE}│${NC} ${title}"
-    echo -e "${BLUE}└─────────────────────────────────────────────────────────────────────────────┘${NC}"
+    echo -e "${BLUE}${NC}"
+    echo -e "${BLUE}${NC} ${title}"
+    echo -e "${BLUE}${NC}"
     echo ""
 }
 
@@ -133,12 +133,12 @@ print_option() {
 
 # Print success message
 print_success() {
-    echo -e "${GREEN}✓ $1${NC}"
+    echo -e "${GREEN} $1${NC}"
 }
 
 # Print error message
 print_error() {
-    echo -e "${RED}✗ $1${NC}"
+    echo -e "${RED} $1${NC}"
 }
 
 # Print info message
@@ -148,7 +148,7 @@ print_info() {
 
 # Print warning message
 print_warning() {
-    echo -e "${YELLOW}⚠ $1${NC}"
+    echo -e "${YELLOW} $1${NC}"
 }
 
 # Logging function
@@ -169,7 +169,7 @@ pause() {
 # LOCAL CONFIG HELPERS (on-demand only)
 # These helpers read values from a user-local config at ${CREDENTIALS_DIR}/env.yml
 # but DO NOT use them as automatic defaults. Values are read only when explicitly
-# requested by the user during interactive prompts.
+# requested by the user during interactive ansible_dev_node_prompts.
 # ============================================================================
 
 # Read a YAML key from ${CREDENTIALS_DIR}/env.yml and print its value.
@@ -314,10 +314,10 @@ select_scenario() {
     
     echo "Choose the products to deploy:"
     echo ""
-    print_option "1" "Satellite Only" "Systems management & provisioning"
-    print_option "2" "AAP Only" "Automation platform & orchestration"
+    print_option "1" "Satellite Only" "Systems management & platform_provisioning"
+    print_option "2" "AAP Only" "Automation platform & ansible_dev_node_orchestration"
     print_option "3" "IdM Only" "Identity & access management"
-    print_option "4" "OpenShift Only" "Container orchestration platform"
+    print_option "4" "OpenShift Only" "Container ansible_dev_node_orchestration platform"
     print_option "5" "Satellite + AAP" "Inventory + Automation"
     print_option "6" "Satellite + IdM" "Inventory + Identity"
     print_option "7" "Satellite + OpenShift" "Inventory + Containers"
@@ -361,7 +361,7 @@ select_platform() {
     print_header
     print_section "Platform Selection"
     
-    echo "Choose the platform where infrastructure will be deployed:"
+    echo "Choose the platform where platform_infrastructure_core will be deployed:"
     echo ""
     print_option "1" "LibVirt" "Local KVM virtualization (testing/development)"
     print_option "2" "Bare Metal" "Physical servers or PXE boot"
@@ -414,7 +414,7 @@ select_os() {
 
     if [[ "${OS_CHOICE}" == "0" ]]; then
         print_info "Exiting installer"
-        log "INFO" "Installer exited by user (os menu)"
+        log "INFO" "Installer exited by user (os_generic menu)"
         exit 0
     fi
     
@@ -546,7 +546,7 @@ create_deployment_config() {
 deployment_metadata:
   scenario: "${DEPLOYMENT_SCENARIO}"
   platform: "${DEPLOYMENT_PLATFORM}"
-  os: "${DEPLOYMENT_OS}"
+  os_generic: "${DEPLOYMENT_OS}"
   install_method: "${INSTALL_METHOD}"
   generated_date: "$(date -Iseconds)"
   version: "${RHIS_VERSION}"
@@ -568,10 +568,10 @@ platform_config:
     enabled: $([ "${DEPLOYMENT_PLATFORM}" = "azure" ] && echo "true" || echo "false")
   gcp:
     enabled: $([ "${DEPLOYMENT_PLATFORM}" = "gcp" ] && echo "true" || echo "false")
-  vmware:
-    enabled: $([ "${DEPLOYMENT_PLATFORM}" = "vmware" ] && echo "true" || echo "false")
-  nutanix:
-    enabled: $([ "${DEPLOYMENT_PLATFORM}" = "nutanix" ] && echo "true" || echo "false")
+  platform_vmware:
+    enabled: $([ "${DEPLOYMENT_PLATFORM}" = "platform_vmware" ] && echo "true" || echo "false")
+  platform_nutanix:
+    enabled: $([ "${DEPLOYMENT_PLATFORM}" = "platform_nutanix" ] && echo "true" || echo "false")
 
 # Installation paths
 paths:
@@ -851,11 +851,11 @@ main() {
             --platform)
                 DEPLOYMENT_PLATFORM="$2"
                 ;;
-            --os)
+            --os_generic)
                 DEPLOYMENT_OS="$2"
                 ;;
-            --skip-prompts)
-                # Auto-run deployment without prompts
+            --skip-ansible_dev_node_prompts)
+                # Auto-run deployment without ansible_dev_node_prompts
                 DEPLOYMENT_SCENARIO="${DEPLOYMENT_SCENARIO:-full_stack}"
                 DEPLOYMENT_PLATFORM="${DEPLOYMENT_PLATFORM:-libvirt}"
                 DEPLOYMENT_OS="${DEPLOYMENT_OS:-rhel-9}"

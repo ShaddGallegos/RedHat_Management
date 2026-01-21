@@ -1,13 +1,13 @@
 ---
 # Satellite kickstart repository wrapper playbook
-# Delegates kickstart repo creation and sync setup to `satellite_os_configuration` role.
+# Delegates kickstart repo creation and sync setup to `scenario_satellite_os_configuration` role.
 
 - name: "Satellite kickstart repository setup"
-  hosts: satellite
+  hosts: scenario_satellite
   gather_facts: yes
 
   roles:
-    - role: satellite_os_configuration
+    - role: scenario_satellite_os_configuration
       vars:
         satellite_os_config_enabled: true
         create_operatingsystems: false

@@ -22,17 +22,17 @@ environment_lookups:
     region: "{{ lookup('env', 'AWS_REGION') | default('us-east-1') }}"
   
   # ServiceNow Integration
-  servicenow:
+  integration_servicenow:
     api_token: "{{ lookup('env', 'SNOW_API_TOKEN') | default('') }}"
   
   # VMware Credentials
-  vmware:
+  platform_vmware:
     username: "{{ lookup('env', 'VMWARE_USERNAME') | default('') }}"
     password: "{{ lookup('env', 'VMWARE_PASSWORD') | default('') }}"
     token: "{{ lookup('env', 'VMWARE_TOKEN') | default('') }}"
   
   # Satellite/Foreman Credentials
-  satellite:
+  scenario_satellite:
     token: "{{ lookup('env', 'FOREMAN_TOKEN') | default('') }}"
     username: "{{ lookup('env', 'FOREMAN_USER') | default('admin') }}"
     password: "{{ lookup('env', 'FOREMAN_PASS') | default('') }}"
@@ -131,7 +131,7 @@ idm_credentials:
 # ==============================================================================
 # SATELLITE 6.18
 # ==============================================================================
-# Systems management and provisioning platform
+# Systems management and platform_provisioning platform
 
 satellite_credentials:
   # Admin Passwords
@@ -153,7 +153,7 @@ satellite_credentials:
       domain: "{{ satellite_email_smtp_domain | default('example.com') }}"
       username: "{{ satellite_email_smtp_user_name | default('') }}"
       password: "{{ satellite_email_smtp_password | default('') }}"
-    reply_address: "{{ satellite_email_reply_address | default('satellite@example.com') }}"
+    reply_address: "{{ satellite_email_reply_address | default('scenario_satellite@example.com') }}"
     subject_prefix: "{{ satellite_email_subject_prefix | default('[Satellite]') }}"
 
 # ==============================================================================
@@ -198,7 +198,7 @@ container_registry:
 # ==============================================================================
 # RED HAT INSIGHTS
 # ==============================================================================
-# Insights integration and reporting
+# Insights integration_generic and reporting
 
 insights_credentials:
   account: "{{ insights_account | default('') }}"
@@ -231,7 +231,7 @@ infrastructure_credentials:
   admin_password: "{{ admin_password | default('') }}"
   
   # VMware
-  vmware:
+  platform_vmware:
     password: "{{ vmware_password | default('') }}"
   
   # AWS Route53 (for DNS)
@@ -246,11 +246,11 @@ infrastructure_credentials:
 # ==============================================================================
 # SSH/PKI CREDENTIALS
 # ==============================================================================
-# SSH keys for passwordless access across infrastructure
+# SSH keys for passwordless access across platform_infrastructure_core
 
 ssh_credentials:
   # Satellite VM SSH key
-  satellite:
+  scenario_satellite:
     pubkey: "{{ satellite_root_ssh_pubkey | default(satellite_vm_root_pubkey) | default('') }}"
   
   # IdM SSH key
@@ -306,9 +306,9 @@ build_credentials:
 
 infrastructure_config:
   # Satellite Domain Configuration
-  satellite:
+  scenario_satellite:
     domain: "{{ satellite_domain | default('example.com') }}"
-    fqdn: "{{ satellite_fqdn | default('satellite.example.com') }}"
+    fqdn: "{{ satellite_fqdn | default('scenario_satellite.example.com') }}"
     ip: "{{ satellite_ip | default('192.168.1.10') }}"
     
     # Network Configuration
@@ -328,12 +328,12 @@ infrastructure_config:
     
     # VM Configuration (if running on hypervisor)
     vm:
-      name: "{{ satellite_vm_name | default('satellite-vm') }}"
-      hostname: "{{ satellite_vm_hostname | default('satellite') }}"
+      name: "{{ satellite_vm_name | default('scenario_satellite-vm') }}"
+      hostname: "{{ satellite_vm_hostname | default('scenario_satellite') }}"
       memory_mb: "{{ satellite_vm_memory_mb | default(32768) }}"
       vcpus: "{{ satellite_vm_vcpus | default(8) }}"
       disk:
-        name: "{{ satellite_vm_disk_name | default('satellite-disk') }}"
+        name: "{{ satellite_vm_disk_name | default('scenario_satellite-disk') }}"
         size_gb: "{{ satellite_vm_disk_size_gb | default(500) }}"
       pool: "{{ satellite_vm_pool | default('default') }}"
       network: "{{ satellite_vm_network | default('default') }}"

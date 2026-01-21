@@ -4,10 +4,10 @@
 
 The RedHat Infrastructure Standard (RHIS) Installer provides a complete, production-ready deployment automation framework for deploying and integrating Red Hat products:
 
-- **Satellite 6.18** - Systems management and provisioning
-- **Ansible Automation Platform 2.6** - Automation and orchestration  
+- **Satellite 6.18** - Systems management and platform_provisioning
+- **Ansible Automation Platform 2.6** - Automation and ansible_dev_node_orchestration  
 - **Red Hat Identity Management 3.0** - Identity and access management
-- **OpenShift 4.21+** - Container orchestration
+- **OpenShift 4.21+** - Container ansible_dev_node_orchestration
 
 ## Quick Start
 
@@ -29,7 +29,7 @@ chmod +x RHIS-Installer-Enhanced.sh
 # Start interactive deployment wizard
 ./RHIS-Installer-Enhanced.sh
 
-# Follow prompts:
+# Follow ansible_dev_node_prompts:
 # 1. Enter Red Hat CDN credentials
 # 2. Enter Red Hat Offline Token
 # 3. Select deployment scenario (1-15)
@@ -99,10 +99,10 @@ Required credentials:
 ./RHIS-Installer-Enhanced.sh --platform libvirt
 
 # Specify OS
-./RHIS-Installer-Enhanced.sh --os rhel-9
+./RHIS-Installer-Enhanced.sh --os_generic rhel-9
 
-# Skip prompts (requires --scenario, --platform, --os)
-./RHIS-Installer-Enhanced.sh --scenario full_stack --platform libvirt --os rhel-9 --skip-prompts
+# Skip ansible_dev_node_prompts (requires --scenario, --platform, --os_generic)
+./RHIS-Installer-Enhanced.sh --scenario full_stack --platform libvirt --os_generic rhel-9 --skip-ansible_dev_node_prompts
 ```
 
 ### Direct Playbook Execution
@@ -111,21 +111,21 @@ Required credentials:
 # Run specific scenario and platform
 cd ~/Downloads/RedHat_Management
 
-ansible-playbook playbooks/orchestration.yml \
+ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
   -e "deployment_scenario=full_stack" \
   -e "deployment_platform=libvirt" \
   -e "deployment_os=rhel-9" \
   -i inventory/hosts
 
 # Use tags for selective execution
-ansible-playbook playbooks/orchestration.yml \
-  --tags "satellite,aap,idm,libvirt,rhel-9,install,configure" \
+ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
+  --tags "scenario_satellite,aap,idm,libvirt,rhel-9,install,configure" \
   -i inventory/hosts
 
 # Skip certain phases
-ansible-playbook playbooks/orchestration.yml \
+ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
   --tags "install,configure,integrate" \
-  --skip-tags "openshift" \
+  --skip-tags "scenario_openshift" \
   -i inventory/hosts
 ```
 
@@ -133,49 +133,49 @@ ansible-playbook playbooks/orchestration.yml \
 
 ```
 RedHat_Management/
-├── RHIS-Installer-Enhanced.sh    ← NEW: Enhanced installer with menus
-├── RHIS-Installer.sh             ← Original installer (backup)
-├── playbooks/
-│   ├── orchestration.yml         ← Main orchestration playbook
-│   ├── scenario_configs.yml      ← Scenario definitions
-│   └── ...                         (other playbooks)
-├── roles/
-│   ├── installer_host/           ← Ansible developer node setup
-│   ├── platform_prep/            ← Platform preparation
-│   ├── inventory_generator/      ← Inventory generation
-│   ├── libvirt_vm_provisioner/  ← VM provisioning
-│   ├── infrastructure_manager/   ← Cloud infrastructure
-│   ├── redhat_products/          ← Product deployment
-│   ├── cmdb/                     ← Ansible-CMDB setup
-│   ├── integration/              ← Product integrations
-│   └── support/                  ← Utilities
-├── group_vars/
-│   ├── all.yml                   ← Global variables
-│   ├── satellite.yml             ← Satellite-specific
-│   ├── aap.yml                   ← AAP-specific
-│   ├── idm.yml                   ← IdM-specific
-│   ├── openshift.yml             ← OpenShift-specific
-│   └── [platform].yml            ← Platform-specific
-├── templates/
-│   ├── ansible.cfg.j2            ← Ansible config template
-│   ├── oemdrv/                   ← OEMDRV kickstart templates
-│   └── repo-enable/              ← Repo enablement scripts
-├── files/
-│   ├── OEMDRV/                   ← OEMDRV kickstart files
-│   ├── rhel-iso/                 ← RHEL ISO location
-│   └── tftp/                     ← TFTP boot files
-├── inventory/
-│   ├── hosts                     ← Generated inventory
-│   └── generated/                ← Dynamic inventory
-├── docs/
-│   ├── deployment/
-│   │   ├── RHIS_DEPLOYMENT_ARCHITECTURE.md
-│   │   └── README.md
-│   ├── platforms/                ← Platform guides
-│   ├── products/                 ← Product guides
-│   └── examples/
-└── logs/
-    └── deployment_*.log          ← Deployment logs
+ RHIS-Installer-Enhanced.sh    ← NEW: Enhanced installer with menus
+ RHIS-Installer.sh             ← Original installer (backup)
+ playbooks/
+    ansible_dev_node_orchestration.yml         ← Main ansible_dev_node_orchestration playbook
+    scenario_configs.yml      ← Scenario definitions
+    ...                         (other playbooks)
+ roles/
+    installer_host/           ← Ansible developer node setup
+    platform_prep/            ← Platform preparation
+    ansible_dev_node_inventory_generator/      ← Inventory generation
+    platform_libvirt_vm_provisioner/  ← VM platform_provisioning
+    platform_infrastructure_manager/   ← Cloud platform_infrastructure_core
+    ansible_dev_node_redhat_products/          ← Product deployment
+    scenario_ansible_cmdb_core/                     ← Ansible-CMDB setup
+    integration_generic/              ← Product integrations
+    ansible_dev_node_support/                  ← Utilities
+ group_vars/
+    all.yml                   ← Global variables
+    scenario_satellite.yml             ← Satellite-specific
+    aap.yml                   ← AAP-specific
+    idm.yml                   ← IdM-specific
+    scenario_openshift.yml             ← OpenShift-specific
+    [platform].yml            ← Platform-specific
+ templates/
+    ansible.cfg.j2            ← Ansible config template
+    oemdrv/                   ← OEMDRV kickstart templates
+    repo-enable/              ← Repo enablement scripts
+ files/
+    OEMDRV/                   ← OEMDRV kickstart files
+    rhel-iso/                 ← RHEL ISO location
+    tftp/                     ← TFTP boot files
+ inventory/
+    hosts                     ← Generated inventory
+    generated/                ← Dynamic inventory
+ docs/
+    deployment/
+       RHIS_DEPLOYMENT_ARCHITECTURE.md
+       README.md
+    platforms/                ← Platform guides
+    products/                 ← Product guides
+    examples/
+ logs/
+     deployment_*.log          ← Deployment logs
 ```
 
 ## Deployment Workflow
@@ -232,7 +232,7 @@ RedHat_Management/
 ~/.ansible/conf/deployment_config.yml
 - scenario: (selected scenario)
 - platform: (selected platform)
-- os: (selected OS)
+- os_generic: (selected OS)
 - install_method: (oemdrv or tftp)
 - generated_date: (ISO 8601 timestamp)
 ```
@@ -242,11 +242,11 @@ RedHat_Management/
 After successful deployment:
 
 ```
-Satellite:     https://satellite-hostname/
+Satellite:     https://scenario_satellite-hostname/
 AAP:           https://aap-controller:443/
 IdM:           https://idm-hostname/ipa/ui/
-OpenShift:     https://console-openshift-console.apps.ocp/
-Ansible-CMDB:  http://satellite-hostname:8081/
+OpenShift:     https://console-scenario_openshift-console.apps.ocp/
+Ansible-CMDB:  http://scenario_satellite-hostname:8081/
 ```
 
 ## Troubleshooting
@@ -258,17 +258,17 @@ tail -f logs/deployment_*.log
 
 ### Re-run Specific Phase
 ```bash
-# Re-run satellite deployment only
-ansible-playbook playbooks/orchestration.yml \
-  --tags "phase4a,satellite" \
+# Re-run scenario_satellite deployment only
+ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
+  --tags "phase4a,scenario_satellite" \
   -i inventory/hosts
 ```
 
 ### Skip Specific Product
 ```bash
 # Deploy everything except OpenShift
-ansible-playbook playbooks/orchestration.yml \
-  --skip-tags "openshift" \
+ansible-playbook playbooks/ansible_dev_node_orchestration.yml \
+  --skip-tags "scenario_openshift" \
   -i inventory/hosts
 ```
 

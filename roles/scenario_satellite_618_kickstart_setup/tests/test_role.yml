@@ -1,0 +1,36 @@
+---
+# Test the satellite_kickstart_config role
+- name: Test satellite_kickstart_config Role
+  hosts: localhost
+  gather_facts: true
+  vars:
+    satellite_kickstart_config_enabled: true
+    kickstart_files_path: "/tmp/test_kickstarts"
+    upload_kickstart_files: true
+
+  tasks:
+    - name: Run satellite_kickstart_config role
+      ansible.builtin.include_role:
+        name: satellite_kickstart_config
+
+    - name: Verify kickstart files were created
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: ks_stat
+      loop:
+        - "/tmp/test_kickstarts/rhel9-baseos-minimal.ks"
+        - "/tmp/test_kickstarts/rhel10-baseos-minimal.ks"
+        - "/tmp/test_kickstarts/rhel9-fullstack.ks"
+        - "/tmp/test_kickstarts/rhel10-fullstack.ks"
+      failed_when: not ks_stat.stat.exists
+
+    - name: Verify kickstart file contents
+      ansible.builtin.shell: |
+        grep -q "RHEL 9 BaseOS Minimal" /tmp/test_kickstarts/rhel9-baseos-minimal.ks && echo "OK"
+        grep -q "RHEL 10 BaseOS Minimal" /tmp/test_kickstarts/rhel10-baseos-minimal.ks && echo "OK"
+      register: content_check
+      changed_when: false
+
+    - name: Test role completed successfully
+      ansible.builtin.debug:
+        msg: " satellite_kickstart_config role test completed successfully"

@@ -21,15 +21,15 @@ scrape_configs:
     static_configs:
       - targets: ['aap.example.com']
 
-  - job_name: 'satellite'
+  - job_name: 'scenario_satellite'
     static_configs:
-      - targets: ['satellite.example.com:9090']
+      - targets: ['scenario_satellite.example.com:9090']
 
   - job_name: 'node-exporters'
     static_configs:
       - targets:
           - 'aap.example.com:9100'
-          - 'satellite.example.com:9100'
+          - 'scenario_satellite.example.com:9100'
           - 'idm.example.com:9100'
 ```
 
@@ -263,7 +263,7 @@ sudo -u postgres pg_isready
 sudo systemctl status tomcat
 
 # Check API connectivity
-curl -X GET https://satellite.example.com/api/v2/organizations/
+curl -X GET https://scenario_satellite.example.com/api/v2/organizations/
 ```
 
 ### IdM Health Check

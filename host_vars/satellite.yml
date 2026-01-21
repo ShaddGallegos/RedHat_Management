@@ -1,4 +1,4 @@
-# Host-specific vars for satellite.prod.spg
+# Host-specific vars for scenario_satellite.prod.spg
 ansible_user: "root"
 ansible_admin_password: "{{ global_admin_password | default('') }}"
 ansible_password: "{{ global_admin_password | default('') }}"

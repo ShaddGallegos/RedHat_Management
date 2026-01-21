@@ -23,17 +23,17 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 function log_pass() {
-    echo -e "${GREEN}✓ PASS${NC}: $1" | tee -a "$LOG_FILE"
+    echo -e "${GREEN} PASS${NC}: $1" | tee -a "$LOG_FILE"
     ((PASSED++))
 }
 
 function log_fail() {
-    echo -e "${RED}✗ FAIL${NC}: $1" | tee -a "$LOG_FILE"
+    echo -e "${RED} FAIL${NC}: $1" | tee -a "$LOG_FILE"
     ((FAILED++))
 }
 
 function log_warn() {
-    echo -e "${YELLOW}⚠ WARN${NC}: $1" | tee -a "$LOG_FILE"
+    echo -e "${YELLOW} WARN${NC}: $1" | tee -a "$LOG_FILE"
     ((WARNINGS++))
 }
 
@@ -99,9 +99,9 @@ echo "Warnings: $WARNINGS" | tee -a "$LOG_FILE"
 echo "" | tee -a "$LOG_FILE"
 
 if [ "$FAILED" -eq 0 ]; then
-    echo -e "${GREEN}✓ All validations passed!${NC}" | tee -a "$LOG_FILE"
+    echo -e "${GREEN} All validations passed!${NC}" | tee -a "$LOG_FILE"
     exit 0
 else
-    echo -e "${RED}✗ Some validations failed!${NC}" | tee -a "$LOG_FILE"
+    echo -e "${RED} Some validations failed!${NC}" | tee -a "$LOG_FILE"
     exit 1
 fi

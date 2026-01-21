@@ -78,7 +78,7 @@ end
 if @iface.bridge?
   bridge_slaves = @iface.attached_devices_identifiers.join(',')
   network_options.push("--bridgeslaves=#{bridge_slaves}")
-  # Currently no support for bridge options in the interface.
+  # Currently no ansible_dev_node_support for bridge options in the interface.
 end
 
 # VLAN (only on physical is recognized)

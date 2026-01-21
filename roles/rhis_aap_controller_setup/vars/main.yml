@@ -1,6 +1,0 @@
----
-# Variables for rhis_aap_controller_setup role
-# These are set at runtime and should not be modified
-
-# This file is intentionally minimal - most configuration
-# should come from defaults/main.yml or be passed at playbook runtime

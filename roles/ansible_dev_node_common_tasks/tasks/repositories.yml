@@ -1,0 +1,37 @@
+---
+# Common repository configuration tasks
+# Handles repository enabling and SCAP configuration
+
+- name: "Ensure the proper repositories are enabled"
+  ansible.builtin.rhsm_repository:
+    name: "{{ item.name }}"
+    state: "enabled"
+  loop: "{{ repositories | default([]) }}"
+  tags: ["repositories", "subscriptions"]
+
+- name: "Enabling repo {{ repo.name }}"
+  ansible.builtin.command: "subscription-manager repos --enable={{ repo.name }}"
+  loop: "{{ repositories | default([]) }}"
+  loop_control:
+    loop_var: "repo"
+  changed_when: yes
+  tags: ["repositories", "subscriptions"]
+
+- name: "Install the SOS Report package"
+  ansible.builtin.package:
+    name: "sos"
+    state: "present"
+  tags: ["ansible_dev_node_support", "diagnostics"]
+
+- name: "Copy the scap file to target"
+  ansible.builtin.copy:
+    src: "{{ scap_file }}"
+    dest: "/tmp/scap_file.xml"
+    mode: "0644"
+  when: scap_file is defined
+  tags: ["compliance", "scap"]
+
+- name: "Enable the mandatory scap tailoring files"
+  ansible.builtin.command: "oscap xccdf eval --profile {{ scap_profile }} /tmp/scap_file.xml"
+  when: scap_file is defined
+  tags: ["compliance", "scap"]

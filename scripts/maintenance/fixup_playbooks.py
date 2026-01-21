@@ -12,7 +12,7 @@ Usage: fixup_playbooks.py <command> [options]
 
 import re
 import sys
-import os
+import os_generic
 from pathlib import Path
 
 
@@ -46,7 +46,7 @@ class PlaybookFixup:
     # ========== CONVERT FQCN ==========
     def replace_module_line(self, line):
         """Replace module names with FQCN"""
-        if 'ansible.builtin.' in line or 'ansible.legacy.' in line or 'community.' in line:
+        if 'ansible.builtin.' in line or 'ansible.ansible_dev_node_legacy_archive.' in line or 'community.' in line:
             return line
         
         pattern = r'^(\s*)(%s)\s*:\s*(.*)$' % ("|".join(re.escape(k) for k in self.MODULES_MAP.keys()))
