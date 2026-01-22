@@ -4,10 +4,12 @@
     msg: "platform_firewall_services_firewall_services_enabled is false; skipping"
   when: not platform_firewall_services_firewall_services_enabled | bool
 
-- block:
-    tags:
-      - platformfirewall
-      - firewall
+- name: Configure firewalld when enabled
+  when: platform_firewall_services_firewall_services_enabled | bool
+  tags:
+    - platformfirewall
+    - firewall
+  block:
     - name: Ensure firewalld is installed
       ansible.builtin.package:
         name: firewalld
@@ -21,29 +23,36 @@
         enabled: true
       become: true
 
-    - name: Build merged service/port list
+    - name: Build merged service or port list
       ansible.builtin.set_fact:
-        firewall_services_to_apply: >-
-          {{ platform_firewall_services_firewall_services_profiles_enabled
-             | map('extract', platform_firewall_services_firewall_services_definitions)
-             | list
-             | select('defined')
-             | list }}
+        platform_firewall_services_firewall_services_to_apply: "{{ platform_firewall_services_firewall_services_profiles_enabled
+          | map('extract', platform_firewall_services_firewall_services_definitions)
+          | list
+          | select('defined')
+          | list }}"
 
     - name: Flatten services and ports
       ansible.builtin.set_fact:
-        firewall_services_unique: "{{ firewall_services_to_apply | map(attribute='services') | sum(start=[]) | unique }}"
-        firewall_ports_unique: "{{ firewall_services_to_apply | map(attribute='ports') | sum(start=[]) | unique }}"
+        platform_firewall_services_firewall_services_unique: >-
+          {{ platform_firewall_services_firewall_services_to_apply
+             | map(attribute='services')
+             | sum(start=[])
+             | unique }}
+        platform_firewall_services_firewall_ports_unique: >-
+          {{ platform_firewall_services_firewall_services_to_apply
+             | map(attribute='ports')
+             | sum(start=[])
+             | unique }}
 
     - name: Allow services
       ansible.posix.firewalld:
-        ansible.builtin.service: "{{ item }}"
+        service: "{{ item }}"
         permanent: true
         immediate: true
         state: enabled
         zone: "{{ platform_firewall_services_firewall_zone }}"
-      loop: "{{ firewall_services_unique }}"
-      when: firewall_services_unique | length > 0
+      loop: "{{ platform_firewall_services_firewall_services_unique }}"
+      when: platform_firewall_services_firewall_services_unique | length > 0
       tags:
         - firewallservices
       become: true
@@ -55,10 +64,8 @@
         immediate: true
         state: enabled
         zone: "{{ platform_firewall_services_firewall_zone }}"
-      loop: "{{ firewall_ports_unique }}"
-      when: firewall_ports_unique | length > 0
+      loop: "{{ platform_firewall_services_firewall_ports_unique }}"
+      when: platform_firewall_services_firewall_ports_unique | length > 0
       tags:
         - firewallports
       become: true
-
-  when: platform_firewall_services_firewall_services_enabled | bool

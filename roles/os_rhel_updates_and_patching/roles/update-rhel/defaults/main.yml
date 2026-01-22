@@ -18,3 +18,18 @@ update_rhel_show_updates: false
 update_rhel_skip_broken: true
 update_rhel_test_command: "whoami"
 update_rhel_verbose: true
+
+# New feature flags and credentials
+update_rhel_enable_epel: false
+update_rhel_enable_auto_updates: false
+update_rhel_enable_kpatch: false
+
+# Subscription manager (optional) - leave empty to skip registration attempts
+update_rhel_subscription_username: ""
+update_rhel_subscription_password: ""
+update_rhel_subscription_pool: ""
+
+# Automatic update configuration options for dnf-automatic / yum-cron
+update_rhel_auto_apply_updates: false
+update_rhel_auto_download_updates: true
+update_rhel_auto_security_only: false

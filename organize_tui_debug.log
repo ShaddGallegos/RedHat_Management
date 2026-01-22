@@ -1,0 +1,44 @@
+TUI initialization error:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.12/curses/__init__.py", line 94, in wrapper
+    return func(stdscr, *args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/run/media/sgallego/SD_Card/storage_organize_up.py", line 835, in draw_menu
+    return interactive_menu()
+           ^^^^^^^^^^^^^^^^^^
+  File "/run/media/sgallego/SD_Card/storage_organize_up.py", line 779, in interactive_menu
+    sys.exit(0)
+SystemExit: 0
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/run/media/sgallego/SD_Card/storage_organize_up.py", line 865, in curses_menu
+    curses.wrapper(draw_menu)
+  File "/usr/lib64/python3.12/curses/__init__.py", line 101, in wrapper
+    endwin()
+_curses.error: endwin() returned ERR
+TUI initialization error:
+Traceback (most recent call last):
+  File "/usr/lib64/python3.12/curses/__init__.py", line 94, in wrapper
+    return func(stdscr, *args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/run/media/sgallego/SD_Card/storage_organize_up.py", line 864, in draw_menu
+    idx = (idx - 1) % len(menu)
+               ^^^^^^^^^^^^^^^^^
+  File "/run/media/sgallego/SD_Card/storage_organize_up.py", line 778, in interactive_menu
+    print(f'Added: {m}')
+  File "/run/media/sgallego/SD_Card/storage_organize_up.py", line 194, in main_organize_and_sync
+    print(f"Listing markers under {root} (type={mtype})")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/run/media/sgallego/SD_Card/storage_organize_up.py", line 906, in curses_menu
+    excludes = [e.strip() for e in ex_str.split(',') if e.strip()]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib64/python3.12/curses/__init__.py", line 101, in wrapper
+    endwin()
+_curses.error: endwin() returned ERR

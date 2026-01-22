@@ -16,13 +16,13 @@
       ansible.builtin.package:
         name: tftp-server
         state: present
-      become: yes
+      become: true
 
     - name: Install tftp-server package
       ansible.builtin.yum:
         name: tftp-server
         state: present
-      become: yes
+      become: true
       when: ansible_os_family == "RedHat"
 
 - name: Configure TFTP Server
@@ -34,7 +34,7 @@
         mode: '0755'
         owner: root
         group: root
-      become: yes
+      become: true
       loop:
         - /var/lib/tftpboot
         - /var/lib/tftpboot/pxelinux.cfg
@@ -51,7 +51,7 @@
           echo "No ISO files found in {{ platform_tftp_boot_server_project_root }}/files/"
         fi
       register: iso_copy_result
-      become: yes
+      become: true
       changed_when: "'copied' in iso_copy_result.stdout"
 
     - name: Copy OEMDRV files from files/ to TFTP directory
@@ -64,7 +64,7 @@
           echo "No OEMDRV files found in {{ platform_tftp_boot_server_project_root }}/files/"
         fi
       register: oemdrv_copy_result
-      become: yes
+      become: true
       changed_when: "'copied' in oemdrv_copy_result.stdout"
 
     - name: Create symlink from files to TFTP for dynamic access
@@ -72,45 +72,49 @@
         src: "{{ platform_tftp_boot_server_project_root }}/files"
         dest: /var/lib/tftpboot/project-files
         state: link
-      become: yes
+      become: true
 
 - name: Start and Enable TFTP Service
   block:
     - name: Enable TFTP socket
       ansible.builtin.systemd:
         name: tftp.socket
-        enabled: yes
+        enabled: true
         state: started
-      become: yes
+      become: true
 
     - name: Verify TFTP service is running
       ansible.builtin.systemd:
         name: tftp.socket
         state: started
-      become: yes
+      become: true
 
     - name: Configure firewall for TFTP (if firewalld is active)
       ansible.posix.firewalld:
         ansible.builtin.service: tftp
-        permanent: yes
-        immediate: yes
+        permanent: true
+        immediate: true
         state: enabled
-      become: yes
+      become: true
       when:
         - ansible_os_family == "RedHat"
         - platform_tftp_boot_server_tftp_enable_firewall | default(true)
-      ignore_errors: yes
+      ignore_errors: true
 
 - name: Create TFTP Boot Configuration Files
   block:
+    - name: Ensure TFTP server IP default is set
+      ansible.builtin.set_fact:
+        platform_tftp_boot_server_tftp_server_ip: "{{ ansible_default_ipv4.address }}"
+      when: platform_tftp_boot_server_tftp_server_ip is not defined
+
     - name: Create DHCP boot menu configuration
       ansible.builtin.template:
         src: pxelinux.cfg.j2
         dest: /var/lib/tftpboot/pxelinux.cfg/default
         mode: '0644'
-      become: yes
+      become: true
       vars:
-        platform_tftp_boot_server_tftp_server_ip: "{{ platform_tftp_boot_server_tftp_server_ip | default(ansible_default_ipv4.address) }}"
         iso_list: "{{ lookup('fileglob', platform_tftp_boot_server_project_root + '/files/*.iso', wantlist=True) | map('basename') | list }}"
 
     - name: Create boot menu HTML for web access
@@ -118,7 +122,7 @@
         src: boot_menu.html.j2
         dest: /var/lib/tftpboot/index.html
         mode: '0644'
-      become: yes
+      become: true
       vars:
         iso_list: "{{ lookup('fileglob', platform_tftp_boot_server_project_root + '/files/*.iso', wantlist=True) | map('basename') | list }}"
 
@@ -133,10 +137,10 @@
     - name: Get TFTP root contents
       ansible.builtin.find:
         paths: /var/lib/tftpboot
-        recurse: yes
+        recurse: true
         file_type: file
       register: tftp_files
-      become: yes
+      become: true
 
     - name: Display TFTP Server Status
       ansible.builtin.debug:
@@ -208,7 +212,7 @@
       echo ""
       echo "OEMDRV Files:"
       ls -lah /var/lib/tftpboot/OEMDRV* 2>/dev/null || echo "None found"
-  become: yes
+  become: true
 
 - name: Create update script for syncing files
   ansible.builtin.copy:
@@ -244,4 +248,4 @@
 
       echo "Sync complete!"
       tftp-server-status
-  become: yes
+  become: true

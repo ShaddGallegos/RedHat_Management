@@ -1,0 +1,33 @@
+Modified files:
+/home/sgallego/Downloads/RedHat_Management/.venv/lib/python3.12/site-packages/pip/_vendor/pygments/lexers/_mapping.py
+/home/sgallego/Downloads/RedHat_Management/.venv/lib/python3.12/site-packages/pip/_vendor/requests/status_codes.py
+/home/sgallego/Downloads/RedHat_Management/.venv/lib/python3.12/site-packages/pip/_vendor/rich/__main__.py
+/home/sgallego/Downloads/RedHat_Management/.venv/lib/python3.12/site-packages/pip/_vendor/rich/_emoji_codes.py
+/home/sgallego/Downloads/RedHat_Management/.venv/lib/python3.12/site-packages/pip/_vendor/rich/_spinners.py
+/home/sgallego/Downloads/RedHat_Management/.venv/lib/python3.12/site-packages/pip/_vendor/rich/cells.py
+/home/sgallego/Downloads/RedHat_Management/.venv/lib/python3.12/site-packages/pip/_vendor/rich/control.py
+/home/sgallego/Downloads/RedHat_Management/.venv/lib/python3.12/site-packages/pip/_vendor/rich/syntax.py
+/home/sgallego/Downloads/RedHat_Management/.venv/lib/python3.12/site-packages/pip/_vendor/rich/tree.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pkg_resources/tests/test_pkg_resources.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pip/_vendor/pygments/lexers/_mapping.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pip/_vendor/requests/status_codes.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pip/_vendor/rich/_spinners.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pip/_vendor/rich/control.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pip/_vendor/rich/syntax.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pip/_vendor/rich/tree.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pip/_vendor/rich/__main__.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pip/_vendor/rich/_emoji_codes.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/pip/_vendor/rich/cells.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/black-26.1.0.dist-info/METADATA
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/jinja2/_identifier.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/black/__init__.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/ansible/galaxy/collection/concrete_artifact_manager.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/ansible_collections/awx/awx/test/awx/test_workflow_job_template_node.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/ansible_collections/azure/azcollection/extensions/audit/README.MD
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/ansible_collections/cisco/dnac/plugins/modules/wired_campus_automation_workflow_manager.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/ansible_collections/hetzner/hcloud/plugins/modules/zone.py
+/home/sgallego/Downloads/RedHat_Management/.venv-ansible/lib/python3.12/site-packages/ansible_collections/lowlydba/sqlserver/CHANGELOG.rst
+
+Remaining files with emoji:
+
+Errors:

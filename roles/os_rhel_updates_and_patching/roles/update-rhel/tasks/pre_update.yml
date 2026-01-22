@@ -28,6 +28,113 @@
   register: update_rhel_install_drpm_result
   failed_when: false
 
+- name: Optionally enable EPEL repository
+  ansible.builtin.package:
+    name: epel-release
+    state: present
+  when:
+    - update_rhel_enable_epel | default(false)
+  register: update_rhel_epel_result
+  failed_when: false
+
+- name: Optionally register system with subscription-manager
+  block:
+    - name: Check subscription-manager identity
+      ansible.builtin.command:
+        cmd: subscription-manager identity
+      register: subscription_identity
+      failed_when: false
+
+    - name: Register with subscription-manager (when credentials provided and not registered)
+      ansible.builtin.command:
+        cmd: >
+          subscription-manager register
+          --username {{ update_rhel_subscription_username }}
+          --password {{ update_rhel_subscription_password }}
+          --auto-attach
+      when:
+        - (subscription_identity.rc != 0)
+        - update_rhel_subscription_username != "" and update_rhel_subscription_password != ""
+      register: update_rhel_sub_register
+      failed_when: update_rhel_sub_register.rc not in [0,64]
+      changed_when: update_rhel_sub_register.rc == 0
+
+    - name: Optionally attach a pool if provided
+      ansible.builtin.command:
+        cmd: subscription-manager attach --pool={{ update_rhel_subscription_pool }}
+      when:
+        - update_rhel_subscription_pool != ""
+  when: >
+    (update_rhel_subscription_username != '' and update_rhel_subscription_password != '')
+  failed_when: false
+
+- name: Install and enable automatic-updates service for RHEL 7 (yum-cron)
+  block:
+    - name: Install yum-cron
+      ansible.builtin.package:
+        name: yum-cron
+        state: present
+
+    - name: Configure yum-cron to apply updates if requested
+      ansible.builtin.lineinfile:
+        path: /etc/yum/yum-cron.conf
+        regexp: '^apply_updates ='
+        line: "apply_updates = {{ 'yes' if update_rhel_auto_apply_updates | default(false) else 'no' }}"
+      when: update_rhel_auto_apply_updates is defined
+
+    - name: Ensure yum-cron is enabled and started
+      ansible.builtin.service:
+        name: yum-cron
+        enabled: true
+        state: started
+  when:
+    - update_rhel_enable_auto_updates | default(false)
+    - update_rhel_os_info.major_version == 7
+
+- name: Install and enable automatic-updates for RHEL 8+ (dnf-automatic)
+  block:
+    - name: Install dnf-automatic
+      ansible.builtin.package:
+        name: dnf-automatic
+        state: present
+
+    - name: Configure dnf-automatic timers (apply updates)
+      ansible.builtin.copy:
+        dest: /etc/dnf/automatic.conf
+        content: |
+          [commands]
+          apply_updates = {{ 'yes' if update_rhel_auto_apply_updates | default(false) else 'no' }}
+          [emitters]
+          system_name = None
+      backup: yes
+
+    - name: Enable and start dnf-automatic.timer
+      ansible.builtin.systemd:
+        name: dnf-automatic.timer
+        enabled: true
+        state: started
+  when:
+    - update_rhel_enable_auto_updates | default(false)
+    - update_rhel_os_info.major_version >= 8
+
+- name: Optionally install kpatch (kpatch) for live kernel patching
+  block:
+    - name: Install kpatch packages
+      ansible.builtin.package:
+        name:
+          - kpatch
+          - kpatch-patch
+        state: present
+
+    - name: Ensure kpatch service is enabled and started
+      ansible.builtin.service:
+        name: kpatch
+        enabled: true
+        state: started
+  when:
+    - update_rhel_enable_kpatch | default(false)
+    - update_rhel_os_info.major_version >= 7
+
 - name: Clean package manager cache
   ansible.builtin.command:
     cmd: "{{ update_rhel_os_info.package_manager }} clean all"

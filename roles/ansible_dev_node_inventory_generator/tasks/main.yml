@@ -4,13 +4,14 @@
 
 - name: Load deployment configuration
   ansible.builtin.include_vars:
-    ansible.builtin.file: "{{ base_dir }}/group_vars/deployment_config.yml"
+    file: "{{ base_dir }}/group_vars/deployment_config.yml"
 
 - name: Generate inventory for selected platform
   block:
     - name: Generate Libvirt inventory
       ansible.builtin.copy:
         dest: "{{ base_dir }}/inventory/hosts"
+        mode: '0644'
         content: |
           # Auto-generated inventory for {{ deployment_platform }}
           # Generated at: {{ ansible_date_time.iso8601 }}
@@ -54,6 +55,7 @@
     - name: Generate AWS inventory
       ansible.builtin.copy:
         dest: "{{ base_dir }}/inventory/hosts"
+        mode: '0644'
         content: |
           # Auto-generated inventory for AWS
           # Generated at: {{ ansible_date_time.iso8601 }}
@@ -88,6 +90,7 @@
     - name: Create all.yml with common variables
       ansible.builtin.copy:
         dest: "{{ base_dir }}/group_vars/all.yml"
+        mode: '0644'
         content: |
           ---
           # Global variables for all hosts
@@ -100,6 +103,7 @@
     - name: Create platform-specific group_vars
       ansible.builtin.copy:
         dest: "{{ base_dir }}/group_vars/{{ deployment_platform }}.yml"
+        mode: '0644'
         content: |
           ---
           # Platform-specific variables for {{ deployment_platform }}
@@ -109,13 +113,3 @@
           libvirt_storage_path: {{ libvirt_storage_path }}
           libvirt_vms: {{ libvirt_vms | to_nice_yaml | indent(2) }}
           {% endif %}
-
-          - name: Display inventory summary
-            ansible.builtin.debug:
-              msg: |
-                Inventory Generated Successfully
-
-                Platform: {{ deployment_platform }}
-                Inventory: {{ base_dir }}/inventory/hosts
-                Group Vars: {{ base_dir }}/group_vars/
-                Ready for component deployment
