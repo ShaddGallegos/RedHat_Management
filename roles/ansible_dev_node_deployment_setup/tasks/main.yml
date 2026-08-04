@@ -1,0 +1,172 @@
+---
+# Deployment Setup Role - Interactive Configuration
+# Consolidated from setup_framework.yml playbook
+
+- name: Display scenario options
+  ansible.builtin.debug:
+    msg: |
+      Select Deployment Scenario
+
+      Single Product:
+        1) Satellite Only
+        2) Ansible Automation Platform Only
+        3) Red Hat Identity Management Only
+        4) OpenShift Only
+
+      Two Products:
+        5) Satellite + AAP
+        6) Satellite + IdM
+        7) Satellite + OpenShift
+        8) AAP + IdM
+        9) AAP + OpenShift
+        10) IdM + OpenShift
+
+      Three Products:
+        11) Satellite + AAP + IdM
+        12) Satellite + AAP + OpenShift
+        13) Satellite + IdM + OpenShift
+        14) AAP + IdM + OpenShift
+
+      Complete Stack (Recommended):
+        15) Satellite + AAP + IdM + OpenShift
+
+
+
+- name: Prompt for scenario selection
+  ansible.builtin.pause:
+    prompt: "Enter scenario number (1-15) or 15 for recommended"
+  register: scenario_input
+
+- name: Map scenario number to components
+  ansible.builtin.set_fact:
+    scenario_mapping:
+      "1": { name: "scenario_satellite", components: ["scenario_satellite"] }
+      "2": { name: "aap", components: ["aap"] }
+      "3": { name: "idm", components: ["idm"] }
+      "4": { name: "scenario_openshift", components: ["scenario_openshift"] }
+      "5": { name: "satellite_aap", components: ["scenario_satellite", "aap"] }
+      "6": { name: "satellite_idm", components: ["scenario_satellite", "idm"] }
+      "7": { name: "satellite_openshift", components: ["scenario_satellite", "scenario_openshift"] }
+      "8": { name: "aap_idm", components: ["aap", "idm"] }
+      "9": { name: "aap_openshift", components: ["aap", "scenario_openshift"] }
+      "10": { name: "idm_openshift", components: ["idm", "scenario_openshift"] }
+      "11": { name: "satellite_aap_idm", components: ["scenario_satellite", "aap", "idm"] }
+      "12": { name: "satellite_aap_openshift", components: ["scenario_satellite", "aap", "scenario_openshift"] }
+      "13": { name: "satellite_idm_openshift", components: ["scenario_satellite", "idm", "scenario_openshift"] }
+      "14": { name: "aap_idm_openshift", components: ["aap", "idm", "scenario_openshift"] }
+      "15": { name: "satellite_aap_idm_openshift", components: ["scenario_satellite", "aap", "idm", "scenario_openshift"] }
+
+- name: Set deployment scenario
+  ansible.builtin.set_fact:
+    deployment_scenario: "{{ scenario_mapping[scenario_input.user_input].name }}"
+    deployment_components: "{{ scenario_mapping[scenario_input.user_input].components }}"
+
+- name: Display platform options
+  ansible.builtin.debug:
+    msg: |
+      Select Infrastructure Platform
+
+      1) Libvirt (KVM) - Recommended for Development
+      2) Bare Metal
+      3) AWS (EC2)
+      4) Google Cloud Platform (GCP)
+      5) Microsoft Azure
+      6) Nutanix
+      7) VMware vSphere
+
+
+
+- name: Prompt for platform selection
+  ansible.builtin.pause:
+    prompt: "Enter platform number (1-7) or 1 for Libvirt (recommended)"
+  register: platform_input
+
+- name: Map platform number to platform name
+  ansible.builtin.set_fact:
+    platform_mapping:
+      "1": libvirt
+      "2": baremetal
+      "3": aws
+      "4": gcp
+      "5": azure
+      "6": platform_nutanix
+      "7": platform_vmware
+
+- name: Set deployment platform
+  ansible.builtin.set_fact:
+    deployment_platform: "{{ platform_mapping[platform_input.user_input] }}"
+
+- name: Display OS options
+  ansible.builtin.debug:
+    msg: |
+      Select Operating System Version
+
+      1) RHEL 10 (Recommended)
+      2) RHEL 9
+
+
+
+- name: Prompt for OS selection
+  ansible.builtin.pause:
+    prompt: "Enter OS version (1-2) or 1 for RHEL 10 (recommended)"
+  register: os_input
+
+- name: Map OS number to OS version
+  ansible.builtin.set_fact:
+    os_mapping:
+      "1": "rhel-10"
+      "2": "rhel-9"
+
+- name: Set operating system version
+  ansible.builtin.set_fact:
+    deployment_os: "{{ os_mapping[os_input.user_input] }}"
+
+- name: Platform-specific configuration
+  block:
+    - name: Libvirt configuration
+      ansible.builtin.set_fact:
+        libvirt_network_cidr: "192.168.122.0/24"
+        libvirt_storage_path: "/var/lib/libvirt/images"
+        libvirt_vms:
+          - { name: scenario_satellite, cpu: 4, memory: 8192, disk: 100 }
+          - { name: aap_controller_1, cpu: 4, memory: 8192, disk: 100 }
+          - { name: aap_controller_2, cpu: 4, memory: 8192, disk: 100 }
+          - { name: aap_controller_3, cpu: 4, memory: 8192, disk: 100 }
+          - { name: idm, cpu: 4, memory: 8192, disk: 80 }
+          - { name: openshift_master_1, cpu: 4, memory: 8192, disk: 100 }
+          - { name: openshift_master_2, cpu: 4, memory: 8192, disk: 100 }
+          - { name: openshift_master_3, cpu: 4, memory: 8192, disk: 100 }
+          - { name: openshift_worker_1, cpu: 4, memory: 8192, disk: 100 }
+          - { name: openshift_worker_2, cpu: 4, memory: 8192, disk: 100 }
+      when: deployment_platform == "libvirt"
+
+- name: Save deployment configuration
+  ansible.builtin.copy:
+    dest: "{{ base_dir }}/group_vars/deployment_config.yml"
+    content: |
+      ---
+      # Auto-generated deployment configuration
+      # Generated at: {{ ansible_date_time.iso8601 }}
+
+      deployment_scenario: {{ deployment_scenario }}
+      deployment_components: {{ deployment_components | to_nice_yaml | indent(2) }}
+      deployment_platform: {{ deployment_platform }}
+      deployment_os: {{ deployment_os }}
+
+      {% if deployment_platform == "libvirt" %}
+      libvirt_network_cidr: {{ libvirt_network_cidr }}
+      libvirt_storage_path: {{ libvirt_storage_path }}
+      libvirt_vms: {{ libvirt_vms | to_nice_yaml | indent(2) }}
+      {% endif %}
+
+- name: Display configuration summary
+  ansible.builtin.debug:
+    msg: |
+      Deployment Configuration
+
+      Scenario: {{ deployment_scenario }}
+      Components: {{ deployment_components | join(', ') }}
+      Platform: {{ deployment_platform }}
+      OS: {{ deployment_os }}
+
+      Configuration saved to: group_vars/deployment_config.yml

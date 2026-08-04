@@ -1,0 +1,16 @@
+---
+# Main entrypoint for scenario_satellite tasks — include modular task files.
+# This keeps the role compatible with Ansible's expected layout and with
+# linters that look for a tasks/main.yml file.
+
+- name: Include install tasks
+  ansible.builtin.import_tasks: install.yml
+
+- name: Include configure tasks
+  ansible.builtin.import_tasks: configure.yml
+
+- name: Include test tasks
+  ansible.builtin.import_tasks: test.yml
+
+- name: Include restore tasks
+  ansible.builtin.import_tasks: restore.yml

@@ -1,0 +1,35 @@
+# Master variables for Satellite + AAP + Insights stack
+
+scenario_satellite_mail_setup_satellite_fqdn: {{ scenario_satellite_mail_setup_satellite_fqdn | default('scenario_satellite.example.com') }}
+scenario_satellite_mail_setup_satellite_org: {{ scenario_satellite_mail_setup_satellite_org | default('Default_Org') }}
+scenario_satellite_mail_setup_satellite_location: {{ scenario_satellite_mail_setup_satellite_location | default('Default_Location') }}
+scenario_satellite_mail_setup_satellite_admin_user: {{ scenario_satellite_mail_setup_satellite_admin_user | default('admin') }}
+scenario_satellite_mail_setup_satellite_admin_password: {{ scenario_satellite_mail_setup_satellite_admin_password | default('') }}
+scenario_satellite_mail_setup_satellite_mail_relay: {{ scenario_satellite_mail_setup_satellite_mail_relay | default('') }}
+scenario_satellite_mail_setup_satellite_mail_relay_credentials: {{ scenario_satellite_mail_setup_satellite_mail_relay_credentials | default('') }}
+
+# Libvirt host details
+scenario_satellite_mail_setup_libvirt_host: {{ scenario_satellite_mail_setup_libvirt_host | default('kaso.prod.spg') }}
+scenario_satellite_mail_setup_satellite_vm_name: {{ scenario_satellite_mail_setup_satellite_vm_name | default('scenario_satellite-poc') }}
+scenario_satellite_mail_setup_satellite_vm_hostname: {{ scenario_satellite_mail_setup_satellite_vm_hostname | default('scenario_satellite-poc.example.com') }}
+scenario_satellite_mail_setup_satellite_vm_memory_mb: {{ scenario_satellite_mail_setup_satellite_vm_memory_mb | default(16384) }}
+scenario_satellite_mail_setup_satellite_vm_vcpus: {{ scenario_satellite_mail_setup_satellite_vm_vcpus | default(4) }}
+scenario_satellite_mail_setup_satellite_vm_disk_size_gb: {{ scenario_satellite_mail_setup_satellite_vm_disk_size_gb | default(200) }}
+scenario_satellite_mail_setup_satellite_vm_disk_name: {{ scenario_satellite_mail_setup_satellite_vm_disk_name | default('scenario_satellite-poc.qcow2') }}
+scenario_satellite_mail_setup_satellite_vm_pool: {{ scenario_satellite_mail_setup_satellite_vm_pool | default('default') }}
+scenario_satellite_mail_setup_satellite_vm_network: {{ scenario_satellite_mail_setup_satellite_vm_network | default('default') }}
+scenario_satellite_mail_setup_satellite_vm_root_pubkey: {{ scenario_satellite_mail_setup_satellite_vm_root_pubkey | default('ssh-rsa AAAA...rootkey') }}
+scenario_satellite_mail_setup_satellite_admin_pubkey: {{ scenario_satellite_mail_setup_satellite_admin_pubkey | default('ssh-rsa AAAA...adminkey') }}
+scenario_satellite_mail_setup_satellite_root_pubkey: {{ scenario_satellite_mail_setup_satellite_root_pubkey | default('ssh-rsa AAAA...rootkey') }}
+
+# AAP vars
+scenario_satellite_mail_setup_aap_inventory_path: {{ scenario_satellite_mail_setup_aap_inventory_path | default('/tmp/aap_inventory.yml') }}
+scenario_satellite_mail_setup_aap_admin_password: {{ scenario_satellite_mail_setup_aap_admin_password | default('') }}
+
+# Insights
+scenario_satellite_mail_setup_insights_account: {{ scenario_satellite_mail_setup_insights_account | default('000000') }}
+scenario_satellite_mail_setup_insights_username: {{ scenario_satellite_mail_setup_insights_username | default('insights-user') }}
+scenario_satellite_mail_setup_insights_password: {{ scenario_satellite_mail_setup_insights_password | default('') }}
+
+# General packages
+scenario_satellite_mail_setup_satellite_base_packages: {{ scenario_satellite_mail_setup_satellite_base_packages | default(['vim','git','firewalld']) }}

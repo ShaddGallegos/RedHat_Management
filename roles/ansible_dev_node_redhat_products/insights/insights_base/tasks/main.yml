@@ -1,0 +1,31 @@
+---
+# Insights Base Configuration and Registration
+# Manages Insights client installation, configuration, and registration
+
+- name: Verify Insights prerequisites
+  ansible.builtin.include_tasks: prerequisites.yml
+  tags: [insights_base, prerequisites]
+
+- name: Install Insights client
+  ansible.builtin.include_tasks: install.yml
+  tags: [insights_base, install]
+
+- name: Configure Insights client
+  ansible.builtin.include_tasks: configure.yml
+  tags: [insights_base, configure]
+
+- name: Register with Insights
+  ansible.builtin.include_tasks: register.yml
+  tags: [insights_base, register]
+
+- name: Configure remediation capabilities
+  ansible.builtin.include_tasks: remediation.yml
+  tags: [insights_base, remediation]
+
+- name: Configure reporting
+  ansible.builtin.include_tasks: reporting.yml
+  tags: [insights_base, reporting]
+
+- name: Validate Insights deployment
+  ansible.builtin.include_tasks: validate.yml
+  tags: [insights_base, validate]

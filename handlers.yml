@@ -1,0 +1,7 @@
+---
+# handlers stub to satisfy linter load checks
+# Real handlers should be provided by roles; this stub avoids false positives
+- name: Noop handler
+  ansible.builtin.debug:
+    msg: "handlers.yml stub - no-op"
+  when: false

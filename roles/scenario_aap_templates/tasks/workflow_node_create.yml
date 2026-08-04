@@ -1,0 +1,56 @@
+---
+- name: Look up job template for workflow node {{ scenario_aap_templates_workflow_node_definition.identifier }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/job_templates/?name={{ scenario_aap_templates_workflow_node_definition.job_template | urlencode }}&organization={{ aap_organization_id }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_workflow_node_job_template_lookup
+  no_log: true
+
+- name: Validate workflow node job template exists for {{ scenario_aap_templates_workflow_node_definition.identifier }}
+  ansible.builtin.assert:
+    that:
+      - scenario_aap_templates_workflow_node_job_template_lookup.json.count | default(0) > 0
+    fail_msg: "Job template {{ scenario_aap_templates_workflow_node_definition.job_template }} was not found"
+
+- name: Look up existing workflow node {{ scenario_aap_templates_workflow_node_definition.identifier }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/workflow_job_template_nodes/?identifier={{ scenario_aap_templates_workflow_node_definition.identifier | urlencode }}&workflow_job_template={{ scenario_aap_templates_workflow_definition_lookup.json.results[0].id }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_workflow_node_existing_lookup
+  no_log: true
+
+- name: Create or update workflow node {{ scenario_aap_templates_workflow_node_definition.identifier }}
+  ansible.builtin.uri:
+    url: >-
+      {{
+        scenario_aap_templates_api_base ~ '/workflow_job_template_nodes/' ~
+        (scenario_aap_templates_workflow_node_existing_lookup.json.results[0].id | string ~ '/' if (scenario_aap_templates_workflow_node_existing_lookup.json.count | default(0) > 0) else '')
+      }}
+    method: "{{ 'PATCH' if (scenario_aap_templates_workflow_node_existing_lookup.json.count | default(0) > 0) else 'POST' }}"
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200, 201]
+    body_format: json
+    body:
+      workflow_job_template: "{{ scenario_aap_templates_workflow_definition_lookup.json.results[0].id | int }}"
+      identifier: "{{ scenario_aap_templates_workflow_node_definition.identifier }}"
+      unified_job_template: "{{ scenario_aap_templates_workflow_node_job_template_lookup.json.results[0].id | int }}"
+  register: scenario_aap_templates_workflow_node_result
+  no_log: true
+
+- name: Store workflow node ID for {{ scenario_aap_templates_workflow_node_definition.identifier }}
+  ansible.builtin.set_fact:
+    scenario_aap_templates_workflow_node_id_map: >-
+      {{ scenario_aap_templates_workflow_node_id_map | default({}) | combine({ scenario_aap_templates_workflow_definition.workflow_template ~ '::' ~ scenario_aap_templates_workflow_node_definition.identifier: scenario_aap_templates_workflow_node_result.json.id }) }}

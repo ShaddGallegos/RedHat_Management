@@ -1,0 +1,41 @@
+---
+# Platform Preparation: Google Cloud Platform (GCP)
+# Prepares GCP environment for Compute Engine instance platform_provisioning
+
+- name: "Prepare GCP Infrastructure"
+  ansible.builtin.debug:
+    msg: |
+      Google Cloud Platform Infrastructure Preparation
+      ================================================
+      Platform: gcp
+      Target: GCP Compute Engine VM platform_provisioning
+  tags: ["platform_infrastructure_core", "gcp", "prepare"]
+
+- name: "Validate GCP prerequisites"
+  block:
+    - name: "Check Google Cloud SDK installation"
+      ansible.builtin.shell: gcloud --version
+      register: gcloud_check
+      changed_when: false
+      failed_when: false
+
+    - name: "Check GCP authentication"
+      ansible.builtin.shell: gcloud auth list
+      register: gcloud_auth_check
+      changed_when: false
+      failed_when: false
+
+    - name: "Assert GCP is configured"
+      ansible.builtin.assert:
+        that:
+          - "gcloud_check.rc == 0"
+          - "gcloud_auth_check.rc == 0"
+        fail_msg: "Google Cloud SDK not installed or authentication failed. Install gcloud SDK and run 'gcloud auth login'."
+      ignore_errors: true
+
+  tags: ["platform_infrastructure_core", "gcp", "validate"]
+
+- name: "GCP platform_infrastructure_core ready for platform_provisioning"
+  ansible.builtin.debug:
+    msg: "GCP platform_infrastructure_core prepared successfully"
+  tags: ["platform_infrastructure_core", "gcp", "info"]

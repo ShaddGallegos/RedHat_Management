@@ -1,0 +1,4 @@
+---
+- name: Satellite restore placeholder
+  ansible.builtin.debug:
+    msg: "Implement Satellite restore/undo here."

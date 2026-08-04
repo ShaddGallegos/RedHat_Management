@@ -1,0 +1,45 @@
+---
+# AAP Role-Based Access Control (RBAC) Configuration
+# Manages users, teams, organizations, and permission assignments
+
+- name: Verify AAP connectivity
+  ansible.builtin.uri:
+    url: "https://{{ groups['aap'][0] | default('aap.example.com') }}/api/v2/config/"
+    user: "admin"
+    password: "{{ aap_admin_password | default('') }}"
+    method: GET
+    validate_certs: false
+    status_code: 200
+  register: aap_config
+  failed_when: false
+  tags: [aap_rbac, verify]
+
+- name: Display AAP connection status
+  ansible.builtin.debug:
+    msg: "AAP API Version: {{ aap_config.json.version | default('unknown') }}"
+  when: aap_config.status is defined
+  tags: [aap_rbac, verify]
+
+- name: Create organizations
+  ansible.builtin.include_tasks: organizations.yml
+  tags: [aap_rbac, organizations]
+
+- name: Create teams
+  ansible.builtin.include_tasks: teams.yml
+  tags: [aap_rbac, teams]
+
+- name: Create and manage users
+  ansible.builtin.include_tasks: users.yml
+  tags: [aap_rbac, users]
+
+- name: Assign users to teams
+  ansible.builtin.include_tasks: user_team_assignments.yml
+  tags: [aap_rbac, assignments]
+
+- name: Configure team permissions
+  ansible.builtin.include_tasks: team_permissions.yml
+  tags: [aap_rbac, permissions]
+
+- name: Validate RBAC configuration
+  ansible.builtin.include_tasks: validate.yml
+  tags: [aap_rbac, validate]

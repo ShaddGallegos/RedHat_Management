@@ -1,0 +1,138 @@
+---
+# Default variables for scenario_satellite_activation_config role
+scenario_satellite_activation_config_satellite_activation_config_enabled: true
+scenario_satellite_activation_config_satellite_activation_config_version: "1.0"
+scenario_satellite_activation_config_satellite_activation_config_timeout: 1200
+
+# Satellite Connection
+scenario_satellite_activation_config_satellite_url: "https://scenario_satellite.example.com"
+scenario_satellite_activation_config_satellite_username: "admin"
+# satellite_password: use vault!
+scenario_satellite_activation_config_satellite_validate_ssl: true
+scenario_satellite_activation_config_satellite_organization: "Default Organization"
+
+# Feature toggles
+scenario_satellite_activation_config_create_activation_keys: true
+scenario_satellite_activation_config_attach_subscriptions: true
+scenario_satellite_activation_config_configure_host_collections: false
+
+# Host Collections (for grouping hosts)
+scenario_satellite_activation_config_host_collections:
+  - name: "RHIS_Production"
+    description: "Production RHIS hosts"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    tags: ["rhis", "production"]
+
+  - name: "RHIS_Development"
+    description: "Development RHIS hosts"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    tags: ["rhis", "development"]
+
+  - name: "RHIS_All"
+    description: "All RHIS managed hosts"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    tags: ["rhis", "all"]
+
+# Activation Keys
+scenario_satellite_activation_config_activation_keys:
+  - name: "RHEL9_BaseOS"
+    description: "RHEL 9 Base OS Activation Key"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    lifecycle_environment: "Library"
+    content_view: "RHIS_BaseOS"
+    usage_limit: -1
+    auto_attach: true
+    release_version: "9"
+    host_collection: "RHIS_All"
+    tags: ["rhis", "rhel9", "baseos"]
+
+  - name: "RHEL9_Development"
+    description: "RHEL 9 Development Activation Key"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    lifecycle_environment: "Development"
+    content_view: "RHIS_BaseOS"
+    usage_limit: 50
+    auto_attach: true
+    release_version: "9"
+    host_collection: "RHIS_Development"
+    tags: ["rhis", "rhel9", "development"]
+
+  - name: "RHEL9_Production"
+    description: "RHEL 9 Production Activation Key"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    lifecycle_environment: "Production"
+    content_view: "RHIS_BaseOS"
+    usage_limit: 200
+    auto_attach: true
+    release_version: "9"
+    host_collection: "RHIS_Production"
+    tags: ["rhis", "rhel9", "production"]
+
+  - name: "RHEL10_BaseOS"
+    description: "RHEL 10 Base OS Activation Key"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    lifecycle_environment: "Library"
+    content_view: "RHIS_RHEL10_BaseOS"
+    usage_limit: -1
+    auto_attach: true
+    release_version: "10"
+    host_collection: "RHIS_All"
+    tags: ["rhis", "rhel10", "baseos"]
+
+  - name: "RHIS_AppStack"
+    description: "RHIS Application Stack Activation Key"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    lifecycle_environment: "Library"
+    content_view: "RHIS_AppStack"
+    usage_limit: -1
+    auto_attach: false
+    tags: ["rhis", "appstack"]
+
+# Subscription Attachments
+scenario_satellite_activation_config_subscription_attachments:
+  - activation_key: "RHEL9_BaseOS"
+    subscription: "Red Hat Enterprise Linux Server"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    quantity: 100
+
+  - activation_key: "RHEL9_Development"
+    subscription: "Red Hat Enterprise Linux Server"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    quantity: 50
+
+  - activation_key: "RHEL9_Production"
+    subscription: "Red Hat Enterprise Linux Server"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    quantity: 200
+
+  - activation_key: "RHEL10_BaseOS"
+    subscription: "Red Hat Enterprise Linux Server"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    quantity: 50
+
+  - activation_key: "RHIS_AppStack"
+    subscription: "Red Hat Enterprise Linux Server"
+    organization: "{{ scenario_satellite_activation_config_satellite_organization }}"
+    quantity: 100
+
+# Repository Sets to Enable
+scenario_satellite_activation_config_repository_sets:
+  - activation_key: "RHEL9_BaseOS"
+    name: "rhel-9-for-x86_64-baseos-rpms"
+    release_version: "9"
+
+  - activation_key: "RHEL9_BaseOS"
+    name: "rhel-9-for-x86_64-appstream-rpms"
+    release_version: "9"
+
+  - activation_key: "RHEL10_BaseOS"
+    name: "rhel-10-for-x86_64-baseos-rpms"
+    release_version: "10"
+
+  - activation_key: "RHEL10_BaseOS"
+    name: "rhel-10-for-x86_64-appstream-rpms"
+    release_version: "10"
+
+# Validation
+scenario_satellite_activation_config_satellite_activation_validate_connectivity: true
+scenario_satellite_activation_config_satellite_activation_test_keys: false

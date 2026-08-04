@@ -1,0 +1,179 @@
+---
+- name: Gather package facts before update
+  ansible.builtin.package_facts: {}
+  register: update_rhel_packages_pre
+
+- name: Store pre-update package count
+  ansible.builtin.set_fact:
+    update_rhel_pre_package_count: "{{ update_rhel_packages_pre.ansible_facts.packages.keys() | length }}"
+
+- name: Display pre-update package summary
+  ansible.builtin.debug:
+    msg: "Pre-update: {{ update_rhel_pre_package_count }} packages installed"
+  when: update_rhel_verbose | default(true)
+
+- name: Install delta RPM package for RHEL 7
+  ansible.builtin.package:
+    name: deltarpm
+    state: present
+  when: update_rhel_os_info.major_version == 7
+  register: update_rhel_install_deltarpm_result
+  failed_when: false
+
+- name: Install delta RPM package for RHEL 8+
+  ansible.builtin.package:
+    name: drpm
+    state: present
+  when: update_rhel_os_info.major_version >= 8
+  register: update_rhel_install_drpm_result
+  failed_when: false
+
+- name: Optionally enable EPEL repository
+  ansible.builtin.package:
+    name: epel-release
+    state: present
+  when:
+    - update_rhel_enable_epel | default(false)
+  register: update_rhel_epel_result
+  failed_when: false
+
+- name: Optionally register system with subscription-manager
+  block:
+    - name: Check subscription-manager identity
+      ansible.builtin.command:
+        cmd: subscription-manager identity
+      register: subscription_identity
+      failed_when: false
+
+    - name: Register with subscription-manager (when credentials provided and not registered)
+      ansible.builtin.command:
+        cmd: >
+          subscription-manager register
+          --username {{ update_rhel_subscription_username_effective }}
+          --password {{ update_rhel_subscription_password_effective }}
+          --auto-attach
+      when:
+        - (subscription_identity.rc != 0)
+        - update_rhel_subscription_username_effective != "" and update_rhel_subscription_password_effective != ""
+      register: update_rhel_sub_register
+      failed_when: update_rhel_sub_register.rc not in [0,64]
+      changed_when: update_rhel_sub_register.rc == 0
+
+    - name: Optionally attach a pool if provided
+      ansible.builtin.command:
+        cmd: subscription-manager attach --pool={{ update_rhel_subscription_pool }}
+      when:
+        - update_rhel_subscription_pool != ""
+  when: >
+    (update_rhel_subscription_username_effective != '' and update_rhel_subscription_password_effective != '')
+  failed_when: false
+
+- name: Install and enable automatic-updates service for RHEL 7 (yum-cron)
+  block:
+    - name: Install yum-cron
+      ansible.builtin.package:
+        name: yum-cron
+        state: present
+
+    - name: Configure yum-cron to apply updates if requested
+      ansible.builtin.lineinfile:
+        path: /etc/yum/yum-cron.conf
+        regexp: '^apply_updates ='
+        line: "apply_updates = {{ 'yes' if update_rhel_auto_apply_updates | default(false) else 'no' }}"
+      when: update_rhel_auto_apply_updates is defined
+
+    - name: Ensure yum-cron is enabled and started
+      ansible.builtin.service:
+        name: yum-cron
+        enabled: true
+        state: started
+  when:
+    - update_rhel_enable_auto_updates | default(false)
+    - update_rhel_os_info.major_version == 7
+
+- name: Install and enable automatic-updates for RHEL 8+ (dnf-automatic)
+  block:
+    - name: Install dnf-automatic
+      ansible.builtin.package:
+        name: dnf-automatic
+        state: present
+
+    - name: Configure dnf-automatic timers (apply updates)
+      ansible.builtin.copy:
+        dest: /etc/dnf/automatic.conf
+        content: |
+          [commands]
+          apply_updates = {{ 'yes' if update_rhel_auto_apply_updates | default(false) else 'no' }}
+          [emitters]
+          system_name = None
+      backup: true
+
+    - name: Enable and start dnf-automatic.timer
+      ansible.builtin.systemd:
+        name: dnf-automatic.timer
+        enabled: true
+        state: started
+  when:
+    - update_rhel_enable_auto_updates | default(false)
+    - update_rhel_os_info.major_version >= 8
+
+- name: Optionally install kpatch (kpatch) for live kernel patching
+  block:
+    - name: Install kpatch packages
+      ansible.builtin.package:
+        name:
+          - kpatch
+          - kpatch-patch
+        state: present
+
+    - name: Ensure kpatch service is enabled and started
+      ansible.builtin.service:
+        name: kpatch
+        enabled: true
+        state: started
+  when:
+    - update_rhel_enable_kpatch | default(false)
+    - update_rhel_os_info.major_version >= 7
+
+- name: Clean package manager cache
+  ansible.builtin.command:
+    cmd: "{{ update_rhel_os_info.package_manager }} clean all"
+  changed_when: true
+  when: update_rhel_clean_cache | default(true)
+
+- name: Check available updates (RHEL 7)
+  ansible.builtin.yum:
+    list: updates
+  register: update_rhel_available_updates
+  when: update_rhel_os_info.major_version == 7
+
+- name: Check available updates (RHEL 8+)
+  ansible.builtin.dnf:
+    list: updates
+  register: update_rhel_available_updates
+  when: update_rhel_os_info.major_version >= 8
+
+- name: Set available updates count
+  ansible.builtin.set_fact:
+    update_rhel_updates_available: "{{ update_rhel_available_updates.results | length }}"
+
+- name: Display available updates summary
+  ansible.builtin.debug:
+    msg: |
+      Available updates: {{ update_rhel_updates_available }}
+      {% if update_rhel_show_updates | default(false) and update_rhel_updates_available > 0 %}
+      Sample updates (first 10):
+      {% for update in update_rhel_available_updates.results[:10] %}
+      - {{ update.name }}-{{ update.version }}
+      {% endfor %}
+      {% if update_rhel_updates_available > 10 %}
+      ... and {{ update_rhel_updates_available - 10 }} more
+      {% endif %}
+      {% endif %}
+  when: update_rhel_verbose | default(true)
+
+- name: Skip updates if none available
+  ansible.builtin.meta: end_host
+  when:
+    - update_rhel_updates_available == 0
+    - not update_rhel_force_run | default(false)

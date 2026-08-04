@@ -1,0 +1,24 @@
+---
+# Default variables for ansible_dev_node_redhat_products/aap role
+aap_enabled: true
+aap_version: "2.7"
+aap_hostname: "aap.example.com"
+aap_port: 443
+aap_timeout: 3600
+aap_max_retries: 3
+
+# Resource allocation
+aap_memory_mb: 16384
+aap_cpu_cores: 8
+
+# Admin configuration
+aap_admin_username: "admin"
+# aap_admin_password: use vault!
+
+# Features
+configure_aap_rbac: true
+aap_enable_ldap: false
+aap_enable_eda: true
+
+# Performance
+aap_max_jobs: 100

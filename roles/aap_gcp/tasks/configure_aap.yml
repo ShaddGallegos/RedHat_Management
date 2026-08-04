@@ -1,0 +1,218 @@
+---
+# Configure AAP 2.6 Resources
+# This file creates credentials, projects, inventories, job templates, and workflows in AAP
+
+- name: Create AAP credentials
+  tags: ['credentials']
+  block:
+    - name: Create GCP Service Account credential
+      awx.awx.credential:
+        name: "{{ aap_credential_gcp_name }}"
+        organization: "{{ aap_organization_name }}"
+        credential_type: "Google Compute Engine"
+        controller_host: "{{ aap_controller_hostname }}"
+        controller_username: "{{ aap_controller_username }}"
+        controller_password: "{{ aap_controller_password }}"
+        validate_certs: "{{ aap_controller_validate_certs }}"
+        inputs:
+          project: "{{ aap_gcp_project_id }}"
+          service_account_file: "{{ lookup('file', aap_gcp_service_account_file | expanduser) }}"
+        state: present
+
+    - name: Create Satellite API credential
+      awx.awx.credential:
+        name: "{{ aap_credential_satellite_name }}"
+        organization: "{{ aap_organization_name }}"
+        credential_type: "Red Hat Satellite 6"
+        controller_host: "{{ aap_controller_hostname }}"
+        controller_username: "{{ aap_controller_username }}"
+        controller_password: "{{ aap_controller_password }}"
+        validate_certs: "{{ aap_controller_validate_certs }}"
+        inputs:
+          host: "{{ aap_satellite_url }}"
+          username: "{{ aap_satellite_username }}"
+          password: "{{ aap_satellite_password }}"
+        state: present
+      no_log: true
+
+    - name: Create Machine (SSH) credential
+      awx.awx.credential:
+        name: "{{ aap_credential_machine_name }}"
+        organization: "{{ aap_organization_name }}"
+        credential_type: "Machine"
+        controller_host: "{{ aap_controller_hostname }}"
+        controller_username: "{{ aap_controller_username }}"
+        controller_password: "{{ aap_controller_password }}"
+        validate_certs: "{{ aap_controller_validate_certs }}"
+        inputs:
+          username: "{{ aap_ssh_username | default(omit) }}"
+          ssh_key_data: "{{ aap_ssh_private_key | default(omit) }}"
+          become_method: "sudo"
+        state: present
+      when: aap_ssh_username | length > 0 or aap_ssh_private_key | length > 0
+
+    - name: Create Vault credential
+      awx.awx.credential:
+        name: "{{ aap_credential_vault_name }}"
+        organization: "{{ aap_organization_name }}"
+        credential_type: "Vault"
+        controller_host: "{{ aap_controller_hostname }}"
+        controller_username: "{{ aap_controller_username }}"
+        controller_password: "{{ aap_controller_password }}"
+        validate_certs: "{{ aap_controller_validate_certs }}"
+        inputs:
+          vault_password: "{{ aap_vault_password }}"
+        state: present
+      no_log: true
+
+- name: Create AAP project
+  awx.awx.project:
+    name: "{{ aap_project_name }}"
+    organization: "{{ aap_organization_name }}"
+    scm_type: "{{ 'git' if aap_git_repo_url | length > 0 else 'manual' }}"
+    scm_url: "{{ aap_git_repo_url | default(omit) }}"
+    scm_branch: "{{ aap_git_branch | default('main') }}"
+    scm_update_on_launch: "{{ aap_project_update_on_launch }}"
+    scm_clean: "{{ aap_project_clean }}"
+    default_environment: "{{ aap_execution_environment_image }}"
+    controller_host: "{{ aap_controller_hostname }}"
+    controller_username: "{{ aap_controller_username }}"
+    controller_password: "{{ aap_controller_password }}"
+    validate_certs: "{{ aap_controller_validate_certs }}"
+    state: present
+  tags: ['project']
+
+- name: Create AAP GCP inventory
+  awx.awx.inventory:
+    name: "{{ aap_inventory_name }}"
+    organization: "{{ aap_organization_name }}"
+    controller_host: "{{ aap_controller_hostname }}"
+    controller_username: "{{ aap_controller_username }}"
+    controller_password: "{{ aap_controller_password }}"
+    validate_certs: "{{ aap_controller_validate_certs }}"
+    state: present
+  tags: ['inventory']
+  register: aap_gcp_inventory_result
+
+- name: Create GCP inventory source
+  awx.awx.inventory_source:
+    name: "{{ aap_inventory_source_name }}"
+    inventory: "{{ aap_inventory_name }}"
+    source: "gce"
+    credential: "{{ aap_credential_gcp_name }}"
+    execution_environment: "{{ aap_execution_environment_image }}"
+    update_on_launch: "{{ aap_inventory_update_on_launch }}"
+    overwrite: "{{ aap_inventory_overwrite }}"
+    source_vars:
+      plugin: google.cloud.gcp_compute
+      projects:
+        - "{{ aap_gcp_project_id }}"
+      auth_kind: serviceaccount
+      filters: "{{ aap_gcp_inventory_filters }}"
+      hostnames:
+        - name
+      keyed_groups:
+        - prefix: gcp_zone
+          key: zone
+        - prefix: gcp_env
+          key: labels.environment
+      compose:
+        ansible_host: networkInterfaces[0].networkIP
+    controller_host: "{{ aap_controller_hostname }}"
+    controller_username: "{{ aap_controller_username }}"
+    controller_password: "{{ aap_controller_password }}"
+    validate_certs: "{{ aap_controller_validate_certs }}"
+    state: present
+  tags: ['inventory']
+
+- name: Create notification templates
+  when: aap_notification_slack_enabled or aap_notification_email_enabled
+  tags: ['notifications']
+  block:
+    - name: Create Slack notification template
+      awx.awx.notification_template:
+        name: "GCP Registration Approval Alert"
+        organization: "{{ aap_organization_name }}"
+        notification_type: "slack"
+        notification_configuration:
+          token: "{{ aap_notification_slack_webhook }}"
+          channels:
+            - "{{ aap_notification_slack_channel }}"
+        controller_host: "{{ aap_controller_hostname }}"
+        controller_username: "{{ aap_controller_username }}"
+        controller_password: "{{ aap_controller_password }}"
+        validate_certs: "{{ aap_controller_validate_certs }}"
+        state: present
+      when: aap_notification_slack_enabled
+
+    - name: Create Email notification template
+      awx.awx.notification_template:
+        name: "GCP Registration Email Alert"
+        organization: "{{ aap_organization_name }}"
+        notification_type: "email"
+        notification_configuration:
+          host: "{{ aap_notification_email_host }}"
+          port: "{{ aap_notification_email_port }}"
+          sender: "{{ aap_notification_sender_email }}"
+          recipients: "{{ aap_notification_recipients }}"
+        controller_host: "{{ aap_controller_hostname }}"
+        controller_username: "{{ aap_controller_username }}"
+        controller_password: "{{ aap_controller_password }}"
+        validate_certs: "{{ aap_controller_validate_certs }}"
+        state: present
+      when: aap_notification_email_enabled
+
+- name: Create job template
+  awx.awx.job_template:
+    name: "{{ aap_job_template_name }}"
+    job_type: "run"
+    inventory: "{{ aap_inventory_name }}"
+    project: "{{ aap_project_name }}"
+    playbook: "playbooks/gcp_satellite_registration.yml"
+    execution_environment: "{{ aap_execution_environment_image }}"
+    credentials:
+      - "{{ aap_credential_gcp_name }}"
+      - "{{ aap_credential_satellite_name }}"
+      - "{{ aap_credential_machine_name }}"
+      - "{{ aap_credential_vault_name }}"
+    become_enabled: true
+    forks: "{{ aap_job_template_forks }}"
+    timeout: "{{ aap_job_template_timeout }}"
+    verbosity: "{{ aap_job_template_verbosity }}"
+    ask_variables_on_launch: true
+    extra_vars:
+      serial_execution: "{{ aap_workflow_serial_execution }}"
+      max_fail_percentage: "{{ aap_workflow_max_fail_percentage }}"
+      ssh_connection_timeout: "{{ aap_ssh_connection_timeout }}"
+    controller_host: "{{ aap_controller_hostname }}"
+    controller_username: "{{ aap_controller_username }}"
+    controller_password: "{{ aap_controller_password }}"
+    validate_certs: "{{ aap_controller_validate_certs }}"
+    state: present
+  tags: ['job_template']
+
+- name: Create workflow template
+  awx.awx.workflow_job_template:
+    name: "{{ aap_workflow_name }}"
+    organization: "{{ aap_organization_name }}"
+    inventory: "{{ aap_inventory_name }}"
+    controller_host: "{{ aap_controller_hostname }}"
+    controller_username: "{{ aap_controller_username }}"
+    controller_password: "{{ aap_controller_password }}"
+    validate_certs: "{{ aap_controller_validate_certs }}"
+    state: present
+  tags: ['workflow']
+  register: aap_gcp_workflow_result
+
+- name: Display AAP configuration summary
+  ansible.builtin.debug:
+    msg:
+      - "AAP Resources Created Successfully!"
+      - "Credentials: {{ aap_credential_gcp_name }}, {{ aap_credential_satellite_name }}, {{ aap_credential_vault_name }}"
+      - "Project: {{ aap_project_name }}"
+      - "Inventory: {{ aap_inventory_name }}"
+      - "Job Template: {{ aap_job_template_name }}"
+      - "Workflow: {{ aap_workflow_name }}"
+      - ""
+      - "Access AAP at: https://{{ aap_controller_hostname }}"
+  tags: ['always']

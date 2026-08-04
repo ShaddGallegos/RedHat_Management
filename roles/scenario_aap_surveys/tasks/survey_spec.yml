@@ -1,0 +1,36 @@
+---
+- name: Look up target template for survey {{ scenario_aap_surveys_target_template.name }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_surveys_api_base }}/{{ scenario_aap_surveys_target_kind }}s/?name={{ scenario_aap_surveys_target_template.name | urlencode }}&organization={{ scenario_aap_surveys_organization_id }}"
+    method: GET
+    user: "{{ scenario_aap_surveys_aap_username }}"
+    password: "{{ scenario_aap_surveys_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_surveys_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_surveys_target_lookup
+  no_log: true
+
+- name: Validate target template exists for survey {{ scenario_aap_surveys_target_template.name }}
+  ansible.builtin.assert:
+    that:
+      - scenario_aap_surveys_target_lookup.json.count | default(0) > 0
+    fail_msg: "Target template {{ scenario_aap_surveys_target_template.name }} was not found"
+
+- name: Create or update survey spec for {{ scenario_aap_surveys_target_template.name }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_surveys_api_base }}/{{ scenario_aap_surveys_target_kind }}s/{{ scenario_aap_surveys_target_lookup.json.results[0].id }}/survey_spec/"
+    method: POST
+    user: "{{ scenario_aap_surveys_aap_username }}"
+    password: "{{ scenario_aap_surveys_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_surveys_aap_verify_ssl }}"
+    status_code: [200, 201]
+    body_format: json
+    body:
+      description: "{{ scenario_aap_surveys_target_template.survey_description | default(scenario_aap_surveys_target_template.description | default('')) }}"
+      spec: "{{ scenario_aap_surveys_target_template.survey_spec | default([]) }}"
+      name: "{{ scenario_aap_surveys_target_template.name }}"
+      password: "{{ scenario_aap_surveys_target_template.survey_password | default(false) }}"
+      enabled: "{{ scenario_aap_surveys_target_template.survey_enabled | default(true) }}"
+  no_log: true

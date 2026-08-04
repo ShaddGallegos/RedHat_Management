@@ -1,0 +1,10 @@
+---
+# Example Windows inventory using static hosts and variables
+all:
+  hosts:
+    win1.example.com:
+      ansible_user: Administrator
+      ansible_password: your-password
+      ansible_connection: winrm
+      ansible_winrm_transport: ntlm
+      ansible_winrm_server_cert_validation: ignore

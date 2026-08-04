@@ -1,0 +1,12 @@
+---
+# Test: ansible_dev_node_redhat_products/scenario_openshift defaults
+- name: Test OpenShift defaults
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - ansible_dev_node_redhat_products/scenario_openshift
+  tasks:
+    - name: Verify defaults loaded
+      ansible.builtin.assert:
+        that:
+          - openshift_enabled is defined

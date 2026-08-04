@@ -1,0 +1,39 @@
+---
+- name: Ensure community.libvirt collection present on controller
+  ansible.builtin.meta: noop
+  when: false  # placeholder; install collection outside role
+
+- name: Ensure Satellite VM exists on libvirt host
+  community.libvirt.virt:
+    name: "{{ scenario_satellite_mail_setup_satellite_vm_name }}"
+    state: running
+    memory_mb: "{{ scenario_satellite_mail_setup_satellite_vm_memory_mb }}"
+    vcpus: "{{ scenario_satellite_mail_setup_satellite_vm_vcpus }}"
+    disk:
+      - name: "{{ scenario_satellite_mail_setup_satellite_vm_disk_name }}"
+        size: "{{ scenario_satellite_mail_setup_satellite_vm_disk_size_gb }}G"
+        pool: "{{ scenario_satellite_mail_setup_satellite_vm_pool }}"
+        cache: none
+    networks:
+      - name: "{{ scenario_satellite_mail_setup_satellite_vm_network }}"
+    boot:
+      hd: true
+      kernel: null
+    xml: "{{ satellite_vm_extra_xml | default(None) }}"
+    cloud_init:
+      user: |
+        #cloud-config
+        users:
+          - default
+          - name: root
+            ssh_authorized_keys:
+              - "{{ scenario_satellite_mail_setup_satellite_vm_root_pubkey }}"
+        package_update: true
+  delegate_to: "{{ scenario_satellite_mail_setup_libvirt_host }}"
+
+- name: Wait for SSH on Satellite VM
+  ansible.builtin.wait_for:
+    host: "{{ scenario_satellite_mail_setup_satellite_vm_hostname }}"
+    port: 22
+    timeout: 600
+  delegate_to: localhost

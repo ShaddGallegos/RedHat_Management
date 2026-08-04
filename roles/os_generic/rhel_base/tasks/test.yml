@@ -1,0 +1,4 @@
+---
+- name: RHEL test placeholder
+  ansible.builtin.debug:
+    msg: "Implement RHEL testing here."

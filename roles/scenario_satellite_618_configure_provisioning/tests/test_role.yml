@@ -1,0 +1,15 @@
+---
+# Test: satellite_content_config role
+- name: Test satellite_content_config role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    scenario_satellite_618_configure_provisioning_satellite_content_config_enabled: true
+    scenario_satellite_618_configure_provisioning_satellite_url: "https://scenario_satellite.example.com"
+    scenario_satellite_618_configure_provisioning_satellite_username: "admin"
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - scenario_satellite_618_configure_provisioning_satellite_content_config_enabled is defined
+          - scenario_satellite_618_configure_provisioning_satellite_url is defined

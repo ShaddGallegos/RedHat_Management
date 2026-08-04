@@ -1,0 +1,12 @@
+---
+# AAP composite entry
+- name: Include install.yml
+- ansible.builtin.import_tasks: install.yml
+- name: Include configure.yml
+- ansible.builtin.import_tasks: configure.yml
+- name: Include test.yml
+- ansible.builtin.import_tasks: test.yml
+- name: Include backup.yml
+- ansible.builtin.import_tasks: backup.yml
+- name: Include restore.yml
+- ansible.builtin.import_tasks: restore.yml

@@ -1,0 +1,13 @@
+---
+# Default variables for platform_provisioning role
+platform_provisioning_provisioning_enabled: true
+platform_provisioning_provisioning_version: "1.0"
+platform_provisioning_provisioning_timeout: 3600
+platform_provisioning_provisioning_max_retries: 3
+
+# Host platform_provisioning
+platform_provisioning_provision_hosts: true
+platform_provisioning_configure_networking: true
+
+# Feature toggles
+platform_provisioning_provisioning_validate_connectivity: true

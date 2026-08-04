@@ -1,0 +1,25 @@
+---
+# Default variables for scenario_aap_controller_setup role
+
+# Controller connection settings
+scenario_aap_controller_setup_aap_controller_host: "{{ ansible_host | default('controller.example.com') }}"
+scenario_aap_controller_setup_aap_controller_username: "{{ aap_admin_user | default('admin') }}"
+scenario_aap_controller_setup_aap_controller_password: "{{ aap_admin_password | default('') }}"
+scenario_aap_controller_setup_aap_controller_validate_certs: false
+
+# Manifest settings
+scenario_aap_controller_setup_aap_manifest_source_path: "/tmp/rhis_aap_manifest.zip"
+scenario_aap_controller_setup_aap_manifest_force: true
+
+# Authentication settings (can be overridden per deployment)
+scenario_aap_controller_setup_aap_settings: []
+  # Example:
+  # - name: "AUTHENTICATION_BACKENDS"
+  #   value: "django.contrib.auth.backends.ModelBackend"
+
+# Certificate settings
+scenario_aap_controller_setup_aap_service_cert_path: ""
+scenario_aap_controller_setup_aap_service_key_path: ""
+
+# Tag for manifest refresh
+scenario_aap_controller_setup_rhis_controller_manifest_refresh_tag: "rhis_manifest_refresh"

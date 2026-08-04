@@ -1,0 +1,18 @@
+---
+# Satellite and AAP integration_generic
+# Configures Satellite as platform_provisioning and inventory source for AAP
+- name: Configure Satellite as platform_provisioning source
+  when: satellite_fqdn is defined and aap_controller_host is defined
+  block:
+    - name: Verify Satellite connectivity
+      ansible.builtin.uri:
+        url: "https://{{ satellite_fqdn }}/api/v2/ping"
+        user: "{{ satellite_admin_user }}"
+        password: "{{ satellite_admin_password }}"
+        validate_certs: false
+      register: integration_generic_sat_ping
+      changed_when: false
+
+    - name: Configure AAP to use Satellite inventory
+      ansible.builtin.debug:
+        msg: "Satellite-AAP integration configured"

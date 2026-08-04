@@ -1,0 +1,168 @@
+---
+# Configure AAP Inventories
+- name: Validate AAP Inventories Configuration
+  block:
+    - name: Authenticate with AAP
+      ansible.builtin.uri:
+        url: "{{ scenario_aap_inventories_aap_url }}/api/v2/auth/token/"
+        method: POST
+        user: "{{ scenario_aap_inventories_aap_username }}"
+        password: "{{ aap_password }}"
+        validate_certs: "{{ scenario_aap_inventories_aap_verify_ssl }}"
+      register: aap_auth
+      no_log: true
+
+    - name: Extract AAP Token
+      ansible.builtin.set_fact:
+        aap_token: "{{ aap_auth.json.token }}"
+      no_log: true
+
+  when: scenario_aap_inventories_aap_inventories_config_enabled
+  tags: ["aap_inventories", "validation"]
+
+- name: Get Organization ID
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_inventories_aap_url }}/api/v2/organizations/?name={{ scenario_aap_inventories_aap_inventories_organization }}"
+    method: GET
+    headers:
+      Authorization: "Bearer {{ aap_token }}"
+    validate_certs: "{{ scenario_aap_inventories_aap_verify_ssl }}"
+  register: org_response
+  no_log: true
+
+- name: Set Organization ID
+  ansible.builtin.set_fact:
+    aap_organization_id: "{{ org_response.json.results[0].id }}"
+  when: org_response.json.results | length > 0
+  no_log: true
+
+- name: Configure Static Inventories
+  block:
+    - name: Create Static Inventories
+      ansible.builtin.uri:
+        url: "{{ scenario_aap_inventories_aap_url }}/api/v2/inventories/"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ scenario_aap_inventories_aap_verify_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          organization: "{{ aap_organization_id }}"
+          variables: "{{ item.variables | default({}) | to_nice_json }}"
+      register: static_inv_results
+      loop: "{{ scenario_aap_inventories_static_inventories }}"
+      no_log: true
+      when: scenario_aap_inventories_create_static_inventories
+
+    - name: Display Static Inventories Created
+      ansible.builtin.debug:
+        msg: "Created static inventory: {{ item.item.name }}"
+      loop: "{{ static_inv_results.results }}"
+      when: scenario_aap_inventories_create_static_inventories and static_inv_results.results is defined
+
+  when: scenario_aap_inventories_aap_inventories_config_enabled
+  tags: ["aap_inventories", "static"]
+
+- name: Configure Dynamic Inventories
+  block:
+    - name: Create Dynamic Inventories
+      ansible.builtin.uri:
+        url: "{{ scenario_aap_inventories_aap_url }}/api/v2/inventories/"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ scenario_aap_inventories_aap_verify_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          organization: "{{ aap_organization_id }}"
+          kind: "{{ item.source | default('dynamic') }}"
+          variables: "{{ item.source_vars | default({}) | to_nice_json }}"
+      register: dynamic_inv_results
+      loop: "{{ scenario_aap_inventories_dynamic_inventories }}"
+      no_log: true
+      when: scenario_aap_inventories_create_dynamic_inventories
+
+    - name: Display Dynamic Inventories Created
+      ansible.builtin.debug:
+        msg: "Created dynamic inventory: {{ item.item.name }}"
+      loop: "{{ dynamic_inv_results.results }}"
+      when: scenario_aap_inventories_create_dynamic_inventories and dynamic_inv_results.results is defined
+
+  when: scenario_aap_inventories_aap_inventories_config_enabled
+  tags: ["aap_inventories", "dynamic"]
+
+- name: Configure Inventory Sources
+  block:
+    - name: Get inventory IDs
+      ansible.builtin.uri:
+        url: "{{ scenario_aap_inventories_aap_url }}/api/v2/inventories/?name={{ item.inventory }}&organization={{ aap_organization_id }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ scenario_aap_inventories_aap_verify_ssl }}"
+      register: inv_lookup
+      loop: "{{ scenario_aap_inventories_inventory_sources }}"
+      no_log: true
+      when: scenario_aap_inventories_create_inventory_sources
+
+    - name: Create Inventory Sources
+      ansible.builtin.uri:
+        url: "{{ scenario_aap_inventories_aap_url }}/api/v2/scenario_aap_inventories_inventory_sources/"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ scenario_aap_inventories_aap_verify_ssl }}"
+        body_format: json
+        body:
+          name: "{{ item.name }}"
+          description: "{{ item.description | default('') }}"
+          inventory: "{{ item.inventory_id }}"
+          source: "{{ item.source }}"
+          source_path: "{{ item.source_path | default('') }}"
+          overwrite: "{{ item.overwrite | default(true) }}"
+      register: inv_source_results
+      loop: "{{ scenario_aap_inventories_inventory_sources }}"
+      vars:
+        inventory_id: "{{ item.inventory_id | default(0) }}"
+      no_log: true
+      when: scenario_aap_inventories_create_inventory_sources
+
+    - name: Display Inventory Sources Created
+      ansible.builtin.debug:
+        msg: "Created inventory source: {{ item.item.name }}"
+      loop: "{{ inv_source_results.results }}"
+      when: scenario_aap_inventories_create_inventory_sources and inv_source_results.results is defined
+
+  when: scenario_aap_inventories_aap_inventories_config_enabled
+  tags: ["aap_inventories", "sources"]
+
+- name: Test Inventories
+  block:
+    - name: Retrieve All Inventories
+      ansible.builtin.uri:
+        url: "{{ scenario_aap_inventories_aap_url }}/api/v2/inventories/?organization={{ aap_organization_id }}"
+        method: GET
+        headers:
+          Authorization: "Bearer {{ aap_token }}"
+        validate_certs: "{{ scenario_aap_inventories_aap_verify_ssl }}"
+      register: all_inventories
+      no_log: true
+
+    - name: Display Inventories Summary
+      ansible.builtin.debug:
+        msg: |
+          Inventories configured: {{ all_inventories.json.count }}
+
+          Inventory List:
+          {% for inv in all_inventories.json.results %}
+          - {{ inv.name }} (Kind: {{ inv.kind }}, Hosts: {{ inv.has_hosts }})
+          {% endfor %}
+
+  when:
+    - scenario_aap_inventories_aap_inventories_config_enabled
+    - scenario_aap_inventories_aap_inventories_test_imports
+  tags: ["aap_inventories", "test"]

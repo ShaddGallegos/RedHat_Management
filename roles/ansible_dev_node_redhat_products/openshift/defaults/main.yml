@@ -1,0 +1,35 @@
+---
+# Default variables for OpenShift role
+
+# OpenShift deployment mode
+openshift_deployment_mode: "containerized"
+
+# OpenShift version
+openshift_version: "4.21"
+
+# OpenShift cluster name
+openshift_cluster_name: "default"
+
+# OpenShift API server configuration
+openshift_api_server: "https://api.example.com:6443"
+
+# OpenShift ingress domain
+openshift_ingress_domain: "apps.example.com"
+
+# Enable OpenShift virtualization
+openshift_virtualization_enabled: false
+
+# Enable Operator Hub
+openshift_operatorhub_enabled: true
+
+# Storage class for persistent volumes
+openshift_storage_class: "local-storage"
+
+# OpenShift registry configuration
+openshift_registry_storage_size: "100Gi"
+
+# OpenShift monitoring stack
+openshift_monitoring_enabled: true
+
+# Enable Service Mesh
+openshift_servicemesh_enabled: false

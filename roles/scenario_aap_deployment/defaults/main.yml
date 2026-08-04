@@ -1,0 +1,29 @@
+---
+# Default variables for scenario_aap_deployment role
+
+# AAP installer settings
+scenario_aap_deployment_aap_installer_version: "2.7"
+scenario_aap_deployment_aap_installer_download_url: "https://access.redhat.com/downloads/content/..."
+scenario_aap_deployment_aap_installer_bundle_dir: "/opt/aap-installer"
+scenario_aap_deployment_aap_installer_inventory_dir: "{{ scenario_aap_deployment_aap_installer_bundle_dir }}/inventory"
+
+# Content download settings
+scenario_aap_deployment_aap_content_source_path: "/opt/aap-content"
+scenario_aap_deployment_aap_content_download_timeout: 3600
+
+# SSH settings for deployment
+scenario_aap_deployment_builder_key_file: "~/.ssh/id_rsa"
+scenario_aap_deployment_deployment_user: "root"
+
+# Controller target
+scenario_aap_deployment_controllers: []
+  # Example:
+  # - name: controller1
+  #   fqdn: "controller1.example.com"
+
+# Installer configuration
+scenario_aap_deployment_aap_installer_template_src: "templates/aap/rhis_controller_inventory.j2"
+scenario_aap_deployment_aap_installer_template_dest: "{{ scenario_aap_deployment_aap_installer_inventory_dir }}/hosts"
+
+# Verbosity
+scenario_aap_deployment_aap_install_verbosity: "-v"

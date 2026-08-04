@@ -1,0 +1,11 @@
+---
+# Reporting Role - Common reporting functionality
+
+galaxy_info:
+  author: "Red Hat Management"
+  description: "Generic reporting role for RHIS products"
+  company: "Red Hat"
+  license: "Apache License 2.0"
+  min_ansible_version: "2.11"
+
+dependencies: []

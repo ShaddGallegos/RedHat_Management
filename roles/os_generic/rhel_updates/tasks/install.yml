@@ -1,0 +1,4 @@
+---
+- name: Updates and patching install placeholder
+  ansible.builtin.debug:
+    msg: "Implement prerequisite installation for patching workflows here (e.g., repos, tooling)."

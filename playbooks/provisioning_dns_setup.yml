@@ -1,0 +1,48 @@
+---
+# DNS Server Only Setup Playbook
+# Configures BIND DNS service on secondary ethernet for 10.168.0.0/16
+
+- name: Configure DNS Server
+  hosts: scenario_satellite
+  gather_facts: true
+  become: true
+
+  vars_files:
+    - "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
+
+  vars:
+    provisioning_secondary_interface: "eth1"
+    provisioning_interface_ip: "10.168.0.1"
+    setup_dns_only: true
+
+  roles:
+    - role: platform_services_provisioning_stack
+      tags: dns
+
+  post_tasks:
+    - name: Verify DNS configuration
+      block:
+        - name: Check DNS service status
+          ansible.builtin.systemd:
+            name: named
+            state: started
+          register: dns_status
+
+        - name: Validate BIND configuration
+          ansible.builtin.command: named-checkconf /etc/named.conf
+          changed_when: false
+
+        - name: Show DNS status
+          ansible.builtin.debug:
+            msg: |
+              DNS Server Status:
+               Service: {{ dns_status.status.ActiveState }}
+               Resolver IP: 10.168.0.1:53
+               Zones: example.com, prod.spg
+               Options: rotate, timeout:2, attempts:3
+
+    - name: Test DNS resolution
+      ansible.builtin.command: "dig @10.168.0.1 scenario_satellite.prod.spg"
+      register: dns_test
+      changed_when: false
+      failed_when: dns_test.rc != 0

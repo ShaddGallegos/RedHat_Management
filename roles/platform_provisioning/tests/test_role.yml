@@ -1,0 +1,12 @@
+---
+# Test: platform_provisioning role basic functionality
+- name: Test platform_provisioning role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    platform_provisioning_provisioning_enabled: true
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - platform_provisioning_provisioning_enabled is defined

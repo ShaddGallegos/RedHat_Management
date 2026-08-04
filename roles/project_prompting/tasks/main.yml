@@ -1,0 +1,321 @@
+# ---
+# Role tasks to prompt for variables and generate env.local.generated.yml
+
+- name: "Prompt: select platform components to install"
+  ansible.builtin.pause:
+    prompt: |-
+      What platform components would you like to install? (comma separated numbers)
+      1. IdM
+      2. Ansible Automation Platform 2.6
+      3. Satellite 6.18
+      4. OpenShift 4.20
+      0. none / exit
+      Enter selection (e.g. 1,2,3):
+  register: project_prompting_platform_selection
+
+- name: Set selected_platforms list
+  ansible.builtin.set_fact:
+    project_prompting_selected_platforms: >-
+      {{ (project_prompting_platform_selection.user_input | default('')).split(',') | map('trim') | reject('equalto', '') | list }}
+
+- name: Debug selected_platforms
+  ansible.builtin.debug:
+    var: project_prompting_selected_platforms
+
+- name: "Prompt: select infrastructure"
+  ansible.builtin.pause:
+    prompt: |-
+      What infrastructure would you like to use? (single number)
+      1. Bare Metal
+      2. Libvirt
+      3. VMware
+      4. Nutanix
+      5. AWS
+      6. GCP
+      7. Azure
+      0. none / exit
+      Enter selection (e.g. 2):
+  register: project_prompting_infra_selection
+
+- name: Set selected_infra list
+  ansible.builtin.set_fact:
+    project_prompting_selected_infra: >-
+      {{ (project_prompting_infra_selection.user_input | default('')).split(',') | map('trim') | reject('equalto', '') | list }}
+
+- name: "Prompt: select integrations (comma separated)"
+  ansible.builtin.pause:
+    prompt: |-
+      Which integrations would you like?
+      1. Red Hat Insights
+      2. Splunk
+      3. syslog
+      4. ansible-cmdb
+      5. AI (MCP, llm, inference)
+      6. ServiceNow
+      7. Dynatrace
+      8. Ansible Development Node
+      0. none / exit
+      Enter selection (e.g. 1,4,6):
+  register: project_prompting_integration_selection
+
+- name: Set selected_integrations list
+  ansible.builtin.set_fact:
+    project_prompting_selected_integrations: >-
+      {{ (project_prompting_integration_selection.user_input | default('')).split(',') | map('trim') | reject('equalto', '') | list }}
+
+- name: Build normalized component list (platforms)
+  ansible.builtin.set_fact:
+    project_prompting_components: []
+
+- name: "Add IdM if selected"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['idm'] }}"
+  when: "'1' in project_prompting_selected_platforms"
+
+- name: "Add AAP if selected"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['aap'] }}"
+  when: "'2' in project_prompting_selected_platforms"
+
+- name: "Add Satellite if selected"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['satellite'] }}"
+  when: "'3' in project_prompting_selected_platforms"
+
+- name: "Add OpenShift if selected"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['openshift'] }}"
+  when: "'4' in project_prompting_selected_platforms"
+
+- name: "Add infra: Bare Metal"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['baremetal'] }}"
+  when: "'1' in project_prompting_selected_infra"
+
+- name: "Add infra: Libvirt"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['libvirt'] }}"
+  when: "'2' in project_prompting_selected_infra"
+
+- name: "Add infra: VMware"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['vmware'] }}"
+  when: "'3' in project_prompting_selected_infra"
+
+- name: "Add infra: Nutanix"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['nutanix'] }}"
+  when: "'4' in project_prompting_selected_infra"
+
+- name: "Add infra: AWS"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['aws'] }}"
+  when: "'5' in project_prompting_selected_infra"
+
+- name: "Add infra: GCP"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['gcp'] }}"
+  when: "'6' in project_prompting_selected_infra"
+
+- name: "Add infra: Azure"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['azure'] }}"
+  when: "'7' in project_prompting_selected_infra"
+
+- name: "Add integrations: Insights"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['insights'] }}"
+  when: "'1' in project_prompting_selected_integrations"
+
+- name: "Add integrations: Splunk"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['splunk'] }}"
+  when: "'2' in project_prompting_selected_integrations"
+
+- name: "Add integrations: syslog"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['syslog'] }}"
+  when: "'3' in project_prompting_selected_integrations"
+
+- name: "Add integrations: ansible-cmdb"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['ansible-cmdb'] }}"
+  when: "'4' in project_prompting_selected_integrations"
+
+- name: "Add integrations: AI"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['ai'] }}"
+  when: "'5' in project_prompting_selected_integrations"
+
+- name: "Add integrations: ServiceNow"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['servicenow'] }}"
+  when: "'6' in project_prompting_selected_integrations"
+
+- name: "Add integrations: Dynatrace"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['dynatrace'] }}"
+  when: "'7' in project_prompting_selected_integrations"
+
+- name: "Add integrations: Ansible Dev Node"
+  ansible.builtin.set_fact:
+    project_prompting_components: "{{ project_prompting_components + ['ansible-dev'] }}"
+  when: "'8' in project_prompting_selected_integrations"
+
+- name: Debug selected components
+  ansible.builtin.debug:
+    var: project_prompting_components
+
+- name: Set default system_admin_user before prompting loop
+  ansible.builtin.set_fact:
+    project_prompting_system_admin_user: "admin"
+
+- name: Enforce unique variable names in prompt definitions
+  ansible.builtin.assert:
+    that:
+      - (project_prompting_prompt_defs | map(attribute='name') | list | length) == (project_prompting_prompt_defs | map(attribute='name') | list | unique | length)
+    fail_msg: >-
+      Duplicate variable names detected in project_prompting_prompt_defs.
+      All variable names must be unique.
+  when: project_prompting_enforce_unique_variable_names | bool
+
+- name: Prompt (interactive) for each variable in project_prompting_prompt_defs filtered by selection
+  ansible.builtin.pause:
+    prompt: "{{ item.prompt }}{% if item.default is defined and item.default != '' %} (default: {{ item.default }}){% endif %}"
+  register: project_prompting_prompt_results
+  loop: "{{ project_prompting_prompt_defs }}"
+  when: item.components is not defined or (item.components | intersect(project_prompting_components) | length > 0)
+
+- name: Set facts from prompt results
+  ansible.builtin.set_fact:
+    "{{ item.name }}": "{{ (project_prompting_prompt_results.results[loop.index0].user_input) | default('') or (item.default | default('')) }}"
+  loop: "{{ project_prompting_prompt_defs }}"
+  when: item.components is not defined or (item.components | intersect(project_prompting_components) | length > 0)
+
+- name: Build variable set from prompted values only
+  ansible.builtin.set_fact:
+    project_prompting_management_vars: "{{ (project_prompting_management_vars | default({})) | combine({item.name: (vars[item.name] | default(''))}) }}"
+  loop: "{{ project_prompting_prompt_defs }}"
+  when: item.components is not defined or (item.components | intersect(project_prompting_components) | length > 0)
+
+- name: Enforce unique non-empty answers
+  vars:
+    project_prompting_answer_values: >-
+      {{
+        (project_prompting_management_vars | default({}))
+        | dict2items
+        | map(attribute='value')
+        | map('string')
+        | map('trim')
+        | reject('equalto', '')
+        | list
+      }}
+  ansible.builtin.assert:
+    that:
+      - (project_prompting_answer_values | length) == (project_prompting_answer_values | unique | length)
+    fail_msg: >-
+      Duplicate answers detected. All non-empty answers must be unique.
+  when: project_prompting_enforce_unique_answers | bool
+
+- name: Debug note for deprecated token
+  ansible.builtin.debug:
+    msg: >-
+      Using project_prompting_console_redhat_token as the canonical console token.
+      Any previous separate ansible_cfg/external_automationhub variables were removed.
+
+- name: Ensure automation_hub_token is set from console token if empty
+  ansible.builtin.set_fact:
+    project_prompting_automation_hub_token: "{{ project_prompting_automation_hub_token | default(project_prompting_console_redhat_token) | default('') }}"
+
+- name: Ensure local ansible conf directory exists
+  ansible.builtin.file:
+    path: "{{ project_prompting_ansible_conf_dir }}"
+    state: directory
+    mode: '0700'
+
+- name: Remove deprecated token keys from management vars
+  ansible.builtin.set_fact:
+    project_prompting_management_vars: >-
+      {{ (project_prompting_management_vars | default({}))
+         | dict2items
+         | rejectattr('key', 'in', ['project_prompting_ansible_cfg_token', 'project_prompting_external_automationhub_token'])
+         | items2dict }}
+
+- name: Split prompted variables into non-sensitive and sensitive sections
+  ansible.builtin.set_fact:
+    project_prompting_non_sensitive_vars: >-
+      {{
+        (project_prompting_management_vars | default({}))
+        | dict2items
+        | rejectattr('key', 'search', project_prompting_sensitive_key_pattern)
+        | items2dict
+      }}
+    project_prompting_sensitive_vars: >-
+      {{
+        (project_prompting_management_vars | default({}))
+        | dict2items
+        | selectattr('key', 'search', project_prompting_sensitive_key_pattern)
+        | items2dict
+      }}
+
+- name: Write merged variables to ~/.ansible/conf/env.yml
+  ansible.builtin.copy:
+    dest: "{{ project_prompting_env_file_path }}"
+    mode: '0600'
+    content: |
+      # Generated by roles/project_prompting on {{ ansible_date_time.iso8601 }}
+      # Canonical local config file: ~/.ansible/conf/env.yml
+      # Keep this file encrypted with ansible-vault using ~/.ansible/conf/.vaultpass.txt.
+      #
+      # Non-sensitive values
+      {{ project_prompting_non_sensitive_vars | to_nice_yaml(indent=2) }}
+
+      # Sensitive values (appended section)
+      {{ project_prompting_sensitive_vars | to_nice_yaml(indent=2) }}
+
+- name: Check preferred vault password file
+  ansible.builtin.stat:
+    path: "{{ project_prompting_vault_password_file_path }}"
+  register: project_prompting_vault_password_file_preferred
+
+- name: Check legacy vault password file
+  ansible.builtin.stat:
+    path: "{{ project_prompting_legacy_vault_password_file_path }}"
+  register: project_prompting_vault_password_file_legacy
+
+- name: Set effective vault password file path
+  ansible.builtin.set_fact:
+    project_prompting_vault_password_file_effective: >-
+      {{
+        project_prompting_vault_password_file_path
+        if project_prompting_vault_password_file_preferred.stat.exists
+        else project_prompting_legacy_vault_password_file_path
+      }}
+
+- name: Require vault password file when auto-encrypt is enabled
+  ansible.builtin.assert:
+    that:
+      - project_prompting_vault_password_file_preferred.stat.exists or project_prompting_vault_password_file_legacy.stat.exists
+    fail_msg: >-
+      Missing vault password file. Create ~/.ansible/conf/.vaultpass.txt
+      (or legacy ~/.ansible/conf/.vault_pass.txt) with mode 0600.
+  when: project_prompting_auto_encrypt_env_file | bool
+
+- name: Check if env.yml is already vaulted
+  ansible.builtin.command:
+    cmd: "head -n 1 {{ project_prompting_env_file_path }}"
+  changed_when: false
+  register: project_prompting_env_header
+
+- name: Encrypt env.yml with ansible-vault when needed
+  ansible.builtin.command:
+    cmd: >-
+      ansible-vault encrypt {{ project_prompting_env_file_path }}
+      --vault-password-file {{ project_prompting_vault_password_file_effective }}
+  when:
+    - project_prompting_auto_encrypt_env_file | bool
+    - "'$ANSIBLE_VAULT;' not in (project_prompting_env_header.stdout | default(''))"
+
+- name: Display where the generated file was written
+  ansible.builtin.debug:
+    msg: "Wrote combined management variables to {{ project_prompting_env_file_path }}"

@@ -1,0 +1,15 @@
+server {
+    listen 80;
+    server_name {{ ansible_cmdb_nginx_server_name | default('_') }};
+
+    access_log /var/log/nginx/ansible_cmdb_access.log;
+    error_log  /var/log/nginx/ansible_cmdb_error.log;
+
+    root {{ ansible_cmdb_data_dir }};
+    index index.html;
+
+    location / {
+        autoindex on;
+        try_files $uri $uri/ =404;
+    }
+}

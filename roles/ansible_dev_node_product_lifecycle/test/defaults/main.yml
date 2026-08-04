@@ -1,0 +1,9 @@
+---
+product_name: "product"
+test_types:
+  - connectivity
+  - services
+  - api
+product_services: []
+product_api_endpoints: []
+skip_tests: false

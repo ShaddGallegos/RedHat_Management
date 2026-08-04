@@ -1,0 +1,7 @@
+---
+# Reporting role defaults
+
+report_types: ["html", "json"]
+report_dir: "/tmp/rhis-reports"
+report_template: "report_standard.j2"
+report_include_cmdb: true

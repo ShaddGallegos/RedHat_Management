@@ -1,0 +1,53 @@
+# Ansible
+*.retry
+*.log
+.ansible/
+!.ansible/cp/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Secrets
+*.pem
+*.key
+*.json
+group_vars/all/vault.yml.unencrypted
+.vault_pass
+.vault_pass.txt
+
+# GCP
+service-account-*.json
+.gcp/
+
+# AAP/Tower
+aap_config_backup*.yml
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/*.log
+*.log.*
+
+# Temporary
+tmp/
+temp/
+*.tmp
+
+# Inventory cache
+/tmp/gcp_inventory_cache*

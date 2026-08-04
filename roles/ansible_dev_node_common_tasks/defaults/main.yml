@@ -1,0 +1,25 @@
+---
+# Default variables for common tasks role
+
+# Repository configuration
+ansible_dev_node_common_tasks_repositories: []
+
+# Time synchronization
+ansible_dev_node_common_tasks_ntp_servers:
+  - "0.rhel.pool.ntp.org"
+  - "1.rhel.pool.ntp.org"
+
+# Compliance/SCAP configuration
+ansible_dev_node_common_tasks_scap_file: null
+ansible_dev_node_common_tasks_scap_profile: "xccdf_org.ssgproject.content_profile_cis"
+
+# Global parameters
+ansible_dev_node_common_tasks_mandatory_global_parameters: []
+ansible_dev_node_common_tasks_mandatory_os_config: []
+
+# Environment type
+ansible_dev_node_common_tasks_environment: "development"
+ansible_dev_node_common_tasks_environment_type: "development"
+
+# System update strategy
+ansible_dev_node_common_tasks_update_strategy: "latest"  # latest or security

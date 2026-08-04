@@ -1,0 +1,12 @@
+---
+# Test: ansible_dev_node_redhat_products/idm defaults
+- name: Test IdM defaults
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - ansible_dev_node_redhat_products/idm
+  tasks:
+    - name: Verify defaults loaded
+      ansible.builtin.assert:
+        that:
+          - idm_enabled is defined

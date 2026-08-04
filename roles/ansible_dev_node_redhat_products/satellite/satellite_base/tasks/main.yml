@@ -1,0 +1,17 @@
+---
+# Organized Product-level Satellite role (PoC)
+# This file includes organized scenario_satellite subtasks (local copies)
+- name: Include install tasks
+  ansible.builtin.include_tasks: install.yml
+
+- name: Include configure tasks
+  ansible.builtin.include_tasks: configure.yml
+
+- name: Include test tasks
+  ansible.builtin.include_tasks: test.yml
+
+- name: Include backup tasks
+  ansible.builtin.include_tasks: backup.yml
+
+- name: Include restore tasks
+  ansible.builtin.include_tasks: restore.yml

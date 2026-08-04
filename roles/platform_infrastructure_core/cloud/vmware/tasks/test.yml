@@ -1,0 +1,4 @@
+---
+- name: VMware test placeholder
+  ansible.builtin.debug:
+    msg: "Implement VMware testing here."

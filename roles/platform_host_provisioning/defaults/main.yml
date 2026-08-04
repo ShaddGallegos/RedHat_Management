@@ -1,0 +1,29 @@
+---
+# Default variables for platform_host_provisioning role
+
+# Hosts to provision
+platform_host_provisioning_provisioning_hosts: []
+  # Example:
+  # - fqdn: "controller1.example.com"
+  #   organization: "example"
+  #   hostgroup: "baseRHEL8/Controller"
+  #   kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.8"
+  #   compute_resource: "VMware_Lab"
+  #   compute_profile: "SOE_Large"
+  #   mac: "00:50:56:ff:ff:ff"
+  #   inventory_groups: ["controllers"]
+
+# Satellite connection
+platform_host_provisioning_satellite_host: "{{ ansible_host | default('scenario_satellite.example.com') }}"
+platform_host_provisioning_satellite_username: "{{ satellite_admin_user | default('admin') }}"
+platform_host_provisioning_satellite_password: "{{ satellite_admin_password | default('') }}"
+
+# Host platform_provisioning defaults
+platform_host_provisioning_host_organization: "example"
+platform_host_provisioning_host_build_sync: true
+platform_host_provisioning_host_wait_timeout: 7200
+platform_host_provisioning_host_wait_sleep: 60
+platform_host_provisioning_host_wait_port: 22
+
+# Inventory groups for provisioned hosts
+platform_host_provisioning_default_inventory_groups: []

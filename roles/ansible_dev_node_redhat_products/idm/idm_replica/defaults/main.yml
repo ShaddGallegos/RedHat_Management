@@ -1,0 +1,16 @@
+---
+# IDM Replica Role Defaults
+
+# Enable/disable replica setup
+idm_replica_enabled: false
+
+# Replica server FQDN (set by playbook)
+idm_replica_fqdn: "{{ ansible_fqdn }}"
+
+# Primary IDM server details
+idm_primary_fqdn: "idm.example.com"
+idm_admin_password: "{{ idm_admin_password | default('') }}"
+
+# Replica configuration
+idm_replica_setup_admin: true
+idm_replica_auto_discovery: true

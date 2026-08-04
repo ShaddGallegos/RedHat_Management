@@ -1,0 +1,25 @@
+---
+# Main tasks for OpenShift role
+
+- name: "OpenShift | Display role information"
+  ansible.builtin.debug:
+    msg: |
+      OpenShift Role
+      Version: {{ openshift_version }}
+      Deployment Mode: {{ openshift_deployment_mode }}
+      Cluster Name: {{ openshift_cluster_name }}
+
+- name: "OpenShift | Validate prerequisites"
+  ansible.builtin.assert:
+    that:
+      - openshift_cluster_name is defined
+      - openshift_version is defined
+    fail_msg: "Required variables not defined for OpenShift deployment"
+
+- name: "OpenShift | Include distribution-specific tasks"
+  ansible.builtin.include_tasks: "{{ ansible_distribution_file_parsed['NAME'] | lower | replace(' ', '_') }}.yml"
+  ignore_errors: true
+
+- name: "OpenShift | Configure OpenShift cluster"
+  ansible.builtin.debug:
+    msg: "OpenShift {{ openshift_version }} cluster '{{ openshift_cluster_name }}' configuration tasks would run here"

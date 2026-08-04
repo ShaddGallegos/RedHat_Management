@@ -1,0 +1,26 @@
+---
+# Role entrypoint: conditionally import subtask modules for ansible_dev_node_support
+
+- name: Include support role preflight checks
+  ansible.builtin.import_tasks: preflight_tests/tasks/main.yml
+  when: ansible_dev_node_support_support_enabled | default(true) | bool and
+        ansible_dev_node_support_run_preflight_checks | default(true) | bool
+  tags: ["ansible_dev_node_support", "preflight"]
+
+- name: Include backup and restore tasks
+  ansible.builtin.import_tasks: backup/tasks/main.yml
+  when: ansible_dev_node_support_support_enabled | default(true) | bool and
+        ansible_dev_node_support_backup_and_restore | default(false) | bool
+  tags: ["ansible_dev_node_support", "backup"]
+
+- name: Include CMDB configuration tasks
+  ansible.builtin.import_tasks: ansible_cmdb_setup/tasks/main.yml
+  when: ansible_dev_node_support_support_enabled | default(true) | bool and
+        ansible_dev_node_support_configure_cmdb | default(true) | bool
+  tags: ["ansible_dev_node_support", "cmdb"]
+
+- name: Include role test tasks
+  ansible.builtin.import_tasks: testing/tasks/main.yml
+  when: ansible_dev_node_support_support_enabled | default(true) | bool and
+        ansible_dev_node_support_run_tests | default(false) | bool
+  tags: ["ansible_dev_node_support", "test"]

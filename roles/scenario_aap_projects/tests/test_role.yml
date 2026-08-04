@@ -1,0 +1,15 @@
+---
+# Test: scenario_aap_projects role
+- name: Test scenario_aap_projects role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    scenario_aap_projects_aap_projects_config_enabled: true
+    scenario_aap_projects_aap_url: "https://aap.example.com"
+    scenario_aap_projects_aap_username: "admin"
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - scenario_aap_projects_aap_projects_config_enabled is defined
+          - scenario_aap_projects_aap_url is defined

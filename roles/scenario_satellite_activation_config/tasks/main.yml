@@ -1,0 +1,160 @@
+---
+# Configure Satellite Activation Keys and Subscriptions
+- name: Validate Satellite Activation Configuration
+  block:
+    - name: Check Satellite connectivity
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_activation_config_satellite_url }}/api/v2/ping/"
+        method: GET
+        user: "{{ scenario_satellite_activation_config_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_activation_config_satellite_validate_ssl }}"
+      register: satellite_ping
+      failed_when: satellite_ping.status not in [200, 401]
+
+  when: scenario_satellite_activation_config_satellite_activation_config_enabled
+  tags: ["satellite_activation", "validation"]
+
+- name: Configure Host Collections
+  block:
+    - name: Create Host Collections
+      redhat.scenario_satellite.host_collection:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        organization: "{{ item.organization | default(scenario_satellite_activation_config_satellite_organization) }}"
+        state: "present"
+        server_url: "{{ scenario_satellite_activation_config_satellite_url }}"
+        username: "{{ scenario_satellite_activation_config_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_activation_config_satellite_validate_ssl }}"
+      register: hc_results
+      loop: "{{ scenario_satellite_activation_config_host_collections }}"
+      when: scenario_satellite_activation_config_configure_host_collections
+
+    - name: Display Host Collections Created
+      ansible.builtin.debug:
+        msg: "Created host collection: {{ item.item.name }}"
+      loop: "{{ hc_results.results }}"
+      when: scenario_satellite_activation_config_configure_host_collections and hc_results.results is defined
+
+  when: scenario_satellite_activation_config_satellite_activation_config_enabled
+  tags: ["satellite_activation", "scenario_satellite_activation_config_host_collections"]
+
+- name: Configure Activation Keys
+  block:
+    - name: Create Activation Keys
+      redhat.scenario_satellite.activation_key:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        organization: "{{ item.organization | default(scenario_satellite_activation_config_satellite_organization) }}"
+        lifecycle_environment: "{{ item.lifecycle_environment | default('Library') }}"
+        content_view: "{{ item.content_view | default('') }}"
+        usage_limit: "{{ item.usage_limit | default(-1) }}"
+        auto_attach: "{{ item.auto_attach | default(true) }}"
+        release_version: "{{ item.release_version | default('') }}"
+        state: "present"
+        server_url: "{{ scenario_satellite_activation_config_satellite_url }}"
+        username: "{{ scenario_satellite_activation_config_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_activation_config_satellite_validate_ssl }}"
+      register: ak_results
+      loop: "{{ scenario_satellite_activation_config_activation_keys }}"
+      when: scenario_satellite_activation_config_create_activation_keys
+
+    - name: Display Activation Keys Created
+      ansible.builtin.debug:
+        msg: "Created activation key: {{ item.item.name }}"
+      loop: "{{ ak_results.results }}"
+      when: scenario_satellite_activation_config_create_activation_keys and ak_results.results is defined
+
+  when: scenario_satellite_activation_config_satellite_activation_config_enabled
+  tags: ["satellite_activation", "keys"]
+
+- name: Attach Subscriptions
+  block:
+    - name: Attach Subscriptions to Activation Keys
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_activation_config_satellite_url }}/api/v2/scenario_satellite_activation_config_activation_keys/{{ ak_id }}/subscriptions"
+        method: POST
+        user: "{{ scenario_satellite_activation_config_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_activation_config_satellite_validate_ssl }}"
+        body_format: json
+        body:
+          subscription_id: "{{ item.subscription_id }}"
+          quantity: "{{ item.quantity | default(1) }}"
+      register: sub_attach_results
+      loop: "{{ scenario_satellite_activation_config_subscription_attachments }}"
+      vars:
+        ak_id: "{{ item.activation_key }}"
+      when: scenario_satellite_activation_config_attach_subscriptions
+
+    - name: Display Subscription Attachments
+      ansible.builtin.debug:
+        msg: "Attached subscription to activation key"
+      loop: "{{ sub_attach_results.results }}"
+      when: scenario_satellite_activation_config_attach_subscriptions and sub_attach_results.results is defined
+
+  when: scenario_satellite_activation_config_satellite_activation_config_enabled
+  tags: ["satellite_activation", "subscriptions"]
+
+- name: Enable Repository Sets
+  block:
+    - name: Enable Repository Sets on Activation Keys
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_activation_config_satellite_url }}/api/v2/scenario_satellite_activation_config_activation_keys/{{ ak_id }}/product_content"
+        method: PUT
+        user: "{{ scenario_satellite_activation_config_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_activation_config_satellite_validate_ssl }}"
+        body_format: json
+        body:
+          content:
+            - content_label: "{{ item.name }}"
+              value: "1"
+      register: repo_enable_results
+      loop: "{{ scenario_satellite_activation_config_repository_sets }}"
+      vars:
+        ak_id: "{{ item.activation_key }}"
+      when: scenario_satellite_activation_config_repository_sets is defined
+
+    - name: Display Repository Sets Enabled
+      ansible.builtin.debug:
+        msg: "Enabled repository set on activation key"
+      loop: "{{ repo_enable_results.results }}"
+      when: repo_enable_results.results is defined
+
+  when: scenario_satellite_activation_config_satellite_activation_config_enabled
+  tags: ["satellite_activation", "repositories"]
+
+- name: Test Activation Configuration
+  block:
+    - name: Get Activation Keys Summary
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_activation_config_satellite_url }}/api/v2/scenario_satellite_activation_config_activation_keys/?organization_id=1"
+        method: GET
+        user: "{{ scenario_satellite_activation_config_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_activation_config_satellite_validate_ssl }}"
+      register: ak_summary
+
+    - name: Display Activation Configuration Summary
+      ansible.builtin.debug:
+        msg: |
+          Satellite Activation Configuration Summary:
+
+          Organization: {{ scenario_satellite_activation_config_satellite_organization }}
+
+          Activation Keys Configured:
+          {% for ak in ak_summary.json.results | default([]) %}
+          - {{ ak.name }}
+            Environment: {{ ak.environment.name | default('Library') }}
+            Content View: {{ ak.content_view.name | default('') }}
+            Auto-attach: {{ ak.auto_attach }}
+          {% endfor %}
+
+          Host Collections: {{ 'Configured' if scenario_satellite_activation_config_configure_host_collections else 'Skipped' }}
+          Subscriptions: {{ 'Configured' if scenario_satellite_activation_config_attach_subscriptions else 'Skipped' }}
+
+  when: scenario_satellite_activation_config_satellite_activation_config_enabled
+  tags: ["satellite_activation", "test"]

@@ -1,0 +1,12 @@
+---
+# Install required packages and enable services
+- name: Install libvirt and tooling packages
+  ansible.builtin.package:
+    name: "{{ libvirt_packages }}"
+    state: present
+
+- name: Ensure libvirtd is enabled and started
+  ansible.builtin.systemd:
+    name: libvirtd
+    state: started
+    enabled: true

@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  author: RHIS Infrastructure Team
+  description: "Configure DHCP, DNS, PXE, and TFTP services on secondary ethernet device for 10.168.0.0/16 network"
+  license: GPL-3.0-or-later
+  min_ansible_version: '2.9'
+  galaxy_tags:
+    - networking
+    - system
+    - platformprovisioning

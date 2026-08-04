@@ -1,0 +1,73 @@
+---
+# Satellite Content Lifecycle Management Defaults
+
+# Content Repository Configuration
+satellite_content_repos:
+  - name: "rhel-8-for-x86_64-baseos-rpms"
+    product: "Red Hat Enterprise Linux for x86_64"
+    enabled: true
+    gpg_check: true
+    sync_policy: "on_demand"
+  - name: "rhel-8-for-x86_64-appstream-rpms"
+    product: "Red Hat Enterprise Linux for x86_64"
+    enabled: true
+    gpg_check: true
+    sync_policy: "on_demand"
+  - name: "rhel-8-for-x86_64-supplementary-rpms"
+    product: "Red Hat Enterprise Linux for x86_64"
+    enabled: false
+    gpg_check: true
+    sync_policy: "on_demand"
+  - name: "rhel-8-for-x86_64-highavailability-rpms"
+    product: "Red Hat Enterprise Linux for x86_64"
+    enabled: false
+    gpg_check: true
+    sync_policy: "on_demand"
+
+# Content View Configuration
+satellite_content_views:
+  - name: "RHEL-8-Base"
+    description: "Base RHEL 8 content with OS updates"
+    repos:
+      - "rhel-8-for-x86_64-baseos-rpms"
+      - "rhel-8-for-x86_64-appstream-rpms"
+    auto_publish: false
+
+  - name: "RHEL-8-Full"
+    description: "Complete RHEL 8 with supplementary and HA"
+    repos:
+      - "rhel-8-for-x86_64-baseos-rpms"
+      - "rhel-8-for-x86_64-appstream-rpms"
+      - "rhel-8-for-x86_64-supplementary-rpms"
+      - "rhel-8-for-x86_64-highavailability-rpms"
+    auto_publish: true
+
+# Composite Content Views
+satellite_composite_views:
+  - name: "Production-Composite"
+    description: "Production environment composite content view"
+    components:
+      - "RHEL-8-Base"
+  - name: "Development-Composite"
+    description: "Development environment composite content view"
+    components:
+      - "RHEL-8-Full"
+
+# Lifecycle Environment Paths
+satellite_lifecycle_paths:
+  - name: "Production"
+    description: "Production environment"
+    prior: "Library"
+  - name: "Staging"
+    description: "Staging environment"
+    prior: "Production"
+  - name: "Development"
+    description: "Development environment"
+    prior: "Library"
+
+# Content promotion settings
+satellite_content_promote: true
+satellite_promotion_wait: 3600  # seconds
+satellite_sync_policy: "on_demand"
+satellite_repo_download_policy: "on_demand"
+satellite_enable_gpg_check: true

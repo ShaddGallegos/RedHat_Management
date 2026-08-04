@@ -1,0 +1,11 @@
+---
+# Default variables for scenario_ansible_cmdb_setup role
+scenario_ansible_cmdb_setup_ansible_cmdb_setup_enabled: false
+scenario_ansible_cmdb_setup_ansible_cmdb_setup_version: "1.0"
+
+# CMDB configuration
+scenario_ansible_cmdb_setup_ansible_cmdb_output_format: "html"
+scenario_ansible_cmdb_setup_ansible_cmdb_output_directory: "/var/www/ansible-scenario_ansible_cmdb_core"
+
+# Feature toggles
+scenario_ansible_cmdb_setup_ansible_cmdb_setup_generate_docs: true

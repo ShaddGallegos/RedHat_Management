@@ -1,0 +1,3 @@
+- name: "Restart IPA"
+  ansible.builtin.command: |
+    ipactl restart

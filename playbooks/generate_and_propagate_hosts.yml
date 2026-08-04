@@ -1,0 +1,250 @@
+---
+- name: Generate hosts and inventory from ansible_dev_node_prompts
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars_files:
+    - "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
+  vars_prompt:
+    - name: scenario
+      prompt: "Choose scenario (lab/prod/custom)"
+      private: false
+    - name: installer
+      prompt: "Enter installer host as hostname:ip (this node must be included) (e.g., installer.example.com:10.0.0.5)"
+      private: false
+    - name: host_list
+      prompt: "Enter hosts as hostname:ip:type separated by commas (e.g., sat.example.com:10.0.0.10:scenario_satellite,dhcp1:10.0.0.11:dhcp)"
+      private: false
+    - name: github_user
+      prompt: "(optional) GitHub username for repo operations (leave blank if not needed)"
+      private: false
+    - name: github_repo
+      prompt: "(optional) GitHub repo name (owner/repo) for workflow integration_generic (leave blank if not needed)"
+      private: false
+    - name: github_pat
+      prompt: "(optional) GitHub Personal Access Token (PAT) with 'repo' and 'workflow' scopes (leave blank if not needed)"
+      private: true
+  tasks:
+    - name: Parse installer into parts
+      ansible.builtin.set_fact:
+        installer_parts: "{{ installer.split(':') }}"
+
+    - name: Build installer_entry
+      ansible.builtin.set_fact:
+        installer_entry: "{{ {'name': (installer_parts[0]) | trim, 'ip': (installer_parts[1]) | trim, 'type': 'installer'} }}"
+
+    - name: Build hosts_entries list
+      vars:
+        parts: "{{ item.split(':') }}"
+        part_entry:
+          name: "{{ parts[0] | trim }}"
+          ip: "{{ parts[1] | trim }}"
+          type: "{{ (parts | length > 2) | ternary((parts[2] | trim), 'unknown') }}"
+      ansible.builtin.set_fact:
+        hosts_entries: "{{ hosts_entries | default([]) + [part_entry] }}"
+      loop: "{{ host_list.split(',') }}"
+
+    - name: Show parsed hosts (for verification)
+      ansible.builtin.debug:
+        var: hosts_entries
+
+    - name: Ensure installer is included in hosts_entries
+      ansible.builtin.set_fact:
+        hosts_entries: "{{ (hosts_entries | default([])) + [installer_entry] }}"
+      when: "(hosts_entries | default([]) | selectattr('name', 'equalto', installer_entry.name) | list | length) == 0"
+
+    - name: Validate no duplicate hostnames or IPs
+      ansible.builtin.assert:
+        that:
+          - "(hosts_entries | map(attribute='name') | list | length) == (hosts_entries | map(attribute='name') | list | unique | length)"
+          - "(hosts_entries | map(attribute='ip') | list | length) == (hosts_entries | map(attribute='ip') | list | unique | length)"
+        fail_msg: "Duplicate hostnames or IP addresses found in host list. Please correct and re-run."
+
+    - name: Validate IPv4 format for all hosts
+      vars:
+        ipv4_regex: '^(?:25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])){3}$'
+      ansible.builtin.assert:
+        that:
+          - "item.ip is match(ipv4_regex)"
+        fail_msg: "Invalid IPv4 address '{{ item.ip }}' for host '{{ item.name }}'"
+      loop: "{{ hosts_entries }}"
+
+    - name: (optional) Reverse-DNS validation per host (run lookup and fail if mismatch)
+      ansible.builtin.command: getent hosts {{ item.ip }}
+      register: rdns_single
+      failed_when: rdns_single.stdout == '' or (item.name not in rdns_single.stdout.split())
+      changed_when: false
+      loop: "{{ hosts_entries }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: reverse_dns_check | default(false) | bool
+
+    # NOTE: Do NOT automatically load a user-level ~/.ansible/conf/env.yml here.
+    # Values from a personal env.yml must be applied explicitly by the operator
+    # (e.g., by setting variables or invoking a helper). Proceed using prompted values.
+
+    - name: Render /etc/hosts template to files/generated_hosts
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/hosts.j2"
+        dest: "{{ playbook_dir }}/files/generated_hosts"
+        mode: '0644'
+
+    - name: Render inventory to inventory/hosts
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/inventory_hosts.j2"
+        dest: "{{ playbook_dir }}/inventory/hosts"
+        mode: '0644'
+
+    - name: Ensure generated_hosts is readable
+      ansible.builtin.file:
+        path: "{{ playbook_dir }}/files/generated_hosts"
+        mode: '0644'
+
+    - name: Collect installer and satellite IP lists (controller)
+      ansible.builtin.set_fact:
+        installer_ips: "{{ hosts_entries | selectattr('type', 'equalto', 'installer') | map(attribute='ip') | list }}"
+        satellite_ips: "{{ hosts_entries | selectattr('type', 'equalto', 'scenario_satellite') | map(attribute='ip') | list }}"
+
+    - name: Collect 10.168.* prefix matches (controller)
+      ansible.builtin.set_fact:
+        ip_prefix_matches: "{{ hosts_entries | selectattr('ip', 'match', '^10\\.168\\.') | map(attribute='ip') | list }}"
+
+    - name: Set installer and scenario_satellite nameserver variables (controller)
+      ansible.builtin.set_fact:
+        installer_ns: "{{ installer_ips[0] | default(installer_entry.ip) }}"
+        satellite_ns: "{{ satellite_ips[0] | default(ip_prefix_matches[0] | default('')) }}"
+
+    - name: Render resolv.conf on controller for verification
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/resolv.conf.j2"
+        dest: "{{ playbook_dir }}/files/generated_resolv.conf"
+        mode: '0644'
+      vars:
+        nameservers: "{{ ([installer_ns] + ([satellite_ns] if satellite_ns != '' else [])) | unique }}"
+
+    - name: Render env.conf with GitHub credentials (controller)
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/env.conf.j2"
+        dest: "{{ playbook_dir }}/files/env.conf"
+        mode: '0600'
+      # github_user/github_repo/github_pat are provided by vars_prompt or the
+      # operator; do not shadow these variables with self-referential defaults
+
+- name: Propagate hosts and inventory to all machines
+  hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: (controller) Optionally wait until all hosts are reachable (runs on localhost)
+      when: wait_until_all | default(false) | bool
+      delegate_to: localhost
+      block:
+        - name: Wait for SSH port on each host
+          ansible.builtin.wait_for:
+            host: "{{ item.ip }}"
+            port: 22
+            timeout: "{{ per_host_wait_timeout | default(total_wait_timeout | default(1800)) }}"
+          register: wait_host_res
+          failed_when: false
+          loop: "{{ hosts_entries }}"
+          loop_control:
+            label: "{{ item.name }}"
+
+        - name: Show reachability report
+          ansible.builtin.debug:
+            msg: "{{ item.item.name }} ({{ item.item.ip }}) reachable={{ not item.failed }} elapsed={{ item.elapsed | default('n/a') }}"
+          loop: "{{ wait_host_res.results }}"
+
+    - name: Wait for SSH to become available
+      ansible.builtin.wait_for_connection:
+        timeout: "{{ wait_timeout | default(300) }}"
+      register: wait_res
+      retries: "{{ wait_retries | default(12) }}"
+      delay: "{{ wait_delay | default(10) }}"
+      until: wait_res is succeeded
+      ignore_errors: true
+      when: (propagate | default(true) | bool)
+
+    - name: Set installer and scenario_satellite nameserver variables
+      vars:
+        installer_list: "{{ hosts_entries | selectattr('type', 'equalto', 'installer') | map(attribute='ip') | list }}"
+        satellite_list: "{{ hosts_entries | selectattr('type', 'equalto', 'scenario_satellite') | map(attribute='ip') | list }}"
+        ip_prefix_matches: "{{ hosts_entries | selectattr('ip', 'match', '^10\\.168\\.') | map(attribute='ip') | list }}"
+      ansible.builtin.set_fact:
+        installer_ns: "{{ installer_list[0] | default(installer_entry.ip) }}"
+        satellite_ns: "{{ satellite_list[0] | default(ip_prefix_matches[0] | default('')) }}"
+
+    - name: Render resolv.conf with both nameservers and rotate option
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/templates/resolv.conf.j2"
+        dest: "{{ playbook_dir }}/files/generated_resolv.conf"
+        mode: '0644'
+      vars:
+        nameservers: "{{ ([installer_ns] + ([satellite_ns] if satellite_ns != '' else [])) | unique }}"
+
+    - name: Copy files to remote machines (hosts, resolv.conf, inventory) honoring dry-run
+      when: propagate | default(true) and wait_res is defined and wait_res is succeeded
+      block:
+        - name: Show files to copy (dry-run)
+          ansible.builtin.debug:
+            msg: |
+                DRY-RUN: would copy these files to {{ inventory_hostname }}:
+                  - ../files/generated_hosts -> /etc/hosts
+                  - ../files/generated_resolv.conf -> /etc/resolv.conf
+                  - ../inventory/hosts -> /etc/ansible_hosts
+          when: dry_run | default(false) | bool
+
+        - name: (dry-run) Show diff for /etc/hosts
+          ansible.builtin.shell: diff -u - /etc/hosts || true
+          register: diff_hosts
+          failed_when: false
+          changed_when: false
+          args:
+            stdin: "{{ lookup('file', playbook_dir + '/files/generated_hosts') }}"
+          when: dry_run | default(false) | bool
+
+        - name: Display /etc/hosts diff (dry-run)
+          ansible.builtin.debug:
+            msg: "{{ diff_hosts.stdout if diff_hosts.stdout != '' else 'No differences for /etc/hosts' }}"
+          when: dry_run | default(false) | bool
+
+        - name: (dry-run) Show diff for /etc/resolv.conf
+          ansible.builtin.shell: diff -u - /etc/resolv.conf || true
+          register: diff_resolv
+          failed_when: false
+          changed_when: false
+          args:
+            stdin: "{{ lookup('file', playbook_dir + '/files/generated_resolv.conf') }}"
+          when: dry_run | default(false) | bool
+
+        - name: Display /etc/resolv.conf diff (dry-run)
+          ansible.builtin.debug:
+            msg: "{{ diff_resolv.stdout if diff_resolv.stdout != '' else 'No differences for /etc/resolv.conf' }}"
+          when: dry_run | default(false) | bool
+
+        - name: Copy generated /etc/hosts to remote machine
+          ansible.builtin.copy:
+            src: "{{ playbook_dir }}/files/generated_hosts"
+            dest: /etc/hosts
+            owner: root
+            group: root
+            mode: '0644'
+          when: not (dry_run | default(false) | bool)
+
+        - name: Copy generated resolv.conf to remote machine
+          ansible.builtin.copy:
+            src: "{{ playbook_dir }}/files/generated_resolv.conf"
+            dest: /etc/resolv.conf
+            owner: root
+            group: root
+            mode: '0644'
+          when: not (dry_run | default(false) | bool)
+
+        - name: Copy inventory hosts to remote machine
+          ansible.builtin.copy:
+            src: "{{ playbook_dir }}/inventory/hosts"
+            dest: /etc/ansible_hosts
+            owner: root
+            group: root
+            mode: '0644'
+          when: not (dry_run | default(false) | bool)

@@ -1,0 +1,43 @@
+---
+# Integrate a new disk into an existing LVM structure
+- name: Resolve target disk name
+  ansible.builtin.set_fact:
+    target_disk_name: "{{ integration_disk_integration_target_disk | regex_replace('^/dev/', '') }}"
+
+- name: Fail if target disk is not detected in facts
+  ansible.builtin.fail:
+    msg: "Target disk {{ integration_disk_integration_target_disk }} not found in ansible_facts.devices; set integration_disk_integration_target_disk to a valid block device."
+  when: target_disk_name not in ansible_facts.devices
+- name: Install LVM2
+  ansible.builtin.package:
+    name: lvm2
+    state: present
+
+- name: Create Physical Volume (PV)
+  ansible.builtin.command: pvcreate "{{ integration_disk_integration_target_disk }}"
+  register: pvcreate_result
+  changed_when: "'successfully created' in pvcreate_result.stdout or pvcreate_result.rc == 0"
+  failed_when: pvcreate_result.rc not in [0,5]  # rc 5 if already initialized
+
+- name: Create Volume Group (VG)
+  community.general.lvg:
+    vg: "{{ integration_disk_integration_vg_name }}"
+    pvs: "{{ integration_disk_integration_target_disk }}"
+
+- name: Create Logical Volume (LV)
+  community.general.lvol:
+    vg: "{{ integration_disk_integration_vg_name }}"
+    lv: "{{ integration_disk_integration_lv_name }}"
+    size: "{{ integration_disk_integration_lv_size }}"
+
+- name: Create Filesystem
+  community.general.filesystem:
+    fstype: "{{ integration_disk_integration_fs_type }}"
+    dev: "/dev/{{ integration_disk_integration_vg_name }}/{{ integration_disk_integration_lv_name }}"
+
+- name: Mount Filesystem
+  ansible.builtin.mount:
+    path: "{{ integration_disk_integration_mount_point }}"
+    src: "/dev/{{ integration_disk_integration_vg_name }}/{{ integration_disk_integration_lv_name }}"
+    fstype: "{{ integration_disk_integration_fs_type }}"
+    state: mounted

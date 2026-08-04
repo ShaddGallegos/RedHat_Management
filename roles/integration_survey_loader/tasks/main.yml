@@ -1,0 +1,24 @@
+---
+# Load survey file from controller if present and expose `vm_list` and `hosts_entries`
+- name: Check for survey file on controller
+  ansible.builtin.stat:
+    path: files/cache/survey.yml
+  delegate_to: localhost
+  run_once: true
+  register: survey_file
+
+- name: Load survey variables from controller when present
+  include_vars:
+    ansible.builtin.file: files/cache/survey.yml
+    name: survey
+  when: survey_file.stat.exists
+  delegate_to: localhost
+  run_once: true
+
+- name: Expose surveyed vm_list and hosts_entries to role consumers
+  ansible.builtin.set_fact:
+    vm_list: "{{ hostvars['localhost']['survey']['vm_list'] }}"
+    hosts_entries: "{{ hostvars['localhost']['survey']['hosts_entries'] }}"
+  when: survey_file.stat.exists
+  delegate_to: localhost
+  run_once: true

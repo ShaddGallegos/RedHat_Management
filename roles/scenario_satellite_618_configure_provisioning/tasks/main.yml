@@ -1,0 +1,256 @@
+---
+# Configure Satellite Content Management
+- name: Validate Satellite Content Configuration
+  block:
+    - name: Check Satellite connectivity
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}/api/v2/ping/"
+        method: GET
+        user: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: satellite_ping
+      failed_when: satellite_ping.status not in [200, 401]
+
+    - name: Authenticate with Satellite
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}/api/v2/users/"
+        method: GET
+        user: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: satellite_auth
+
+  when: scenario_satellite_618_configure_provisioning_satellite_content_config_enabled
+  tags: ["satellite_content", "validation"]
+
+- name: Configure Organizations
+  block:
+    - name: Create Organizations
+      redhat.scenario_satellite.organization:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        state: "{{ item.state | default('present') }}"
+        server_url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}"
+        username: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: org_results
+      loop: "{{ scenario_satellite_618_configure_provisioning_organizations }}"
+      when: scenario_satellite_618_configure_provisioning_create_organizations
+
+    - name: Display Organizations Created
+      ansible.builtin.debug:
+        msg: "Created/Updated organization: {{ item.item.name }}"
+      loop: "{{ org_results.results }}"
+      when: scenario_satellite_618_configure_provisioning_create_organizations and org_results.results is defined
+
+  when: scenario_satellite_618_configure_provisioning_satellite_content_config_enabled
+  tags: ["satellite_content", "scenario_satellite_618_configure_provisioning_organizations"]
+
+- name: Configure Locations
+  block:
+    - name: Create Locations
+      redhat.scenario_satellite.location:
+        name: "{{ item.name }}"
+        description: "{{ item.description | default('') }}"
+        state: "{{ item.state | default('present') }}"
+        server_url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}"
+        username: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: loc_results
+      loop: "{{ scenario_satellite_618_configure_provisioning_locations }}"
+      when: scenario_satellite_618_configure_provisioning_create_locations
+
+    - name: Display Locations Created
+      ansible.builtin.debug:
+        msg: "Created/Updated location: {{ item.item.name }}"
+      loop: "{{ loc_results.results }}"
+      when: scenario_satellite_618_configure_provisioning_create_locations and loc_results.results is defined
+
+  when: scenario_satellite_618_configure_provisioning_satellite_content_config_enabled
+  tags: ["satellite_content", "scenario_satellite_618_configure_provisioning_locations"]
+
+- name: Configure Products
+  block:
+    - name: Create Products
+      redhat.scenario_satellite.product:
+        name: "{{ item.name }}"
+        organization: "{{ item.organization | default(scenario_satellite_618_configure_provisioning_satellite_organization) }}"
+        description: "{{ item.description | default('') }}"
+        state: "present"
+        server_url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}"
+        username: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: prod_results
+      loop: "{{ scenario_satellite_618_configure_provisioning_products }}"
+      when: scenario_satellite_618_configure_provisioning_create_products
+
+    - name: Display Products Created
+      ansible.builtin.debug:
+        msg: "Created product: {{ item.item.name }}"
+      loop: "{{ prod_results.results }}"
+      when: scenario_satellite_618_configure_provisioning_create_products and prod_results.results is defined
+
+  when: scenario_satellite_618_configure_provisioning_satellite_content_config_enabled
+  tags: ["satellite_content", "scenario_satellite_618_configure_provisioning_products"]
+
+- name: Configure Repositories
+  block:
+    - name: Create Repositories
+      redhat.scenario_satellite.repository:
+        name: "{{ item.name }}"
+        product: "{{ item.product }}"
+        organization: "{{ item.organization | default(scenario_satellite_618_configure_provisioning_satellite_organization) }}"
+        content_type: "{{ item.content_type | default('yum') }}"
+        url: "{{ item.url | default('') }}"
+        download_policy: "{{ item.download_policy | default('immediate') }}"
+        mirror_on_sync: "{{ item.mirror_on_sync | default(true) }}"
+        state: "present"
+        server_url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}"
+        username: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: repo_results
+      loop: "{{ scenario_satellite_618_configure_provisioning_repositories }}"
+      when: scenario_satellite_618_configure_provisioning_create_repositories
+
+    - name: Display Repositories Created
+      ansible.builtin.debug:
+        msg: "Created repository: {{ item.item.name }}"
+      loop: "{{ repo_results.results }}"
+      when: scenario_satellite_618_configure_provisioning_create_repositories and repo_results.results is defined
+
+    - name: Synchronize Repositories
+      block:
+        - name: Trigger repository sync
+          ansible.builtin.uri:
+            url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}/api/v2/scenario_satellite_618_configure_provisioning_repositories/{{ item.id }}/sync/"
+            method: POST
+            user: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+            password: "{{ satellite_password }}"
+            validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+            body_format: json
+            body: {}
+          register: sync_results
+          loop: "{{ repo_results.results | selectattr('id', 'defined') | list }}"
+          when: scenario_satellite_618_configure_provisioning_synchronize_repositories and repo_results.results is defined
+
+        - name: Display Sync Tasks Started
+          ansible.builtin.debug:
+            msg: "Sync task started for repository"
+          loop: "{{ sync_results.results }}"
+          when: scenario_satellite_618_configure_provisioning_synchronize_repositories and sync_results.results is defined
+
+      when: scenario_satellite_618_configure_provisioning_create_repositories and scenario_satellite_618_configure_provisioning_synchronize_repositories
+
+  when: scenario_satellite_618_configure_provisioning_satellite_content_config_enabled
+  tags: ["satellite_content", "scenario_satellite_618_configure_provisioning_repositories"]
+
+- name: Enable RHEL Repository Sets
+  block:
+    - name: Enable RHEL yum repository sets for scenario_satellite_618_configure_provisioning_products
+      redhat.scenario_satellite.repository_set:
+        name: "{{ item.name }}"
+        product: "{{ item.product }}"
+        organization: "{{ scenario_satellite_618_configure_provisioning_satellite_organization }}"
+        basearch: "{{ item.basearch }}"
+        releasever: "{{ item.releasever }}"
+        state: "enabled"
+        server_url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}"
+        username: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: repo_set_results
+      loop: "{{ scenario_satellite_618_configure_provisioning_repository_sets_to_enable }}"
+      when: scenario_satellite_618_configure_provisioning_enable_repository_sets
+
+    - name: Display Enabled Repository Sets
+      ansible.builtin.debug:
+        msg: "Enabled repository set: {{ item.item.name }} ({{ item.item.releasever }})"
+      loop: "{{ repo_set_results.results }}"
+      when: scenario_satellite_618_configure_provisioning_enable_repository_sets and repo_set_results.results is defined
+
+    - name: Verify Repository Sets Enabled
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}/api/v2/scenario_satellite_618_configure_provisioning_products?organization_id={{ org_id | default('1') }}&name=Red%20Hat%20Enterprise%20Linux%20Server"
+        method: GET
+        user: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: product_info
+      when: scenario_satellite_618_configure_provisioning_enable_repository_sets
+
+    - name: Display Enabled Repositories
+      ansible.builtin.debug:
+        msg: |
+          RHEL Repository Sets Status:
+
+          Successfully enabled RHEL yum scenario_satellite_618_configure_provisioning_repositories for:
+          {% for item in scenario_satellite_618_configure_provisioning_repository_sets_to_enable %}
+          - {{ item.name }} (RelVer: {{ item.releasever }})
+          {% endfor %}
+
+          These scenario_satellite_618_configure_provisioning_repositories are now available for content views and activation keys.
+      when: scenario_satellite_618_configure_provisioning_enable_repository_sets and repo_set_results.changed
+
+  when: scenario_satellite_618_configure_provisioning_satellite_content_config_enabled
+  tags: ["satellite_content", "repository_sets"]
+- name: Configure Sync Plans
+  block:
+    - name: Create Sync Plans
+      redhat.scenario_satellite.sync_plan:
+        name: "{{ item.name }}"
+        organization: "{{ item.organization | default(scenario_satellite_618_configure_provisioning_satellite_organization) }}"
+        description: "{{ item.description | default('') }}"
+        interval: "{{ item.interval | default('weekly') }}"
+        sync_date: "{{ item.sync_date }}"
+        enabled: "{{ item.enabled | default(true) }}"
+        state: "present"
+        server_url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}"
+        username: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: sync_plan_results
+      loop: "{{ scenario_satellite_618_configure_provisioning_sync_plans }}"
+      when: scenario_satellite_618_configure_provisioning_create_sync_plans
+
+    - name: Display Sync Plans Created
+      ansible.builtin.debug:
+        msg: "Created sync plan: {{ item.item.name }}"
+      loop: "{{ sync_plan_results.results }}"
+      when: scenario_satellite_618_configure_provisioning_create_sync_plans and sync_plan_results.results is defined
+
+  when: scenario_satellite_618_configure_provisioning_satellite_content_config_enabled
+  tags: ["satellite_content", "scenario_satellite_618_configure_provisioning_sync_plans"]
+
+- name: Test Content Configuration
+  block:
+    - name: Get Organization Information
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_618_configure_provisioning_satellite_url }}/api/v2/scenario_satellite_618_configure_provisioning_organizations/{{ scenario_satellite_618_configure_provisioning_satellite_organization }}"
+        method: GET
+        user: "{{ scenario_satellite_618_configure_provisioning_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_618_configure_provisioning_satellite_validate_ssl }}"
+      register: org_info
+
+    - name: Display Content Summary
+      ansible.builtin.debug:
+        msg: |
+          Satellite Content Configuration Summary:
+
+          Organization: {{ scenario_satellite_618_configure_provisioning_satellite_organization }}
+          Location: {{ scenario_satellite_618_configure_provisioning_satellite_location }}
+
+          Configurations Applied:
+          - Organizations: {{ 'Configured' if scenario_satellite_618_configure_provisioning_create_organizations else 'Skipped' }}
+          - Locations: {{ 'Configured' if scenario_satellite_618_configure_provisioning_create_locations else 'Skipped' }}
+          - Products: {{ 'Configured' if scenario_satellite_618_configure_provisioning_create_products else 'Skipped' }}
+          - Repositories: {{ 'Configured' if scenario_satellite_618_configure_provisioning_create_repositories else 'Skipped' }}
+          - Sync Plans: {{ 'Configured' if scenario_satellite_618_configure_provisioning_create_sync_plans else 'Skipped' }}
+
+  when: scenario_satellite_618_configure_provisioning_satellite_content_config_enabled
+  tags: ["satellite_content", "test"]

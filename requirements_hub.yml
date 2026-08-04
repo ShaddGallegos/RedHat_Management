@@ -1,0 +1,61 @@
+---
+# Collections that require Red Hat Automation Hub access (subscription token)
+# Install with: ANSIBLE_GALAXY_SERVER_AUTOMATION_HUB_TOKEN=<token> ansible-galaxy collection install -r requirements_hub.yml
+collections:
+  - name: redhat.satellite_operations
+    version: ">=1.3.0"
+  - name: redhat.rhel_system_roles
+    version: ">=1.22.0"
+  - name: infra.aap_configuration
+    version: ">=2.6.0"
+  - name: redhat.insights
+    version: ">=1.3.0"
+  # The following community/ansible entries are placed here when pinned
+  # to specific versions intended for Automation Hub installs only.
+  - name: ansible.utils
+    version: ">=2.11.0"
+  - name: community.general
+    version: ">=6.0.0"
+  - name: ansible.posix
+    version: ">=2.0.0"
+  - name: ansible.netcommon
+    version: ">=4.0.0"
+  - name: community.crypto
+    version: ">=3.0.0"
+  - name: community.os_windows
+    version: ">=2.0.0"
+  - name: community.platform_vmware
+    version: ">=3.0.0"
+  - name: community.docker
+    version: ">=2.0.0"
+  - name: community.kubernetes
+    version: ">=2.0.0"
+  - name: community.hashi_vault
+    version: ">=3.0.0"
+  - name: redhat.certificates 
+    version: ">=2.5.0"
+  - name: redhat.firewall
+    version: ">=2.5.0"
+  - name: redhat.logging  
+    version: ">=2.5.0"
+  - name: redhat.monitoring
+    version: ">=2.5.0"
+  - name: redhat.network_insights 
+    version: ">=2.5.0"
+  - name: redhat.storage
+    version: ">=2.5.0"
+  - name: redhat.system_roles 
+    version: ">=2.5.0"
+  - name: redhat.users
+    version: ">=2.5.0"
+  - name: redhat.workloads
+    version: ">=2.5.0"
+  - name: ansible.kubernetes
+    version: ">=2.0.0"
+  - name: ansible.platform_vmware
+    version: ">=2.0.0"
+  - name: ansible.docker
+    version: ">=2.0.0"
+  - name: ansible.hashi_vault
+    version: ">=2.0.0"
+roles: []

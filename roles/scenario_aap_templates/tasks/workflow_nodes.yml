@@ -1,0 +1,32 @@
+---
+- name: Look up workflow template ID for {{ scenario_aap_templates_workflow_definition.workflow_template }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/workflow_job_templates/?name={{ scenario_aap_templates_workflow_definition.workflow_template | urlencode }}&organization={{ aap_organization_id }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_workflow_definition_lookup
+  no_log: true
+
+- name: Validate workflow template exists for {{ scenario_aap_templates_workflow_definition.workflow_template }}
+  ansible.builtin.assert:
+    that:
+      - scenario_aap_templates_workflow_definition_lookup.json.count | default(0) > 0
+    fail_msg: "Workflow template {{ scenario_aap_templates_workflow_definition.workflow_template }} was not found"
+
+- name: Create workflow nodes for {{ scenario_aap_templates_workflow_definition.workflow_template }}
+  ansible.builtin.include_tasks: workflow_node_create.yml
+  loop: "{{ scenario_aap_templates_workflow_definition.nodes }}"
+  loop_control:
+    loop_var: scenario_aap_templates_workflow_node_definition
+    label: "{{ scenario_aap_templates_workflow_node_definition.identifier }}"
+
+- name: Link workflow nodes for {{ scenario_aap_templates_workflow_definition.workflow_template }}
+  ansible.builtin.include_tasks: workflow_node_link.yml
+  loop: "{{ scenario_aap_templates_workflow_definition.nodes }}"
+  loop_control:
+    loop_var: scenario_aap_templates_workflow_node_definition
+    label: "{{ scenario_aap_templates_workflow_node_definition.identifier }}"

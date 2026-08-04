@@ -1,0 +1,17 @@
+---
+# Global variables used across RedHat_Management integrations
+admin_username: admin
+admin_password: "REMOVED_EXAMPLE_PASSWORD"
+satellite_url: "https://scenario_satellite.example.com"
+aap_url: "https://aap.example.com"
+insights_account: ""
+selected_integrations:
+  - scenario_satellite
+  - aap
+  - libvirt
+  - insights
+  - eda
+  - ara
+  - ansible_cmdb
+  - httpd
+  - firewall

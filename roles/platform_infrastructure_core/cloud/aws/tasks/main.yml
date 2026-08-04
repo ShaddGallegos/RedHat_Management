@@ -1,0 +1,21 @@
+---
+- name: AWS role main dispatcher
+  - name: Include install.yml
+  ansible.builtin.import_tasks: install.yml
+  tags: [install]
+
+- name: Include configure.yml
+- ansible.builtin.import_tasks: configure.yml
+  tags: [configure]
+
+- name: Include test.yml
+- ansible.builtin.import_tasks: test.yml
+  tags: [test]
+
+- name: Include backup.yml
+- ansible.builtin.import_tasks: backup.yml
+  tags: [backup]
+
+- name: Include restore.yml
+- ansible.builtin.import_tasks: restore.yml
+  tags: [restore]

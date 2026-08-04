@@ -1,0 +1,63 @@
+---
+- name: Install mail server packages
+  ansible.builtin.package:
+    name:
+      - postfix
+      - mailx
+    state: present
+  become: true
+
+- name: Configure postfix main.cf
+  ansible.builtin.lineinfile:
+    path: /etc/postfix/main.cf
+    regexp: "^{{ item.key }} ="
+    line: "{{ item.key }} = {{ item.value }}"
+    create: true
+    backup: true
+  loop:
+    - { key: inet_interfaces, value: all }
+    - { key: myhostname, value: "{{ scenario_satellite_mail_setup_satellite_fqdn }}" }
+    - { key: mydestination, value: "$myhostname, localhost.$mydomain, localhost" }
+    - { key: relayhost, value: "{{ scenario_satellite_mail_setup_satellite_mail_relay | default('') }}" }
+    - { key: smtp_use_tls, value: 'yes' }
+    - { key: smtp_tls_security_level, value: may }
+    - { key: smtp_tls_note_starttls_offer, value: 'yes' }
+    - { key: smtp_tls_loglevel, value: 1 }
+    - { key: smtp_tls_CAfile, value: "/etc/pki/tls/cert.pem" }
+  notify: Restart postfix
+  become: true
+
+- name: Ensure postfix running and enabled
+  ansible.builtin.service:
+    name: postfix
+    state: started
+    enabled: true
+  become: true
+
+- name: Optionally configure SMTP auth/relay credentials
+  ansible.builtin.copy:
+    dest: /etc/postfix/sasl_passwd
+    content: "{{ scenario_satellite_mail_setup_satellite_mail_relay_credentials | default('') }}\n"
+    owner: root
+    group: root
+    mode: '0600'
+  when: scenario_satellite_mail_setup_satellite_mail_relay_credentials is defined and scenario_satellite_mail_setup_satellite_mail_relay_credentials|length > 0
+  notify:
+    - Postmap sasl_passwd
+    - Restart postfix
+  become: true
+
+- name: Ensure postmap sasl_passwd
+  ansible.builtin.command: postmap /etc/postfix/sasl_passwd
+  when: scenario_satellite_mail_setup_satellite_mail_relay_credentials is defined and scenario_satellite_mail_setup_satellite_mail_relay_credentials|length > 0
+  notify: Restart postfix
+  become: true
+
+- name: Allow mail traffic in firewalld if present
+  ansible.posix.firewalld:
+    ansible.builtin.service: smtp
+    state: enabled
+    permanent: true
+    immediate: true
+  when: ansible_facts.services is not defined or ansible_facts.services['firewalld.service'] is defined
+  become: true

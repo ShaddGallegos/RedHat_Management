@@ -1,0 +1,14 @@
+---
+# Default variables for platform_infrastructure_manager role
+platform_infrastructure_manager_infrastructure_manager_enabled: true
+platform_infrastructure_manager_infrastructure_manager_version: "1.0"
+platform_infrastructure_manager_infrastructure_manager_timeout: 1800
+platform_infrastructure_manager_infrastructure_manager_max_retries: 3
+
+# Platform configuration
+platform_infrastructure_manager_deploy_infrastructure: true
+platform_infrastructure_manager_infrastructure_platform: "libvirt"
+platform_infrastructure_manager_infrastructure_network: "default"
+
+# Feature toggles
+platform_infrastructure_manager_infrastructure_manager_validate_prerequisites: true

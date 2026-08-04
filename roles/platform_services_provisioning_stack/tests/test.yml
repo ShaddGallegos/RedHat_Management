@@ -1,0 +1,32 @@
+---
+# Test playbook for platform_services_provisioning_stack role
+
+- name: Test platform_services_provisioning_stack configuration
+  hosts: localhost
+  gather_facts: true
+  vars:
+    platform_services_provisioning_stack_provisioning_host: "scenario_satellite.prod.spg"
+    platform_services_provisioning_stack_provisioning_secondary_interface: "eth1"
+    platform_services_provisioning_stack_provisioning_interface_ip: "10.168.0.1"
+
+  tasks:
+    - name: Verify platform_provisioning role variables
+      ansible.builtin.debug:
+        msg: |
+          Testing platform_services_provisioning_stack role
+          ==========================================
+          Provisioning Host: {{ platform_services_provisioning_stack_provisioning_host }}
+          Secondary Interface: {{ platform_services_provisioning_stack_provisioning_secondary_interface }}
+          Interface IP: {{ platform_services_provisioning_stack_provisioning_interface_ip }}
+          DHCP Enabled: {{ platform_services_provisioning_stack_dhcp_enabled }}
+          DNS Enabled: {{ platform_services_provisioning_stack_dns_enabled }}
+          TFTP Enabled: {{ platform_services_provisioning_stack_tftp_enabled }}
+          PXE Enabled: {{ platform_services_provisioning_stack_pxe_enabled }}
+
+    - name: Test required variables exist
+      ansible.builtin.assert:
+        that:
+          - platform_services_provisioning_stack_provisioning_host is defined
+          - platform_services_provisioning_stack_provisioning_secondary_interface is defined
+          - platform_services_provisioning_stack_provisioning_interface_ip is defined
+        fail_msg: "Required platform_provisioning variables not defined"

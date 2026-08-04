@@ -1,0 +1,52 @@
+---
+# Insights Base Configuration Defaults
+
+# Insights Registration
+insights_enabled: true
+insights_org_id: "{{ insights_organization_id | default('org_id') }}"
+insights_activation_key: "{{ insights_activation_key_value | default('activation_key') }}"
+
+# Insights Service Configuration
+insights_rhc_enabled: true
+insights_rhc_user: "insights"
+insights_rhc_group: "insights"
+insights_rhc_config_dir: "/etc/insights-client"
+
+# Insights Client Settings
+insights_client_enabled: true
+insights_client_interval: 86400  # 24 hours
+insights_client_auto_update: true
+insights_client_https_certificate_verify: true
+
+# Compliance and Remediation
+insights_compliance_enabled: true
+insights_remediation_enabled: true
+insights_vulnerability_scanning: true
+insights_patch_recommendations: true
+
+# Reporting Configuration
+insights_report_format: "json"
+insights_report_upload: true
+insights_report_schedule: "0 2 * * *"  # Daily at 2 AM
+
+# Insights Hybrid-Cloud Features
+insights_drift_detection: true
+insights_performance_analytics: true
+insights_configuration_management: true
+
+# Automation Integration
+insights_enable_remediation_playbooks: true
+insights_enable_event_driven_automation: true
+insights_aap_integration: true
+
+# Security and Authentication
+insights_tls_verify: true
+insights_proxy_enabled: false
+insights_proxy_host: "{{ proxy_host | default('') }}"
+insights_proxy_port: "{{ proxy_port | default(3128) }}"
+
+# Logging Configuration
+insights_log_level: "INFO"
+insights_log_dir: "/var/log/insights-client"
+insights_log_max_size: 52428800  # 50MB
+insights_log_retention_days: 30

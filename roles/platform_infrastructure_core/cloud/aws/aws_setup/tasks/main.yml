@@ -1,0 +1,17 @@
+- name: Include ensure_repositories.yml
+- ansible.builtin.import_tasks: ensure_repositories.yml
+  tags:
+    - mandatory
+
+- name: Include ensure_chronyd.yml
+- ansible.builtin.import_tasks: ensure_chronyd.yml
+  tags:
+    - mandatory
+    - time
+
+- name: Include ensure_idm_registered.yml
+- ansible.builtin.import_tasks: ensure_idm_registered.yml
+  tags:
+    - mandatory
+    - idmclient
+    - idm_setup

@@ -1,0 +1,98 @@
+---
+# Example playbook to generate GCP-AAP-Satellite integration project
+# This playbook uses the aap_gcp role to create all necessary configuration
+# files, playbooks, and optionally AAP resources.
+#
+# Usage:
+#   ansible-playbook setup_gcp_integration.yml
+#
+# To configure AAP resources as well:
+#   ansible-playbook setup_gcp_integration.yml -e aap_configure_aap=true
+#
+# Prerequisites:
+#   - Install required collections: ansible-galaxy collection install -r requirements.yml
+#   - Set up GCP project and service account
+#   - Configure Satellite 6.18 instance
+#   - Have AAP 2.6 controller accessible (if using aap_configure_aap=true)
+
+- name: Generate GCP to Satellite Integration Project
+  hosts: localhost
+  gather_facts: true
+  
+  vars:
+    # Required Variables - Update these with your environment details
+    aap_gcp_project_name: "my-gcp-satellite-integration"
+    aap_gcp_base_dir: "/home/sgallego/ansible-projects/gcp-satellite"
+    
+    # GCP Configuration
+    aap_gcp_project_id: "my-gcp-project-id"
+    aap_gcp_region: "us-central1"
+    aap_gcp_zones:
+      - us-central1-a
+      - us-central1-b
+    aap_gcp_service_account_file: "~/.gcp/sa-key.json"
+    
+    # Satellite Configuration
+    aap_satellite_url: "https://satellite.example.com"
+    aap_satellite_org: "Default Organization"
+    aap_satellite_location: "Default Location"
+    aap_satellite_hostgroup: "RHEL9/Production"
+    aap_satellite_activation_key: "rhel9-prod-key"
+    aap_satellite_username: "admin"
+    # Note: Password will be stored in generated vault.yml file
+    
+    # AAP Controller Configuration (only needed if aap_configure_aap=true)
+    aap_controller_hostname: "https://controller.example.com"
+    aap_controller_username: "admin"
+    # Note: Password will be stored in generated vault.yml file
+    
+    # Execution Environment
+    aap_ee_image: "my-registry.io/gcp-satellite-ee:latest"
+    
+    # Optional: Customize workflow behavior
+    aap_workflow_approval_timeout: 3600  # 1 hour for approvals
+    aap_workflow_job_timeout: 7200       # 2 hours for job execution
+    
+    # Optional: Enable notifications
+    aap_enable_slack_notifications: true
+    aap_slack_channel: "#ansible-alerts"
+    # Note: Slack webhook URL will be stored in generated vault.yml file
+    
+    # Optional: Customize inventory filtering
+    aap_gcp_inventory_filters:
+      - 'status = RUNNING'
+      - 'labels.environment = production'
+    
+    # Create project structure and files
+    aap_gcp_create_structure: true
+    
+    # Set to true to also create AAP resources
+    # Requires AAP credentials and connectivity
+    aap_configure_aap: false
+
+  roles:
+    - role: aap_gcp
+
+  post_tasks:
+    - name: Display next steps
+      ansible.builtin.debug:
+        msg:
+          - "✅ Project structure created successfully!"
+          - ""
+          - "📁 Project location: {{ aap_gcp_base_dir }}"
+          - ""
+          - "Next Steps:"
+          - "1. Copy your GCP service account JSON to {{ aap_gcp_service_account_file }}"
+          - "2. Edit {{ aap_gcp_base_dir }}/vars/vault.yml and add real passwords/credentials"
+          - "3. Encrypt the vault file:"
+          - "   ansible-vault encrypt {{ aap_gcp_base_dir }}/vars/vault.yml --vault-password-file {{ aap_gcp_base_dir }}/.vault_password"
+          - "4. Install required collections:"
+          - "   ansible-galaxy collection install -r {{ aap_gcp_base_dir }}/collections/requirements.yml"
+          - "5. Build the execution environment:"
+          - "   cd {{ aap_gcp_base_dir }}/execution_environments && ansible-builder build -t {{ aap_ee_image }}"
+          - "6. Test the GCP dynamic inventory:"
+          - "   ansible-inventory -i {{ aap_gcp_base_dir }}/inventories/gcp_dynamic.yml --list"
+          - "7. Test the registration playbook locally:"
+          - "   ansible-playbook {{ aap_gcp_base_dir }}/playbooks/gcp_satellite_registration.yml --limit test-vm"
+          - ""
+          - "{% if aap_configure_aap %}✅ AAP resources created - login to {{ aap_controller_hostname }} to see workflow{% else %}⏭️  To create AAP resources, run again with: -e aap_configure_aap=true{% endif %}"

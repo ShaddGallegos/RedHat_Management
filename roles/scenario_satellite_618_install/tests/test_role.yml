@@ -1,0 +1,12 @@
+---
+# Test: satellite_6_18_deployment role basic functionality
+- name: Test satellite_6_18_deployment role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    scenario_satellite_618_install_satellite_6_18_deployment_enabled: true
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - scenario_satellite_618_install_satellite_6_18_deployment_enabled is defined

@@ -1,0 +1,27 @@
+---
+# IDM Replica Installation and Configuration
+# Configures secondary IDM servers with multi-master replication
+# Uses Red Hat rhel_idm collection ipareplica role
+
+- name: Configure IDM replica server
+  block:
+    - name: Apply the IdM Replica role to {{ ansible_fqdn }}
+      ansible.builtin.include_role:
+        name: redhat.rhel_idm.ipareplica
+
+  when: idm_replica_enabled is defined and idm_replica_enabled | bool
+
+- name: Verify replica functionality
+  block:
+    - name: Test IDM replica connectivity
+      ansible.builtin.command: ipa user-list
+      register: idm_replica_test
+      changed_when: false
+      ignore_errors: true
+
+    - name: Display replica verification result
+      ansible.builtin.debug:
+        msg: "IDM replica {{ ansible_fqdn }} is operational"
+      when: idm_replica_test.rc == 0
+
+  when: idm_replica_enabled is defined and idm_replica_enabled | bool

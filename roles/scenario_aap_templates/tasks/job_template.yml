@@ -1,0 +1,117 @@
+---
+- name: Look up inventory for {{ scenario_aap_templates_job_template.name }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/inventories/?name={{ scenario_aap_templates_job_template.inventory | urlencode }}&organization={{ aap_organization_id }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_job_template_inventory_lookup
+  no_log: true
+
+- name: Look up project for {{ scenario_aap_templates_job_template.name }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/projects/?name={{ scenario_aap_templates_job_template.project | urlencode }}&organization={{ aap_organization_id }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_job_template_project_lookup
+  no_log: true
+
+- name: Look up credential for {{ scenario_aap_templates_job_template.name }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/credentials/?name={{ scenario_aap_templates_job_template.credential | urlencode }}&organization={{ aap_organization_id }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_job_template_credential_lookup
+  no_log: true
+
+- name: Look up vault credential for {{ scenario_aap_templates_job_template.name }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/credentials/?name={{ scenario_aap_templates_job_template.vault_credential | urlencode }}&organization={{ aap_organization_id }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_job_template_vault_lookup
+  no_log: true
+  when: scenario_aap_templates_job_template.vault_credential is defined and scenario_aap_templates_job_template.vault_credential | length > 0
+
+- name: Validate dependencies for {{ scenario_aap_templates_job_template.name }}
+  ansible.builtin.assert:
+    that:
+      - scenario_aap_templates_job_template_inventory_lookup.json.count | default(0) > 0
+      - scenario_aap_templates_job_template_project_lookup.json.count | default(0) > 0
+      - scenario_aap_templates_job_template_credential_lookup.json.count | default(0) > 0
+      - scenario_aap_templates_job_template.vault_credential is not defined or scenario_aap_templates_job_template_vault_lookup.json.count | default(0) > 0
+    fail_msg: "Missing inventory, project, or credential for {{ scenario_aap_templates_job_template.name }}"
+
+- name: Build credential ID list for {{ scenario_aap_templates_job_template.name }}
+  ansible.builtin.set_fact:
+    scenario_aap_templates_job_template_credentials: >-
+      {{
+        [scenario_aap_templates_job_template_credential_lookup.json.results[0].id]
+        + ([scenario_aap_templates_job_template_vault_lookup.json.results[0].id] if (scenario_aap_templates_job_template_vault_lookup is defined and scenario_aap_templates_job_template_vault_lookup.json.count | default(0) > 0) else [])
+      }}
+
+- name: Look up existing job template for {{ scenario_aap_templates_job_template.name }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/job_templates/?name={{ scenario_aap_templates_job_template.name | urlencode }}&organization={{ aap_organization_id }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_job_template_existing_lookup
+  no_log: true
+
+- name: Create or update job template {{ scenario_aap_templates_job_template.name }}
+  ansible.builtin.uri:
+    url: >-
+      {{
+        scenario_aap_templates_api_base ~ '/job_templates/' ~
+        (scenario_aap_templates_job_template_existing_lookup.json.results[0].id | string ~ '/' if (scenario_aap_templates_job_template_existing_lookup.json.count | default(0) > 0) else '')
+      }}
+    method: "{{ 'PATCH' if (scenario_aap_templates_job_template_existing_lookup.json.count | default(0) > 0) else 'POST' }}"
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200, 201]
+    body_format: json
+    body:
+      name: "{{ scenario_aap_templates_job_template.name }}"
+      description: "{{ scenario_aap_templates_job_template.description | default('') }}"
+      inventory: "{{ scenario_aap_templates_job_template_inventory_lookup.json.results[0].id | int }}"
+      project: "{{ scenario_aap_templates_job_template_project_lookup.json.results[0].id | int }}"
+      playbook: "{{ scenario_aap_templates_job_template.playbook }}"
+      credentials: "{{ scenario_aap_templates_job_template_credentials }}"
+      become_enabled: "{{ scenario_aap_templates_job_template.become_enabled | default(true) }}"
+      forks: "{{ scenario_aap_templates_job_template.forks | default(0) }}"
+      timeout: "{{ scenario_aap_templates_job_template.timeout | default(0) }}"
+      verbosity: "{{ scenario_aap_templates_job_template.verbosity | default(0) }}"
+      ask_inventory_on_launch: "{{ scenario_aap_templates_job_template.ask_inventory | default(false) }}"
+      ask_variables_on_launch: "{{ scenario_aap_templates_job_template.ask_variables | default(false) }}"
+      job_tags: "{{ scenario_aap_templates_job_template.tags | default([]) | join(',') }}"
+      skip_tags: "{{ scenario_aap_templates_job_template.skip_tags | default('') }}"
+      limit: "{{ scenario_aap_templates_job_template.limit | default('') }}"
+      extra_vars: "{{ scenario_aap_templates_job_template.extra_vars | default({}) }}"
+  register: scenario_aap_templates_job_template_result
+  no_log: true
+
+- name: Store job template ID for {{ scenario_aap_templates_job_template.name }}
+  ansible.builtin.set_fact:
+    scenario_aap_templates_job_template_results: >-
+      {{ scenario_aap_templates_job_template_results | default({}) | combine({ scenario_aap_templates_job_template.name: scenario_aap_templates_job_template_result.json.id }) }}

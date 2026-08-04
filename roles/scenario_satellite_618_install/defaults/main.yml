@@ -1,0 +1,10 @@
+---
+# Default variables for satellite_6_18_deployment role
+scenario_satellite_618_install_satellite_6_18_deployment_enabled: false
+scenario_satellite_618_install_satellite_6_18_deployment_version: "1.0"
+
+# RHIS-specific Satellite configuration
+scenario_satellite_618_install_satellite_rhis_environment: "production"
+
+# Feature toggles
+scenario_satellite_618_install_satellite_6_18_deployment_validate_config: true

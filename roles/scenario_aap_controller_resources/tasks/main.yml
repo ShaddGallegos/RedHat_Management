@@ -1,0 +1,32 @@
+---
+# Orchestrate AAP controller resources for Red Hat Management
+
+- name: Run AAP controller credentials role
+  ansible.builtin.include_role:
+    name: scenario_aap_credentials
+  when: scenario_aap_controller_resources_enabled | bool
+  tags: ["aap", "credentials"]
+
+- name: Run AAP controller inventories role
+  ansible.builtin.include_role:
+    name: scenario_aap_inventories
+  when: scenario_aap_controller_resources_enabled | bool
+  tags: ["aap", "inventories"]
+
+- name: Run AAP controller projects role
+  ansible.builtin.include_role:
+    name: scenario_aap_projects
+  when: scenario_aap_controller_resources_enabled | bool
+  tags: ["aap", "projects"]
+
+- name: Run AAP controller templates role
+  ansible.builtin.include_role:
+    name: scenario_aap_templates
+  when: scenario_aap_controller_resources_enabled | bool
+  tags: ["aap", "templates"]
+
+- name: Run AAP controller surveys role
+  ansible.builtin.include_role:
+    name: scenario_aap_surveys
+  when: scenario_aap_controller_resources_enabled | bool
+  tags: ["aap", "surveys"]

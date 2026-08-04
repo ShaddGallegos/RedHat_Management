@@ -1,0 +1,17 @@
+---
+# Default variables for ansible_dev_node_support role
+ansible_dev_node_support_support_enabled: true
+ansible_dev_node_support_support_version: "1.0"
+
+# Support operations
+ansible_dev_node_support_run_preflight_checks: true
+ansible_dev_node_support_run_tests: false
+ansible_dev_node_support_backup_and_restore: false
+ansible_dev_node_support_configure_cmdb: true
+
+# Backup configuration
+ansible_dev_node_support_backup_destination: "/backup"
+ansible_dev_node_support_backup_retention_days: 30
+
+# Feature toggles
+ansible_dev_node_support_support_validate_deployment: true

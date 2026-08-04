@@ -1,0 +1,30 @@
+---
+# Satellite platform_infrastructure_core wrapper playbook
+# Delegates work to existing roles; keep variables in group_vars.
+
+- name: "Satellite platform_infrastructure_core setup"
+  hosts: scenario_satellite
+  gather_facts: true
+  vars_files:
+    - "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
+    - "group_vars/all.yml"
+    - "group_vars/scenario_satellite.yml"
+
+  roles:
+    - role: scenario_satellite_os_configuration
+      when: >
+        (setup_os | default(true) | bool) or (setup_install_media | default(true) | bool)
+        or (setup_kickstart_repo | default(false) | bool) or (setup_sync_jobs | default(false) | bool)
+      vars:
+        scenario_satellite_os_configuration_satellite_os_config_enabled: "{{ setup_os | default(true) | bool }}"
+        scenario_satellite_os_configuration_create_operatingsystems: "{{ setup_os | default(true) | bool }}"
+        scenario_satellite_os_configuration_create_install_media: "{{ setup_install_media | default(true) | bool }}"
+        scenario_satellite_os_configuration_create_kickstart_repo: "{{ setup_kickstart_repo | default(false) | bool }}"
+        scenario_satellite_os_configuration_configure_sync_job: "{{ setup_sync_jobs | default(false) | bool }}"
+
+    - role: platform_network_infrastructure
+      when: (setup_network | default(false))
+      vars:
+        platform_network_infrastructure_network_config_enabled: "{{ setup_network | default(false) }}"
+
+# End of playbook — role implementations perform the real work

@@ -1,0 +1,111 @@
+---
+# Post-update analysis and reboot detection
+
+- name: Gather package facts after update
+  ansible.builtin.package_facts:
+    manager: auto
+  register: update_rhel_packages_post
+
+- name: Store post-update package count
+  ansible.builtin.set_fact:
+    update_rhel_post_package_count: "{{ update_rhel_packages_post.ansible_facts.packages.keys() | length }}"
+
+- name: Determine latest installed kernel attributes
+  ansible.builtin.set_fact:
+    update_rhel_latest_kernel_version: >-
+      {{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].version }}
+    update_rhel_latest_kernel_release: >-
+      {{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].release }}
+    update_rhel_latest_kernel_arch: >-
+      {{ update_rhel_packages_post.ansible_facts.packages.kernel[-1].arch }}
+  when:
+    - update_rhel_packages_post.ansible_facts.packages.kernel is defined
+    - update_rhel_packages_post.ansible_facts.packages.kernel | length > 0
+
+- name: Build latest installed kernel version string
+  ansible.builtin.set_fact:
+    update_rhel_latest_kernel: "{{ update_rhel_latest_kernel_version }}-{{ update_rhel_latest_kernel_release }}.{{ update_rhel_latest_kernel_arch }}"
+  when:
+    - update_rhel_latest_kernel_version is defined
+    - update_rhel_latest_kernel_release is defined
+    - update_rhel_latest_kernel_arch is defined
+
+- name: Check if kernel update requires reboot
+  ansible.builtin.set_fact:
+    update_rhel_kernel_reboot_needed: >-
+      {{ (update_rhel_latest_kernel is defined) and (update_rhel_os_info.kernel != update_rhel_latest_kernel) }}
+
+- name: Check for system reboot indicators (RHEL 8+)
+  ansible.builtin.stat:
+    path: /var/run/reboot-required
+  register: update_rhel_reboot_file
+  when: update_rhel_os_info.major_version >= 8
+
+- name: Collect service facts (avoid using systemctl directly)
+  ansible.builtin.service_facts:
+
+- name: Reload systemd daemon (use systemd module instead of systemctl)
+  ansible.builtin.systemd:
+    daemon_reload: true
+  when: update_rhel_systemd_reload | default(false) | bool
+
+- name: Register collected service facts for later checks
+  ansible.builtin.set_fact:
+    update_rhel_service_facts: "{{ ansible_facts.services | default({}) }}"
+  failed_when: false
+  changed_when: false
+
+- name: Example determine if sshd is running using service_facts (do not use systemctl)
+  ansible.builtin.set_fact:
+    update_rhel_sshd_running: "{{ (update_rhel_service_facts['sshd'].state == 'running') | default(false) }}"
+  when: "update_rhel_service_facts is defined and 'sshd' in update_rhel_service_facts"
+
+- name: Determine overall reboot requirement
+  ansible.builtin.set_fact:
+    update_rhel_reboot_needed: >-
+      {{
+        update_rhel_kernel_reboot_needed | default(false) or
+        (update_rhel_reboot_file.stat.exists | default(false)) or
+        update_rhel_force_reboot | default(false)
+      }}
+
+- name: Display kernel information
+  ansible.builtin.debug:
+    msg: |
+      Kernel Analysis:
+      - Current running: {{ update_rhel_os_info.kernel }}
+      - Latest installed: {{ update_rhel_latest_kernel | default('Unable to determine') }}
+      - Kernel reboot needed: {{ update_rhel_kernel_reboot_needed | default(false) }}
+  when: update_rhel_verbose | default(true)
+
+- name: Display reboot requirement analysis
+  ansible.builtin.debug:
+    msg: |
+      Reboot Analysis:
+      {% if update_rhel_reboot_needed %}
+      REBOOT REQUIRED due to:
+      {% if update_rhel_kernel_reboot_needed | default(false) %}
+      - Kernel update: {{ update_rhel_os_info.kernel }} -> {{ update_rhel_latest_kernel }}
+      {% endif %}
+      {% if update_rhel_reboot_file.stat.exists | default(false) %}
+      - System reboot indicator file present
+      {% endif %}
+      {% if update_rhel_force_reboot | default(false) %}
+      - Forced reboot requested
+      {% endif %}
+      {% else %}
+      No reboot required
+      {% endif %}
+  when: update_rhel_verbose | default(true)
+
+- name: Display update summary
+  ansible.builtin.debug:
+    msg: |
+      Update Summary:
+      - System: {{ update_rhel_os_info.distribution }} {{ update_rhel_os_info.version }}
+      - Pre-update packages: {{ update_rhel_pre_package_count | default('Unknown') }}
+      - Post-update packages: {{ update_rhel_post_package_count | default('Unknown') }}
+      - Updates applied: {{ 'Yes' if update_rhel_package_result.changed | default(false) else 'No' }}
+      - Updates remaining: {{ update_rhel_remaining_count | default('Unknown') }}
+      - Reboot needed: {{ update_rhel_reboot_needed }}
+  when: update_rhel_verbose | default(true)

@@ -1,0 +1,56 @@
+---
+reboot_timeout: 600
+update_distro_packages: "*"
+update_distro_packages_excludes: []
+update_reboot_kernel: false
+update_rhel_allow_erasing: false
+update_rhel_bugfix: false
+update_rhel_clean_cache: true
+update_rhel_connect_timeout: 10
+update_rhel_force_reboot: false
+update_rhel_force_run: false
+update_rhel_ignore_errors: false
+update_rhel_nobest: false
+update_rhel_post_reboot_delay: 30
+update_rhel_pre_reboot_delay: 10
+update_rhel_security_only: false
+update_rhel_show_updates: false
+update_rhel_skip_broken: true
+update_rhel_test_command: "whoami"
+update_rhel_verbose: true
+
+# New feature flags and credentials
+update_rhel_enable_epel: false
+update_rhel_enable_auto_updates: false
+update_rhel_enable_kpatch: false
+
+# Subscription manager (optional) - leave empty to skip registration attempts
+update_rhel_subscription_username: ""
+update_rhel_subscription_password: ""
+update_rhel_subscription_pool: ""
+
+# Canonical runtime aliases for subscription credentials.
+# Priority: explicit role vars -> project aliases -> common canonical vars.
+update_rhel_subscription_username_effective: >-
+  {{
+    update_rhel_subscription_username
+    | default(redhat_cdn_username, true)
+    | default(rhsm_username, true)
+    | default(redhat_username, true)
+    | default(redhat_user, true)
+    | default(common.redhat_cdn_username | default(''), true)
+  }}
+
+update_rhel_subscription_password_effective: >-
+  {{
+    update_rhel_subscription_password
+    | default(redhat_cdn_password, true)
+    | default(rhsm_password, true)
+    | default(redhat_password, true)
+    | default(common.redhat_cdn_password | default(''), true)
+  }}
+
+# Automatic update configuration options for dnf-automatic / yum-cron
+update_rhel_auto_apply_updates: false
+update_rhel_auto_download_updates: true
+update_rhel_auto_security_only: false

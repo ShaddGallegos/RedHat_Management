@@ -1,0 +1,182 @@
+---
+- name: Set package list for RedHat
+  ansible.builtin.set_fact:
+    platform_libvirt_setup_packages:
+      - 'libvirt*'
+      - 'qemu*'
+      - 'virt-manager'
+      - 'kvm*'
+      - 'python3-libvirt'
+      - 'cloud-utils'
+  when: ansible_facts is defined and ansible_facts['os_family'] == 'RedHat'
+
+- name: Set package list for Debian
+  ansible.builtin.set_fact:
+    platform_libvirt_setup_packages:
+      - 'libvirt-daemon-system'
+      - 'libvirt-clients'
+      - 'qemu-kvm'
+      - 'virt-manager'
+      - 'python3-libvirt'
+      - 'cloud-utils'
+  when: ansible_facts is defined and ansible_facts['os_family'] == 'Debian'
+
+- name: Set default package list
+  ansible.builtin.set_fact:
+    platform_libvirt_setup_packages:
+      - 'libvirt*'
+      - 'qemu*'
+      - 'virt-manager'
+      - 'kvm*'
+      - 'python3-libvirt'
+      - 'cloud-utils'
+  when: ansible_facts is defined and ansible_facts['os_family'] not in ['RedHat', 'Debian']
+
+- name: Install packages on RedHat systems
+  ansible.builtin.dnf:
+    name: "{{ platform_libvirt_setup_packages }}"
+    state: present
+    skip_broken: true
+    allowerasing: true
+  when: ansible_facts is defined and ansible_facts['os_family'] == 'RedHat'
+  register: platform_libvirt_setup_install
+  become: true
+
+- name: Install packages on Debian systems
+  ansible.builtin.apt:
+    name: "{{ platform_libvirt_setup_packages }}"
+    state: present
+    update_cache: true
+  when: ansible_facts is defined and ansible_facts['os_family'] == 'Debian'
+  register: platform_libvirt_setup_install
+  become: true
+
+- name: Check if bridge 'virbr0' already exists on host
+  ansible.builtin.stat:
+    path: /sys/class/net/virbr0
+  register: platform_libvirt_setup_virbr0_stat
+
+- name: Set external bridge name (use alternate if virbr0 exists)
+  ansible.builtin.set_fact:
+    platform_libvirt_setup_external_bridge: >-
+      {{ 'external_nat' if (platform_libvirt_setup_virbr0_stat.stat is not defined)
+      or (not platform_libvirt_setup_virbr0_stat.stat.exists) else 'external_nat_alt' }}
+  when: platform_libvirt_setup_virbr0_stat is defined
+
+- name: Ensure libvirt service is enabled and running
+  ansible.builtin.service:
+    name: libvirtd
+    state: started
+    enabled: true
+  become: true
+
+- name: Ensure default network is active (ignore harmless failure)
+  ansible.builtin.command: /usr/bin/virsh net-start default
+  args:
+    warn: false
+  register: platform_libvirt_setup_net_start
+  failed_when: platform_libvirt_setup_net_start.rc not in [0,1]
+  changed_when: platform_libvirt_setup_net_start.rc == 0
+  become: true
+
+- name: Render external libvirt network XML
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/networks/external_nat.xml.j2"
+    dest: "/tmp/libvirt-external.xml"
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Define external libvirt network (idempotent)
+  ansible.builtin.shell: virsh net-define /tmp/libvirt-external.xml
+  environment:
+    PATH: "{{ ansible_env.PATH | default('/usr/bin:/bin:/usr/sbin:/sbin') }}"
+  register: platform_libvirt_setup_define_external
+  failed_when: platform_libvirt_setup_define_external.rc not in [0,1]
+  changed_when: platform_libvirt_setup_define_external.rc == 0
+
+- name: Start external libvirt network
+  ansible.builtin.shell: virsh net-start external
+  environment:
+    PATH: "{{ ansible_env.PATH | default('/usr/bin:/bin:/usr/sbin:/sbin') }}"
+  register: platform_libvirt_setup_start_external
+  failed_when: platform_libvirt_setup_start_external.rc not in [0,1]
+  changed_when: platform_libvirt_setup_start_external.rc == 0
+
+- name: Autostart external libvirt network
+  ansible.builtin.shell: virsh net-autostart external
+  environment:
+    PATH: "{{ ansible_env.PATH | default('/usr/bin:/bin:/usr/sbin:/sbin') }}"
+  register: platform_libvirt_setup_autostart_external
+  failed_when: platform_libvirt_setup_autostart_external.rc not in [0,1]
+  changed_when: platform_libvirt_setup_autostart_external.rc == 0
+
+- name: Render internal libvirt network XML
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/networks/internal_priv.xml.j2"
+    dest: "/tmp/libvirt-internal.xml"
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Define internal libvirt network (idempotent)
+  ansible.builtin.shell: virsh net-define /tmp/libvirt-internal.xml
+  environment:
+    PATH: "{{ ansible_env.PATH | default('/usr/bin:/bin:/usr/sbin:/sbin') }}"
+  register: platform_libvirt_setup_define_internal
+  failed_when: platform_libvirt_setup_define_internal.rc not in [0,1]
+  changed_when: platform_libvirt_setup_define_internal.rc == 0
+
+- name: Start internal libvirt network
+  ansible.builtin.shell: virsh net-start internal_priv
+  environment:
+    PATH: "{{ ansible_env.PATH | default('/usr/bin:/bin:/usr/sbin:/sbin') }}"
+  register: platform_libvirt_setup_start_internal
+  failed_when: platform_libvirt_setup_start_internal.rc not in [0,1]
+  changed_when: platform_libvirt_setup_start_internal.rc == 0
+
+- name: Autostart internal libvirt network
+  ansible.builtin.shell: virsh net-autostart internal_priv
+  environment:
+    PATH: "{{ ansible_env.PATH | default('/usr/bin:/bin:/usr/sbin:/sbin') }}"
+  register: platform_libvirt_setup_autostart_internal
+  failed_when: platform_libvirt_setup_autostart_internal.rc not in [0,1]
+  changed_when: platform_libvirt_setup_autostart_internal.rc == 0
+
+- name: Check for persistent setup marker file
+  ansible.builtin.stat:
+    path: /var/lib/rhm/platform_libvirt_setup_done
+  register: platform_libvirt_setup_marker_stat
+
+- name: Set persistent marker fact
+  ansible.builtin.set_fact:
+    platform_libvirt_setup_done: "{{ platform_libvirt_setup_marker_stat.stat.exists | default(false) }}"
+
+- block:
+    - name: Create persistent marker directory
+      ansible.builtin.file:
+        path: /var/lib/rhm
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+      become: true
+
+    - name: Touch marker file
+      ansible.builtin.file:
+        path: /var/lib/rhm/platform_libvirt_setup_done
+        state: touch
+        owner: root
+        group: root
+        mode: '0644'
+      become: true
+
+    - name: Write ansible facts file for persistent recognition
+      ansible.builtin.copy:
+        dest: /etc/ansible/facts.d/rhm.fact
+        content: '{"platform_libvirt_setup_done": true}'
+        mode: '0644'
+      become: true
+  when: not (platform_libvirt_setup_done | default(false))

@@ -1,0 +1,20 @@
+- name: Updates and patching configure placeholder
+  ansible.builtin.debug:
+    msg: "Implement configuration for patching policies, os_windows, and notification settings here."
+
+- name: Run RHEL update workflow
+  block:
+    - name: Check for available updates
+      ansible.builtin.command:
+        cmd: /usr/bin/yum check-update
+      changed_when: false
+      failed_when: false
+      register: yum_check_update
+      tags: [rhel, patch]
+
+    - name: Install available updates
+      ansible.builtin.yum:
+        name: "*"
+        state: latest
+      when: yum_check_update.rc != 0
+      tags: [rhel, patch]

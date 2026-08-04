@@ -1,0 +1,60 @@
+
+  ansible.builtin.ping:
+
+  ansible.builtin.uri:
+    url: "{{ satellite_url }}"
+    method: GET
+    status_code: 200
+  register: satellite_api
+  ignore_errors: true
+
+# Preflight API connectivity checks
+
+  ansible.builtin.ping:
+
+  ansible.builtin.uri:
+    url: "{{ satellite_url }}"
+    method: GET
+    status_code: 200
+  register: satellite_api
+  failed_when: false
+
+  ansible.builtin.uri:
+    url: "{{ aap_url }}"
+    method: GET
+    status_code: 200
+  register: aap_api
+  failed_when: false
+
+  ansible.builtin.uri:
+    url: "{{ idm_url }}"
+    method: GET
+    status_code: 200
+  register: idm_api
+  failed_when: false
+
+  ansible.builtin.uri:
+    url: "{{ insights_url }}"
+    method: GET
+    status_code: 200
+  register: insights_api
+  failed_when: false
+
+  ansible.builtin.uri:
+    url: "{{ rhc_url }}"
+    method: GET
+    status_code: 200
+  register: rhc_api
+  failed_when: false
+
+  ansible.builtin.assert:
+    that:
+      - satellite_api.status == 200
+      - aap_api.status == 200
+      - idm_api.status == 200
+      - insights_api.status == 200
+      - rhc_api.status == 200
+    fail_msg: "One or more APIs are not reachable. See previous tasks for details."
+  failed_when: false
+
+  ansible.builtin.include_tasks: report.yml

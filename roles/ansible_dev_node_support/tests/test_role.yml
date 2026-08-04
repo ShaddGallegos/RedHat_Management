@@ -1,0 +1,12 @@
+---
+# Test: ansible_dev_node_support role basic functionality
+- name: Test ansible_dev_node_support role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    ansible_dev_node_support_support_enabled: true
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - ansible_dev_node_support_support_enabled is defined

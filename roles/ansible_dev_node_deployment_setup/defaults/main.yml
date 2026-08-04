@@ -1,0 +1,14 @@
+---
+# Default variables for ansible_dev_node_deployment_setup role
+ansible_dev_node_deployment_setup_deployment_setup_enabled: true
+ansible_dev_node_deployment_setup_deployment_setup_version: "1.0"
+
+# Directory structure
+ansible_dev_node_deployment_setup_deployment_setup_directories:
+  - "/opt"
+  - "/opt/reports"
+  - "/opt/inventory"
+  - "/var/log"
+
+# Feature toggles
+ansible_dev_node_deployment_setup_deployment_setup_validate_environment: true

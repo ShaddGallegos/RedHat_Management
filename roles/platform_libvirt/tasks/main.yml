@@ -1,0 +1,30 @@
+---
+- name: Stat user env overrides file
+  ansible.builtin.stat:
+    path: "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
+  register: user_env_file
+
+- name: Include user env overrides if present
+  include_vars:
+    ansible.builtin.file: "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
+  when: user_env_file.stat.exists
+
+- name: Run libvirt package install command (allow failures)
+  ansible.builtin.shell: "{{ libvirt_install_cmd }}"
+  register: libvirt_install
+  ignore_errors: true
+
+- name: Run yum-builddep for libvirt packages (ignore failures)
+  ansible.builtin.shell: "{{ libvirt_builddep_cmd }}"
+  register: libvirt_builddep
+  ignore_errors: true
+
+- name: Run dnf upgrade on libvirt host (ignore failures)
+  ansible.builtin.shell: "{{ libvirt_upgrade_cmd }}"
+  register: libvirt_upgrade
+  ignore_errors: true
+
+- name: Include platform_libvirt_setup role to render and define networks
+  ansible.builtin.include_role:
+    name: platform_libvirt_setup
+  tags: platform_libvirt_setup

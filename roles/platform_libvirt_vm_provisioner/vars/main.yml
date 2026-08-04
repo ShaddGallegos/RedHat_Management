@@ -1,0 +1,15 @@
+---
+# Libvirt VM Provisioner - Role Variables
+
+# Validation messages
+platform_libvirt_vm_provisioner_libvirt_validation_success: "[SUCCESS] All prerequisites validated"
+platform_libvirt_vm_provisioner_libvirt_validation_failed: "[FAILED] Prerequisite validation failed"
+
+# Calculated paths
+platform_libvirt_vm_provisioner_libvirt_iso_absolute_path: "{{ platform_libvirt_vm_provisioner_libvirt_iso_file | expanduser | realpath }}"
+platform_libvirt_vm_provisioner_libvirt_kickstart_absolute_path: "{{ platform_libvirt_vm_provisioner_libvirt_kickstart_file | expanduser | realpath }}"
+
+# Status tracking
+platform_libvirt_vm_provisioner_libvirt_vm_created: false
+platform_libvirt_vm_provisioner_libvirt_installation_complete: false
+platform_libvirt_vm_provisioner_libvirt_provisioning_success: false

@@ -1,0 +1,5 @@
+---
+# Intentionally minimal. Sensitive values (passwords/tokens/secrets) are
+# stored in ~/.ansible/conf/env.yml and managed with Ansible Vault.
+#
+# This file is reserved for non-sensitive, schema-approved defaults only.

@@ -1,0 +1,20 @@
+---
+# Satellite kickstart repository wrapper playbook
+# Delegates kickstart repo creation and sync setup to `scenario_satellite_os_configuration` role.
+
+- name: "Satellite kickstart repository setup"
+  hosts: scenario_satellite
+  gather_facts: true
+  vars_files:
+    - "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
+
+  roles:
+    - role: scenario_satellite_os_configuration
+      vars:
+        scenario_satellite_os_configuration_satellite_os_config_enabled: true
+        scenario_satellite_os_configuration_create_operatingsystems: false
+        scenario_satellite_os_configuration_create_install_media: false
+        scenario_satellite_os_configuration_create_kickstart_repo: true
+        scenario_satellite_os_configuration_configure_sync_job: true
+
+# End of playbook — role handles repository creation and syncs

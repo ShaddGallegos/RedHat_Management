@@ -1,0 +1,18 @@
+--- roles/scenario_satellite_618_configure_provisioning/meta/main.yml
++++ roles/scenario_satellite_618_configure_provisioning/meta/main.yml (patched)
+@@ -4,11 +4,13 @@
+   license: Apache-2.0
+   version: "1.0"
+   min_ansible_version: "2.10"
+-  max_ansible_version: "2.16"
+   platforms:
+     - name: EL
+       versions: ["9", "10"]
+-  categories:
++  galaxy_tags:
++  - scenario-satellite
++  - content
++  - management
+     - scenario_satellite
+     - content
+     - management

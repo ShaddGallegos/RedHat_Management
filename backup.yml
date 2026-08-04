@@ -1,0 +1,7 @@
+---
+# backup tasks stub to satisfy linter load checks
+# Intentionally a no-op; real backup tasks should be provided by the operator
+- name: Noop backup task
+  ansible.builtin.debug:
+    msg: "backup.yml tasks stub - no-op"
+  when: false

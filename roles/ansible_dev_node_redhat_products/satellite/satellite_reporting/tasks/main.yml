@@ -1,0 +1,7 @@
+---
+# Placeholder for scenario_satellite reporting and monitoring
+# This role sets up dashboards, reports, and monitoring for Satellite
+
+- name: Reporting placeholder
+  ansible.builtin.debug:
+    msg: "Satellite reporting and monitoring - implementation pending"

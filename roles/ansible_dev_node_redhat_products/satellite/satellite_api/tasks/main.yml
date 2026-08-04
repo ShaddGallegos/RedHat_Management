@@ -1,0 +1,81 @@
+---
+# Tasks to manage Satellite API automation user and token
+- name: Compute control env path
+  ansible.builtin.set_fact:
+    control_env_path: "{{ lookup('env','HOME') + '/.ansible/conf/env.yml' }}"
+
+- name: Load control env if present (only when explicitly enabled)
+  ansible.builtin.set_fact:
+    control_env: >-
+      {{ lookup('file', control_env_path) | default('{}') | from_yaml }}
+  when: use_local_env | default(false) | bool
+
+- name: Resolve admin password
+  ansible.builtin.set_fact:
+    admin_pass: >-
+      {{ (use_local_env | default(false) | bool) | ternary(control_env.global_admin_password | default(''), (global_admin_password | default(''))) }}
+
+- name: Ensure API user exists (collection)
+  redhat.scenario_satellite.user:
+    server_url: "https://{{ satellite_fqdn | default(groups['scenario_satellite'][0]) }}"
+    validate_certs: false
+    username: admin
+    password: "{{ admin_pass }}"
+    login: "{{ satellite_api_user | default('hammer_api_user') }}"
+    firstname: Automation
+    lastname: API
+    mail: automation@localhost
+    roles:
+      - Viewer
+    state: present
+  register: user_result
+
+- name: Find user id via API (fallback)
+  ansible.builtin.uri:
+    url: "https://{{ satellite_fqdn | default(groups['scenario_satellite'][0]) }}/api/users?search={{ satellite_api_user | default('hammer_api_user') }}"
+    method: GET
+    user: admin
+    password: "{{ admin_pass }}"
+    return_content: true
+    validate_certs: false
+    headers:
+      Accept: application/json
+  register: user_search
+  failed_when: false
+
+- name: Set user id fact
+  ansible.builtin.set_fact:
+    target_user_id: >-
+      {{ (user_search.json.results[0].id | default(user_search.json[0].id)) | default('') }}
+
+- name: Create personal access token via API (if user id found)
+  ansible.builtin.uri:
+    url: "https://{{ satellite_fqdn | default(groups['scenario_satellite'][0]) }}/api/users/{{ target_user_id }}/access_tokens"
+    method: POST
+    user: admin
+    password: "{{ admin_pass }}"
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    body: "{\"access_token\":{\"name\":\"automation_token\"}}"
+    status_code: 201
+    return_content: true
+    validate_certs: false
+  register: token_create
+  when: target_user_id != ''
+  failed_when: false
+
+- name: Parse token from API response
+  ansible.builtin.set_fact:
+    satellite_api_token: >-
+      {{ (token_create.json.token | default(token_create.json.value | default(''))) }}
+  when: token_create is defined and token_create.json is defined
+
+- name: Write token to control env (if present)
+  ansible.builtin.copy:
+    dest: "{{ lookup('env', 'HOME') + '/.ansible/conf/env.yml' }}"
+    content: |
+      hammer_api_user: {{ satellite_api_user | default('hammer_api_user') }}
+      hammer_api_token: "{{ satellite_api_token | default('') }}"
+    mode: '0600'
+    when: (satellite_api_token is defined and satellite_api_token != '') and (use_local_env | default(false) | bool)

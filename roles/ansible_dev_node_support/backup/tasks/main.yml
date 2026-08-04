@@ -1,0 +1,57 @@
+---
+# Generic backup tasks
+
+- name: "Backup | Create backup directory"
+  ansible.builtin.file:
+    path: "{{ backup_base_dir }}"
+    state: "directory"
+    mode: "0700"
+  tags: ["backup"]
+
+- name: "Backup | Run pre-backup tasks"
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop: "{{ backup_pre_backup_tasks }}"
+  when: backup_pre_backup_tasks | length > 0
+  tags: ["backup"]
+
+- name: "Backup | Archive data"
+  community.general.archive:
+    path: "{{ backup_paths | default([]) }}"
+    dest: "{{ backup_base_dir }}/backup_{{ ansible_date_time.date }}.tar.{{ backup_compression }}"
+    mode: "0600"
+  when: backup_paths is defined
+  tags: ["backup"]
+
+- name: "Backup | Verify backup"
+  ansible.builtin.stat:
+    path: "{{ backup_base_dir }}/backup_{{ ansible_date_time.date }}.tar.{{ backup_compression }}"
+  register: backup_file
+  when: backup_verify | bool
+  tags: ["backup"]
+
+- name: "Backup | Clean old backups"
+  ansible.builtin.find:
+    path: "{{ backup_base_dir }}"
+    age: "{{ ansible_dev_node_support_backup_retention_days }}d"
+    recurse: no
+  register: old_backups
+  tags: ["maintenance"]
+
+- name: "Backup | Remove old backups"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: "absent"
+  loop: "{{ old_backups.files }}"
+  tags: ["maintenance"]
+
+- name: "Backup | Run post-backup tasks"
+  ansible.builtin.include_tasks: "{{ item }}"
+  loop: "{{ backup_post_backup_tasks }}"
+  when: backup_post_backup_tasks | length > 0
+  tags: ["backup"]
+
+- name: "Backup | Generate backup manifest"
+  ansible.builtin.template:
+    src: "backup_manifest.j2"
+    dest: "{{ backup_base_dir }}/manifest_{{ ansible_date_time.date }}.json"
+  tags: ["backup"]

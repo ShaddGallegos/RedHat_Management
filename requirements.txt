@@ -1,0 +1,3 @@
+# Project Python requirements
+# Added transformers as requested
+transformers>=4.34.0

@@ -1,0 +1,29 @@
+---
+# Role: scenario_aap_deployment
+# Purpose: Deploy and launch AAP installer
+# This role handles the complete AAP deployment workflow including
+# downloading content, extracting the installer, configuring it, and launching.
+
+- name: "Download AAP installation content"
+  ansible.builtin.include_tasks: download_content.yml
+  tags:
+    - rhis_aap_download
+    - rhis_aap_deploy
+
+- name: "Extract AAP installer bundle"
+  ansible.builtin.include_tasks: extract_aap_installer.yml
+  tags:
+    - rhis_aap_extract
+    - rhis_aap_deploy
+
+- name: "Generate AAP installer configuration"
+  ansible.builtin.include_tasks: generate_installer_template.yml
+  tags:
+    - rhis_aap_generate_config
+    - rhis_aap_deploy
+
+- name: "Launch AAP installer"
+  ansible.builtin.include_tasks: launch_installer.yml
+  tags:
+    - rhis_aap_launch
+    - rhis_aap_deploy

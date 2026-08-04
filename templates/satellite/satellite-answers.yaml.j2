@@ -1,0 +1,460 @@
+# scenario_satellite-answers.yaml Jinja2 template for Satellite installer
+# Secrets (passwords/keys) are expected to come from vaulted vars (e.g., ~/.ansible/conf/env.yml)
+{% set _detected_domain = satellite_domain | default(ansible_domain, true) | default(lookup('pipe', 'hostname -d'), true) %}
+{% set system_domain = (_detected_domain | trim | default(lookup('pipe', 'hostname -d'), true) | default('localdomain', true)) %}
+{% set system_domain_upper = system_domain | upper %}
+{% set primary_iface = satellite_primary_interface | default(ansible_default_ipv4.interface, true) | default('enp2s0', true) %}
+{% set _iface_facts = (ansible_facts[primary_iface] if (ansible_facts is defined and primary_iface in ansible_facts) else {}) %}
+{% set primary_ip = _iface_facts.ipv4.address if (_iface_facts and _iface_facts.ipv4 is defined and _iface_facts.ipv4.address is defined) else (ansible_default_ipv4.address if ansible_default_ipv4 is defined and ansible_default_ipv4.address is defined else '') %}
+{% set primary_prefix = _iface_facts.ipv4.prefix if (_iface_facts and _iface_facts.ipv4 is defined and _iface_facts.ipv4.prefix is defined) else (ansible_default_ipv4.prefix if ansible_default_ipv4 is defined and ansible_default_ipv4.prefix is defined else 24) %}
+{% set primary_cidr = (primary_ip ~ '/' ~ primary_prefix) if primary_ip else '' %}
+{% set primary_network = (primary_cidr | ipaddr('network')) if primary_cidr else '' %}
+{% set primary_netmask = (primary_cidr | ipaddr('netmask')) if primary_cidr else '' %}
+{% set primary_gateway = satellite_gateway | default(_iface_facts.ipv4.gateway if (_iface_facts and _iface_facts.ipv4 is defined and _iface_facts.ipv4.gateway is defined) else (ansible_default_ipv4.gateway if ansible_default_ipv4 is defined and ansible_default_ipv4.gateway is defined else (primary_network | ipaddr('first_usable') if primary_network else ''))) %}
+{% set primary_nameserver = satellite_nameserver | default(primary_ip | default(ansible_dns.nameservers[0] if (ansible_dns is defined and ansible_dns.nameservers) else '')) %}
+{% set dhcp_range_start = satellite_dhcp_range_start | default(primary_network | ipaddr('nth_usable', 200) if primary_network else '') %}
+{% set dhcp_range_end = satellite_dhcp_range_end | default(primary_network | ipaddr('nth_usable', 250) if primary_network else '') %}
+{% set dhcp_pxeserver_ip = satellite_pxeserver | default(primary_ip | default('')) %}
+{% set reverse_zone = (primary_ip | ipaddr('revdns')) if primary_ip else 'in-addr.arpa' %}
+{% set failover_iface = satellite_failover_interface | default('enp1s0') %}
+{% set _failover_facts = (ansible_facts[failover_iface] if (ansible_facts is defined and failover_iface in ansible_facts) else {}) %}
+{% set failover_ip = _failover_facts.ipv4.address if (_failover_facts and _failover_facts.ipv4 is defined and _failover_facts.ipv4.address is defined) else '' %}
+{% set failover_prefix = _failover_facts.ipv4.prefix if (_failover_facts and _failover_facts.ipv4 is defined and _failover_facts.ipv4.prefix is defined) else 24 %}
+{% set failover_cidr = (failover_ip ~ '/' ~ failover_prefix) if failover_ip else '' %}
+{% set failover_network = (failover_cidr | ipaddr('network')) if failover_cidr else '' %}
+{% set dhcp_failover_address_val = satellite_dhcp_failover_address | default(failover_ip | default(failover_network | ipaddr('first_usable') if failover_network else '')) %}
+
+---
+apache::mod::status: false
+certs:
+  node_fqdn: {{ satellite_fqdn }}
+  cname: []
+  generate: true
+  regenerate: false
+  deploy: true
+  ca_common_name: {{ satellite_fqdn }}
+  country: {{ satellite_cert_country | default('US') }}
+  state: {{ satellite_cert_state | default('North Carolina') }}
+  city: {{ satellite_cert_city | default('Raleigh') }}
+  org: {{ satellite_cert_org | default('Katello') }}
+  org_unit: {{ satellite_cert_org_unit | default('SomeOrgUnit') }}
+  expiration: '{{ satellite_cert_expiration | default('7300') }}'
+  ca_expiration: '{{ satellite_cert_ca_expiration | default('36500') }}'
+  server_cert: {{ satellite_cert_path | default('') }}
+  server_key: {{ satellite_cert_key_path | default('') }}
+  server_cert_req: {{ satellite_cert_req_path | default('') }}
+  server_ca_cert: {{ satellite_cert_ca_path | default('') }}
+  pki_dir: "/etc/pki/katello"
+  ssl_build_dir: "/root/ssl-build"
+  user: root
+  group: foreman
+  default_ca_name: katello-default-ca
+  server_ca_name: katello-server-ca
+  tar_file:
+foreman:
+  foreman_url: https://{{ satellite_fqdn }}
+  unattended: true
+  unattended_url:
+  apache: true
+  servername: {{ satellite_fqdn }}
+  serveraliases:
+  - foreman
+  ssl: true
+  version: present
+  plugin_version: present
+  db_manage: true
+  db_host:
+  db_port:
+  db_database: foreman
+  db_username: foreman
+  db_password: "{{ satellite_db_password | default('') }}"
+  db_sslmode:
+  db_root_cert:
+  db_pool:
+  db_manage_rake: true
+  server_port: 80
+  server_ssl_port: 443
+  server_ssl_ca: "/etc/pki/katello/certs/katello-default-ca.crt"
+  server_ssl_chain: "/etc/pki/katello/certs/katello-server-ca.crt"
+  server_ssl_cert: "/etc/pki/katello/certs/katello-apache.crt"
+  server_ssl_key: "/etc/pki/katello/private/katello-apache.key"
+  server_ssl_crl: ''
+  server_ssl_protocol:
+  server_ssl_verify_client: optional
+  client_ssl_ca: "/etc/foreman/proxy_ca.pem"
+  client_ssl_cert: "/etc/foreman/client_cert.pem"
+  client_ssl_key: "/etc/foreman/client_key.pem"
+  oauth_active: true
+  oauth_map_users: false
+  oauth_consumer_key: {{ satellite_oauth_consumer_key }}
+  oauth_consumer_secret: {{ satellite_oauth_consumer_secret }}
+  oauth_effective_user: admin
+  initial_admin_username: admin
+  initial_admin_password: {{ satellite_admin_password }}
+  initial_admin_first_name:
+  initial_admin_last_name:
+  initial_admin_email: {{ satellite_initial_admin_email | default('admin@' ~ system_domain) }}
+  initial_admin_locale:
+  initial_admin_timezone:
+  initial_organization: {{ satellite_initial_org | default('Default Organization') }}
+  initial_location: {{ satellite_initial_location | default('Default Location') }}
+  ipa_authentication: false
+  ipa_authentication_api: false
+  http_keytab:
+  gssapi_local_name: true
+  pam_service: foreman
+  ipa_manage_sssd: true
+  ipa_sssd_default_realm:
+  websockets_encrypt: true
+  websockets_ssl_key:
+  websockets_ssl_cert:
+  logging_level: info
+  logging_type: file
+  logging_layout:
+  loggers: {}
+  email_delivery_method: {{ satellite_email_delivery_method | default('smtp') }}
+  email_sendmail_location: {{ satellite_email_sendmail_location | default('') }}
+  email_sendmail_arguments: {{ satellite_email_sendmail_arguments | default('') }}
+  email_smtp_address: {{ satellite_email_smtp_address | default(satellite_mail_relay | default('')) }}
+  email_smtp_port: {{ satellite_email_smtp_port | default(25) }}
+  email_smtp_domain: {{ satellite_email_smtp_domain | default('') }}
+  email_smtp_authentication: {{ satellite_email_smtp_authentication | default('none') }}
+  email_smtp_user_name: {{ satellite_email_smtp_user_name | default('') }}
+  email_smtp_password: {{ satellite_email_smtp_password | default('') }}
+  email_reply_address: {{ satellite_email_reply_address | default('') }}
+  email_subject_prefix: {{ satellite_email_subject_prefix | default('') }}
+  telemetry_prefix: fm_rails
+  telemetry_prometheus_enabled: false
+  telemetry_statsd_enabled: false
+  telemetry_statsd_host: 127.0.0.1:8125
+  telemetry_statsd_protocol: statsd
+  telemetry_logger_enabled: false
+  telemetry_logger_level: DEBUG
+  dynflow_manage_services: true
+  dynflow_orchestrator_ensure: present
+  dynflow_worker_instances: {{ satellite_dynflow_worker_instances | default(1) }}
+  dynflow_worker_concurrency: {{ satellite_dynflow_worker_concurrency | default(5) }}
+  dynflow_redis_url:
+  hsts_enabled: true
+  cors_domains: []
+  trusted_proxies:
+  - {{ primary_ip | default(satellite_fqdn_ip | default('127.0.0.1')) }}
+  - {{ satellite_fqdn }}
+  foreman_service_puma_threads_min:
+  foreman_service_puma_threads_max: 5
+  foreman_service_puma_workers:
+  rails_cache_store:
+    type: redis
+  keycloak: false
+  keycloak_app_name: foreman-openidc
+  keycloak_realm: ssl-realm
+  register_in_foreman: true
+  provisioning_ct_location:
+  provisioning_fcct_location:
+foreman::cli:
+  foreman_url: https://{{ satellite_fqdn }}
+  version: installed
+  manage_root_config: true
+  username: {{ satellite_cli_username | default('admin') }}
+  password: {{ satellite_cli_password | default(satellite_admin_password) }}
+  use_sessions: false
+  refresh_cache: false
+  request_timeout: 120
+  ssl_ca_file:
+foreman::cli::ansible: {{ satellite_cli_ansible | default({}) }}
+foreman::cli::azure: {{ satellite_cli_azure | default({}) }}
+foreman::cli::bootdisk: {{ satellite_cli_bootdisk | default({}) }}
+foreman::cli::google: {{ satellite_cli_google | default({}) }}
+foreman::cli::katello: {{ satellite_cli_katello | default({}) }}
+foreman::cli::kubevirt: {{ satellite_cli_kubevirt | default(false) }}
+foreman::cli::puppet: {{ satellite_cli_puppet | default(false) }}
+foreman::cli::remote_execution: {{ satellite_cli_remote_execution | default({}) }}
+foreman::cli::virt_who_configure: {{ satellite_cli_virt_who_configure | default({}) }}
+foreman::cli::webhooks: {{ satellite_cli_webhooks | default({}) }}
+foreman::compute::ec2:
+  version: {{ satellite_compute_ec2_version | default('installed') }}
+foreman::compute::libvirt:
+  version: {{ satellite_compute_libvirt_version | default('installed') }}
+foreman::compute::openstack:
+  version: {{ satellite_compute_openstack_version | default('installed') }}
+foreman::compute::platform_vmware:
+  version: {{ satellite_compute_vmware_version | default('installed') }}
+foreman::plugin::ansible: {{ satellite_plugin_ansible | default({}) }}
+foreman::plugin::azure: {{ satellite_plugin_azure | default({}) }}
+foreman::plugin::bootdisk: {{ satellite_plugin_bootdisk | default(false) }}
+foreman::plugin::discovery: {{ satellite_plugin_discovery | default({}) }}
+foreman::plugin::google: {{ satellite_plugin_google | default({}) }}
+foreman::plugin::kubevirt: {{ satellite_plugin_kubevirt | default(false) }}
+foreman::plugin::leapp: {{ satellite_plugin_leapp | default({}) }}
+foreman::plugin::openscap: {{ satellite_plugin_openscap | default({}) }}
+foreman::plugin::puppet: {{ satellite_plugin_puppet | default(false) }}
+foreman::plugin::remote_execution: {{ satellite_plugin_remote_execution | default({}) }}
+foreman::plugin::remote_execution::cockpit: {{ satellite_plugin_remote_execution_cockpit | default(false) }}
+foreman::plugin::rh_cloud: {{ satellite_plugin_rh_cloud | default({}) }}
+foreman::plugin::tasks:
+  automatic_cleanup: true
+  cron_line: 45 19 * * *
+  backup: false
+foreman::plugin::templates: {{ satellite_plugin_templates | default({}) }}
+foreman::plugin::virt_who_configure: {{ satellite_plugin_virt_who_configure | default({}) }}
+foreman::plugin::webhooks: {{ satellite_plugin_webhooks | default({}) }}
+foreman_proxy:
+  version: present
+  ensure_packages_version: installed
+  manage_service: true
+  bind_host:
+  - "*"
+  http_port: 8000
+  ssl_port: 9090
+  groups: []
+  log: "/var/log/foreman-proxy/proxy.log"
+  log_level: INFO
+  log_buffer: 2000
+  log_buffer_errors: 1000
+  http: false
+  ssl: true
+  ssl_ca: "/etc/foreman-proxy/ssl_ca.pem"
+  ssl_cert: "/etc/foreman-proxy/ssl_cert.pem"
+  ssl_key: "/etc/foreman-proxy/ssl_key.pem"
+  foreman_ssl_ca: "/etc/foreman-proxy/foreman_ssl_ca.pem"
+  foreman_ssl_cert: "/etc/foreman-proxy/foreman_ssl_cert.pem"
+  foreman_ssl_key: "/etc/foreman-proxy/foreman_ssl_key.pem"
+  trusted_hosts:
+  - {{ satellite_fqdn }}
+  ssl_disabled_ciphers: []
+  tls_disabled_versions: []
+  puppetca: false
+  puppetca_listen_on: https
+  ssldir: "/etc/puppetlabs/puppet/ssl"
+  puppetdir: "/etc/puppetlabs/puppet"
+  puppet_group: puppet
+  puppetca_provider: puppetca_hostname_whitelisting
+  autosignfile: "/etc/puppetlabs/puppet/autosign.conf"
+  puppetca_sign_all: false
+  puppetca_tokens_file: "/var/lib/foreman-proxy/tokens.yml"
+  puppetca_token_ttl: 360
+  puppetca_certificate:
+  manage_puppet_group: false
+  puppet: false
+  puppet_listen_on: https
+  puppet_url: https://{{ satellite_fqdn }}:8140
+  puppet_ssl_ca: "/etc/puppetlabs/puppet/ssl/certs/ca.pem"
+  puppet_ssl_cert: "/etc/puppetlabs/puppet/ssl/certs/{{ satellite_fqdn }}.pem"
+  puppet_ssl_key: "/etc/puppetlabs/puppet/ssl/private_keys/{{ satellite_fqdn }}.pem"
+  puppet_api_timeout: 30
+  templates: false
+  templates_listen_on: both
+  template_url: http://{{ satellite_fqdn }}:8000
+  registration: false
+  registration_listen_on: https
+  logs: true
+  logs_listen_on: https
+  httpboot: false
+  httpboot_listen_on: both
+  tftp: true
+  tftp_listen_on: https
+  tftp_managed: true
+  tftp_manage_wget: true
+  tftp_root: "/var/lib/tftpboot"
+  tftp_dirs:
+  tftp_servername: {{ primary_ip | default(satellite_fqdn_ip | default('127.0.0.1')) }}
+  tftp_replace_grub2_cfg: false
+  dhcp: true
+  dhcp_listen_on: https
+  dhcp_managed: true
+  dhcp_provider: isc
+  dhcp_subnets:
+  - {{ primary_network ~ '/' ~ primary_prefix if primary_network and primary_prefix else '10.168.0.0/16' }}
+  dhcp_ping_free_ip: true
+  dhcp_option_domain:
+  - {{ system_domain_upper }}
+  dhcp_search_domains:
+  dhcp_interface: {{ primary_iface }}
+  dhcp_additional_interfaces: []
+  dhcp_gateway: {{ primary_gateway }}
+  dhcp_range: {{ dhcp_range_start }} {{ dhcp_range_end }}
+  dhcp_pxeserver: {{ dhcp_pxeserver_ip }}
+  dhcp_pxefilename: pxelinux.0
+  dhcp_ipxefilename:
+  dhcp_ipxe_bootstrap: false
+  dhcp_network: {{ primary_network }}
+  dhcp_netmask: {{ primary_netmask }}
+  dhcp_nameservers: {{ primary_nameserver }}
+  dhcp_server: {{ primary_ip | default(primary_gateway) }}
+  dhcp_config: "/etc/dhcp/dhcpd.conf"
+  dhcp_leases: "/var/lib/dhcpd/dhcpd.leases"
+  dhcp_key_name:
+  dhcp_key_secret:
+  dhcp_key_algorithm:
+  dhcp_omapi_port: 7911
+  dhcp_peer_address:
+  dhcp_node_type: standalone
+  dhcp_failover_address: {{ dhcp_failover_address_val }}
+  dhcp_failover_port: 519
+  dhcp_max_response_delay: 30
+  dhcp_max_unacked_updates: 10
+  dhcp_mclt: 300
+  dhcp_load_split: 255
+  dhcp_load_balance: 3
+  dhcp_manage_acls: true
+  dns: true
+  dns_listen_on: https
+  dns_managed: true
+  dns_provider: nsupdate
+  dns_interface: {{ primary_iface }}
+  dns_zone: {{ system_domain_upper }}
+  dns_reverse:
+  - {{ reverse_zone }}
+  dns_server: 127.0.0.1
+  dns_ttl: 86400
+  dns_tsig_keytab: "/etc/foreman-proxy/dns.keytab"
+  dns_tsig_principal: foremanproxy/{{ satellite_fqdn | upper }}@{{ system_domain_upper }}
+  dns_forwarders:
+  - 8.8.8.8
+  - 8.8.4.4
+  libvirt_network: default
+  libvirt_connection: qemu:///system
+  bmc: false
+  bmc_listen_on: https
+  bmc_default_provider: ipmitool
+  bmc_redfish_verify_ssl: true
+  bmc_ssh_user: root
+  bmc_ssh_key: "/usr/share/foreman/.ssh/id_rsa"
+  bmc_ssh_powerstatus: 'true'
+  bmc_ssh_powercycle: shutdown -r +1
+  bmc_ssh_poweroff: shutdown +1
+  bmc_ssh_poweron: 'false'
+  realm: false
+  realm_listen_on: https
+  realm_provider: freeipa
+  realm_keytab: "/etc/foreman-proxy/freeipa.keytab"
+  realm_principal: realm-proxy@{{ system_domain_upper }}
+  freeipa_config: "/etc/ipa/default.conf"
+  freeipa_remove_dns: true
+  keyfile: "/etc/rndc.key"
+  register_in_foreman: true
+  foreman_base_url: https://{{ satellite_fqdn }}
+  registered_name: {{ satellite_fqdn }}
+  registered_proxy_url:
+  oauth_effective_user: admin
+  oauth_consumer_key: {{ satellite_oauth_consumer_key }}
+  oauth_consumer_secret: {{ satellite_oauth_consumer_secret }}
+  registration_url:
+foreman_proxy_content:
+  pulpcore_mirror: false
+  reverse_proxy_backend_protocol: h2
+  enable_yum: true
+  enable_file: true
+  enable_docker: true
+  enable_deb: false
+  enable_ansible: true
+  enable_python: false
+  enable_ostree: false
+  pulpcore_manage_postgresql: true
+  pulpcore_postgresql_host: localhost
+  pulpcore_postgresql_port: 5432
+  pulpcore_allowed_content_checksums:
+  - md5
+  - sha1
+  - sha224
+  - sha256
+  - sha384
+  - sha512
+  pulpcore_postgresql_user: pulp
+  pulpcore_postgresql_password: {{ pulpcore_db_password }}
+  pulpcore_postgresql_db_name: pulpcore
+  pulpcore_postgresql_ssl: false
+  pulpcore_postgresql_ssl_require: true
+  pulpcore_postgresql_ssl_cert: "/etc/pki/katello/certs/pulpcore-database.crt"
+  pulpcore_postgresql_ssl_key: "/etc/pki/katello/private/pulpcore-database.key"
+  pulpcore_postgresql_ssl_root_ca: "/etc/pki/tls/certs/ca-bundle.crt"
+  pulpcore_worker_count: 4
+  pulpcore_django_secret_key: {{ pulpcore_django_secret_key }}
+  pulpcore_content_service_worker_timeout: 90
+  pulpcore_api_service_worker_timeout: 90
+  pulpcore_cache_enabled: true
+  pulpcore_cache_expires_ttl:
+  pulpcore_additional_import_paths: []
+  pulpcore_additional_export_paths: []
+  pulpcore_analytics: false
+  pulpcore_hide_guarded_distributions: true
+  pulpcore_import_workers_percent:
+foreman_proxy::plugin::ansible:
+  enabled: true
+  listen_on: https
+  ansible_dir: "/usr/share/foreman-proxy"
+  working_dir: "/tmp"
+  host_key_checking: false
+  roles_path:
+  - "/etc/ansible/roles"
+  - "/usr/share/ansible/roles"
+  ssh_args: "-C -o ControlMaster=auto -o ControlPersist=60s -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+  install_runner: true
+  callback: redhat.scenario_satellite.foreman
+  runner_package_name: ansible-runner
+  collections_paths:
+  - "/etc/ansible/collections"
+  - "/usr/share/ansible/collections"
+foreman_proxy::plugin::dhcp::infoblox: false
+foreman_proxy::plugin::dhcp::remote_isc: false
+foreman_proxy::plugin::discovery:
+  enabled: true
+  version:
+  listen_on: https
+  install_images: false
+  tftp_root: "/var/lib/tftpboot"
+  source_url: http://downloads.theforeman.org/discovery/releases/latest/
+  image_name: fdi-image-latest.tar
+foreman_proxy::plugin::dns::infoblox: false
+foreman_proxy::plugin::openscap:
+  enabled: true
+  version:
+  listen_on: https
+  openscap_send_log_file: "/var/log/foreman-proxy/openscap-send.log"
+  spooldir: "/var/spool/foreman-proxy/openscap"
+  contentdir: "/var/lib/foreman-proxy/openscap/content"
+  reportsdir: "/var/lib/foreman-proxy/openscap/reports"
+  failed_dir: "/var/lib/foreman-proxy/openscap/failed"
+  corrupted_dir: "/var/lib/foreman-proxy/openscap/corrupted"
+  proxy_name:
+  timeout: 60
+  ansible_module: false
+  ansible_module_ensure: present
+  puppet_module: false
+  puppet_module_ensure: present
+foreman_proxy::plugin::remote_execution::script:
+  enabled: true
+  listen_on: https
+  generate_keys: true
+  install_key: false
+  ssh_identity_dir: "/var/lib/foreman-proxy/ssh"
+  ssh_identity_file: id_rsa_foreman_proxy
+  ssh_keygen: "/usr/bin/ssh-keygen"
+  local_working_dir: "/var/tmp"
+  remote_working_dir: "/var/tmp"
+  ssh_kerberos_auth: false
+  mode: ssh
+  ssh_log_level:
+  cockpit_integration: true
+  mqtt_ttl:
+  mqtt_rate_limit:
+  mqtt_resend_interval:
+foreman_proxy::plugin::shellhooks: false
+iop: false
+katello:
+  candlepin_oauth_key: {{ candlepin_oauth_key | default('') }}
+  candlepin_oauth_secret: {{ candlepin_oauth_secret | default('') }}
+  rest_client_timeout: 3600
+  candlepin_db_host: localhost
+  candlepin_db_port:
+  candlepin_db_name: candlepin
+  candlepin_db_user: candlepin
+  candlepin_db_password: {{ candlepin_db_password | default('') }}
+  candlepin_db_ssl: false
+  candlepin_db_ssl_verify: true
+  candlepin_db_ssl_ca:
+  candlepin_manage_db: true
+  candlepin_loggers: {}
+  candlepin_facts_match_regex:
+  hosts_queue_workers: 1
+puppet: false

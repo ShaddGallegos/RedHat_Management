@@ -1,0 +1,6 @@
+---
+- name: Run project prompting to collect deployment secrets and defaults
+  hosts: localhost
+  gather_facts: true
+  roles:
+    - project_prompting

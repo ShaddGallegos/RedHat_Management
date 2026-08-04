@@ -1,0 +1,4 @@
+---
+- name: ServiceNow install placeholder
+  ansible.builtin.debug:
+    msg: "Implement ServiceNow install here."

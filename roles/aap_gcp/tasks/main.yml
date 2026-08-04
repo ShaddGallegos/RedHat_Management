@@ -1,0 +1,234 @@
+---
+# tasks file for aap_gcp
+
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - aap_gcp_project_id is defined and aap_gcp_project_id | length > 0
+      - aap_satellite_url is defined and aap_satellite_url | length > 0
+    fail_msg: "Required variables not set. Please set aap_gcp_project_id and aap_satellite_url"
+    success_msg: "All required variables are configured"
+  tags: ['always']
+
+- name: Display configuration summary
+  ansible.builtin.debug:
+    msg:
+      - "GCP Project: {{ aap_gcp_project_id }}"
+      - "Satellite URL: {{ aap_satellite_url }}"
+      - "Base Directory: {{ aap_gcp_base_dir }}"
+      - "Configure AAP: {{ aap_configure_aap }}"
+  tags: ['always']
+
+# ===================================
+# Create Directory Structure
+# ===================================
+- name: Create project directory structure
+  when: aap_gcp_create_structure
+  tags: ['structure']
+  block:
+    - name: Create base project directory
+      ansible.builtin.file:
+        path: "{{ aap_gcp_base_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Create subdirectories
+      ansible.builtin.file:
+        path: "{{ aap_gcp_base_dir }}/{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - inventories
+        - playbooks
+        - group_vars/all
+        - roles
+        - execution_environments
+        - collections
+        - logs
+        - .ansible/cp
+
+    - name: Create Ansible control path directory
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.ansible/cp"
+        state: directory
+        mode: '0700'
+
+# ===================================
+# Generate Vault Password
+# ===================================
+- name: Generate vault password if not provided
+  when: aap_gcp_vault_password | length == 0
+  tags: ['security']
+  block:
+    - name: Generate random vault password
+      ansible.builtin.set_fact:
+        aap_gcp_vault_password: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters,digits') }}"
+
+    - name: Display generated vault password
+      ansible.builtin.debug:
+        msg: "Generated vault password: {{ aap_gcp_vault_password }}"
+      no_log: false
+
+- name: Create vault password directory
+  ansible.builtin.file:
+    path: "{{ (aap_vault_password_file | expanduser) | dirname }}"
+    state: directory
+    mode: '0700'
+  tags: ['security']
+
+- name: Save vault password to file
+  ansible.builtin.copy:
+    content: "{{ aap_gcp_vault_password }}"
+    dest: "{{ aap_vault_password_file | expanduser }}"
+    mode: '0600'
+  tags: ['security']
+  no_log: true
+
+# ===================================
+# Generate Configuration Files
+# ===================================
+- name: Generate ansible.cfg
+  ansible.builtin.template:
+    src: ansible.cfg.j2
+    dest: "{{ aap_gcp_base_dir }}/ansible.cfg"
+    mode: '0644'
+  tags: ['configs']
+
+- name: Generate GCP dynamic inventory
+  ansible.builtin.template:
+    src: gcp_dynamic.yml.j2
+    dest: "{{ aap_gcp_base_dir }}/inventories/gcp_dynamic.yml"
+    mode: '0644'
+  tags: ['configs']
+
+- name: Generate group_vars - non-sensitive variables
+  ansible.builtin.template:
+    src: vars.yml.j2
+    dest: "{{ aap_gcp_base_dir }}/group_vars/all/vars.yml"
+    mode: '0644'
+  tags: ['configs']
+
+- name: Generate group_vars - vault encrypted variables
+  ansible.builtin.template:
+    src: vault.yml.j2
+    dest: "{{ aap_gcp_base_dir }}/group_vars/all/vault.yml.unencrypted"
+    mode: '0600'
+  tags: ['configs']
+  no_log: true
+
+- name: Encrypt vault file
+  ansible.builtin.command:
+    cmd: "ansible-vault encrypt {{ aap_gcp_base_dir }}/group_vars/all/vault.yml.unencrypted --output={{ aap_gcp_base_dir }}/group_vars/all/vault.yml"
+  environment:
+    ANSIBLE_VAULT_PASSWORD_FILE: "{{ aap_vault_password_file | expanduser }}"
+  tags: ['configs']
+  changed_when: true
+
+- name: Remove unencrypted vault file
+  ansible.builtin.file:
+    path: "{{ aap_gcp_base_dir }}/group_vars/all/vault.yml.unencrypted"
+    state: absent
+  tags: ['configs']
+
+# ===================================
+# Generate Playbooks
+# ===================================
+- name: Generate registration playbook
+  ansible.builtin.template:
+    src: gcp_satellite_registration.yml.j2
+    dest: "{{ aap_gcp_base_dir }}/playbooks/gcp_satellite_registration.yml"
+    mode: '0644'
+  tags: ['playbooks']
+
+- name: Generate AAP export playbook
+  ansible.builtin.template:
+    src: export_aap_config.yml.j2
+    dest: "{{ aap_gcp_base_dir }}/playbooks/export_aap_config.yml"
+    mode: '0644'
+  when: aap_create_export_playbook
+  tags: ['playbooks']
+
+# ===================================
+# Generate Execution Environment
+# ===================================
+- name: Generate execution environment definition
+  ansible.builtin.template:
+    src: ee_gcp_satellite.yml.j2
+    dest: "{{ aap_gcp_base_dir }}/execution_environments/ee_gcp_satellite.yml"
+    mode: '0644'
+  tags: ['templates']
+
+- name: Generate collections requirements
+  ansible.builtin.template:
+    src: requirements.yml.j2
+    dest: "{{ aap_gcp_base_dir }}/collections/requirements.yml"
+    mode: '0644'
+  tags: ['templates']
+
+# ===================================
+# Generate Additional Files
+# ===================================
+- name: Generate .gitignore
+  ansible.builtin.template:
+    src: gitignore.j2
+    dest: "{{ aap_gcp_base_dir }}/.gitignore"
+    mode: '0644'
+  when: aap_create_gitignore
+  tags: ['templates']
+
+- name: Generate project README
+  ansible.builtin.template:
+    src: PROJECT_README.md.j2
+    dest: "{{ aap_gcp_base_dir }}/README.md"
+    mode: '0644'
+  when: aap_create_readme
+  tags: ['templates']
+
+- name: Create logs directory
+  ansible.builtin.file:
+    path: "{{ aap_gcp_base_dir }}/logs"
+    state: directory
+    mode: '0755'
+  when: aap_create_log_directory
+  tags: ['structure']
+
+# ===================================
+# Configure AAP Resources
+# ===================================
+- name: Configure AAP resources
+  when: aap_configure_aap
+  tags: ['aap']
+  block:
+    - name: Validate AAP configuration requirements
+      ansible.builtin.assert:
+        that:
+          - aap_controller_hostname is defined and aap_controller_hostname | length > 0
+          - aap_controller_password is defined and aap_controller_password | length > 0
+          - aap_satellite_password is defined and aap_satellite_password | length > 0
+        fail_msg: "AAP configuration requires aap_controller_hostname, aap_controller_password, and aap_satellite_password"
+
+    - name: Include AAP configuration tasks
+      ansible.builtin.include_tasks: configure_aap.yml
+
+# ===================================
+# Display Summary
+# ===================================
+- name: Display completion summary
+  ansible.builtin.debug:
+    msg:
+      - "========================================="
+      - "GCP-AAP Integration Project Created"
+      - "========================================="
+      - "Project Location: {{ aap_gcp_base_dir }}"
+      - "Vault Password File: {{ aap_vault_password_file | expanduser }}"
+      - ""
+      - "Next Steps:"
+      - "1. Copy your GCP service account key to {{ aap_gcp_service_account_file }}"
+      - "2. Review configuration: {{ aap_gcp_base_dir }}/ansible.cfg"
+      - "3. Update variables: {{ aap_gcp_base_dir }}/group_vars/all/vars.yml"
+      - "4. Test inventory: cd {{ aap_gcp_base_dir }} && ansible-inventory -i inventories/gcp_dynamic.yml --list"
+      - "5. Run playbook: cd {{ aap_gcp_base_dir }} && ansible-playbook playbooks/gcp_satellite_registration.yml"
+      - ""
+      - "{{ 'AAP Resources Configured!' if aap_configure_aap else 'To configure AAP, re-run with aap_configure_aap=true' }}"
+      - "========================================="
+  tags: ['always']

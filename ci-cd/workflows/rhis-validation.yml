@@ -1,0 +1,87 @@
+---
+# GitHub Actions workflow for RHIS CI/CD validation
+
+name: RHIS CI/CD Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    - cron: '0 2 * * *'  # Daily at 2 AM
+
+jobs:
+  validation:
+    # RHEL-only CI policy
+    runs-on: [self-hosted, rhel]
+    name: Validate RHIS Project
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Ansible
+        run: |
+          pip install ansible ansible-lint
+
+      - name: Syntax Check
+        run: |
+          for file in *.yml; do
+            ansible-playbook --syntax-check "$file"
+          done
+
+      - name: Lint Check
+        run: |
+          ansible-lint --strict roles/ || true
+
+      - name: Role Metadata Validation
+        run: |
+          python ci-cd/scripts/validate_metadata.py
+
+      - name: Documentation Coverage
+        run: |
+          python ci-cd/scripts/validate_docs.py
+
+      - name: Variable Naming Convention
+        run: |
+          python ci-cd/scripts/validate_variables.py
+
+      - name: Test Role Functionality
+        run: |
+          for test_file in roles/*/tests/test_role.yml; do
+            if [ -f "$test_file" ]; then
+              ansible-playbook "$test_file"
+            fi
+          done
+
+      - name: Generate Report
+        if: always()
+        run: |
+          python ci-cd/scripts/generate_report.py
+
+      - name: Upload Artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-report
+          path: /tmp/validation-report.html
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('/tmp/validation-summary.txt', 'utf8');
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## RHIS Validation Report\n' + report
+            });

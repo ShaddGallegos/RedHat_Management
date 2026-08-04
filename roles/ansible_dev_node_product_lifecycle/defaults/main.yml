@@ -1,0 +1,13 @@
+---
+# Default variables for ansible_dev_node_product_lifecycle role
+ansible_dev_node_product_lifecycle_product_lifecycle_enabled: false
+ansible_dev_node_product_lifecycle_product_lifecycle_version: "1.0"
+ansible_dev_node_product_lifecycle_product_lifecycle_timeout: 7200
+
+# Product lifecycle configuration
+ansible_dev_node_product_lifecycle_manage_product_updates: true
+ansible_dev_node_product_lifecycle_manage_product_upgrades: true
+ansible_dev_node_product_lifecycle_enable_rollback: true
+
+# Feature toggles
+ansible_dev_node_product_lifecycle_product_lifecycle_validate_compatibility: true

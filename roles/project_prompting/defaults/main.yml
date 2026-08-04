@@ -1,0 +1,472 @@
+---
+# Secrets policy controls
+project_prompting_ansible_conf_dir: "{{ lookup('env', 'HOME') + '/.ansible/conf' }}"
+project_prompting_env_file_path: "{{ project_prompting_ansible_conf_dir + '/env.yml' }}"
+project_prompting_vault_password_file_path: "{{ project_prompting_ansible_conf_dir + '/.vaultpass.txt' }}"
+project_prompting_legacy_vault_password_file_path: "{{ project_prompting_ansible_conf_dir + '/.vault_pass.txt' }}"
+project_prompting_auto_encrypt_env_file: true
+project_prompting_enforce_unique_variable_names: true
+project_prompting_enforce_unique_answers: true
+project_prompting_sensitive_key_pattern: '(?i)(password|passwd|token|secret|api[_-]?key|private[_-]?key|credential)'
+
+# Centralized prompt definitions for the project
+# Role-scoped variable name to satisfy repo conventions
+project_prompting_prompt_defs:
+  # Global system admin (must be first since other prompts reference it)
+  - name: project_prompting_system_admin_user
+    prompt: >-
+      Default system admin username for Satellite/Ansible/IdM/OpenShift/
+      ansible-cmdb
+    default: "admin"
+    # global
+
+  # Satellite
+  - name: project_prompting_satellite_domain
+    prompt: "Satellite domain (e.g. hostname -d)"
+    default: "{{ ansible_domain | default('example.com') }}"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_primary_interface
+    prompt: "Primary interface for Satellite services (DHCP/DNS/TFTP)"
+    default: "{{ ansible_default_ipv4.interface | default('enp2s0') }}"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_fqdn
+    prompt: "Satellite FQDN"
+    default: >-
+      {{ ansible_fqdn
+         | default('scenario_satellite.' +
+                   (ansible_domain | default('example.com'))) }}
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_fqdn_ip
+    prompt: "Satellite FQDN IP (leave blank to auto-detect)"
+    default: "{{ ansible_default_ipv4.address | default('') }}"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_gateway
+    prompt: "Gateway for primary interface (leave blank to auto-detect)"
+    default: "{{ ansible_default_ipv4.gateway | default('') }}"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_nameserver
+    prompt: "Nameserver to publish via DHCP (leave blank to auto-detect)"
+    default: >-
+      {{ (ansible_dns.nameservers | first)
+         | default('') if ansible_dns is defined else '' }}
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_dhcp_range_start
+    prompt: "DHCP range start (leave blank to auto-compute)"
+    default: ""
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_dhcp_range_end
+    prompt: "DHCP range end (leave blank to auto-compute)"
+    default: ""
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_pxeserver
+    prompt: "PXE/TFTP server IP (leave blank to use primary IP)"
+    default: ""
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_initial_admin_email
+    prompt: "Initial Satellite admin email"
+    default: "admin@{{ ansible_domain | default('example.com') }}"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_admin_user
+    prompt: "Satellite admin username"
+    default: "{{ project_prompting_system_admin_user }}"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_admin_password
+    prompt: "Satellite admin password"
+    default: "r3dh4t7!"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_mail_relay
+    prompt: "Satellite SMTP relay host:port (leave blank to skip)"
+    default: ""
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_mail_relay_credentials
+    prompt: >-
+      Satellite SMTP relay credentials (user:pass) - leave blank if not
+      required
+    default: ""
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_version
+    prompt: "Satellite version (e.g. 6.18)"
+    default: "6.18"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_subnet_mask_bits
+    prompt: "Satellite subnet mask bits (e.g. 16, 24)"
+    default: "16"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_dhcp_network
+    prompt: "DHCP network address (e.g. 10.168.0.0)"
+    default: "10.168.0.0"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_dhcp_network_mask
+    prompt: "DHCP network mask (e.g. 255.255.0.0)"
+    default: "255.255.0.0"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_enable_rhel_repositories
+    prompt: "Enable RHEL repositories (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_rhel_versions
+    prompt: "RHEL versions to support (comma-separated, e.g. 8,9,10)"
+    default: "8,9,10"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_configure_sync_plans
+    prompt: "Configure repository sync plans (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_create_lifecycle_environments
+    prompt: "Create lifecycle environments (DEV/TEST/PROD) (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_create_content_views
+    prompt: "Create content views (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_create_activation_keys
+    prompt: "Create activation keys (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_foreman_initial_organization
+    prompt: "Satellite initial organization name"
+    default: "DefaultOrg"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_foreman_initial_location
+    prompt: "Satellite initial location name"
+    default: "DefaultLoc"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_enable_foreman_proxy
+    prompt: "Enable Foreman Smart Proxy (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_enable_foreman_plugin_ansible
+    prompt: "Enable Foreman Ansible plugin (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_foreman_proxy_tftp
+    prompt: "Enable TFTP on Foreman proxy (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_foreman_proxy_dns
+    prompt: "Enable DNS on Foreman proxy (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  - name: project_prompting_satellite_foreman_proxy_dhcp
+    prompt: "Enable DHCP on Foreman proxy (true/false)"
+    default: "true"
+    components: ["satellite"]
+
+  # AAP
+  - name: project_prompting_aap_admin_user
+    prompt: "AAP admin user"
+    default: "{{ project_prompting_system_admin_user }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_admin_password
+    prompt: "AAP admin password"
+    default: "r3dh4t7!"
+    components: ["aap"]
+
+  - name: project_prompting_aap_version
+    prompt: "AAP version (e.g. 2.7)"
+    default: "2.7"
+    components: ["aap"]
+
+  - name: project_prompting_aap_domain
+    prompt: "AAP domain"
+    default: "{{ ansible_domain | default('example.com') }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_hostname
+    prompt: "AAP hostname (FQDN)"
+    default: "aap.{{ ansible_domain | default('example.com') }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_primary_interface
+    prompt: "Primary network interface for AAP"
+    default: "{{ ansible_default_ipv4.interface | default('enp2s0') }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_ip
+    prompt: "AAP IP address"
+    default: "{{ ansible_default_ipv4.address | default('10.168.151.126') }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_subnet_mask_bits
+    prompt: "AAP subnet mask bits (e.g. 16, 24)"
+    default: "16"
+    components: ["aap"]
+
+  - name: project_prompting_aap_gateway
+    prompt: "AAP network gateway"
+    default: "{{ ansible_default_ipv4.gateway | default('10.168.0.1') }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_installer_bundle_path
+    prompt: "Path to AAP installer bundle (.tar.gz)"
+    default: "files/ansible-automation-platform-containerized-setup-bundle-2.7-4-x86_64.tar.gz"
+    components: ["aap"]
+
+  - name: project_prompting_aap_platform_admin_password
+    prompt: "AAP platform admin password"
+    default: "r3dh4t7!"
+    components: ["aap"]
+
+  - name: project_prompting_aap_automationgateway
+    prompt: "AAP Automation Gateway FQDN"
+    default: "aap.{{ ansible_domain | default('example.com') }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_automationcontroller
+    prompt: "AAP Automation Controller FQDN"
+    default: "aap.{{ ansible_domain | default('example.com') }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_automationhub
+    prompt: "AAP Automation Hub FQDN"
+    default: "aap.{{ ansible_domain | default('example.com') }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_automationeda
+    prompt: "AAP Automation EDA FQDN"
+    default: "aap.{{ ansible_domain | default('example.com') }}"
+    components: ["aap"]
+
+  - name: project_prompting_aap_database
+    prompt: "AAP database FQDN"
+    default: "aap.{{ ansible_domain | default('example.com') }}"
+    components: ["aap"]
+
+  - name: project_prompting_automation_hub_token
+    prompt: "Ansible Automation Hub token (leave blank if not needed)"
+    default: ""
+    # can be supplied from console_token if present
+
+  # IdM
+  - name: project_prompting_idm_domain
+    prompt: "IdM domain"
+    default: "{{ ansible_domain | default('example.com') }}"
+    components: ["idm"]
+
+  - name: project_prompting_idm_realm
+    prompt: "IdM realm (usually domain uppercased)"
+    default: "{{ (ansible_domain | default('example.com')) | upper }}"
+    components: ["idm"]
+
+  - name: project_prompting_idm_admin_password
+    prompt: "IdM admin password"
+    default: "r3dh4t7!"
+    components: ["idm"]
+
+  - name: project_prompting_idm_directory_manager_password
+    prompt: "IdM Directory Manager password"
+    default: "r3dh4t7!"
+    components: ["idm"]
+
+  - name: project_prompting_idm_enable_dns
+    prompt: "Enable IdM DNS server (true/false)"
+    default: "true"
+    components: ["idm"]
+
+  - name: project_prompting_idm_dns_forwarders
+    prompt: "IdM DNS forwarders (comma-separated IPs, e.g. 8.8.8.8,1.1.1.1)"
+    default: "8.8.8.8,1.1.1.1"
+    components: ["idm"]
+
+  - name: project_prompting_idm_primary_interface
+    prompt: "Primary network interface for IdM services"
+    default: "{{ ansible_default_ipv4.interface | default('enp2s0') }}"
+    components: ["idm"]
+
+  - name: project_prompting_idm_fqdn
+    prompt: "IdM server FQDN"
+    default: "idm.{{ ansible_domain | default('example.com') }}"
+    components: ["idm"]
+
+  - name: project_prompting_idm_ip
+    prompt: "IdM server IP address"
+    default: "{{ ansible_default_ipv4.address | default('10.168.151.125') }}"
+    components: ["idm"]
+
+  - name: project_prompting_idm_subnet_mask_bits
+    prompt: "IdM subnet mask bits (e.g. 16, 24)"
+    default: "16"
+    components: ["idm"]
+
+  - name: project_prompting_idm_gateway
+    prompt: "IdM network gateway"
+    default: "{{ ansible_default_ipv4.gateway | default('10.168.0.1') }}"
+    components: ["idm"]
+
+  - name: project_prompting_idm_ldap_base_dn
+    prompt: "IdM LDAP base DN (e.g. dc=example,dc=com)"
+    default: "dc={{ (ansible_domain | default('example.com')).split('.') | join(',dc=') }}"
+    components: ["idm"]
+
+  - name: project_prompting_idm_kerberos_realm
+    prompt: "IdM Kerberos realm (usually realm uppercased)"
+    default: "{{ (ansible_domain | default('example.com')) | upper }}"
+    components: ["idm"]
+
+  # Insights
+  - name: project_prompting_insights_account
+    prompt: "Red Hat Insights account number"
+    default: "000000"
+    components: ["insights"]
+
+  - name: project_prompting_insights_username
+    prompt: "Red Hat Insights username"
+    default: "insights-user"
+    components: ["insights"]
+
+  - name: project_prompting_insights_password
+    prompt: "Red Hat Insights password"
+    default: ""
+    components: ["insights"]
+
+  # Installer / Libvirt / VM nodes
+  - name: project_prompting_installer_node_fqdn
+    prompt: "Installer node (ansibledev) FQDN"
+    default: "ansibledev.{{ ansible_domain | default('example.com') }}"
+
+  - name: project_prompting_installer_node_ip
+    prompt: "Installer node (ansibledev) IP"
+    default: "10.168.0.1"
+
+  - name: project_prompting_libvirt_host_fqdn
+    prompt: "Libvirt host FQDN (where VMs will be created)"
+    default: "libvirt.{{ ansible_domain | default('example.com') }}"
+
+  - name: project_prompting_libvirt_host_ip
+    prompt: "Libvirt host IP"
+    default: "10.168.0.1"
+    components: ["libvirt"]
+
+  # Node definitions
+  - name: project_prompting_node_ansibledev_fqdn
+    prompt: "ansibledev VM FQDN"
+    default: "ansibledev.{{ ansible_domain | default('example.com') }}"
+    components: ["libvirt", "baremetal"]
+
+  - name: project_prompting_node_ansibledev_ip
+    prompt: "ansibledev VM IP"
+    default: "10.168.0.10"
+    components: ["libvirt", "baremetal"]
+
+  - name: project_prompting_node_satellite_fqdn
+    prompt: "scenario_satellite VM FQDN"
+    default: "scenario_satellite.{{ ansible_domain | default('example.com') }}"
+
+  - name: project_prompting_node_satellite_ip
+    prompt: "scenario_satellite VM IP"
+    default: "10.168.0.11"
+    components: ["satellite", "libvirt", "baremetal"]
+
+  - name: project_prompting_node_aap_fqdn
+    prompt: "aap VM FQDN"
+    default: "aap.{{ ansible_domain | default('example.com') }}"
+
+  - name: project_prompting_node_aap_ip
+    prompt: "aap VM IP"
+    default: "10.168.0.12"
+
+  - name: project_prompting_node_idm_fqdn
+    prompt: "idm VM FQDN"
+    default: "idm.{{ ansible_domain | default('example.com') }}"
+
+  - name: project_prompting_node_idm_ip
+    prompt: "idm VM IP"
+    default: "10.168.0.13"
+
+  - name: project_prompting_inventory_admin_user
+    prompt: "Default inventory admin username"
+    default: "{{ project_prompting_system_admin_user }}"
+    # global
+
+  - name: project_prompting_inventory_admin_password
+    prompt: "Default inventory admin password"
+    default: "r3dh4t7!"
+    # global
+
+  # Global credentials / tokens / keys used across components
+  - name: project_prompting_global_admin_user
+    prompt: "Global admin username (used across selected platforms)"
+    default: "admin"
+
+  - name: project_prompting_global_admin_password
+    prompt: "Global admin password (used across selected platforms)"
+    default: "r3dh4t7!"
+
+  - name: project_prompting_redhat_cdn_username
+    prompt: "Red Hat CDN username (podman/quay login username)"
+    default: ""
+
+  - name: project_prompting_redhat_cdn_password
+    prompt: "Red Hat CDN password (podman/quay login password)"
+    default: ""
+
+  - name: project_prompting_console_redhat_token
+    prompt: >-
+      console.redhat.com token (also used for ansible.cfg token and external
+      automation hub)
+    default: ""
+
+  # NOTE: project_prompting_console_redhat_token is the canonical token used
+  # for console.redhat.com, ansible.cfg token, and external Automation Hub.
+  # The separate `project_prompting_ansible_cfg_token` and
+  # `project_prompting_external_automationhub_token` variables were removed
+  # to avoid duplication; code should reference
+  # `project_prompting_console_redhat_token` instead.
+
+  - name: project_prompting_ssh_public_key
+    prompt: >-
+      Path to SSH public key to use across systems (e.g.
+      ~/.ssh/id_rsa.pub)
+    default: "~/.ssh/id_rsa.pub"
+
+  - name: project_prompting_ssh_private_key_file
+    prompt: >-
+      Path to SSH private key to use across systems (e.g.
+      ~/.ssh/id_rsa)
+    default: "~/.ssh/id_rsa"
+
+  - name: project_prompting_github_username
+    prompt: "GitHub username for repo operations (leave blank if not needed)"
+    default: ""
+
+  - name: project_prompting_github_pat
+    prompt: >-
+      GitHub Personal Access Token (PAT) with 'repo' and 'workflow' scopes
+      (leave blank if not needed)
+    default: ""
+
+  - name: project_prompting_rh_offline_token
+    prompt: "Red Hat offline/manifest token (if required)"
+    default: ""

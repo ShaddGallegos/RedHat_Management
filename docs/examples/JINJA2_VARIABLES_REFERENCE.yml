@@ -1,0 +1,389 @@
+---
+# RHIS Variable Management and Jinja2 Lookups Organization
+# Best practices for credentials, environment variables, and defaults
+# Use these in playbooks with proper filtering and validation
+
+# ==============================================================================
+# ENVIRONMENT VARIABLE LOOKUPS
+# ==============================================================================
+# These pull values directly from system environment variables
+# Safe approach: always provide defaults to prevent task failure
+
+environment_lookups:
+  # User and System Environment
+  user: "{{ lookup('env', 'USER') | default('') }}"
+  home: "{{ lookup('env', 'HOME') | default('') }}"
+  shell: "{{ lookup('env', 'SHELL') | default('/bin/bash') }}"
+  
+  # Cloud Provider Credentials (AWS)
+  aws:
+    access_key_id: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') | default('') }}"
+    secret_access_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') | default('') }}"
+    region: "{{ lookup('env', 'AWS_REGION') | default('us-east-1') }}"
+  
+  # ServiceNow Integration
+  integration_servicenow:
+    api_token: "{{ lookup('env', 'SNOW_API_TOKEN') | default('') }}"
+  
+  # VMware Credentials
+  platform_vmware:
+    username: "{{ lookup('env', 'VMWARE_USERNAME') | default('') }}"
+    password: "{{ lookup('env', 'VMWARE_PASSWORD') | default('') }}"
+    token: "{{ lookup('env', 'VMWARE_TOKEN') | default('') }}"
+  
+  # Satellite/Foreman Credentials
+  scenario_satellite:
+    token: "{{ lookup('env', 'FOREMAN_TOKEN') | default('') }}"
+    username: "{{ lookup('env', 'FOREMAN_USER') | default('admin') }}"
+    password: "{{ lookup('env', 'FOREMAN_PASS') | default('') }}"
+
+# ==============================================================================
+# RED HAT & TOKENS
+# ==============================================================================
+# Credentials for Red Hat repositories, Automation Hub, and CDN
+
+redhat_credentials:
+  # Offline Token (primary method for modern deployments)
+  offline_token: "{{ offline_token | default('') }}"
+  offline_token_vault: "{{ offline_token_vault | default('') }}"
+  
+  # Image Builder Token
+  imagebuilder_offline_token_vault: "{{ imagebuilder_offline_token_vault | default('') }}"
+  
+  # Automation Hub Tokens (multiple names for compatibility)
+  automation_hub_token: "{{ automation_hub_token | default('') }}"
+  redhat_automation_hub_token: "{{ redhat_automation_hub_token | default('') }}"
+  
+  # General RH Credentials
+  rh_credentials_token: "{{ rh_credentials_token | default('') }}"
+  
+  # Console.redhat.com Access
+  console_redhat_token: "{{ project_prompting_console_redhat_token | default(console_redhat_token | default('')) }}"
+  console_redhat_password: "{{ console_redhat_password | default('') }}"
+  
+  # RHSM (Red Hat Subscription Management)
+  rhsm:
+    username: "{{ rhsm_username | default(redhat_cdn_username | default(redhat_username | default(redhat_user | default('')))) }}"
+    password: "{{ rhsm_password | default(redhat_cdn_password | default(redhat_password | default(''))) }}"
+    org: "{{ rhsm_org | default('') }}"
+    activation_key: "{{ activation_key | default('') }}"
+  
+  # CDN Credentials (for isolated networks)
+  cdn:
+    username: "{{ redhat_cdn_username | default(rhsm_username | default(redhat_username | default(redhat_user | default('')))) }}"
+    password: "{{ redhat_cdn_password | default(rhsm_password | default(redhat_password | default(''))) }}"
+
+  # Legacy redhat_* aliases (treated as equivalent to CDN/RHSM)
+  redhat:
+    username: "{{ redhat_username | default(redhat_user | default(redhat_cdn_username | default(rhsm_username | default('')))) }}"
+    user: "{{ redhat_user | default(redhat_username | default(redhat_cdn_username | default(rhsm_username | default('')))) }}"
+    password: "{{ redhat_password | default(redhat_cdn_password | default(rhsm_password | default(''))) }}"
+  
+  # Catalog Credentials
+  catalog:
+    username: "{{ redhat_catalog_username | default('') }}"
+    password: "{{ redhat_catalog_password | default('') }}"
+
+# ==============================================================================
+# AAP (ANSIBLE AUTOMATION PLATFORM) 2.6
+# ==============================================================================
+# Complete credential and configuration management for AAP
+
+aap_credentials:
+  # Admin Passwords (multiple naming conventions)
+  admin_password: "{{ aap_password | default(aap_admin_password) | default('') }}"
+  hub_password: "{{ aap_hub_password | default(automationhub_admin_password) | default('') }}"
+  controller_password: "{{ automationcontroller_admin_password | default('') }}"
+  platform_admin_password: "{{ platform_admin_password | default('') }}"
+  
+  # Database Passwords
+  postgresql:
+    password: "{{ aap_pg_password | default(automationcontroller_pg_password) | default(postgres_password) | default('') }}"
+    username: "awx"
+    database: "awx"
+  
+  # Hub Configuration
+  hub:
+    url: "{{ aap_hub_url | default('https://aap-hub.example.com') }}"
+    username: "admin"
+    password: "{{ aap_hub_password | default('') }}"
+
+# ==============================================================================
+# IDM (IDENTITY MANAGEMENT) 3.0
+# ==============================================================================
+# Identity management and Kerberos configuration
+
+idm_credentials:
+  # Admin Passwords (multiple naming conventions)
+  admin_password: "{{ idm_admin_password | default(idm_admin_pwd) | default('') }}"
+  
+  # Directory Manager (LDAP admin)
+  directory_manager:
+    password: "{{ idm_directory_manager_password | default(idm_dm_password) | default(idm_dm_pwd) | default('') }}"
+  
+  # Default User Password
+  user_password: "{{ idm_user_password | default('') }}"
+  
+  # LDAP Bind Credentials (for external integrations)
+  ldap_bind:
+    dn: "uid=admin,cn=users,cn=accounts,dc=example,dc=com"
+    password: "{{ idm_ldap_bind_password | default('') }}"
+  
+  # Realm Configuration
+  realm:
+    name: "{{ idm_realm | default('EXAMPLE.COM') }}"
+    domain: "{{ idm_domain | default('example.com') }}"
+
+# ==============================================================================
+# SATELLITE 6.18
+# ==============================================================================
+# Systems management and platform_provisioning platform
+
+satellite_credentials:
+  # Admin Passwords
+  admin_password: "{{ satellite_admin_password | default(foreman_admin_password) | default('') }}"
+  
+  # Database
+  database:
+    password: "{{ satellite_db_password | default('') }}"
+    username: "foreman"
+    database: "foreman"
+  
+  # Email Configuration (for notifications)
+  email:
+    sendmail:
+      location: "{{ satellite_email_sendmail_location | default('/usr/sbin/sendmail') }}"
+      arguments: "{{ satellite_email_sendmail_arguments | default('-t -i') }}"
+    smtp:
+      address: "{{ satellite_email_smtp_address | default('') }}"
+      domain: "{{ satellite_email_smtp_domain | default('example.com') }}"
+      username: "{{ satellite_email_smtp_user_name | default('') }}"
+      password: "{{ satellite_email_smtp_password | default('') }}"
+    reply_address: "{{ satellite_email_reply_address | default('scenario_satellite@example.com') }}"
+    subject_prefix: "{{ satellite_email_subject_prefix | default('[Satellite]') }}"
+
+# ==============================================================================
+# DATABASE MANAGEMENT
+# ==============================================================================
+# Centralized database password management
+
+database_credentials:
+  # PostgreSQL (AAP, Satellite)
+  postgresql:
+    admin_password: "{{ postgres_password | default(pg_password) | default('') }}"
+  
+  # Pulp (Repository management)
+  pulpcore:
+    password: "{{ pulpcore_db_password | default('') }}"
+    database: "pulpcore"
+  
+  # Candlepin (Satellite subscription management)
+  candlepin:
+    password: "{{ candlepin_db_password | default('') }}"
+    oauth_key: "{{ candlepin_oauth_key | default('') }}"
+    oauth_secret: "{{ candlepin_oauth_secret | default('') }}"
+
+# ==============================================================================
+# EDA (EVENT DRIVEN AUTOMATION)
+# ==============================================================================
+# Event-driven automation platform credentials
+
+eda_credentials:
+  admin_password: "{{ eda_password | default('') }}"
+
+# ==============================================================================
+# CONTAINER REGISTRY
+# ==============================================================================
+# Container registry authentication for EE and images
+
+container_registry:
+  username: "{{ container_registry_username | default('') }}"
+  password: "{{ container_registry_password | default('') }}"
+  registry_url: "{{ container_registry_url | default('registry.redhat.io') }}"
+
+# ==============================================================================
+# RED HAT INSIGHTS
+# ==============================================================================
+# Insights integration_generic and reporting
+
+insights_credentials:
+  account: "{{ insights_account | default('') }}"
+  username: "{{ insights_username | default('') }}"
+  password: "{{ insights_password | default('') }}"
+  
+  # AAP Insights Integration
+  aap:
+    api_token: "{{ aap_insights_api_token | default('') }}"
+    admin_password: "{{ aap_insights_aap_admin_password | default('') }}"
+
+# ==============================================================================
+# HYBRID CREDENTIALS (CDN/CATALOG)
+# ==============================================================================
+# Remote repository and hub credentials
+
+hybrid_credentials:
+  # Remote Automation Hub
+  remote_hub:
+    username: "{{ remote_automationhub_user | default('') }}"
+    password: "{{ remote_automationhub_password | default('') }}"
+
+# ==============================================================================
+# INFRASTRUCTURE & CLOUD
+# ==============================================================================
+# Infrastructure and cloud provider credentials
+
+infrastructure_credentials:
+  # General admin credentials
+  admin_password: "{{ admin_password | default('') }}"
+  
+  # VMware
+  platform_vmware:
+    password: "{{ vmware_password | default('') }}"
+  
+  # AWS Route53 (for DNS)
+  aws_route53:
+    zone_id: "{{ aws_route53_zone_id | default('') }}"
+  
+  # AWS EC2
+  aws_ec2:
+    access_key: "{{ aws_access_key | default('') }}"
+    secret_key: "{{ aws_secret_key | default('') }}"
+
+# ==============================================================================
+# SSH/PKI CREDENTIALS
+# ==============================================================================
+# SSH keys for passwordless access across platform_infrastructure_core
+
+ssh_credentials:
+  # Satellite VM SSH key
+  scenario_satellite:
+    pubkey: "{{ satellite_root_ssh_pubkey | default(satellite_vm_root_pubkey) | default('') }}"
+  
+  # IdM SSH key
+  idm:
+    pubkey: "{{ idm_root_ssh_pubkey | default('') }}"
+  
+  # AAP SSH key
+  aap:
+    pubkey: "{{ aap_root_ssh_pubkey | default('') }}"
+
+# ==============================================================================
+# INSTALLER & SETUP CREDENTIALS
+# ==============================================================================
+# Credentials used during initial setup
+
+setup_credentials:
+  installer:
+    user: "{{ installer_user | default('root') }}"
+    password: "{{ installer_password | default('') }}"
+  
+  global:
+    admin_password: "{{ global_admin_password | default('') }}"
+
+# ==============================================================================
+# BUILD & PIPELINE CREDENTIALS
+# ==============================================================================
+# CI/CD and build pipeline configuration
+
+build_credentials:
+  # Satellite Callback Configuration
+  satellite_ansible_callback_config_key: "{{ satellite_ansible_callback_config_key | default('') }}"
+  
+  # Workflow Templates
+  workflows:
+    soe_content_delivery_pipeline_dev: "{{ workflow_soe_content_delivery_pipeline_dev | default('') }}"
+    soe_content_delivery_pipeline_qa: "{{ workflow_soe_content_delivery_pipeline_qa | default('') }}"
+    c2r_pipeline: "{{ workflow_c2r_pipeline | default('') }}"
+  
+  # Job Templates
+  templates:
+    vm_day_2: "{{ templates_vm_day_2 | default('') }}"
+    soe_dev: "{{ templates_soe_dev | default('') }}"
+    soe_qa: "{{ templates_soe_qa | default('') }}"
+    convert_2_rhel: "{{ templates_convert_2_rhel | default('') }}"
+    default_monthly_publish: "{{ templates_default_monthly_publish | default('') }}"
+    soe_ansible_callback: "{{ templates_soe_ansible_callback | default('') }}"
+    soe_imagebuilder: "{{ templates_soe_imagebuilder | default('') }}"
+
+# ==============================================================================
+# INFRASTRUCTURE CONFIGURATION
+# ==============================================================================
+# Network, storage, and VM configuration
+
+infrastructure_config:
+  # Satellite Domain Configuration
+  scenario_satellite:
+    domain: "{{ satellite_domain | default('example.com') }}"
+    fqdn: "{{ satellite_fqdn | default('scenario_satellite.example.com') }}"
+    ip: "{{ satellite_ip | default('192.168.1.10') }}"
+    
+    # Network Configuration
+    network:
+      primary_interface: "{{ satellite_primary_interface | default('eth0') }}"
+      gateway: "{{ satellite_gateway | default('192.168.1.1') }}"
+      nameserver: "{{ satellite_nameserver | default('8.8.8.8') }}"
+    
+    # DHCP Configuration
+    dhcp:
+      range_start: "{{ satellite_dhcp_range_start | default('192.168.1.100') }}"
+      range_end: "{{ satellite_dhcp_range_end | default('192.168.1.200') }}"
+      pxeserver: "{{ satellite_pxeserver | default('192.168.1.10') }}"
+    
+    # Mail Configuration
+    mail_relay: "{{ satellite_mail_relay | default('') }}"
+    
+    # VM Configuration (if running on hypervisor)
+    vm:
+      name: "{{ satellite_vm_name | default('scenario_satellite-vm') }}"
+      hostname: "{{ satellite_vm_hostname | default('scenario_satellite') }}"
+      memory_mb: "{{ satellite_vm_memory_mb | default(32768) }}"
+      vcpus: "{{ satellite_vm_vcpus | default(8) }}"
+      disk:
+        name: "{{ satellite_vm_disk_name | default('scenario_satellite-disk') }}"
+        size_gb: "{{ satellite_vm_disk_size_gb | default(500) }}"
+      pool: "{{ satellite_vm_pool | default('default') }}"
+      network: "{{ satellite_vm_network | default('default') }}"
+  
+  # LibVirt Configuration
+  libvirt_host: "{{ libvirt_host | default('localhost') }}"
+
+# ==============================================================================
+# BEST PRACTICES FOR USING THESE VARIABLES
+# ==============================================================================
+# 
+# 1. ALWAYS use defaults to prevent undefined variable errors:
+#    {{ variable | default('') }}
+#    {{ variable | default('fallback_value') }}
+#
+# 2. Use environment lookups for sensitive data:
+#    Never hard-code credentials in playbooks
+#
+# 3. Store sensitive data in vault:
+#    ansible-vault encrypt ~/.ansible/conf/env.yml
+#    source ~/.ansible/conf/env.yml in pre_tasks
+#
+# 4. Use filters for security:
+#    - no_log: true (when displaying passwords)
+#    - | sensitive (in Jinja2 templates)
+#
+# 5. Validate credentials before use:
+#    - name: Validate credentials
+#      ansible.builtin.assert:
+#        that:
+#          - aap_admin_password is defined
+#          - aap_admin_password | length > 0
+#        fail_msg: "AAP admin password must be configured"
+#
+# 6. Use variable precedence:
+#    - Most specific first (host_vars, group_vars)
+#    - Then play-level vars
+#    - Then role defaults
+#    - Then environment lookups
+#
+# 7. Document all variables:
+#    - Use clear naming conventions
+#    - Include examples in .example files
+#    - Provide vault template files
+#
+# ==============================================================================
+

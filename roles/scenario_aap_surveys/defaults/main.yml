@@ -1,0 +1,108 @@
+---
+# Default variables for scenario_aap_surveys role
+scenario_aap_surveys_enabled: true
+scenario_aap_surveys_aap_url: "https://aap.example.com"
+scenario_aap_surveys_aap_username: "admin"
+scenario_aap_surveys_aap_password: "{{ aap_password | default('') }}"
+scenario_aap_surveys_aap_verify_ssl: true
+scenario_aap_surveys_aap_surveys_organization: "Default"
+
+scenario_aap_surveys_job_templates:
+  - name: "RHIS_Deploy_Infrastructure"
+    survey_description: "Infrastructure deployment inputs"
+    survey_spec:
+      - question_name: "Deployment Domain"
+        question_description: "FQDN domain for hosts"
+        required: true
+        type: "text"
+        variable: "project_domain"
+        min: 3
+        max: 255
+        default: "{{ global.domain | default('example.com') }}"
+      - question_name: "Primary CIDR"
+        question_description: "CIDR used for deployment network"
+        required: true
+        type: "text"
+        variable: "private_cidr"
+        default: "{{ private_cidr | default('10.168.0.0/16') }}"
+      - question_name: "Red Hat CDN Username"
+        question_description: "CDN/RHSM username"
+        required: true
+        type: "text"
+        variable: "redhat_cdn_username"
+        default: "{{ global.redhat_cdn_username | default('') }}"
+      - question_name: "Red Hat CDN Password"
+        question_description: "CDN/RHSM password"
+        required: true
+        type: "password"
+        variable: "redhat_cdn_password"
+        default: ""
+
+  - name: "RHIS_Setup_AAP"
+    survey_description: "AAP controller setup inputs"
+    survey_spec:
+      - question_name: "AAP Controller URL"
+        question_description: "Controller base URL"
+        required: true
+        type: "text"
+        variable: "scenario_aap_templates_aap_url"
+        default: "{{ scenario_aap_templates_aap_url | default('https://aap.example.com') }}"
+      - question_name: "AAP Controller Username"
+        question_description: "Controller admin user"
+        required: true
+        type: "text"
+        variable: "scenario_aap_templates_aap_username"
+        default: "{{ scenario_aap_templates_aap_username | default('admin') }}"
+      - question_name: "AAP Controller Password"
+        question_description: "Controller admin password"
+        required: true
+        type: "password"
+        variable: "scenario_aap_templates_aap_password"
+        default: ""
+
+  - name: "RHIS_Configure_Satellite"
+    survey_description: "Satellite configuration inputs"
+    survey_spec:
+      - question_name: "Satellite Hostname"
+        question_description: "Satellite FQDN"
+        required: true
+        type: "text"
+        variable: "satellite_hostname"
+        default: "{{ scenario_satellite.satellite_hostname | default('satellite.example.com') }}"
+      - question_name: "Satellite Admin Username"
+        question_description: "Satellite admin account"
+        required: true
+        type: "text"
+        variable: "satellite_admin_username"
+        default: "{{ scenario_satellite.satellite_admin_username | default('admin') }}"
+      - question_name: "Satellite Admin Password"
+        question_description: "Satellite admin password"
+        required: true
+        type: "password"
+        variable: "satellite_admin_password"
+        default: ""
+
+scenario_aap_surveys_workflow_templates:
+  - name: "RHIS_Complete_Deployment"
+    survey_description: "End-to-end workflow launch inputs"
+    survey_spec:
+      - question_name: "Execution Scenario"
+        question_description: "Deployment scenario to run"
+        required: true
+        type: "multiplechoice"
+        variable: "deployment_scenario"
+        choices: "satellite_only\naap_only\nidm_only\nfull_stack"
+        default: "full_stack"
+      - question_name: "Execution Platform"
+        question_description: "Target platform"
+        required: true
+        type: "multiplechoice"
+        variable: "deployment_platform"
+        choices: "libvirt\naws\nazure\ngcp\nplatform_vmware\nplatform_nutanix"
+        default: "libvirt"
+      - question_name: "Global Admin Password"
+        question_description: "Shared admin password"
+        required: true
+        type: "password"
+        variable: "global_admin_password"
+        default: ""

@@ -1,0 +1,23 @@
+---
+# Test: ansible_dev_node_orchestration_master role basic functionality
+- name: Test ansible_dev_node_orchestration_master role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    ansible_dev_node_orchestration_master_orchestration_master_enabled: true
+    deployment_scenario: "satellite_aap"
+    deployment_platform: "libvirt"
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - ansible_dev_node_orchestration_master_orchestration_master_enabled is defined
+          - deployment_scenario is defined
+          - deployment_platform is defined
+        fail_msg: "Required variables not defined"
+
+    - name: Check scenario validity
+      ansible.builtin.assert:
+        that:
+          - deployment_scenario in ['satellite_only', 'aap_only', 'idm_only', 'openshift_only', 'satellite_aap', 'satellite_idm', 'satellite_openshift', 'aap_idm', 'aap_openshift', 'idm_openshift', 'satellite_aap_idm', 'satellite_aap_openshift', 'satellite_idm_openshift', 'aap_idm_openshift', 'satellite_aap_idm_openshift']
+        fail_msg: "Invalid deployment scenario"

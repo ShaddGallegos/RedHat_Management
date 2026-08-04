@@ -1,0 +1,81 @@
+---
+# Configure AAP templates, workflow templates, and workflow nodes
+
+- name: Ensure AAP template configuration is enabled
+  ansible.builtin.assert:
+    that:
+      - scenario_aap_templates_aap_templates_config_enabled | bool
+    fail_msg: "AAP template configuration is disabled"
+  when: scenario_aap_templates_aap_templates_config_enabled | bool
+  tags: ["aap_templates", "validation"]
+
+- name: Set AAP controller API base
+  ansible.builtin.set_fact:
+    scenario_aap_templates_api_base: "{{ scenario_aap_templates_aap_url }}/api/v2"
+  when: scenario_aap_templates_aap_templates_config_enabled | bool
+  tags: ["aap_templates", "validation"]
+
+- name: Look up organization ID
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/organizations/?name={{ scenario_aap_templates_aap_templates_organization | urlencode }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_org_lookup
+  no_log: true
+  when: scenario_aap_templates_aap_templates_config_enabled | bool
+
+- name: Set organization ID
+  ansible.builtin.set_fact:
+    aap_organization_id: "{{ scenario_aap_templates_org_lookup.json.results[0].id }}"
+  when:
+    - scenario_aap_templates_aap_templates_config_enabled | bool
+    - scenario_aap_templates_org_lookup.json.count | default(0) > 0
+  no_log: true
+
+- name: Configure job templates
+  ansible.builtin.include_tasks: job_template.yml
+  loop: "{{ scenario_aap_templates_job_templates }}"
+  loop_control:
+    loop_var: scenario_aap_templates_job_template
+    label: "{{ scenario_aap_templates_job_template.name }}"
+  when:
+    - scenario_aap_templates_aap_templates_config_enabled | bool
+    - scenario_aap_templates_create_job_templates | bool
+  tags: ["aap_templates", "job"]
+
+- name: Configure workflow templates
+  ansible.builtin.include_tasks: workflow_template.yml
+  loop: "{{ scenario_aap_templates_workflow_templates }}"
+  loop_control:
+    loop_var: scenario_aap_templates_workflow_template
+    label: "{{ scenario_aap_templates_workflow_template.name }}"
+  when:
+    - scenario_aap_templates_aap_templates_config_enabled | bool
+    - scenario_aap_templates_create_workflow_templates | bool
+  tags: ["aap_templates", "workflow"]
+
+- name: Configure workflow nodes
+  ansible.builtin.include_tasks: workflow_nodes.yml
+  loop: "{{ scenario_aap_templates_workflow_nodes }}"
+  loop_control:
+    loop_var: scenario_aap_templates_workflow_definition
+    label: "{{ scenario_aap_templates_workflow_definition.workflow_template }}"
+  when:
+    - scenario_aap_templates_aap_templates_config_enabled | bool
+    - scenario_aap_templates_create_workflow_nodes | bool
+  tags: ["aap_templates", "workflow", "nodes"]
+
+- name: Display AAP template summary
+  ansible.builtin.debug:
+    msg:
+      - "AAP templates configured successfully"
+      - "Organization: {{ scenario_aap_templates_aap_templates_organization }}"
+      - "Job templates: {{ scenario_aap_templates_job_template_results | default({}) | length }}"
+      - "Workflow templates: {{ scenario_aap_templates_workflow_template_results | default({}) | length }}"
+      - "Workflow nodes: {{ scenario_aap_templates_workflow_node_id_map | default({}) | length }}"
+  when: scenario_aap_templates_aap_templates_config_enabled | bool
+  tags: ["aap_templates", "always"]

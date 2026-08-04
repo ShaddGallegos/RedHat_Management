@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: "Red Hat Management"
+  description: \"Managed role\"
+  license: Apache-2.0
+
+  min_ansible_version: "2.10"
+
+  platforms:
+    - name: EL
+      versions: ["9", "10"]
+  galaxy_tags:
+    - scenario-satellite
+    - subscriptions
+    - management------management

@@ -1,0 +1,21 @@
+---
+# AWS DNS Management Role Defaults
+
+# Enable/disable Route53 DNS management
+aws_dns_management_enabled: true
+
+# Route53 hosted zone ID
+aws_route53_zone_id: "{{ aws_route53_zone_id | default('') }}"
+
+# Domain name for DNS records
+aws_dns_domain: "example.com"
+
+# TTL for DNS records
+aws_dns_ttl: 300
+
+# Record types to manage
+aws_dns_record_types:
+  - A
+  - CNAME
+  - MX
+  - TXT

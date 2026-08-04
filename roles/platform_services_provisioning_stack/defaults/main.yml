@@ -1,0 +1,144 @@
+---
+# Provisioning Services Configuration Defaults
+
+# Target System
+platform_services_provisioning_stack_provisioning_host: "scenario_satellite.prod.spg"
+platform_services_provisioning_stack_provisioning_host_fqdn: "scenario_satellite.prod.spg.example.com"
+
+# Primary Ethernet Device Configuration (External Network - libvirt NAT)
+platform_services_provisioning_stack_provisioning_primary_interface: "eth0"
+platform_services_provisioning_stack_provisioning_primary_interface_type: "ethernet"
+platform_services_provisioning_stack_provisioning_primary_connection_type: "dhcp"
+platform_services_provisioning_stack_provisioning_primary_autoconnect: true
+platform_services_provisioning_stack_provisioning_primary_description: "External Network (libvirt NAT)"
+
+# Secondary Ethernet Device Configuration (Private Network - 10.168.0.0/16)
+platform_services_provisioning_stack_provisioning_secondary_interface: "eth1"
+platform_services_provisioning_stack_provisioning_interface_ip: "10.168.0.1"
+platform_services_provisioning_stack_provisioning_interface_netmask: "255.255.0.0"
+platform_services_provisioning_stack_provisioning_interface_gateway: "10.168.0.1"
+platform_services_provisioning_stack_provisioning_interface_network: "10.168.0.0"
+platform_services_provisioning_stack_provisioning_interface_broadcast: "10.168.255.255"
+platform_services_provisioning_stack_provisioning_secondary_connection_type: "static"
+platform_services_provisioning_stack_provisioning_secondary_autoconnect: true
+platform_services_provisioning_stack_provisioning_secondary_description: "Private Network (10.168.0.0/16 Provisioning)"
+
+# DHCP Configuration
+platform_services_provisioning_stack_dhcp_enabled: true
+platform_services_provisioning_stack_dhcp_package: "dhcp-server"
+platform_services_provisioning_stack_dhcp_service: "dhcpd"
+platform_services_provisioning_stack_dhcp_config_file: "/etc/dhcp/dhcpd.conf"
+platform_services_provisioning_stack_dhcp_leases_file: "/var/lib/dhcp/dhcpd.leases"
+platform_services_provisioning_stack_dhcp_subnet: "10.168.0.0"
+platform_services_provisioning_stack_dhcp_netmask: "255.255.0.0"
+platform_services_provisioning_stack_dhcp_range_start: "10.168.50.0"
+platform_services_provisioning_stack_dhcp_range_end: "10.168.200.255"
+platform_services_provisioning_stack_dhcp_lease_time: 86400  # 24 hours
+platform_services_provisioning_stack_dhcp_max_lease_time: 172800  # 48 hours
+platform_services_provisioning_stack_dhcp_default_lease_time: 86400
+platform_services_provisioning_stack_dhcp_option_routers: "10.168.0.1"
+platform_services_provisioning_stack_dhcp_option_domain_name: "example.com"
+platform_services_provisioning_stack_dhcp_option_domain_name_servers:
+  - "10.168.0.1"
+  - "10.168.1.53"
+  - "8.8.8.8"
+platform_services_provisioning_stack_dhcp_option_ntp_servers:
+  - "10.168.0.1"
+  - "8.8.8.8"
+platform_services_provisioning_stack_dhcp_option_netbios_name_servers:
+  - "10.168.0.1"
+
+# PXE Boot Configuration
+platform_services_provisioning_stack_pxe_enabled: true
+platform_services_provisioning_stack_pxe_bootloader: "pxelinux.0"
+platform_services_provisioning_stack_pxe_boot_file: "pxelinux.0"
+platform_services_provisioning_stack_pxe_menu_file: "pxelinux.cfg/default"
+platform_services_provisioning_stack_pxe_menu_label: "RHIS Provisioning"
+platform_services_provisioning_stack_pxe_kernel_append_params: "net.ifnames=0 biosdevname=0"
+
+# TFTP Configuration
+platform_services_provisioning_stack_tftp_enabled: true
+platform_services_provisioning_stack_tftp_package: "tftp-server"
+platform_services_provisioning_stack_tftp_service: "tftp"
+platform_services_provisioning_stack_tftp_socket_service: "tftp.socket"
+platform_services_provisioning_stack_tftp_root: "/var/lib/tftpboot"
+platform_services_provisioning_stack_tftp_user: "tftp"
+platform_services_provisioning_stack_tftp_group: "tftp"
+platform_services_provisioning_stack_tftp_permissions: "0755"
+platform_services_provisioning_stack_tftp_file_permissions: "0644"
+
+# DNS Configuration
+platform_services_provisioning_stack_dns_enabled: true
+platform_services_provisioning_stack_dns_package: "bind"
+platform_services_provisioning_stack_dns_service: "named"
+platform_services_provisioning_stack_dns_config_file: "/etc/named.conf"
+platform_services_provisioning_stack_dns_zones_dir: "/var/named"
+platform_services_provisioning_stack_dns_zone_name: "example.com"
+platform_services_provisioning_stack_dns_zone_file: "named.example.com"
+platform_services_provisioning_stack_dns_secondary_zone_name: "prod.spg"
+platform_services_provisioning_stack_dns_secondary_zone_file: "named.prod.spg"
+platform_services_provisioning_stack_dns_nameserver_ip: "10.168.0.1"
+platform_services_provisioning_stack_dns_secondary_ip: "10.168.1.53"
+platform_services_provisioning_stack_dns_forward_servers:
+  - "8.8.8.8"
+  - "8.8.4.4"
+
+# Resolv.conf Configuration
+platform_services_provisioning_stack_resolv_conf_path: "/etc/resolv.conf"
+platform_services_provisioning_stack_resolv_conf_nameservers:
+  - "10.168.0.1"
+platform_services_provisioning_stack_resolv_conf_search_domains:
+  - "example.com"
+  - "prod.spg"
+  - "lab.example.com"
+platform_services_provisioning_stack_resolv_conf_options:
+  - "rotate"
+  - "timeout:2"
+  - "attempts:3"
+
+# Service Configuration
+platform_services_provisioning_stack_service_restart_enabled: true
+platform_services_provisioning_stack_service_enable_on_boot: true
+
+# Firewall Configuration
+platform_services_provisioning_stack_firewall_enabled: true
+platform_services_provisioning_stack_firewall_rules:
+  - port: 67
+    protocol: "udp"
+    ansible.builtin.service: "dhcp"
+    state: "enabled"
+  - port: 68
+    protocol: "udp"
+    ansible.builtin.service: "dhcp-client"
+    state: "enabled"
+  - port: 53
+    protocol: "udp"
+    ansible.builtin.service: "dns"
+    state: "enabled"
+  - port: 53
+    protocol: "tcp"
+    ansible.builtin.service: "dns-tcp"
+    state: "enabled"
+  - port: 69
+    protocol: "udp"
+    ansible.builtin.service: "tftp"
+    state: "enabled"
+  - port: 4011
+    protocol: "udp"
+    ansible.builtin.service: "pxe-dhcp"
+    state: "enabled"
+
+# Logging Configuration
+platform_services_provisioning_stack_logging_enabled: true
+platform_services_provisioning_stack_log_level: "info"
+platform_services_provisioning_stack_dhcp_log_file: "/var/log/dhcpd.log"
+platform_services_provisioning_stack_dns_log_file: "/var/log/named.log"
+platform_services_provisioning_stack_tftp_log_file: "/var/log/tftp.log"
+
+# Backup Configuration
+platform_services_provisioning_stack_backup_enabled: true
+platform_services_provisioning_stack_backup_configs:
+  - "{{ platform_services_provisioning_stack_dhcp_config_file }}"
+  - "{{ platform_services_provisioning_stack_dns_config_file }}"
+  - "{{ platform_services_provisioning_stack_resolv_conf_path }}"
+platform_services_provisioning_stack_backup_directory: "/var/backups/platform_provisioning-services"

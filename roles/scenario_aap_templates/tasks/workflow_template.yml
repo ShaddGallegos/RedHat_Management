@@ -1,0 +1,39 @@
+---
+- name: Look up existing workflow template for {{ scenario_aap_templates_workflow_template.name }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/workflow_job_templates/?name={{ scenario_aap_templates_workflow_template.name | urlencode }}&organization={{ aap_organization_id }}"
+    method: GET
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_templates_workflow_template_existing_lookup
+  no_log: true
+
+- name: Create or update workflow template {{ scenario_aap_templates_workflow_template.name }}
+  ansible.builtin.uri:
+    url: >-
+      {{
+        scenario_aap_templates_api_base ~ '/workflow_job_templates/' ~
+        (scenario_aap_templates_workflow_template_existing_lookup.json.results[0].id | string ~ '/' if (scenario_aap_templates_workflow_template_existing_lookup.json.count | default(0) > 0) else '')
+      }}
+    method: "{{ 'PATCH' if (scenario_aap_templates_workflow_template_existing_lookup.json.count | default(0) > 0) else 'POST' }}"
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200, 201]
+    body_format: json
+    body:
+      name: "{{ scenario_aap_templates_workflow_template.name }}"
+      description: "{{ scenario_aap_templates_workflow_template.description | default('') }}"
+      organization: "{{ aap_organization_id | int }}"
+      extra_vars: "{{ scenario_aap_templates_workflow_template.extra_vars | default({}) }}"
+  register: scenario_aap_templates_workflow_template_result
+  no_log: true
+
+- name: Store workflow template ID for {{ scenario_aap_templates_workflow_template.name }}
+  ansible.builtin.set_fact:
+    scenario_aap_templates_workflow_template_results: >-
+      {{ scenario_aap_templates_workflow_template_results | default({}) | combine({ scenario_aap_templates_workflow_template.name: scenario_aap_templates_workflow_template_result.json.id }) }}

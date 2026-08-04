@@ -1,0 +1,11 @@
+---
+# Default variables for scenario_aap_setup role
+scenario_aap_setup_aap_2_7_setup_enabled: false
+scenario_aap_setup_aap_2_7_setup_version: "1.0"
+
+# AAP 2.7 specific configuration
+scenario_aap_setup_setup_aap_controllers: true
+scenario_aap_setup_setup_aap_event_driven: true
+
+# Feature toggles
+scenario_aap_setup_aap_2_7_setup_validate_prerequisites: true

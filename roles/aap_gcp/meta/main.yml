@@ -1,0 +1,41 @@
+---
+galaxy_info:
+  author: Red Hat Management Team
+  description: "Ansible role to generate complete GCP-AAP-Satellite integration project structure with all configuration files, playbooks, and AAP resources"
+  company: Red Hat
+  license: Apache-2.0
+
+  min_ansible_version: "2.15"
+
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+    - name: Fedora
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+
+  galaxy_tags:
+    - cloud
+    - gcp
+    - google
+    - satellite
+    - redhat
+    - aap
+    - automation
+    - integration
+    - infrastructure
+
+dependencies: []
+
+collections:
+  - google.cloud
+  - redhat.satellite
+  - awx.awx
+  - infra.controller_configuration
+  - community.general

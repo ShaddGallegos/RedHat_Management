@@ -1,0 +1,12 @@
+---
+# Test: scenario_ansible_cmdb_setup role basic functionality
+- name: Test scenario_ansible_cmdb_setup role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    scenario_ansible_cmdb_setup_ansible_cmdb_setup_enabled: true
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - scenario_ansible_cmdb_setup_ansible_cmdb_setup_enabled is defined

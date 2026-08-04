@@ -1,0 +1,210 @@
+---
+# defaults file for aap_gcp
+
+# ===================================
+# Project Configuration
+# ===================================
+aap_gcp_project_name: "gcp-satellite-integration"
+aap_gcp_base_dir: "{{ ansible_env.HOME }}/aap-gcp-project"
+aap_gcp_create_structure: true
+
+# ===================================
+# GCP Configuration
+# ===================================
+aap_gcp_project_id: ""
+aap_gcp_service_account_file: "~/.gcp/service-account-key.json"
+aap_gcp_zones:
+  - us-central1-a
+  - us-central1-b
+  - us-east1-c
+aap_gcp_region: "us-central1"
+aap_gcp_inventory_cache_timeout: 3600
+aap_gcp_inventory_filters:
+  - "status = RUNNING"
+  - "labels.os = rhel OR name ~ 'rhel'"
+
+# ===================================
+# Satellite Configuration
+# ===================================
+aap_gcp_satellite_url: ""
+aap_gcp_satellite_organization: "Default_Organization"
+aap_gcp_satellite_location: "Default_Location"
+aap_gcp_satellite_hostgroup: "GCP_RHEL_Production"
+aap_gcp_satellite_activation_key: "gcp-rhel-prod-key"
+aap_gcp_satellite_username: "admin"
+aap_gcp_satellite_password: ""
+aap_gcp_satellite_verify_ssl: false
+
+# ===================================
+# AAP Configuration
+# ===================================
+aap_gcp_controller_hostname: ""
+aap_gcp_controller_username: "admin"
+aap_gcp_controller_password: ""
+aap_gcp_controller_validate_certs: false
+aap_gcp_configure_aap: false
+aap_gcp_execution_environment_image: "quay.io/your-org/ee-gcp-satellite:1.0.0"
+aap_gcp_organization_name: "Default"
+
+# ===================================
+# Workflow Configuration
+# ===================================
+aap_gcp_workflow_name: "GCP to Satellite - Automated Registration Workflow"
+aap_gcp_workflow_approval_timeout: 3600
+aap_gcp_workflow_job_timeout: 1800
+aap_gcp_workflow_job_forks: 10
+aap_gcp_workflow_serial_execution: 5
+aap_gcp_workflow_max_fail_percentage: 10
+
+# ===================================
+# Job Template Configuration
+# ===================================
+aap_gcp_job_template_name: "Register GCP Instances to Satellite"
+aap_gcp_job_template_forks: 10
+aap_gcp_job_template_timeout: 1800
+aap_gcp_job_template_verbosity: 0
+
+# ===================================
+# Inventory Configuration
+# ===================================
+aap_gcp_inventory_name: "GCP Dynamic Inventory - Production"
+aap_gcp_inventory_source_name: "GCP Compute Engine Source"
+aap_gcp_inventory_update_on_launch: true
+aap_gcp_inventory_overwrite: true
+
+# ===================================
+# Notification Configuration
+# ===================================
+aap_gcp_notification_slack_enabled: false
+aap_gcp_notification_slack_webhook: ""
+aap_gcp_notification_slack_channel: "#infrastructure-alerts"
+
+aap_gcp_notification_email_enabled: false
+aap_gcp_notification_email_host: "smtp.office365.com"
+aap_gcp_notification_email_port: 587
+aap_gcp_notification_sender_email: "aap-notifications@example.com"
+aap_gcp_notification_recipients:
+  - "ops-team@example.com"
+
+# ===================================
+# Security Configuration
+# ===================================
+aap_gcp_vault_password: ""
+aap_gcp_vault_password_file: "~/.ansible/conf/.vault_pass.txt"
+aap_gcp_ssh_private_key: ""
+aap_gcp_ssh_username: ""
+
+# ===================================
+# Ansible Collections
+# ===================================
+aap_gcp_required_collections:
+  - name: google.cloud
+    version: ">=1.3.0"
+  - name: redhat.satellite
+    version: ">=4.0.0"
+  - name: awx.awx
+    version: ">=24.0.0"
+  - name: infra.controller_configuration
+    version: ">=2.7.0"
+  - name: community.general
+    version: ">=9.0.0"
+
+# ===================================
+# Execution Environment
+# ===================================
+aap_gcp_ee_base_image: "registry.redhat.io/ansible-automation-platform-26/ee-minimal-rhel9:latest"
+aap_gcp_ee_python_packages:
+  - "google-auth>=2.29.0"
+  - "requests>=2.31.0"
+  - "pytz>=2024.1"
+aap_gcp_ee_system_packages:
+  - "python3-libcloud [platform:rpm]"
+  - "git-core [platform:rpm]"
+
+# ===================================
+# RHEL Version Mapping
+# ===================================
+aap_gcp_rhel_version_packages:
+  '7': "google-rhui-client-rhel7"
+  '8': "google-rhui-client-rhel8"
+  '9': "google-rhui-client-rhel9"
+
+# ===================================
+# Network Configuration
+# ===================================
+aap_gcp_ssh_connection_timeout: 30
+aap_gcp_ssh_control_persist: 300
+
+# ===================================
+# Ansible Configuration
+# ===================================
+aap_gcp_ansible_forks: 10
+aap_gcp_ansible_timeout: 30
+aap_gcp_ansible_host_key_checking: false
+aap_gcp_ansible_pipelining: true
+aap_gcp_ansible_stdout_callback: "yaml"
+aap_gcp_ansible_callbacks_enabled:
+  - profile_tasks
+  - timer
+
+# ===================================
+# Logging Configuration
+# ===================================
+aap_gcp_log_path: "{{ aap_gcp_base_dir }}/logs/ansible.log"
+aap_gcp_create_log_directory: true
+
+# ===================================
+# Git Configuration
+# ===================================
+aap_gcp_git_repo_url: ""
+aap_gcp_git_branch: "main"
+aap_gcp_git_credential_name: ""
+
+# ===================================
+# Credential Names in AAP
+# ===================================
+aap_gcp_credential_gcp_name: "GCP Service Account - Production"
+aap_gcp_credential_satellite_name: "Satellite 6.18 API Credential"
+aap_gcp_credential_machine_name: "GCP SSH - OS Login"
+aap_gcp_credential_vault_name: "Ansible Vault - Secrets"
+
+# ===================================
+# Project Configuration in AAP
+# ===================================
+aap_gcp_project_update_on_launch: true
+aap_gcp_project_clean: true
+
+# ===================================
+# Advanced Options
+# ===================================
+aap_gcp_create_gitignore: true
+aap_gcp_create_readme: true
+aap_gcp_create_export_playbook: true
+aap_gcp_enable_job_slicing: false
+aap_gcp_job_slice_count: 5
+
+# ===================================
+# Cleanup Configuration
+# ===================================
+aap_gcp_rhui_packages_to_remove:
+  - "google-cloud-sdk"
+
+aap_gcp_rhui_repo_files_to_remove:
+  - "/etc/yum.repos.d/google-cloud.repo"
+  - "/etc/yum.repos.d/rh-cloud.repo"
+  - "/etc/pki/rpm-gpg/google-cloud-public-key"
+
+# ===================================
+# Satellite Repositories
+# ===================================
+aap_gcp_satellite_repositories:
+  - "rhel-{{ ansible_distribution_major_version }}-for-x86_64-baseos-rpms"
+  - "rhel-{{ ansible_distribution_major_version }}-for-x86_64-appstream-rpms"
+
+# ===================================
+# Feature Flags
+# ===================================
+aap_gcp_feature_install_katello_agent: true
+aap_gcp_feature_enable_fact_storage: true
+aap_gcp_feature_enable_webhooks: false
+aap_gcp_feature_concurrent_jobs: true

@@ -1,0 +1,37 @@
+---
+# Common repository configuration tasks
+# Handles repository enabling and SCAP configuration
+
+- name: "Ensure the proper ansible_dev_node_common_tasks_repositories are enabled"
+  ansible.builtin.rhsm_repository:
+    name: "{{ item.name }}"
+    state: "enabled"
+  loop: "{{ ansible_dev_node_common_tasks_repositories | default([]) }}"
+  tags: ["ansible_dev_node_common_tasks_repositories", "subscriptions"]
+
+- name: "Enabling repo {{ repo.name }}"
+  ansible.builtin.command: "subscription-manager repos --enable={{ repo.name }}"
+  loop: "{{ ansible_dev_node_common_tasks_repositories | default([]) }}"
+  loop_control:
+    loop_var: "repo"
+  changed_when: true
+  tags: ["ansible_dev_node_common_tasks_repositories", "subscriptions"]
+
+- name: "Install the SOS Report package"
+  ansible.builtin.package:
+    name: "sos"
+    state: "present"
+  tags: ["ansible_dev_node_support", "diagnostics"]
+
+- name: "Copy the scap file to target"
+  ansible.builtin.copy:
+    src: "{{ ansible_dev_node_common_tasks_scap_file }}"
+    dest: "/tmp/ansible_dev_node_common_tasks_scap_file.xml"
+    mode: "0644"
+  when: ansible_dev_node_common_tasks_scap_file is defined
+  tags: ["compliance", "scap"]
+
+- name: "Enable the mandatory scap tailoring files"
+  ansible.builtin.command: "oscap xccdf eval --profile {{ ansible_dev_node_common_tasks_scap_profile }} /tmp/ansible_dev_node_common_tasks_scap_file.xml"
+  when: ansible_dev_node_common_tasks_scap_file is defined
+  tags: ["compliance", "scap"]

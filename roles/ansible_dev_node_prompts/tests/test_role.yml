@@ -1,0 +1,12 @@
+---
+# Test: ansible_dev_node_prompts role basic functionality
+- name: Test ansible_dev_node_prompts role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    prompts_enabled: true
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - prompts_enabled is defined

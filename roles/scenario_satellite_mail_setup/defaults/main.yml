@@ -1,0 +1,62 @@
+---
+# Default variables for scenario_satellite_mail_setup
+scenario_satellite_mail_setup_satellite_mail_targets:
+  - scenario_satellite
+  - aap
+  - scenario_openshift
+
+scenario_satellite_mail_setup_satellite_mail_master_vars_dest: ./master_vars.yml
+scenario_satellite_mail_setup_satellite_mail_inventory_dest: ./installer_inventory.yml
+
+# Satellite specifics
+scenario_satellite_mail_setup_satellite_fqdn: scenario_satellite.example.com
+scenario_satellite_mail_setup_satellite_org: Default_Org
+scenario_satellite_mail_setup_satellite_location: Default_Location
+scenario_satellite_mail_setup_satellite_admin_user: admin
+scenario_satellite_mail_setup_satellite_admin_password: ''
+scenario_satellite_mail_setup_satellite_mail_relay: ''
+scenario_satellite_mail_setup_satellite_mail_relay_credentials: ''
+
+# Libvirt / VM
+scenario_satellite_mail_setup_libvirt_host: kaso.prod.spg
+scenario_satellite_mail_setup_libvirt_user: root
+scenario_satellite_mail_setup_satellite_vm_name: scenario_satellite-poc
+scenario_satellite_mail_setup_satellite_vm_hostname: scenario_satellite-poc.example.com
+scenario_satellite_mail_setup_satellite_vm_memory_mb: 16384
+scenario_satellite_mail_setup_satellite_vm_vcpus: 4
+scenario_satellite_mail_setup_satellite_vm_disk_size_gb: 200
+scenario_satellite_mail_setup_satellite_vm_disk_name: scenario_satellite-poc.qcow2
+scenario_satellite_mail_setup_satellite_vm_pool: default
+scenario_satellite_mail_setup_satellite_vm_network: default
+scenario_satellite_mail_setup_satellite_vm_root_pubkey: 'ssh-rsa AAAA...rootkey'
+scenario_satellite_mail_setup_satellite_admin_pubkey: 'ssh-rsa AAAA...adminkey'
+scenario_satellite_mail_setup_satellite_root_pubkey: 'ssh-rsa AAAA...rootkey'
+
+scenario_satellite_mail_setup_satellite_base_packages:
+  - vim
+  - git
+  - firewalld
+
+# Hosts/resolver data
+scenario_satellite_mail_setup_satellite_hosts_entries:
+  - { ip: '10.168.151.125', fqdn: 'idm.prod.spg', short: 'idm' }
+  - { ip: '10.168.151.127', fqdn: 'scenario_satellite.prod.spg', short: 'scenario_satellite' }
+  - { ip: '10.168.151.126', fqdn: 'ansible.prod.spg', short: 'ansible' }
+  - { ip: '10.168.0.1', fqdn: 'kaso.prod.spg', short: 'kaso' }
+
+scenario_satellite_mail_setup_satellite_nameservers:
+  - 192.168.122.1
+  - 10.168.0.1
+  - 192.168.100.1
+
+scenario_satellite_mail_setup_satellite_search_domain: prod.spg
+
+# AAP
+scenario_satellite_mail_setup_aap_inventory_path: /tmp/aap_inventory.yml
+scenario_satellite_mail_setup_aap_admin_user: admin
+scenario_satellite_mail_setup_aap_admin_password: ''
+
+# Insights
+scenario_satellite_mail_setup_insights_account: '000000'
+scenario_satellite_mail_setup_insights_username: insights-user
+scenario_satellite_mail_setup_insights_password: ''

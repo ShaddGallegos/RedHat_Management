@@ -1,0 +1,52 @@
+---
+# Configure survey specifications for AAP job templates and workflow templates
+
+- name: Set AAP survey API base
+  ansible.builtin.set_fact:
+    scenario_aap_surveys_api_base: "{{ scenario_aap_surveys_aap_url }}/api/v2"
+  when: scenario_aap_surveys_enabled | bool
+
+- name: Look up organization ID for surveys
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_surveys_api_base }}/organizations/?name={{ scenario_aap_surveys_aap_surveys_organization | urlencode }}"
+    method: GET
+    user: "{{ scenario_aap_surveys_aap_username }}"
+    password: "{{ scenario_aap_surveys_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_surveys_aap_verify_ssl }}"
+    status_code: [200]
+  register: scenario_aap_surveys_org_lookup
+  no_log: true
+  when: scenario_aap_surveys_enabled | bool
+
+- name: Set organization ID for surveys
+  ansible.builtin.set_fact:
+    scenario_aap_surveys_organization_id: "{{ scenario_aap_surveys_org_lookup.json.results[0].id }}"
+  when:
+    - scenario_aap_surveys_enabled | bool
+    - scenario_aap_surveys_org_lookup.json.count | default(0) > 0
+  no_log: true
+
+- name: Configure job template surveys
+  ansible.builtin.include_tasks: survey_spec.yml
+  loop: "{{ scenario_aap_surveys_job_templates }}"
+  loop_control:
+    loop_var: scenario_aap_surveys_target_template
+    label: "{{ scenario_aap_surveys_target_template.name }}"
+  vars:
+    scenario_aap_surveys_target_kind: "job_template"
+  when:
+    - scenario_aap_surveys_enabled | bool
+    - scenario_aap_surveys_job_templates | length > 0
+
+- name: Configure workflow template surveys
+  ansible.builtin.include_tasks: survey_spec.yml
+  loop: "{{ scenario_aap_surveys_workflow_templates }}"
+  loop_control:
+    loop_var: scenario_aap_surveys_target_template
+    label: "{{ scenario_aap_surveys_target_template.name }}"
+  vars:
+    scenario_aap_surveys_target_kind: "workflow_job_template"
+  when:
+    - scenario_aap_surveys_enabled | bool
+    - scenario_aap_surveys_workflow_templates | length > 0

@@ -1,0 +1,11 @@
+---
+# Minimal public collections for local linting (avoid Automation Hub queries)
+collections:
+  - name: ansible.posix
+  - name: ansible.netcommon
+  - name: ansible.utils
+  - name: community.general
+  - name: freeipa.ansible_freeipa
+  - name: infra.leapp
+
+roles: []

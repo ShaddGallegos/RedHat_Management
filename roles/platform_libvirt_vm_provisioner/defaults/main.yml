@@ -1,0 +1,65 @@
+---
+# Libvirt VM Provisioner - Default Variables
+
+# VM Configuration
+platform_libvirt_vm_provisioner_libvirt_vm_name: "rhel10-vm"
+platform_libvirt_vm_provisioner_libvirt_vm_cpus: 2
+platform_libvirt_vm_provisioner_libvirt_vm_memory: 2048  # MB
+platform_libvirt_vm_provisioner_libvirt_vm_disk: 50      # GB
+platform_libvirt_vm_provisioner_libvirt_vm_network: "default"
+
+# File Paths
+platform_libvirt_vm_provisioner_libvirt_iso_file: "files/rhel-10.iso"
+platform_libvirt_vm_provisioner_libvirt_kickstart_file: "files/oem.cfg"
+
+# HTTP Server Configuration
+platform_libvirt_vm_provisioner_libvirt_kickstart_port: 8888
+platform_libvirt_vm_provisioner_libvirt_kickstart_http_dir: "/tmp/rhel-kickstart-{{ ansible_date_time.iso8601_basic_short }}"
+
+# Installation Monitoring
+platform_libvirt_vm_provisioner_libvirt_monitor_timeout: 300  # seconds
+platform_libvirt_vm_provisioner_libvirt_monitor_interval: 5   # seconds
+
+# Optional Network Configuration
+platform_libvirt_vm_provisioner_libvirt_bridge_device: null
+platform_libvirt_vm_provisioner_libvirt_mac_address: null
+platform_libvirt_vm_provisioner_libvirt_static_ip: null
+platform_libvirt_vm_provisioner_libvirt_gateway: null
+platform_libvirt_vm_provisioner_libvirt_nameserver: null
+
+# Kickstart Template Variables
+platform_libvirt_vm_provisioner_libvirt_root_password: "$1$salt$N6vxIwfYxSXXPw8jg2Qz5/"  # Change this!
+platform_libvirt_vm_provisioner_libvirt_ansible_user: "ansible"
+platform_libvirt_vm_provisioner_libvirt_packages:
+  - "@core"
+  - "@standard"
+  - "vim"
+  - "curl"
+  - "wget"
+  - "git"
+  - "python3"
+  - "python3-devel"
+
+# Post-Installation Tasks
+platform_libvirt_vm_provisioner_libvirt_install_ansible: true
+platform_libvirt_vm_provisioner_libvirt_enable_selinux: true
+platform_libvirt_vm_provisioner_libvirt_enable_firewall: true
+platform_libvirt_vm_provisioner_libvirt_firewall_services:
+  - "ssh"
+
+# Cleanup Options
+platform_libvirt_vm_provisioner_libvirt_cleanup_http_server: true
+platform_libvirt_vm_provisioner_libvirt_cleanup_temp_files: true
+
+# Logging
+platform_libvirt_vm_provisioner_libvirt_log_level: "info"  # debug, info, warning, error
+platform_libvirt_vm_provisioner_libvirt_save_logs: true
+platform_libvirt_vm_provisioner_libvirt_logs_dir: "/tmp/libvirt-provisioner-logs"
+
+# Cloud-init and seed options
+platform_libvirt_vm_provisioner_use_cloud_init_iso: true
+platform_libvirt_vm_provisioner_use_cloud_init_disk: false
+platform_libvirt_vm_provisioner_cloud_init_allow_password_auth: false
+platform_libvirt_vm_provisioner_seed_disk_size_mb: 64
+# Optional SSH public key to inject into provisioned VMs
+platform_libvirt_vm_provisioner_ssh_public_key: ""

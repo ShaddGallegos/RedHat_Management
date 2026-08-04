@@ -1,0 +1,19 @@
+--- roles/platform_tftp_boot_server/meta/main.yml
++++ roles/platform_tftp_boot_server/meta/main.yml (patched)
+@@ -5,13 +5,14 @@
+   company: "Red Hat"
+   license: "Apache-2.0"
+   min_ansible_version: "2.10"
+-  max_ansible_version: "2.16"
+   platforms:
+     - name: EL
+       versions:
+         - "9"
+         - "10"
+-  categories:
++  galaxy_tags:
++  - networking
++  - system
+     - networking
+     - system
+ 

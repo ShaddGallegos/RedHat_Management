@@ -1,0 +1,19 @@
+---
+all:
+  children:
+    libvirt_hosts:
+- hosts:
+        libvirt-server-01:
+          ansible_host: "192.168.1.100"
+          ansible_user: "root"
+          libvirt_uri: "qemu:///system"
+          storage_pool: "default"
+          admin_email: "admin@example.com"
+          disk_usage_threshold: 90
+    virtual_machines:
+- hosts:
+        rhel8-vm-01:
+          ansible_host: "192.168.1.101"
+          ansible_user: "root"
+          vm_name: "rhel8-vm-01"
+          hypervisor_host: "libvirt-server-01"

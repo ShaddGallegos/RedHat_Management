@@ -1,0 +1,14 @@
+---
+# Test: platform_infrastructure_manager role basic functionality
+- name: Test platform_infrastructure_manager role
+  hosts: localhost
+  gather_facts: false
+  vars:
+    platform_infrastructure_manager_infrastructure_manager_enabled: true
+    deployment_platform: "libvirt"
+  tasks:
+    - name: Verify role variables
+      ansible.builtin.assert:
+        that:
+          - platform_infrastructure_manager_infrastructure_manager_enabled is defined
+          - deployment_platform is defined

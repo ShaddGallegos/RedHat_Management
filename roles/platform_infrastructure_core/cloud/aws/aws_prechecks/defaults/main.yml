@@ -1,0 +1,15 @@
+---
+# AWS Prechecks Role Defaults
+
+# Enable/disable AWS prechecks
+aws_prechecks_enabled: true
+
+# AWS credentials (set via environment or playbook)
+aws_access_key: "{{ lookup('env', 'AWS_ACCESS_KEY_ID') | default('') }}"
+aws_secret_key: "{{ lookup('env', 'AWS_SECRET_ACCESS_KEY') | default('') }}"
+aws_region: us-east-1
+
+# Prerequisite checks
+aws_check_boto3: true
+aws_check_botocore: true
+aws_check_jinja2: true

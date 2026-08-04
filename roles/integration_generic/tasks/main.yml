@@ -1,0 +1,12 @@
+---
+# Role entrypoint for integration_generic: include integration task modules.
+# Using FQCN import_tasks for each integration submodule.
+
+- name: Include Satellite AAP integration tasks
+  ansible.builtin.import_tasks: satellite_aap/tasks/main.yml
+
+- name: Include Satellite IDM integration tasks
+  ansible.builtin.import_tasks: satellite_idm/tasks/main.yml
+
+- name: Include Satellite Insights integration tasks
+  ansible.builtin.import_tasks: satellite_insights/tasks/main.yml

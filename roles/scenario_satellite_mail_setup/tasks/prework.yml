@@ -1,0 +1,27 @@
+---
+- name: Ensure admin user exists
+  ansible.builtin.user:
+    name: "{{ scenario_satellite_mail_setup_satellite_admin_user }}"
+    state: present
+    groups: wheel
+    append: true
+  become: true
+
+- name: Authorize admin SSH key
+  ansible.posix.authorized_key:
+    user: "{{ scenario_satellite_mail_setup_satellite_admin_user }}"
+    key: "{{ scenario_satellite_mail_setup_satellite_admin_pubkey }}"
+  become: true
+
+- name: Ensure root SSH key present (if provided)
+  ansible.posix.authorized_key:
+    user: root
+    key: "{{ scenario_satellite_mail_setup_satellite_root_pubkey }}"
+  when: scenario_satellite_mail_setup_satellite_root_pubkey is defined
+  become: true
+
+- name: Install base packages for Satellite host
+  ansible.builtin.package:
+    name: "{{ scenario_satellite_mail_setup_satellite_base_packages }}"
+    state: present
+  become: true

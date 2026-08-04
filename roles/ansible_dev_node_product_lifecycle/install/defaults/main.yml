@@ -1,0 +1,6 @@
+---
+product_name: "product"
+product_roles: []
+backup_dir: "/var/backups"
+backup_retention_days: 30
+skip_validation: false

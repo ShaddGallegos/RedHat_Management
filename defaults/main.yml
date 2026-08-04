@@ -1,0 +1,4 @@
+---
+redhat_management_use_local_defaults_env: true
+redhat_management_defaults_env_file: "{{ playbook_dir | dirname }}/defaults/env.yml"
+redhat_management_local_defaults_precedence: "noninteractive"

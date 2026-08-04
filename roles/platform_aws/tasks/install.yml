@@ -1,0 +1,4 @@
+---
+- name: AWS install placeholder
+  ansible.builtin.debug:
+    msg: "Implement AWS install here."

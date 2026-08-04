@@ -1,0 +1,56 @@
+---
+- name: Build workflow node link targets for {{ scenario_aap_templates_workflow_node_definition.identifier }}
+  ansible.builtin.set_fact:
+    scenario_aap_templates_workflow_node_success_ids: >-
+      {{
+        scenario_aap_templates_workflow_node_definition.success_nodes | default([])
+        | map('regex_replace', '^(.*)$', scenario_aap_templates_workflow_definition.workflow_template ~ '::\\1')
+        | map('extract', scenario_aap_templates_workflow_node_id_map | default({}))
+        | list
+      }}
+    scenario_aap_templates_workflow_node_failure_ids: >-
+      {{
+        scenario_aap_templates_workflow_node_definition.failure_nodes | default([])
+        | map('regex_replace', '^(.*)$', scenario_aap_templates_workflow_definition.workflow_template ~ '::\\1')
+        | map('extract', scenario_aap_templates_workflow_node_id_map | default({}))
+        | list
+      }}
+    scenario_aap_templates_workflow_node_always_ids: >-
+      {{
+        scenario_aap_templates_workflow_node_definition.always_nodes | default([])
+        | map('regex_replace', '^(.*)$', scenario_aap_templates_workflow_definition.workflow_template ~ '::\\1')
+        | map('extract', scenario_aap_templates_workflow_node_id_map | default({}))
+        | list
+      }}
+
+- name: Validate workflow node links for {{ scenario_aap_templates_workflow_node_definition.identifier }}
+  ansible.builtin.assert:
+    that:
+      - scenario_aap_templates_workflow_node_success_ids | select('defined') | list | length == scenario_aap_templates_workflow_node_success_ids | length
+      - scenario_aap_templates_workflow_node_failure_ids | select('defined') | list | length == scenario_aap_templates_workflow_node_failure_ids | length
+      - scenario_aap_templates_workflow_node_always_ids | select('defined') | list | length == scenario_aap_templates_workflow_node_always_ids | length
+    fail_msg: "One or more workflow node links could not be resolved for {{ scenario_aap_templates_workflow_node_definition.identifier }}"
+  when:
+    - scenario_aap_templates_workflow_node_definition.success_nodes | default([]) | length > 0
+      or scenario_aap_templates_workflow_node_definition.failure_nodes | default([]) | length > 0
+      or scenario_aap_templates_workflow_node_definition.always_nodes | default([]) | length > 0
+
+- name: Link workflow node {{ scenario_aap_templates_workflow_node_definition.identifier }}
+  ansible.builtin.uri:
+    url: "{{ scenario_aap_templates_api_base }}/workflow_job_template_nodes/{{ scenario_aap_templates_workflow_node_result.json.id }}/"
+    method: PATCH
+    user: "{{ scenario_aap_templates_aap_username }}"
+    password: "{{ scenario_aap_templates_aap_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ scenario_aap_templates_aap_verify_ssl }}"
+    status_code: [200]
+    body_format: json
+    body:
+      success_nodes: "{{ scenario_aap_templates_workflow_node_success_ids | default([]) }}"
+      failure_nodes: "{{ scenario_aap_templates_workflow_node_failure_ids | default([]) }}"
+      always_nodes: "{{ scenario_aap_templates_workflow_node_always_ids | default([]) }}"
+  when:
+    - scenario_aap_templates_workflow_node_definition.success_nodes | default([]) | length > 0
+      or scenario_aap_templates_workflow_node_definition.failure_nodes | default([]) | length > 0
+      or scenario_aap_templates_workflow_node_definition.always_nodes | default([]) | length > 0
+  no_log: true

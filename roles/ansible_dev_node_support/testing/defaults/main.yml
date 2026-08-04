@@ -1,0 +1,7 @@
+---
+# Testing role defaults
+
+test_categories: ["connectivity", "services", "api"]
+test_verbose: false
+test_generate_report: true
+test_report_dir: "/tmp/rhis-tests"

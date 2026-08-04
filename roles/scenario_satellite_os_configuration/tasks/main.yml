@@ -1,0 +1,219 @@
+---
+# Configure Satellite Operating Systems, Install Media, and Kickstart Repository
+- name: Validate Satellite OS Configuration
+  when: scenario_satellite_os_configuration_satellite_os_config_enabled
+  tags: ["satellite_os", "validation"]
+  block:
+    - name: Check Satellite connectivity
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_os_configuration_satellite_url }}/api/v2/ping/"
+        method: GET
+        user: "{{ scenario_satellite_os_configuration_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_os_configuration_satellite_validate_ssl }}"
+      register: scenario_satellite_os_configuration_ping
+      failed_when: scenario_satellite_os_configuration_ping.status not in [200, 401]
+
+    - name: Authenticate with Satellite
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_os_configuration_satellite_url }}/api/v2/users/"
+        method: GET
+        user: "{{ scenario_satellite_os_configuration_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_os_configuration_satellite_validate_ssl }}"
+      register: scenario_satellite_os_configuration_auth
+
+- name: Configure Operating Systems
+  when: scenario_satellite_os_configuration_satellite_os_config_enabled
+  tags: ["satellite_os", "scenario_satellite_os_configuration_operatingsystems"]
+  block:
+    - name: Create Operating Systems in Satellite
+      when: scenario_satellite_os_configuration_create_operatingsystems
+      tags: []
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_os_configuration_satellite_url }}/api/v2/scenario_satellite_os_configuration_operatingsystems/"
+        method: POST
+        user: "{{ scenario_satellite_os_configuration_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_os_configuration_satellite_validate_ssl }}"
+        body_format: json
+        body:
+          operatingsystem:
+            name: "{{ item.name }}"
+            major: "{{ item.major }}"
+            minor: "{{ item.minor | default(0) }}"
+            family: "{{ item.family | default('Redhat') }}"
+            password_hash: "{{ item.password_hash | default('SHA512') }}"
+      register: scenario_satellite_os_configuration_os_results
+      loop: "{{ scenario_satellite_os_configuration_operatingsystems }}"
+      ignore_errors: true
+
+    - name: Display Operating Systems Created
+      when: scenario_satellite_os_configuration_create_operatingsystems
+      tags: []
+      ansible.builtin.debug:
+        msg: |
+          Operating Systems configured:
+          {% for item in scenario_satellite_os_configuration_operatingsystems %}
+          - {{ item.name }} ({{ item.major }}.{{ item.minor | default('0') }})
+          {% endfor %}
+
+- name: Configure Install Media
+  when: scenario_satellite_os_configuration_satellite_os_config_enabled
+  tags: ["satellite_os", "scenario_satellite_os_configuration_install_media"]
+  block:
+    - name: Create Install Media in Satellite
+      when: scenario_satellite_os_configuration_create_install_media
+      loop: "{{ scenario_satellite_os_configuration_install_media }}"
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_os_configuration_satellite_url }}/api/v2/media/"
+        method: POST
+        user: "{{ scenario_satellite_os_configuration_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_os_configuration_satellite_validate_ssl }}"
+        body_format: json
+        body:
+          medium:
+            name: "{{ item.name }}"
+            os_family: "Redhat"
+            path: "{{ item.path }}"
+      register: scenario_satellite_os_configuration_media_results
+      ignore_errors: true
+
+    - name: Display Install Media Created
+      ansible.builtin.debug:
+        msg: |
+          Install Media configured:
+          {% for item in scenario_satellite_os_configuration_install_media %}
+          - {{ item.name }}
+            Path: {{ item.path }}
+            Media Type: {{ item.media_type }}
+          {% endfor %}
+      when: scenario_satellite_os_configuration_create_install_media
+
+- name: Configure Kickstart Repository
+  when: scenario_satellite_os_configuration_satellite_os_config_enabled
+  tags: ["satellite_os", "scenario_satellite_os_configuration_kickstart_repository"]
+  block:
+    - name: Create Kickstart Repository Product
+      when: scenario_satellite_os_configuration_create_kickstart_repo
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_os_configuration_satellite_url }}/api/v2/products/"
+        method: POST
+        user: "{{ scenario_satellite_os_configuration_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_os_configuration_satellite_validate_ssl }}"
+        body_format: json
+        body:
+          product:
+            name: "{{ scenario_satellite_os_configuration_kickstart_repository.product }}"
+            organization_id: 1
+      register: scenario_satellite_os_configuration_product_result
+      ignore_errors: true
+
+    - name: Create Kickstart Files Repository
+      when: scenario_satellite_os_configuration_create_kickstart_repo
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_os_configuration_satellite_url }}/api/v2/repositories/"
+        method: POST
+        user: "{{ scenario_satellite_os_configuration_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_os_configuration_satellite_validate_ssl }}"
+        body_format: json
+        body:
+          repository:
+            name: "{{ scenario_satellite_os_configuration_kickstart_repository.name }}"
+            product_id: "{{ scenario_satellite_os_configuration_product_result.json.id | default(1) }}"
+            content_type: "file"
+            url: "{{ scenario_satellite_os_configuration_kickstart_repository.url }}"
+            download_policy: "{{ scenario_satellite_os_configuration_kickstart_repository.download_policy | default('immediate') }}"
+      register: scenario_satellite_os_configuration_kickstart_repo_result
+      ignore_errors: true
+
+    - name: Display Kickstart Repository Created
+      when: scenario_satellite_os_configuration_create_kickstart_repo
+      ansible.builtin.debug:
+        msg: |
+          Kickstart Repository configured:
+
+          Name: {{ scenario_satellite_os_configuration_kickstart_repository.name }}
+          Product: {{ scenario_satellite_os_configuration_kickstart_repository.product }}
+          Content Type: {{ scenario_satellite_os_configuration_kickstart_repository.content_type }}
+          URL: {{ scenario_satellite_os_configuration_kickstart_repository.url }}
+          Download Policy: {{ scenario_satellite_os_configuration_kickstart_repository.download_policy | default('immediate') }}
+
+- name: Configure Sync Jobs
+  when: scenario_satellite_os_configuration_satellite_os_config_enabled
+  tags: ["satellite_os", "scenario_satellite_os_configuration_sync_jobs"]
+  block:
+    - name: Create Weekly Sync Job for Kickstart Repository
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_os_configuration_satellite_url }}/api/v2/sync_plans/"
+        method: POST
+        user: "{{ scenario_satellite_os_configuration_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_os_configuration_satellite_validate_ssl }}"
+        body_format: json
+        body:
+          sync_plan:
+            name: "{{ item.name }}"
+            description: "Weekly synchronization of {{ item.repository }}"
+            sync_date: "{{ item.sync_date }}"
+            interval: "{{ item.interval }}"
+            enabled: "{{ item.enabled | default(true) }}"
+            organization_id: 1
+      register: scenario_satellite_os_configuration_sync_plan_results
+      loop: "{{ scenario_satellite_os_configuration_sync_jobs }}"
+      when: scenario_satellite_os_configuration_configure_sync_job
+      ignore_errors: true
+
+    - name: Display Sync Jobs Created
+      ansible.builtin.debug:
+        msg: |
+          Sync Jobs configured:
+          {% for item in scenario_satellite_os_configuration_sync_jobs %}
+          - {{ item.name }}
+            Repository: {{ item.repository }}
+            Interval: {{ item.interval }}
+            Sync Time: {{ item.sync_date }}
+            Enabled: {{ item.enabled | default(true) }}
+          {% endfor %}
+      when: scenario_satellite_os_configuration_configure_sync_job
+
+- name: Test OS Configuration
+  when: scenario_satellite_os_configuration_satellite_os_config_enabled
+  tags: ["satellite_os", "test"]
+  block:
+    - name: Verify Operating Systems Configured
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_os_configuration_satellite_url }}/api/v2/scenario_satellite_os_configuration_operatingsystems/"
+        method: GET
+        user: "{{ scenario_satellite_os_configuration_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_os_configuration_satellite_validate_ssl }}"
+      register: scenario_satellite_os_configuration_os_list
+
+    - name: Verify Install Media Configured
+      ansible.builtin.uri:
+        url: "{{ scenario_satellite_os_configuration_satellite_url }}/api/v2/media/"
+        method: GET
+        user: "{{ scenario_satellite_os_configuration_satellite_username }}"
+        password: "{{ satellite_password }}"
+        validate_certs: "{{ scenario_satellite_os_configuration_satellite_validate_ssl }}"
+      register: scenario_satellite_os_configuration_media_list
+
+    - name: Display Configuration Summary
+      ansible.builtin.debug:
+        msg: |
+          Satellite OS Configuration Summary:
+
+          Operating Systems: {{ os_list.json.total | default(0) }}
+          Install Media: {{ media_list.json.total | default(0) }}
+
+          Configurations Applied:
+          - Operating Systems: {{ 'Configured' if scenario_satellite_os_configuration_create_operatingsystems else 'Skipped' }}
+          - Install Media: {{ 'Configured' if scenario_satellite_os_configuration_create_install_media else 'Skipped' }}
+          - Kickstart Repository: {{ 'Configured' if scenario_satellite_os_configuration_create_kickstart_repo else 'Skipped' }}
+          - Sync Jobs: {{ 'Configured' if scenario_satellite_os_configuration_configure_sync_job else 'Skipped' }}
+
+          Status:  Ready for platform_provisioning template assignment
